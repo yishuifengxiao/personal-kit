@@ -1,0 +1,9 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://admin:123456@10.8.80.241/personkit
+  mongodb:
+    embedded:
+      storage:
+        database-dir: ./mongo
+      version: 3.5.5

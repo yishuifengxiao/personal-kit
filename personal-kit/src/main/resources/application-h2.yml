@@ -1,0 +1,30 @@
+spring:
+  jpa:
+    show-sql: true
+    open-in-view: true
+    hibernate:
+      ddl-auto: update
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    database: h2
+    database-platform: org.hibernate.dialect.H2Dialect
+  properties:
+    hibernate:
+      default_schema: demo_y
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: default
+  datasource:
+    driver-class-name: org.h2.Driver
+    password: "123456"
+    url: jdbc:h2:file:./sql/test
+    username: root
+  h2:
+    console:
+      enabled: true
+      path: /h2console
+      settings:
+        trace: true
+        web-allow-others: true
