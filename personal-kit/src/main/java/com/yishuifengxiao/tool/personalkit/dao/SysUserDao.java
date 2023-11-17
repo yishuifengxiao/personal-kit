@@ -44,7 +44,7 @@ public class SysUserDao {
     }
 
     public List<SysRole> findAllRoleByUserId(String userId) {
-        String sql = String.format("SELECT r.* from sys_relation_user_role ur ,sys_role r where r.id=ur.role_id and ur.user_id=%s", userId);
+        String sql = String.format("SELECT r.* from sys_relation_user_role ur ,sys_role r where r.id=ur.role_id and r.stat=1 and ur.user_id=%s", userId);
         return jdbcHelper.query(SysRole.class, sql).orElse(Collections.EMPTY_LIST);
 
     }

@@ -6,15 +6,16 @@ import com.yishuifengxiao.common.tool.collections.MapUtil;
 import com.yishuifengxiao.common.tool.entity.Response;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
+import com.yishuifengxiao.tool.personalkit.domain.vo.LoginVo;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,7 +53,7 @@ public class IndexController {
     @ApiOperation("获取当前用户的token列表")
     @GetMapping("/tokens")
     @ResponseBody
-    public Response<List<SecurityToken>> tokens(Authentication authentication) {
+    public Response<List<SecurityToken>> tokens(@ApiIgnore Authentication authentication) {
         List<SecurityToken> tokens = tokenHolder.getAll(authentication.getName());
 
         tokens.stream().map(token -> {
@@ -98,7 +99,7 @@ public class IndexController {
     @ApiOperation("登录接口")
     @PostMapping("/login")
     @org.springframework.web.bind.annotation.ResponseBody
-    public Response login(HttpServletRequest request, @Valid @RequestBody LoginQuery query, BindingResult error) throws CustomException {
+    public Response<LoginVo> login(HttpServletRequest request, @Valid @RequestBody LoginQuery query, BindingResult error) throws CustomException {
 
         return Response.suc(userService.login(request, query));
     }

@@ -5,6 +5,7 @@ import com.yishuifengxiao.tool.personalkit.domain.query.IdRequest;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -27,6 +28,7 @@ public class UserController {
 
     private final UserService userService;
 
+    @ApiOperation("用户基本信息")
     @GetMapping("/info/{id}")
     public UserInfo info(@PathVariable String id) {
         return userService.userInfo(id);

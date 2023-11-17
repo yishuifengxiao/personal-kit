@@ -56,12 +56,12 @@ public class UserService {
 
         List<SysRole> roles = sysUserDao.findAllRoleByUserId(sysUser.getId());
         //判断权限
-        boolean anyMatch = roles.stream().anyMatch(v -> Objects.equals(v.getEmbedded(), BooleanUtils.isNotTrue(query.getType()) ? BoolStat.False.code() : BoolStat.True.code()));
-        Assert.isTrue("暂无此权限", anyMatch);
+        Assert.isNotEmpty("暂无此权限", roles);
         //获取token
         SecurityToken token = TokenUtil.createUnsafe(request, query.getUsername().trim());
 
-        return new LoginVo(sysUser.getId(), sysUser.getUsername(), sysUser.getNickname(), token.getValue(), roles.stream().map(SysRole::getName).collect(Collectors.toList()));
+        return new LoginVo(sysUser.getId(), sysUser.getUsername(), sysUser.getNickname(), token.getValue(), roles.stream()
+                .map(v -> new LoginVo.Role(v.getId(), v.getName(), v.getDescription(), v.getHomeUrl())).collect(Collectors.toList()));
 
     }
 
@@ -69,6 +69,6 @@ public class UserService {
         SysUser sysUser = sysUserRepository.findById(id).orElseThrow(() -> UncheckedException.of("记录不存在"));
         UserInfo userInfo = BeanUtil.copy(sysUser, new UserInfo());
         String sql = String.format("SELECT r.* from sys_relation_user_role ur,sys_role r where ur.role_id=r.id and ur.user_id='%s'", id);
-        return userInfo.setRoles(JdbcUtil.jdbc().query(SysRole.class, sql).orElse(Collections.EMPTY_LIST));
+        return userInfo.setRoles(JdbcUtil.jdbcHelper().query(SysRole.class, sql).orElse(Collections.EMPTY_LIST));
     }
 }

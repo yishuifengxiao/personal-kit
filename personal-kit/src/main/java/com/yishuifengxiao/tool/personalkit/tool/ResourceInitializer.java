@@ -8,6 +8,7 @@ import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.tool.personalkit.dao.repository.*;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.*;
+import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,15 +29,17 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.DEFAULT_HOME_URL;
+
 /**
  * @author yishui
  * @version 1.0.0
  * @date 2023/11/7-19:37
  * @since 1.0.0
  */
-@Component
+@Component("resourceInitializer")
 public class ResourceInitializer implements CommandLineRunner {
-
+    private boolean hasInit = false;
     private final static List<String> sets = Arrays.asList("springfox.documentation", "org.springframework");
 
 
@@ -131,24 +134,36 @@ public class ResourceInitializer implements CommandLineRunner {
         return null;
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-
+    public void doInit() {
+        if (this.hasInit) {
+            return;
+        }
+        Long userNum = JdbcUtil.jdbcHelper().countAll(new SysUser().setUsername(Constant.DEFAULT_USER));
+        if (null != userNum && userNum > 0) {
+            return;
+        }
         //初始化权限
         List<SysPermission> permissions = this.scanSysPermissions();
-        permissions.stream().forEach(JdbcUtil.jdbc()::saveOrUpdate);
+        permissions.stream().forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
         //初始化角色
-        SysRole sysRole = JdbcUtil.jdbc().saveOrUpdate(new SysRole(Constant.DEFAULT_ROOT_ID, "系统角色", "系统初始化数据", Constant.DEFAULT_ROOT_ID, BoolStat.True.code()));
+        SysRole sysRole = JdbcUtil.jdbcHelper().saveOrUpdate(new SysRole(Constant.DEFAULT_ROOT_ID, "系统角色", "系统初始化数据,内置超级管理员，具有系统全部权限", Constant.DEFAULT_ROOT_ID, DEFAULT_HOME_URL, RoleStat.ROLE_ENABLE.getCode(), BoolStat.True.code()));
         // 初始化用户
-        SysUser sysUser = JdbcUtil.jdbc().saveOrUpdate(new SysUser().setUsername(Constant.DEFAULT_USER).setPwd(passwordEncoder.encode(Constant.DEFAULT_PWD)).setId(Constant.DEFAULT_ROOT_ID).setEmbedded(BoolStat.True.code())
+        SysUser sysUser = JdbcUtil.jdbcHelper().saveOrUpdate(new SysUser().setUsername(Constant.DEFAULT_USER).setPwd(passwordEncoder.encode(Constant.DEFAULT_PWD)).setId(Constant.DEFAULT_ROOT_ID).setEmbedded(BoolStat.True.code())
                 //
                 .setVer(Constant.ACTIVE_DATA_VER).setStat(UserStat.ACCOUNT_ENABLE.getCode()).setCreateTime(LocalDateTime.now()).setLastUpdateTime(LocalDateTime.now()).setNickname("系统超级管理员"));
 
         // 初始化 角色-权限 关联
-        permissions.stream().map(v -> new SysRelationRolePermission(Md5.md5Short(sysRole.getId() + v.getId()), sysRole.getId(), v.getId())).forEach(JdbcUtil.jdbc()::saveOrUpdate);
+        permissions.stream().map(v -> new SysRelationRolePermission(Md5.md5Short(sysRole.getId() + v.getId()), sysRole.getId(), v.getId())).forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
 
         //初始化
         SysRelationUserRole userRole = new SysRelationUserRole(Md5.md5Short(sysUser.getId() + sysRole.getId()), sysUser.getId(), sysRole.getId());
-        JdbcUtil.jdbc().saveOrUpdate(userRole);
+        JdbcUtil.jdbcHelper().saveOrUpdate(userRole);
+        this.hasInit = true;
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        this.doInit();
+
     }
 }

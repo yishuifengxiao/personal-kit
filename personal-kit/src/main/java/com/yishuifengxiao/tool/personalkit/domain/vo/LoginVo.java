@@ -28,7 +28,21 @@ public class LoginVo implements Serializable {
 
     private String token;
 
-    private List<String> roles;
+    private List<Role> roles;
 
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Accessors(chain = true)
+    public static class Role implements Serializable {
+        private String id;
+        private String name;
+
+
+        private String description;
+
+        private String homeUrl;
+    }
 
 }

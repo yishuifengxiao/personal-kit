@@ -25,5 +25,4 @@ public class LoginQuery implements Serializable {
     private String password;
 
 
-    private Boolean type;
 }

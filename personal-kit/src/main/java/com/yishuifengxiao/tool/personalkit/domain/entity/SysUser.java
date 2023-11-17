@@ -89,6 +89,7 @@ public class SysUser implements Serializable {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createTime;
 
+
     @Column(length = 11, nullable = false, columnDefinition = "int(11) default 0")
     @JsonIgnore
     private Integer ver;

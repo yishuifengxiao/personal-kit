@@ -1,5 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.domain.entity;
 
+import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,6 +40,16 @@ public class SysRole implements Serializable {
 
     @Column(name = "parent_id", length = 64, nullable = false)
     private String parentId;
+
+    @Column(name = "home_url")
+    private String homeUrl;
+
+    /**
+     * @see RoleStat
+     */
+    @Column(name = "stat", length = 1, columnDefinition = "tinyint(1) default 1")
+    private Integer stat;
+
 
     @Column(name = "is_embedded", length = 1, columnDefinition = "tinyint(1) default 0")
     private Integer embedded;

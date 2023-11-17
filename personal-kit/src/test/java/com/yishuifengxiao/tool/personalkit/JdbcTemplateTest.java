@@ -32,5 +32,18 @@ public class JdbcTemplateTest {
     public void test1() {
         List list = jdbcTemplate.query("select * from sys_role;", new ColumnNameRowMapper(SysRole.class));
         list.stream().map(JsonUtil::toJSONString).forEach(System.out::println);
+
+    }
+
+    @Test
+    public void queryForListTest() {
+        List<String> list = jdbcTemplate.queryForList("select sp.url from sys_permission sp ;", String.class);
+        System.out.println(JsonUtil.toJSONString(list));
+    }
+
+    @Test
+    public void queryForListTest1() {
+        List<String> list = jdbcTemplate.query("select sp.url from sys_permission sp ;", new BeanPropertyRowMapper(String.class));
+        System.out.println(JsonUtil.toJSONString(list));
     }
 }

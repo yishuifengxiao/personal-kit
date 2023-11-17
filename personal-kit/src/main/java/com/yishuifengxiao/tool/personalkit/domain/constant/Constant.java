@@ -29,4 +29,9 @@ public final class Constant {
      * 默认的id生成器
      */
     public final static String GENERIC_GENERATOR = "com.yishuifengxiao.tool.personalkit.utils.CustomIdGenerator";
+
+    /**
+     * 默认的首页路径
+     */
+    public final static String DEFAULT_HOME_URL = "/";
 }
