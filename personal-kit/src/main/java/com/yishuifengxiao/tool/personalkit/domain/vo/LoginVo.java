@@ -1,5 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.yishuifengxiao.common.security.token.SecurityToken;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +29,9 @@ public class LoginVo implements Serializable {
     private String nickName;
 
     private String token;
+
+    @JsonIgnore
+    private transient SecurityToken securityToken;
 
     private List<Role> roles;
 

@@ -4,10 +4,8 @@ import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.TokenUtil;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
-import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
-import com.yishuifengxiao.common.tool.lang.BoolUtil;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.dao.repository.SysUserRepository;
@@ -18,16 +16,12 @@ import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.vo.LoginVo;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.BooleanUtils;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -60,8 +54,10 @@ public class UserService {
         //获取token
         SecurityToken token = TokenUtil.createUnsafe(request, query.getUsername().trim());
 
-        return new LoginVo(sysUser.getId(), sysUser.getUsername(), sysUser.getNickname(), token.getValue(), roles.stream()
-                .map(v -> new LoginVo.Role(v.getId(), v.getName(), v.getDescription(), v.getHomeUrl())).collect(Collectors.toList()));
+
+        return new LoginVo(sysUser.getId(), sysUser.getUsername(), sysUser.getNickname(), token.getValue(), token,
+                roles.stream()
+                        .map(v -> new LoginVo.Role(v.getId(), v.getName(), v.getDescription(), v.getHomeUrl())).collect(Collectors.toList()));
 
     }
 

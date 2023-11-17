@@ -1,7 +1,11 @@
 package com.yishuifengxiao.tool.personalkit.web;
 
+import com.yishuifengxiao.common.security.support.PropertyResource;
+import com.yishuifengxiao.common.security.support.SecurityEvent;
+import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.holder.TokenHolder;
+import com.yishuifengxiao.common.support.SpringContext;
 import com.yishuifengxiao.common.tool.collections.MapUtil;
 import com.yishuifengxiao.common.tool.entity.Response;
 import com.yishuifengxiao.common.tool.exception.CustomException;
@@ -21,10 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -76,7 +77,7 @@ public class IndexController {
     @ApiOperation(value = "index", notes = "index")
     @RequestMapping("/index")
     @ResponseBody
-    public Response<Object> index(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+    public Response<Object> index(HttpServletRequest request, HttpServletResponse response, @ApiIgnore Authentication authentication) {
 
         StringBuffer requestURL = request.getRequestURL();
         String requestURI = request.getRequestURI();
@@ -91,17 +92,32 @@ public class IndexController {
             headerMap.put(element, header);
         }
 
-        Map map = MapUtil.map().put("requestURL", requestURL).put("requestURI", requestURI).put("contextPath", contextPath)
-                .put("servletPath", servletPath).put("parameterMap", parameterMap).put("headerMap", headerMap).build();
+        Map map = MapUtil.map().put("requestURL", requestURL).put("requestURI", requestURI).put("contextPath", contextPath).put("servletPath", servletPath).put("parameterMap", parameterMap).put("headerMap", headerMap).build();
         return Response.sucData(map);
     }
+
+    @Autowired
+    private PropertyResource propertyResource;
 
     @ApiOperation("登录接口")
     @PostMapping("/login")
     @org.springframework.web.bind.annotation.ResponseBody
-    public Response<LoginVo> login(HttpServletRequest request, @Valid @RequestBody LoginQuery query, BindingResult error) throws CustomException {
+    public Response<LoginVo> login(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody LoginQuery query, BindingResult error) throws CustomException {
 
-        return Response.suc(userService.login(request, query));
+        try {
+            LoginVo loginVo = userService.login(request, query);
+            SpringContext.publishEvent(new SecurityEvent(this, request, response, propertyResource, Strategy.AUTHENTICATION_SUCCESS, loginVo.getSecurityToken(), null));
+            return Response.suc(loginVo);
+        } catch (Exception e) {
+            SpringContext.publishEvent(new SecurityEvent(this, request, response, propertyResource,
+                    Strategy.AUTHENTICATION_SUCCESS, new SecurityToken(Collections.EMPTY_LIST) {
+                @Override
+                public String getName() {
+                    return query.getUsername();
+                }
+            }, e));
+            throw e;
+        }
     }
 
 
