@@ -1,5 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -50,7 +51,7 @@ public class SysRole implements Serializable {
     @Column(name = "stat", length = 1, columnDefinition = "tinyint(1) default 1")
     private Integer stat;
 
-
+    @JsonIgnore
     @Column(name = "is_embedded", length = 1, columnDefinition = "tinyint(1) default 0")
     private Integer embedded;
 }

@@ -1,5 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -45,6 +46,7 @@ public class SysPermission implements Serializable {
     private String applicationName;
 
 
+    @JsonIgnore
     @Column(name = "is_embedded", length = 1, columnDefinition = "tinyint(1) default 0")
     private Integer embedded;
 }
