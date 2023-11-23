@@ -1,6 +1,11 @@
 package com.yishuifengxiao.tool.personalkit.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +15,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.GENERIC_GENERATOR;
 
@@ -54,4 +60,11 @@ public class SysRole implements Serializable {
     @JsonIgnore
     @Column(name = "is_embedded", length = 1, columnDefinition = "tinyint(1) default 0")
     private Integer embedded;
+
+    @Column(name = "create_time", nullable = false, updatable = false)
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime createTime;
+
 }

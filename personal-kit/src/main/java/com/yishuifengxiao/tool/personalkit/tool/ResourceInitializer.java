@@ -5,7 +5,6 @@ import com.yishuifengxiao.common.tool.collections.DataUtil;
 import com.yishuifengxiao.common.tool.encoder.Md5;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.common.tool.random.IdWorker;
-import com.yishuifengxiao.tool.personalkit.dao.repository.*;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.*;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
@@ -18,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
@@ -146,7 +144,9 @@ public class ResourceInitializer implements CommandLineRunner {
         List<SysPermission> permissions = this.scanSysPermissions();
         permissions.stream().forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
         //初始化角色
-        SysRole sysRole = JdbcUtil.jdbcHelper().saveOrUpdate(new SysRole(Constant.DEFAULT_ROOT_ID, "系统角色", "系统初始化数据,内置超级管理员，具有系统全部权限", Constant.DEFAULT_ROOT_ID, DEFAULT_HOME_URL, RoleStat.ROLE_ENABLE.getCode(), BoolStat.True.code()));
+        SysRole sysRole = JdbcUtil.jdbcHelper().saveOrUpdate(new SysRole(Constant.DEFAULT_ROOT_ID, "系统角色", "系统初始化数据," +
+                "内置超级管理员，具有系统全部权限", Constant.DEFAULT_ROOT_ID, DEFAULT_HOME_URL, RoleStat.ROLE_ENABLE.getCode(),
+                BoolStat.True.code(), LocalDateTime.now()));
         // 初始化用户
         SysUser sysUser = JdbcUtil.jdbcHelper().saveOrUpdate(new SysUser().setUsername(Constant.DEFAULT_USER).setPwd(passwordEncoder.encode(Constant.DEFAULT_PWD)).setId(Constant.DEFAULT_ROOT_ID).setEmbedded(BoolStat.True.code())
                 //
