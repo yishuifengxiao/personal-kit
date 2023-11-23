@@ -7,7 +7,6 @@ import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.holder.TokenHolder;
 import com.yishuifengxiao.common.support.SpringContext;
 import com.yishuifengxiao.common.tool.collections.MapUtil;
-import com.yishuifengxiao.common.tool.entity.Response;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.vo.LoginVo;
@@ -46,15 +45,15 @@ public class IndexController {
     @ApiOperation(value = "当前用户信息-接口总结", notes = "当前用户信息-接口描述")
     @GetMapping("/currentUser")
     @ResponseBody
-    public Response<Authentication> user(Authentication authentication) {
-        return Response.suc(authentication);
+    public Authentication user(@ApiIgnore  Authentication authentication) {
+        return authentication;
     }
 
 
     @ApiOperation("获取当前用户的token列表")
     @GetMapping("/tokens")
     @ResponseBody
-    public Response<List<SecurityToken>> tokens(@ApiIgnore Authentication authentication) {
+    public List<SecurityToken> tokens(@ApiIgnore Authentication authentication) {
         List<SecurityToken> tokens = tokenHolder.getAll(authentication.getName());
 
         tokens.stream().map(token -> {
@@ -71,13 +70,13 @@ public class IndexController {
         }).collect(Collectors.toList());
 
 
-        return Response.sucData(tokens);
+        return tokens;
     }
 
     @ApiOperation(value = "index", notes = "index")
-    @RequestMapping("/index")
+    @RequestMapping(value = "/index",method = RequestMethod.GET)
     @ResponseBody
-    public Response<Object> index(HttpServletRequest request, HttpServletResponse response, @ApiIgnore Authentication authentication) {
+    public Object index(HttpServletRequest request, HttpServletResponse response, @ApiIgnore Authentication authentication) {
 
         StringBuffer requestURL = request.getRequestURL();
         String requestURI = request.getRequestURI();
@@ -93,7 +92,7 @@ public class IndexController {
         }
 
         Map map = MapUtil.map().put("requestURL", requestURL).put("requestURI", requestURI).put("contextPath", contextPath).put("servletPath", servletPath).put("parameterMap", parameterMap).put("headerMap", headerMap).build();
-        return Response.sucData(map);
+        return map;
     }
 
     @Autowired
@@ -102,12 +101,13 @@ public class IndexController {
     @ApiOperation("登录接口")
     @PostMapping("/login")
     @org.springframework.web.bind.annotation.ResponseBody
-    public Response<LoginVo> login(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody LoginQuery query, BindingResult error) throws CustomException {
+    public LoginVo login(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody LoginQuery query, BindingResult error) throws CustomException {
 
         try {
-            LoginVo loginVo = userService.login(request, query);
+            LoginVo loginVo = userService.login(request,response, query);
             SpringContext.publishEvent(new SecurityEvent(this, request, response, propertyResource, Strategy.AUTHENTICATION_SUCCESS, loginVo.getSecurityToken(), null));
-            return Response.suc(loginVo);
+
+            return loginVo;
         } catch (Exception e) {
             SpringContext.publishEvent(new SecurityEvent(this, request, response, propertyResource,
                     Strategy.AUTHENTICATION_SUCCESS, new SecurityToken(Collections.EMPTY_LIST) {

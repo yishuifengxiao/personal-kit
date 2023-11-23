@@ -29,3 +29,7 @@ spring:
       on-profile:
         - security
         - nosql
+
+yishuifengxiao:
+  web:
+    unified-response-format: true

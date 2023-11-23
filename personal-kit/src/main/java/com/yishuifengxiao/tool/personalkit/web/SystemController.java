@@ -1,9 +1,11 @@
 package com.yishuifengxiao.tool.personalkit.web;
 
+import com.yishuifengxiao.common.tool.entity.BaseQuery;
 import com.yishuifengxiao.common.tool.entity.Page;
-import com.yishuifengxiao.common.tool.entity.Response;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
-import com.yishuifengxiao.tool.personalkit.domain.query.PageQuery;
+import com.yishuifengxiao.tool.personalkit.domain.query.RoleQuery;
+import com.yishuifengxiao.tool.personalkit.domain.vo.PermissionVo;
+import com.yishuifengxiao.tool.personalkit.domain.vo.RoleVo;
 import com.yishuifengxiao.tool.personalkit.service.SysService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,13 +30,22 @@ public class SystemController {
     private final SysService sysService;
 
     @ApiOperation(value = "分页查询资源")
-    @PostMapping("/findPagePermission")
+    @PostMapping("/permission/page")
     @ResponseBody
-    public Response<Page<SysPermission>> findPagePermission(@RequestBody PageQuery<SysPermission> pageQuery) {
-        Page<SysPermission> page = sysService.findPagePermission(pageQuery);
+    public Page<PermissionVo> findPagePermission(@RequestBody BaseQuery<SysPermission> pageQuery) {
+        Page<PermissionVo> page = sysService.findPagePermission(pageQuery);
 
-        return Response.sucData(page);
+        return page;
 
+    }
+
+    @ApiOperation(value = "分页查询角色")
+    @PostMapping("/role/page")
+    @ResponseBody
+    public Page<RoleVo> findPageRole(@RequestBody BaseQuery<RoleQuery> pageQuery) {
+        Page<RoleVo> page = sysService.findPageRole(pageQuery);
+
+        return page;
 
     }
 }

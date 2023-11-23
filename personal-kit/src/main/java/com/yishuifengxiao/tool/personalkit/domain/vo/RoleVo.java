@@ -1,0 +1,20 @@
+package com.yishuifengxiao.tool.personalkit.domain.vo;
+
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.List;
+
+/**
+ * @author yishui
+ * @version 1.0.0
+ * @date 2023/11/20 16:25
+ * @since 1.0.0
+ */
+@Data
+public class RoleVo extends SysRole implements Serializable {
+
+    private List<SysPermission> permissions;
+}

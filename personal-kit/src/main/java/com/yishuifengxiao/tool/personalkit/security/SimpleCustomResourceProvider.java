@@ -42,7 +42,7 @@ public class SimpleCustomResourceProvider implements CustomResourceProvider {
         String uri = request.getRequestURI().toLowerCase();
         String uriWithoutContextPath = StringUtils.substringAfter(uri, propertyResource.contextPath());
 
-        String sql = "SELECT sp.* FROM sys_user su JOIN sys_relation_user_role sur ON su.id = sur.user_id JOIN sys_role sr ON sur.role_id = sr.id AND sr.stat = 1" + " JOIN sys_relation_role_permission srp ON sr.id = srp.role_id JOIN sys_permission sp ON srp.permission_id = sp.id " + "WHERE su.username = '%s' AND su.ver = 0";
+        String sql = "SELECT  DISTINCT sp.* FROM sys_user su JOIN sys_relation_user_role sur ON su.id = sur.user_id " + "JOIN " + "sys_role sr ON sur.role_id = sr.id AND sr.stat = 1" + " JOIN sys_relation_role_permission srp ON sr.id = srp.role_id JOIN sys_permission sp ON srp.permission_id = sp.id " + "WHERE su.username = '%s' AND su.ver = 0";
         sql = String.format(sql, authentication.getName());
 
         List<SysPermission> list = JdbcUtil.jdbcHelper().query(SysPermission.class, sql).orElse(Collections.EMPTY_LIST);

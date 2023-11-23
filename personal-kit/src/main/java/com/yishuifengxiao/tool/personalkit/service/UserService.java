@@ -1,11 +1,14 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
+import com.yishuifengxiao.common.security.constant.TokenConstant;
+import com.yishuifengxiao.common.security.support.PropertyResource;
 import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.TokenUtil;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
+import com.yishuifengxiao.common.tool.http.CookieUtil;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.dao.repository.SysUserRepository;
@@ -16,10 +19,12 @@ import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.vo.LoginVo;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,7 +44,9 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public LoginVo login(HttpServletRequest request, LoginQuery query) throws CustomException {
+    private final PropertyResource propertyResource;
+
+    public LoginVo login(HttpServletRequest request, HttpServletResponse response, LoginQuery query) throws CustomException {
 
         SysUser sysUser = sysUserDao.findActiveSysUser(query.getUsername().trim()).orElseThrow(() -> new UncheckedException(String.format("用户名%s不存在", query.getUsername())));
         Assert.isTrue("账号已过期", UserStat.ACCOUNT_EXPIRED.getCode() != sysUser.getStat());
@@ -53,6 +60,12 @@ public class UserService {
         Assert.isNotEmpty("暂无此权限", roles);
         //获取token
         SecurityToken token = TokenUtil.createUnsafe(request, query.getUsername().trim());
+
+        String requestParameter = propertyResource.security().getToken().getRequestParameter();
+        if (StringUtils.isBlank(requestParameter)) {
+            requestParameter = TokenConstant.TOKEN_REQUEST_PARAM;
+        }
+        request.getSession().setAttribute(requestParameter, token.getValue());
 
 
         return new LoginVo(sysUser.getId(), sysUser.getUsername(), sysUser.getNickname(), token.getValue(), token,
