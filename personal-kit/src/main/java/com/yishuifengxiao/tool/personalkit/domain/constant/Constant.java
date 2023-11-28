@@ -18,7 +18,12 @@ public final class Constant {
     /**
      * 默认的顶级树的ID
      */
-    public final static String DEFAULT_ROOT_ID = "0";
+    public final static String DEFAULT_ROOT_ID = "1";
+
+    /**
+     * 默认的顶级父级ID
+     */
+    public final static String DEFAULT_PARENT_ROOT_ID = "0";
 
     /**
      * 未被删除的数据的版本

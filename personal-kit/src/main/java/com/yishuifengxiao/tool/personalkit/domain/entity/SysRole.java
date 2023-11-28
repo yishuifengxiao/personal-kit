@@ -6,14 +6,18 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.yishuifengxiao.common.tool.validate.Group;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -25,6 +29,7 @@ import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.GENER
  * @date 2023/11/7-15:27
  * @since 1.0.0
  */
+@Validated
 @Table(name = "sys_role")
 @Entity(name = "sys_role")
 @Data
@@ -32,6 +37,8 @@ import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.GENER
 @NoArgsConstructor
 @Accessors(chain = true)
 public class SysRole implements Serializable {
+
+    @NotBlank(message = "待修改的记录主键不能为空", groups = {Group.Update.class})
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "system_uuid")
     @GenericGenerator(name = "system_uuid", strategy = GENERIC_GENERATOR)
@@ -39,15 +46,17 @@ public class SysRole implements Serializable {
     private String id;
 
 
+    @Size(max = 50, message = "角色名称最大50个字符", groups = {Group.Update.class, Group.Create.class})
     @Column(length = 50, unique = true)
     private String name;
 
-
+    @Size(max = 255, message = "角色描述最大255个字符", groups = {Group.Update.class, Group.Create.class})
     private String description;
 
     @Column(name = "parent_id", length = 64, nullable = false)
     private String parentId;
 
+    @Size(max = 255, message = "角色主页最大255个字符", groups = {Group.Update.class, Group.Create.class})
     @Column(name = "home_url")
     private String homeUrl;
 

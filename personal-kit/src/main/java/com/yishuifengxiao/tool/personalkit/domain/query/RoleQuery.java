@@ -14,6 +14,9 @@ import javax.persistence.Column;
 @Data
 public class RoleQuery extends SysRole {
 
+    @Column(name = "id")
+    private String permissionId;
+
     @Column(name = "name")
     private String permissionName;
 

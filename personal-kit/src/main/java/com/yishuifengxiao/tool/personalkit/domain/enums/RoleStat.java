@@ -1,6 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.domain.enums;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * @author yishui
@@ -37,7 +38,7 @@ public enum RoleStat {
         return code;
     }
 
-    public static RoleStat code(int code) {
-        return Arrays.stream(values()).filter(v -> v.code == code).findFirst().orElse(null);
+    public static Optional<RoleStat> code(int code) {
+        return Arrays.stream(values()).filter(v -> v.code == code).findFirst();
     }
 }

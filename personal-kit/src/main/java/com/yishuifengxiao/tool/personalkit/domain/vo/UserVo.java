@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.domain.vo;
 
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
 
@@ -10,15 +10,15 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * @author yishui
+ * @author qingteng
  * @version 1.0.0
- * @date 2023/11/20 16:25
+ * @date 2023/11/26 21:49
  * @since 1.0.0
  */
 @Data
 @Validated
-public class RoleVo extends SysRole implements Serializable {
+public class UserVo extends SysUser implements Serializable {
 
     @Valid
-    private List<SysPermission> permissions;
+    private List<SysRole> roles;
 }

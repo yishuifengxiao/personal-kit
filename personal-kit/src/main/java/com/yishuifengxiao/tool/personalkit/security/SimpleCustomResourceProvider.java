@@ -3,7 +3,7 @@ package com.yishuifengxiao.tool.personalkit.security;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.security.httpsecurity.authorize.custom.CustomResourceProvider;
 import com.yishuifengxiao.common.security.support.PropertyResource;
-import com.yishuifengxiao.common.tool.collections.CollectionUtil;
+import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.collections.DataUtil;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
 import com.yishuifengxiao.tool.personalkit.tool.ResourceInitializer;
@@ -60,7 +60,7 @@ public class SimpleCustomResourceProvider implements CustomResourceProvider {
         resourceInitializer.doInit();
         String sql = StringUtils.isBlank(propertyResource.contextPath()) ? "SELECT DISTINCT sp.url FROM sys_permission sp WHERE ISNULL(sp.context_path)" : String.format("SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='%s'", propertyResource.contextPath());
         List<String> list = JdbcUtil.jdbcTemplate().queryForList(sql, String.class);
-        if (CollectionUtil.isEmpty(list)) {
+        if (CollUtil.isEmpty(list)) {
             return null;
         }
         Set<String> definedUrls = propertyResource.definedUrls();
