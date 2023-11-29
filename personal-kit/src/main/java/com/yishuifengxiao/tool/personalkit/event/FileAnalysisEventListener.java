@@ -9,6 +9,7 @@ import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.tool.personalkit.domain.bo.FileAnalysisEvent;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
+import com.yishuifengxiao.tool.personalkit.domain.enums.SupportedSuffix;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadStat;
 import org.apache.commons.lang3.StringUtils;
@@ -56,6 +57,9 @@ public class FileAnalysisEventListener {
             //需要解析
             futures.add(CompletableFuture.runAsync(() -> {
                 try {
+                    if (!SupportedSuffix.of(IoUtil.suffix(file)).isPresent()) {
+                        return;
+                    }
 
                 } catch (Throwable e) {
                     throwable.set(e);
