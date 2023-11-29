@@ -26,6 +26,11 @@ public final class Constant {
     public final static String DEFAULT_PARENT_ROOT_ID = "0";
 
     /**
+     * 默认的顶级文件夹名字
+     */
+    public final static String DEFAULT_FOLDER_NAME = "home";
+
+    /**
      * 未被删除的数据的版本
      */
     public final static int ACTIVE_DATA_VER = 0;

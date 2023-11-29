@@ -5,13 +5,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.yishuifengxiao.common.security.support.Strategy;
+import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -20,18 +19,20 @@ import java.time.LocalDateTime;
 import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.GENERIC_GENERATOR;
 
 /**
- * @author yishui
+ * @author qingteng
  * @version 1.0.0
- * @date 2023/11/17 11:25
+ * @date 2023/11/28 22:47
  * @since 1.0.0
  */
-@Table(name = "sys_security_event", indexes = {@Index(name = "idx_name", columnList = "name")})
-@Entity(name = "sys_security_event")
+@Table(name = "disk_file", indexes = {@Index(name = "idx_file_name", columnList = "file_name"), @Index(name =
+        "idx_original_file_name", columnList = "original_file_name"),
+        @Index(name = "idx_upload_id", columnList = "upload_id")})
+@Entity(name = "disk_file")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class SysSecurityEvent implements Serializable {
+public class DiskFile implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "system_uuid")
@@ -39,49 +40,52 @@ public class SysSecurityEvent implements Serializable {
     @Column(name = "id", length = 64, nullable = false, unique = true)
     private String id;
 
-    private String name;
 
-    @Column(length = 50)
-    private String token;
+    @Column(name = "file_name", nullable = false)
+    private String fileName;
 
-    @Column(name = "content_type")
-    private String contentType;
+    @Column(name = "folder_id", length = 64)
+    private String folderId;
 
-    @Column(name = "user_agent")
-    private String userAgent;
+    @Column(name = "user_id", length = 64)
+    private String userId;
 
-    private String referer;
-    
-    @Column(length = 50)
-    private String ip;
 
-    private String accept;
+    @Column(name = "oss_id", length = 64)
+    private String ossId;
 
-    private String url;
 
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(columnDefinition = "longtext ")
-    private String cookie;
+    @Column(name = "file_md5", length = 32)
+    private String fileMd5;
+
+
+    @Column(name = "suffix", length = 50)
+    private String suffix;
+
+
+    @Column(name = "file_url", length = 100)
+    private String fileUrl;
+
+    @Column(name = "original_file_name")
+    private String originalFileName;
+
+
+    @Column(name = "upload_id", length = 64)
+    private String uploadId;
+
 
     /**
-     * @see Strategy
+     * 模式：0:仅上传，1:上传且解析
+     *
+     * @see UploadMode
      */
-    private Integer strategy;
-
-
-    private String msg;
-
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(columnDefinition = "longtext ")
-    private String exception;
-
+    @Column(length = 1, nullable = false, columnDefinition = "tinyint(1) default 0")
+    private Integer mode;
 
     @Column(name = "create_time", nullable = false, updatable = false)
-    @CreatedDate
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createTime;
+
 }

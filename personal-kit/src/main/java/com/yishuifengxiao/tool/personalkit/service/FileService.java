@@ -1,0 +1,103 @@
+package com.yishuifengxiao.tool.personalkit.service;
+
+import com.yishuifengxiao.common.guava.EventPublisher;
+import com.yishuifengxiao.common.jdbc.JdbcUtil;
+import com.yishuifengxiao.common.tool.collections.DataUtil;
+import com.yishuifengxiao.common.tool.io.IoUtil;
+import com.yishuifengxiao.common.tool.random.IdWorker;
+import com.yishuifengxiao.common.tool.utils.Assert;
+import com.yishuifengxiao.common.tool.utils.OsUtils;
+import com.yishuifengxiao.tool.personalkit.domain.bo.FileAnalysisEvent;
+import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
+import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFolder;
+import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
+import com.yishuifengxiao.tool.personalkit.domain.enums.UploadStat;
+import com.yishuifengxiao.tool.personalkit.domain.request.IdListReq;
+import com.yishuifengxiao.tool.personalkit.tool.ContextUser;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDateTime;
+
+import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.DEFAULT_FOLDER_NAME;
+import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.DEFAULT_PARENT_ROOT_ID;
+
+/**
+ * @author qingteng
+ * @version 1.0.0
+ * @date 2023/11/28 23:13
+ * @since 1.0.0
+ */
+@Component
+@Transactional(rollbackOn = {Exception.class})
+public class FileService {
+
+    @Autowired
+    private EventPublisher eventPublisher;
+
+    public void uploads(HttpServletRequest request, SysUser sysUser, String folder, UploadMode uploadMode, MultipartFile[] files) {
+        DataUtil.parallelStream(files).forEach(v -> upload(request, sysUser, folder, uploadMode, v, v.getName()));
+    }
+
+    public String upload(HttpServletRequest request, SysUser sysUser, String folder, UploadMode uploadMode, MultipartFile multipartFile, String traceId) {
+        File root = new File(OsUtils.currentWorkPath(), IdWorker.snowflakeStringId());
+        if (!root.exists()) {
+            root.mkdirs();
+        }
+        DiskFolder diskFolder = diskFolder(folder);
+        File file = new File(root, multipartFile.getOriginalFilename());
+        DiskUploadRecord uploadRecord = null;
+        try {
+            IoUtil.inputStream2File(multipartFile.getInputStream(), file);
+            uploadRecord = new DiskUploadRecord(IdWorker.snowflakeStringId(), multipartFile.getOriginalFilename(), sysUser.getId(), UploadStat.UPLOAD_HANDING.getCode(), LocalDateTime.now(), null);
+            JdbcUtil.jdbcHelper().insertSelective(uploadRecord);
+
+            eventPublisher.post(new FileAnalysisEvent(diskFolder, sysUser, file.getAbsolutePath(), uploadMode, uploadRecord));
+        } catch (IOException e) {
+            if (null != file) {
+                file.delete();
+                file = null;
+            }
+            throw new RuntimeException(e);
+        }
+
+        return null == uploadRecord ? null : uploadRecord.getId();
+    }
+
+    public DiskFolder diskFolder(String folder) {
+        if (StringUtils.isNotBlank(folder)) {
+            DiskFolder diskFolder = new DiskFolder().setId(IdWorker.snowflakeStringId()).setFolderName(DEFAULT_FOLDER_NAME).setParentId(DEFAULT_PARENT_ROOT_ID).setUserId(ContextUser.currentUserId()).setCreateTime(LocalDateTime.now());
+
+            JdbcUtil.jdbcHelper().insertSelective(diskFolder);
+            return diskFolder;
+        }
+        DiskFolder diskFolder = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFolder.class, folder.trim());
+        Assert.isNotNull("路径不存在", diskFolder);
+        return diskFolder;
+    }
+
+    public void delete(IdListReq req) {
+
+        for (String id : req.getIds()) {
+            if (StringUtils.isBlank(id)) {
+                continue;
+            }
+            DiskFile diskFile = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFile.class, id.trim());
+            Assert.isNotNull("记录不存在", diskFile);
+            int deleted = JdbcUtil.jdbcHelper().deleteByPrimaryKey(DiskFile.class, id.trim());
+            Assert.gtZero("删除失败", deleted);
+        }
+    }
+
+    public String share(String id) {
+        return null;
+    }
+}

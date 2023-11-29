@@ -18,6 +18,6 @@ spring:
         bootstrap-mode: default
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    password: "123456"
-    url: jdbc:mysql://10.8.80.241:3306/personkit?useUnicode=true&characterEncoding=UTF-8&pinGlobalTxToPhysicalConnection=true&useSSL=false&createDatabaseIfNotExist=true
+    password: "Yishui@36"
+    url: jdbc:mysql://47.111.112.103:3306/personkit?useUnicode=true&characterEncoding=UTF-8&pinGlobalTxToPhysicalConnection=true&useSSL=false&createDatabaseIfNotExist=true
     username: root

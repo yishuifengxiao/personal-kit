@@ -30,7 +30,7 @@ import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.GENER
  * @since 1.0.0
  */
 @Validated
-@Table(name = "sys_role")
+@Table(name = "sys_role", indexes = {@Index(name = "idx_parent_id", columnList = "parent_id")}, uniqueConstraints = {@UniqueConstraint(name = "uk_name", columnNames = {"name"})})
 @Entity(name = "sys_role")
 @Data
 @AllArgsConstructor

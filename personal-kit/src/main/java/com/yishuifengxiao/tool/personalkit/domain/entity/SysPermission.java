@@ -18,7 +18,7 @@ import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.GENER
  * @date 2023/11/7-15:34
  * @since 1.0.0
  */
-@Table(name = "sys_permission")
+@Table(name = "sys_permission", indexes = {@Index(name = "idx_name", columnList = "name"), @Index(name = "idx_url", columnList = "url")})
 @Entity(name = "sys_permission")
 @Data
 @AllArgsConstructor
