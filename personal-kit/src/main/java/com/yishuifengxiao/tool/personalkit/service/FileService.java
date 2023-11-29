@@ -57,7 +57,8 @@ public class FileService {
         DiskUploadRecord uploadRecord = null;
         try {
             IoUtil.inputStream2File(multipartFile.getInputStream(), file);
-            uploadRecord = new DiskUploadRecord(IdWorker.snowflakeStringId(), multipartFile.getOriginalFilename(), sysUser.getId(), UploadStat.UPLOAD_HANDING.getCode(), LocalDateTime.now(), null);
+            uploadRecord = new DiskUploadRecord(IdWorker.snowflakeStringId(), multipartFile.getOriginalFilename(),
+                    sysUser.getId(), UploadStat.UPLOAD_HANDING.getCode(), null, LocalDateTime.now(), null);
             JdbcUtil.jdbcHelper().insertSelective(uploadRecord);
 
             eventPublisher.post(new FileAnalysisEvent(diskFolder, sysUser, file.getAbsolutePath(), uploadMode, uploadRecord));
