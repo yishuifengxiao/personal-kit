@@ -48,7 +48,7 @@ public class FileService {
     }
 
     public String upload(HttpServletRequest request, SysUser sysUser, String folder, UploadMode uploadMode, MultipartFile multipartFile, String traceId) {
-        File root = new File(OsUtils.currentWorkPath(), IdWorker.snowflakeStringId());
+        File root = new File(new File(OsUtils.currentWorkPath(), "tmp"), IdWorker.snowflakeStringId());
         if (!root.exists()) {
             root.mkdirs();
         }
@@ -74,7 +74,7 @@ public class FileService {
     }
 
     public DiskFolder diskFolder(String folder) {
-        if (StringUtils.isNotBlank(folder)) {
+        if (StringUtils.isBlank(folder)) {
             DiskFolder diskFolder = new DiskFolder().setId(IdWorker.snowflakeStringId()).setFolderName(DEFAULT_FOLDER_NAME).setParentId(DEFAULT_PARENT_ROOT_ID).setUserId(ContextUser.currentUserId()).setCreateTime(LocalDateTime.now());
 
             JdbcUtil.jdbcHelper().insertSelective(diskFolder);

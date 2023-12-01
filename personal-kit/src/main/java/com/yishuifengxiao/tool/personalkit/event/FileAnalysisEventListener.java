@@ -12,6 +12,7 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
 import com.yishuifengxiao.tool.personalkit.domain.enums.SupportedSuffix;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadStat;
+import com.yishuifengxiao.tool.personalkit.tool.UploadClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,6 +35,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public class FileAnalysisEventListener {
     @Autowired
     private EventPublisher eventPublisher;
+    @Autowired
+    private UploadClient uploadClient;
 
     @Subscribe
     public void onFileAnalysisEvent(FileAnalysisEvent fileAnalysisEvent) {
@@ -45,7 +48,8 @@ public class FileAnalysisEventListener {
         futures.add(CompletableFuture.runAsync(() -> {
 
             try {
-                DiskFile diskFile = new DiskFile(fileId, file.getName(), fileAnalysisEvent.getDiskFolder().getId(), fileAnalysisEvent.getSysUser().getId(), null, Md5.md5Short(file), IoUtil.suffix(file), null, file.getName(), fileAnalysisEvent.getUploadRecord().getId(), fileAnalysisEvent.getUploadMode().getCode(), LocalDateTime.now());
+                String objectName = uploadClient.upload(fileAnalysisEvent.getSysUser(), file);
+                DiskFile diskFile = new DiskFile(fileId, file.getName(), fileAnalysisEvent.getDiskFolder().getId(), fileAnalysisEvent.getSysUser().getId(), objectName, Md5.md5Short(file), IoUtil.suffix(file), null, file.getName(), fileAnalysisEvent.getUploadRecord().getId(), fileAnalysisEvent.getUploadMode().getCode(), LocalDateTime.now());
                 reference.set(diskFile);
             } catch (Throwable e) {
                 throwable.set(e);
@@ -69,7 +73,13 @@ public class FileAnalysisEventListener {
         }
         // 等待任务完成
         CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
-        JdbcUtil.jdbcHelper().insertSelective(reference.get());
+        DiskFile diskFile = reference.get();
+        if (null != diskFile) {
+            JdbcUtil.jdbcHelper().insertSelective(diskFile);
+        }
+        if (null != file) {
+            file.delete();
+        }
         UploadStat uploadStat = null == throwable.get() ? UploadStat.UPLOAD_FAIL : UploadStat.UPLOAD_SUCCESS;
         String msg = null == throwable.get() ? null : StringUtils.substring(throwable.get().getMessage(), 0, 255);
         DiskUploadRecord uploadRecord = fileAnalysisEvent.getUploadRecord().setStat(uploadStat.getCode()).setMsg(msg).setFinishTime(LocalDateTime.now());

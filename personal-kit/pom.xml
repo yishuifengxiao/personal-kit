@@ -17,6 +17,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <yishuifengxiao.starter.version>BUILD-SNAPSHOT</yishuifengxiao.starter.version>
+        <minio.version>8.5.7</minio.version>
     </properties>
     <dependencies>
 
@@ -75,7 +76,11 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>${minio.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>${project.artifactId}</finalName>

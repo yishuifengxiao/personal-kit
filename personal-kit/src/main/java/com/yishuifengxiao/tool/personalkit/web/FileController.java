@@ -1,6 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.web;
 
 
+import com.yishuifengxiao.common.tool.entity.Response;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdListReq;
@@ -62,23 +63,24 @@ public class FileController {
             //
             @ApiImplicitParam(name = "file", value = "文件流对象,接收数组格式", allowMultiple = true, dataTypeClass = MultipartFile.class, required = true, dataType = "MultipartFile"),
             //
-            @ApiImplicitParam(name = "folder", value = "文件夹目录", required = true),
+            @ApiImplicitParam(name = "folder", value = "文件夹目录", required = false),
 
             //
             @ApiImplicitParam(name = "mode", value = "模式（true:解析，false仅存储）", required = false)})
     @ApiOperation(value = "文件上传", notes = "使用文件方式上传")
     @PostMapping("/import")
     @ResponseBody
-    public Object importFile(HttpServletRequest request, @RequestParam(value = "file", required = true) MultipartFile file,
-                             //
-                             @RequestParam(value = "folder", required = false) String folder,
-                             //
-                             @RequestParam(value = "traceId", required = false) String traceId,
-                             //
-                             @RequestParam(value = "mode", required = false) UploadMode uploadMode) throws IOException {
+    public Response importFile(HttpServletRequest request,
+                               @RequestParam(value = "file", required = true) MultipartFile file,
+                               //
+                               @RequestParam(value = "folder", required = false) String folder,
+                               //
+                               @RequestParam(value = "traceId", required = false) String traceId,
+                               //
+                               @RequestParam(value = "mode", required = false) UploadMode uploadMode) throws IOException {
         final SysUser sysUser = ContextUser.currentUser();
         final String upload = fileService.upload(request, sysUser, folder, uploadMode, file, traceId);
-        return upload;
+        return Response.sucData(upload);
     }
 
 
