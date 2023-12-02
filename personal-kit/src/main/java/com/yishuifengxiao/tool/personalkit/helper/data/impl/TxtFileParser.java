@@ -8,6 +8,7 @@ import com.yishuifengxiao.tool.personalkit.domain.enums.SupportedSuffix;
 import com.yishuifengxiao.tool.personalkit.domain.model.VirtuallyFile;
 import com.yishuifengxiao.tool.personalkit.helper.data.BaseFileParser;
 import com.yishuifengxiao.tool.personalkit.helper.data.ParserResult;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -22,6 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @date 2023/12/2 9:29
  * @since 1.0.0
  */
+@Slf4j
 public class TxtFileParser extends BaseFileParser {
 
     @Override
@@ -41,10 +43,9 @@ public class TxtFileParser extends BaseFileParser {
                 rows.add(parserRow);
             }
             return Arrays.asList(new ParserResult(file.getName(), headers, rows));
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.info("--------> 按照csv方式处理文件【{}】时发生问题{}", file.getAbsolutePath(), e);
+            throw new RuntimeException("文件不是一个有效的TXT文件");
         }
 
 

@@ -10,6 +10,7 @@ import com.yishuifengxiao.tool.personalkit.domain.model.VirtuallyFile;
 import com.yishuifengxiao.tool.personalkit.domain.model.VirtuallyRow;
 import com.yishuifengxiao.tool.personalkit.helper.data.BaseFileParser;
 import com.yishuifengxiao.tool.personalkit.helper.data.ParserResult;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
  * @date 2023/12/2 9:56
  * @since 1.0.0
  */
+@Slf4j
 public class JsonFileParser extends BaseFileParser {
     @Override
     public List<ParserResult> execute(File file) {
@@ -63,7 +65,8 @@ public class JsonFileParser extends BaseFileParser {
             return Arrays.asList(new ParserResult(file.getName(), virtuallyHeaders, rows));
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.info("--------> 按照jsonArray方式处理文件【{}】时发生问题{}", file.getAbsolutePath(), e);
+            throw new RuntimeException("文件不是一个有效的JSON数组文件");
         }
     }
 

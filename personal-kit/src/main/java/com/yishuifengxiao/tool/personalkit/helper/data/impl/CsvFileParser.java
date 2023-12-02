@@ -8,6 +8,7 @@ import com.yishuifengxiao.tool.personalkit.domain.model.VirtuallyFile;
 import com.yishuifengxiao.tool.personalkit.domain.model.VirtuallyRow;
 import com.yishuifengxiao.tool.personalkit.helper.data.BaseFileParser;
 import com.yishuifengxiao.tool.personalkit.helper.data.ParserResult;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -27,6 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @date 2023/12/2 9:56
  * @since 1.0.0
  */
+@Slf4j
 public class CsvFileParser extends BaseFileParser {
     @Override
     public List<ParserResult> execute(File file) {
@@ -53,7 +55,8 @@ public class CsvFileParser extends BaseFileParser {
             }
             return Arrays.asList(new ParserResult(file.getName(), headers, rows));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.info("--------> 按照csv方式处理文件【{}】时发生问题{}", file.getAbsolutePath(), e);
+            throw new RuntimeException("文件不是一个有效的CSV文件");
         }
 
     }

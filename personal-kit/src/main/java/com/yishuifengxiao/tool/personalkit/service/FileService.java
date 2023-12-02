@@ -16,6 +16,7 @@ import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadStat;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdListReq;
 import com.yishuifengxiao.tool.personalkit.tool.ContextUser;
+import com.yishuifengxiao.tool.personalkit.tool.UploadClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,8 @@ public class FileService {
 
     @Autowired
     private EventPublisher eventPublisher;
+    @Autowired
+    private UploadClient uploadClient;
 
     public void uploads(HttpServletRequest request, SysUser sysUser, String folder, UploadMode uploadMode, MultipartFile[] files) {
         DataUtil.parallelStream(files).forEach(v -> upload(request, sysUser, folder, uploadMode, v, v.getName()));
@@ -57,8 +60,7 @@ public class FileService {
         DiskUploadRecord uploadRecord = null;
         try {
             IoUtil.inputStream2File(multipartFile.getInputStream(), file);
-            uploadRecord = new DiskUploadRecord(IdWorker.snowflakeStringId(), multipartFile.getOriginalFilename(),
-                    sysUser.getId(), UploadStat.UPLOAD_HANDING.getCode(), null, LocalDateTime.now(), null);
+            uploadRecord = new DiskUploadRecord(IdWorker.snowflakeStringId(), multipartFile.getOriginalFilename(), sysUser.getId(), UploadStat.UPLOAD_HANDING.getCode(), null, LocalDateTime.now(), null);
             JdbcUtil.jdbcHelper().insertSelective(uploadRecord);
 
             eventPublisher.post(new FileAnalysisEvent(diskFolder, sysUser, file.getAbsolutePath(), uploadMode, uploadRecord));
@@ -99,6 +101,10 @@ public class FileService {
     }
 
     public String share(String id) {
-        return null;
+        DiskFile diskFile = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFile.class, id.trim());
+        Assert.isNotNull("请选择一个正确的数据", diskFile);
+
+        SysUser user = JdbcUtil.jdbcHelper().findByPrimaryKey(SysUser.class, diskFile.getUserId().trim());
+        return uploadClient.share(user.getUsername(), diskFile.getOssId());
     }
 }

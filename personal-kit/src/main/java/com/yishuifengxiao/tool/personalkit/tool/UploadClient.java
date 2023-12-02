@@ -32,9 +32,7 @@ public class UploadClient {
         // https://www.bookstack.cn/read/MinioCookbookZH/21.md
         try {
             // 使用Minio服务的URL，端口，Access key和Secret key创建一个MinioClient对象
-            MinioClient minioClient =
-                    MinioClient.builder().endpoint(minioProperties.getUrl()).credentials(minioProperties.getAccessKey(),
-                            minioProperties.getSecretKey()).build();
+            MinioClient minioClient = MinioClient.builder().endpoint(minioProperties.getUrl()).credentials(minioProperties.getAccessKey(), minioProperties.getSecretKey()).build();
             String bucket = "bucket" + sysUser.getId() + sysUser.getUsername();
             // 检查存储桶是否已经存在
             if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build())) {
@@ -48,6 +46,19 @@ public class UploadClient {
         } catch (Exception e) {
             log.warn("---------> 用户 {} 上传文件 {} 失败 ，失败的原因为 {}", sysUser.getUsername(), file.getAbsolutePath(), e);
             throw new UncheckedException("文件保存失败");
+        }
+    }
+
+    public String share(String bucket, String objectName) {
+        try {
+            // 使用Minio服务的URL，端口，Access key和Secret key创建一个MinioClient对象
+            MinioClient minioClient = MinioClient.builder().endpoint(minioProperties.getUrl()).credentials(minioProperties.getAccessKey(), minioProperties.getSecretKey()).build();
+            GetPresignedObjectUrlArgs args = GetPresignedObjectUrlArgs.builder().bucket(bucket).object(objectName).build();
+            return minioClient.getPresignedObjectUrl(args);
+        } catch (Exception e) {
+            log.warn("---------> 获取 bucket ={} ,objectName ={} getPresignedObjectUrl 的 失败 ，失败的原因为 {}", bucket,
+                    objectName, e);
+            throw new UncheckedException("文件url获取失败");
         }
     }
 }
