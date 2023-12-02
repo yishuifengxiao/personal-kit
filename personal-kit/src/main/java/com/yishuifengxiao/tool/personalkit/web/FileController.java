@@ -4,6 +4,7 @@ package com.yishuifengxiao.tool.personalkit.web;
 import com.yishuifengxiao.common.tool.entity.Response;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
+import com.yishuifengxiao.tool.personalkit.domain.request.FileMoveReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdListReq;
 import com.yishuifengxiao.tool.personalkit.service.FileService;
 import com.yishuifengxiao.tool.personalkit.tool.ContextUser;
@@ -100,4 +101,10 @@ public class FileController {
         return share;
     }
 
+    @ApiOperation(value = "移动文件", notes = "移动文件")
+    @PostMapping("/move")
+    @ResponseBody
+    public void move(HttpServletRequest request, @RequestBody FileMoveReq req, BindingResult errors) {
+        fileService.move(req);
+    }
 }

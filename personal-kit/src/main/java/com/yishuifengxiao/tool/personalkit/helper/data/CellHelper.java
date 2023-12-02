@@ -26,7 +26,7 @@ public class CellHelper {
         if (StringUtils.isBlank(text)) {
             return new VirtuallyRow.ExcelCell(columnIndex, columnName, text, null, null, false, DataType.ANY);
         }
-        LocalDateTime time = DateTimeUtil.parse(text.trim());
+        LocalDateTime time = localDateTime(text.trim());
         if (null != time) {
             return new VirtuallyRow.ExcelCell(columnIndex, columnName, text.trim(), null, time, true, DataType.DATE_TIME);
         }
@@ -43,5 +43,15 @@ public class CellHelper {
             return new VirtuallyRow.ExcelCell(columnIndex, columnName, text.trim(), new BigDecimal(String.valueOf(number)), null, true, DataType.NUMBER);
         }
         return new VirtuallyRow.ExcelCell(columnIndex, columnName, text.trim(), null, null, true, DataType.TEXT);
+    }
+
+
+    private LocalDateTime localDateTime(String text) {
+        try {
+            return DateTimeUtil.parse(text.trim());
+        } catch (Exception e) {
+            return null;
+        }
+
     }
 }

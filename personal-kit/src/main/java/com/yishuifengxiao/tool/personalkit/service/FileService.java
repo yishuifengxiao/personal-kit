@@ -14,6 +14,7 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadStat;
+import com.yishuifengxiao.tool.personalkit.domain.request.FileMoveReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdListReq;
 import com.yishuifengxiao.tool.personalkit.tool.ContextUser;
 import com.yishuifengxiao.tool.personalkit.tool.UploadClient;
@@ -106,5 +107,16 @@ public class FileService {
 
         SysUser user = JdbcUtil.jdbcHelper().findByPrimaryKey(SysUser.class, diskFile.getUserId().trim());
         return uploadClient.share(user.getUsername(), diskFile.getOssId());
+    }
+
+
+    public void move(FileMoveReq req) {
+        DiskFile diskFile = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFile.class, req.getId().trim());
+        Assert.isNotNull("请选择一个正确的数据", diskFile);
+        DiskFolder folder = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFolder.class, req.getFolder().trim());
+        Assert.isNotNull("记录不存在", folder);
+        Assert.isTrue("请选择一个正确的文件夹", StringUtils.equalsIgnoreCase(folder.getUserId(), folder.getUserId()));
+        diskFile.setFolderId(folder.getId());
+        JdbcUtil.jdbcHelper().updateByPrimaryKeySelective(diskFile);
     }
 }

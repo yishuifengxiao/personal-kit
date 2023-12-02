@@ -6,6 +6,7 @@ import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.tool.personalkit.config.MinioProperties;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import io.minio.*;
+import io.minio.http.Method;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,7 @@ public class UploadClient {
         try {
             // 使用Minio服务的URL，端口，Access key和Secret key创建一个MinioClient对象
             MinioClient minioClient = MinioClient.builder().endpoint(minioProperties.getUrl()).credentials(minioProperties.getAccessKey(), minioProperties.getSecretKey()).build();
-            String bucket = "bucket" + sysUser.getId() + sysUser.getUsername();
+            String bucket = "bucket" + sysUser.getId();
             // 检查存储桶是否已经存在
             if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build())) {
                 // 创建一个名为asiatrip的存储桶，用于存储照片的zip文件。
@@ -49,11 +50,14 @@ public class UploadClient {
         }
     }
 
-    public String share(String bucket, String objectName) {
+    public String share(String userId, String objectName) {
+        String bucket = "bucket" + userId;
         try {
+
             // 使用Minio服务的URL，端口，Access key和Secret key创建一个MinioClient对象
             MinioClient minioClient = MinioClient.builder().endpoint(minioProperties.getUrl()).credentials(minioProperties.getAccessKey(), minioProperties.getSecretKey()).build();
-            GetPresignedObjectUrlArgs args = GetPresignedObjectUrlArgs.builder().bucket(bucket).object(objectName).build();
+            GetPresignedObjectUrlArgs args =
+                    GetPresignedObjectUrlArgs.builder().bucket(bucket).object(objectName).method(Method.DELETE).build();
             return minioClient.getPresignedObjectUrl(args);
         } catch (Exception e) {
             log.warn("---------> 获取 bucket ={} ,objectName ={} getPresignedObjectUrl 的 失败 ，失败的原因为 {}", bucket,

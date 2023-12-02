@@ -65,6 +65,9 @@ public class FolderService {
             Long counted = JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextUser.currentUserId()).setParentId(req.getParent()));
             Assert.lteZeroN("已经存在相同名称的文件夹", counted);
         }
+        DiskFolder parentFolder = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFolder.class, req.getParent());
+        Assert.isNotNull("目标文件不存在", parentFolder);
+        Assert.isTrue("请选择一个正确的文件夹", StringUtils.equalsIgnoreCase(folder.getUserId(), parentFolder.getUserId()));
         folder.setParentId(req.getParent());
         JdbcUtil.jdbcHelper().updateByPrimaryKeySelective(folder);
     }
