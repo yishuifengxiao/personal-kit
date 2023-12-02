@@ -39,7 +39,6 @@ public class SystemController {
 
     @ApiOperation(value = "分页查询资源")
     @PostMapping("/permission/page")
-    @ResponseBody
     public Page<PermissionVo> findPagePermission(@RequestBody BaseQuery<SysPermission> pageQuery) {
         Page<PermissionVo> page = sysService.findPagePermission(pageQuery);
 
@@ -49,7 +48,6 @@ public class SystemController {
 
     @ApiOperation(value = "分页查询角色")
     @PostMapping("/role/page")
-    @ResponseBody
     public Page<RoleVo> findPageRole(@RequestBody BaseQuery<RoleQuery> pageQuery) {
         Page<RoleVo> page = sysService.findPageRole(pageQuery);
 
@@ -59,7 +57,6 @@ public class SystemController {
 
     @ApiOperation(value = "分页查询用户")
     @PostMapping("/user/page")
-    @ResponseBody
     public Page<UserVo> findPageUser(@RequestBody BaseQuery<UserQuery> pageQuery) {
         Page<UserVo> page = sysService.findPageUser(pageQuery);
         return page;
@@ -68,35 +65,30 @@ public class SystemController {
 
     @ApiOperation(value = "添加一个角色")
     @PostMapping("/role/add")
-    @ResponseBody
     public void addRole(@Validated(Group.Create.class) @RequestBody RoleVo param, BindingResult errors) {
         sysService.addRole(param);
     }
 
     @ApiOperation(value = "根据主键更新角色")
     @PostMapping("/role/update")
-    @ResponseBody
     public void updateRole(@Validated(Group.Create.class) @RequestBody RoleVo param, BindingResult errors) {
         sysService.updateRole(param);
     }
 
     @ApiOperation(value = "根据主键更新角色")
     @PostMapping("/role/deletes")
-    @ResponseBody
     public void deleteRole(@Valid @RequestBody IdListReq param) {
         sysService.deleteRoles(param.getIds());
     }
 
     @ApiOperation(value = "为角色分配用户")
     @PostMapping("/role/updateRoleUser")
-    @ResponseBody
     public void updateRole(@Validated(Group.Update.class) @RequestBody RoleUserReq param, BindingResult errors) {
         sysService.updateRoleUser(param);
     }
 
     @ApiOperation(value = "为用户分配角色")
     @PostMapping("/role/UserRoleReq")
-    @ResponseBody
     public void updateUserRole(@Validated(Group.Update.class) @RequestBody UserRoleReq param, BindingResult errors) {
         sysService.updateUserRole(param);
     }
