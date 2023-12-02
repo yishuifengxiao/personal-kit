@@ -74,6 +74,9 @@ public class DiskFile implements Serializable {
     private String uploadId;
 
 
+    private Long size;
+
+
     /**
      * 模式：0:仅上传，1:上传且解析
      *

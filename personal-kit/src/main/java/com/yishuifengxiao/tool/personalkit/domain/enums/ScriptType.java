@@ -3,20 +3,15 @@ package com.yishuifengxiao.tool.personalkit.domain.enums;
 /**
  * @author qingteng
  * @version 1.0.0
- * @date 2023/11/29 23:23
+ * @date 2023/12/2 12:54
  * @since 1.0.0
  */
-public enum DataType {
+public enum ScriptType {
 
-    TEXT,
+    DATE_TIME_PARSER,
 
-    NUMBER,
+    NUMBER_PARSER,
 
-    PHONE,
+    PHONE_PARSER,
 
-    ID_CARD,
-
-    DATE_TIME,
-
-    ANY
 }

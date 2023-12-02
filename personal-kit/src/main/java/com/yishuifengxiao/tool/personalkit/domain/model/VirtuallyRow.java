@@ -1,13 +1,13 @@
 package com.yishuifengxiao.tool.personalkit.domain.model;
 
-import com.yishuifengxiao.tool.personalkit.domain.enums.DataType;
+import com.yishuifengxiao.tool.personalkit.domain.bo.ExcelRow;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import javax.persistence.Id;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -20,40 +20,26 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class VirtuallyRow implements Serializable {
+public class VirtuallyRow extends ExcelRow implements Serializable {
 
 
+    @Id
     private String id;
 
     private String fileId;
 
     private String userId;
 
-    private Long index;
+    private String virtuallyFileId;
 
     private Boolean isNormal;
 
-    private List<ExcelCell> cells;
-
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Accessors(chain = true)
-    public static class ExcelCell implements Serializable {
-
-        private String text;
-
-        private BigDecimal decimal;
-
-        private Long columnIndex;
-
-        private Boolean isNormal;
-
-
-        private DataType dataType;
-
+    public VirtuallyRow(Long rowIndex, List<ExcelCell> cells, String id, String fileId, String userId, String virtuallyFileId, Boolean isNormal) {
+        super(rowIndex, cells);
+        this.id = id;
+        this.fileId = fileId;
+        this.userId = userId;
+        this.virtuallyFileId = virtuallyFileId;
+        this.isNormal = isNormal;
     }
-
-
 }

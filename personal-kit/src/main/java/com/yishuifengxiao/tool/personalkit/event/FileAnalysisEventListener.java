@@ -12,9 +12,15 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
 import com.yishuifengxiao.tool.personalkit.domain.enums.SupportedSuffix;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadStat;
+import com.yishuifengxiao.tool.personalkit.domain.model.VirtuallyFile;
+import com.yishuifengxiao.tool.personalkit.domain.model.VirtuallyRow;
+import com.yishuifengxiao.tool.personalkit.helper.data.FileParserHelper;
+import com.yishuifengxiao.tool.personalkit.helper.data.ParserResult;
 import com.yishuifengxiao.tool.personalkit.tool.UploadClient;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -38,6 +44,9 @@ public class FileAnalysisEventListener {
     @Autowired
     private UploadClient uploadClient;
 
+    @Autowired
+    private MongoTemplate mongotemplate;
+
     @Subscribe
     public void onFileAnalysisEvent(FileAnalysisEvent fileAnalysisEvent) {
         List<CompletableFuture> futures = new ArrayList<>();
@@ -49,7 +58,7 @@ public class FileAnalysisEventListener {
 
             try {
                 String objectName = uploadClient.upload(fileAnalysisEvent.getSysUser(), file);
-                DiskFile diskFile = new DiskFile(fileId, file.getName(), fileAnalysisEvent.getDiskFolder().getId(), fileAnalysisEvent.getSysUser().getId(), objectName, Md5.md5Short(file), IoUtil.suffix(file), null, file.getName(), fileAnalysisEvent.getUploadRecord().getId(), fileAnalysisEvent.getUploadMode().getCode(), LocalDateTime.now());
+                DiskFile diskFile = new DiskFile(fileId, file.getName(), fileAnalysisEvent.getDiskFolder().getId(), fileAnalysisEvent.getSysUser().getId(), objectName, Md5.md5Short(file), IoUtil.suffix(file), null, file.getName(), fileAnalysisEvent.getUploadRecord().getId(), file.length(), fileAnalysisEvent.getUploadMode().getCode(), LocalDateTime.now());
                 reference.set(diskFile);
             } catch (Throwable e) {
                 throwable.set(e);
@@ -63,6 +72,16 @@ public class FileAnalysisEventListener {
                 try {
                     if (!SupportedSuffix.of(IoUtil.suffix(file)).isPresent()) {
                         return;
+                    }
+                    List<ParserResult> parserResults = FileParserHelper.parse(file);
+                    for (ParserResult parserResult : parserResults) {
+
+
+                        VirtuallyFile virtuallyFile = mongotemplate.save(new VirtuallyFile(IdWorker.snowflakeStringId(), null, fileAnalysisEvent.getSysUser().getId(), parserResult.getSheetName(), parserResult.getHeaders()));
+
+                        parserResult.getRows().stream().map(s -> new VirtuallyRow(s.getRowIndex(), s.getCells(), IdWorker.snowflakeStringId(), virtuallyFile.getFileId(), fileAnalysisEvent.getSysUser().getId(), virtuallyFile.getId(), s.getCells().stream().allMatch(v -> BooleanUtils.isNotFalse(v.getIsNormal())))).forEach(mongotemplate::save);
+
+
                     }
 
                 } catch (Throwable e) {

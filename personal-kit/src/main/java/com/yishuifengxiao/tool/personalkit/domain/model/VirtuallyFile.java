@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import javax.persistence.Id;
 import java.io.Serializable;
 import java.util.List;
 
@@ -21,11 +22,15 @@ import java.util.List;
 @Accessors(chain = true)
 public class VirtuallyFile implements Serializable {
 
+
+    @Id
     private String id;
 
     private String fileId;
 
     private String userId;
+
+    private String sheetName;
 
     private List<VirtuallyHeader> headers;
 
@@ -35,9 +40,10 @@ public class VirtuallyFile implements Serializable {
     @NoArgsConstructor
     @Accessors(chain = true)
     public static class VirtuallyHeader implements Serializable {
-        private String name;
 
-        private Long columnIndex;
+        private Integer columnIndex;
+
+        private String name;
 
         private DataType dataType;
     }

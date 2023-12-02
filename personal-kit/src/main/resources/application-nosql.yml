@@ -1,7 +1,8 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://admin:123456@10.8.80.241/personkit
+      uri: mongodb://localhost/personkit
+#      uri: mongodb://admin:123456@10.8.80.241/personkit
   mongodb:
     embedded:
       storage:
