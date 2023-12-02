@@ -60,36 +60,30 @@ public class FileAnalysisEventListener {
                 String objectName = uploadClient.upload(fileAnalysisEvent.getSysUser(), file);
                 DiskFile diskFile = new DiskFile(fileId, file.getName(), fileAnalysisEvent.getDiskFolder().getId(), fileAnalysisEvent.getSysUser().getId(), objectName, Md5.md5Short(file), IoUtil.suffix(file), null, file.getName(), fileAnalysisEvent.getUploadRecord().getId(), file.length(), fileAnalysisEvent.getUploadMode().getCode(), LocalDateTime.now());
                 reference.set(diskFile);
-            } catch (Throwable e) {
-                throwable.set(e);
-            }
-
-
-        }));
-        if (UploadMode.ANALYSIS.equals(fileAnalysisEvent.getUploadMode())) {
-            //需要解析
-            futures.add(CompletableFuture.runAsync(() -> {
-                try {
+                if (UploadMode.ANALYSIS.equals(fileAnalysisEvent.getUploadMode())) {
+                    //需要解析
                     if (!SupportedSuffix.of(IoUtil.suffix(file)).isPresent()) {
                         return;
                     }
                     List<ParserResult> parserResults = FileParserHelper.parse(file);
                     for (ParserResult parserResult : parserResults) {
 
-
-                        VirtuallyFile virtuallyFile = mongotemplate.save(new VirtuallyFile(IdWorker.snowflakeStringId(), null, fileAnalysisEvent.getSysUser().getId(), parserResult.getSheetName(), parserResult.getHeaders()));
+                        VirtuallyFile virtuallyFile =
+                                mongotemplate.save(new VirtuallyFile(IdWorker.snowflakeStringId(), diskFile.getId(),
+                                        fileAnalysisEvent.getSysUser().getId(), parserResult.getSheetName(), parserResult.getHeaders()));
 
                         parserResult.getRows().stream().map(s -> new VirtuallyRow(s.getRowIndex(), s.getCells(), IdWorker.snowflakeStringId(), virtuallyFile.getFileId(), fileAnalysisEvent.getSysUser().getId(), virtuallyFile.getId(), s.getCells().stream().allMatch(v -> BooleanUtils.isNotFalse(v.getIsNormal())))).forEach(mongotemplate::save);
 
-
                     }
-
-                } catch (Throwable e) {
-                    throwable.set(e);
                 }
 
-            }));
-        }
+            } catch (Throwable e) {
+                throwable.set(e);
+            }
+
+
+        }));
+
         // 等待任务完成
         CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
         DiskFile diskFile = reference.get();
