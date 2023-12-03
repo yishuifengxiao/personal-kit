@@ -2,6 +2,7 @@ package com.yishuifengxiao.tool.personalkit.web;
 
 import com.yishuifengxiao.common.tool.validate.Group;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
@@ -40,6 +41,13 @@ public class UserController {
     public void updatePwd(@Validated(Group.Update.class) @RequestBody UpdatePwdReq req, BindingResult errors) {
         userService.updatePwd(req);
     }
+
+    @ApiOperation("重置密码")
+    @PostMapping("/pwd/reset")
+    public void resetPwd(@Valid @RequestBody ResetPwdReq req) {
+        userService.updateResetPwd(req);
+    }
+
 
     @ApiOperation("修改基本信息")
     @PostMapping("/info/update")

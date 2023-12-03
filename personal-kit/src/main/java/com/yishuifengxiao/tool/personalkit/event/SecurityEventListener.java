@@ -10,7 +10,7 @@ import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.common.tool.utils.ExceptionUtil;
 import com.yishuifengxiao.tool.personalkit.config.CoreProperties;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysSecurityEvent;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysSecurityRecord;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.tool.CacheRateLimiter;
 import org.apache.commons.lang3.StringUtils;
@@ -70,7 +70,7 @@ public class SecurityEventListener {
         }
         requestRateLimiter(name, event.getStrategy(), request.getRequestURL().toString());
         //@formatter:off
-        SysSecurityEvent sysSecurityEvent = new SysSecurityEvent().setId(IdWorker.snowflakeStringId())
+        SysSecurityRecord sysSecurityRecord = new SysSecurityRecord().setId(IdWorker.snowflakeStringId())
                 .setName(name).setToken(tokenVal)
                 .setContentType(request.getContentType())
                 .setUserAgent(request.getHeader("user-agent"))
@@ -83,7 +83,7 @@ public class SecurityEventListener {
                 .setMsg(Optional.ofNullable(event.getException()).map(Throwable::getMessage).orElse(null))
                 .setException(ExceptionUtil.extractError( event.getException()))
                 .setCreateTime(LocalDateTime.ofInstant(Instant.ofEpochMilli( event.getTimestamp()),ZoneId.of("+8")));
-        JdbcUtil.jdbcHelper().insertSelective(sysSecurityEvent);
+        JdbcUtil.jdbcHelper().insertSelective(sysSecurityRecord);
     }
     private void requestRateLimiter(String name, Strategy strategy, String url) {
         if(StringUtils.isNotBlank(name)&&(Strategy.AUTHENTICATION_FAILURE.equals(strategy)||Strategy.ACCESS_DENIED.equals(strategy))){
