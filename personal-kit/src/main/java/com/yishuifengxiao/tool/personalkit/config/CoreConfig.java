@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
  * @date 2023/11/30 23:00
  * @since 1.0.0
  */
-@EnableConfigurationProperties(MinioProperties.class)
+@EnableConfigurationProperties({MinioProperties.class, CoreProperties.class})
 @Configuration
 public class CoreConfig {
 }

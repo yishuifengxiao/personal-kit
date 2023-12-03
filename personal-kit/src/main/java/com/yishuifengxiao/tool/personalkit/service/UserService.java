@@ -8,7 +8,6 @@ import com.yishuifengxiao.common.security.token.TokenUtil;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
-import com.yishuifengxiao.common.tool.http.CookieUtil;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.dao.repository.SysUserRepository;
@@ -16,6 +15,7 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
+import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.LoginVo;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,5 +80,34 @@ public class UserService {
         UserInfo userInfo = BeanUtil.copy(sysUser, new UserInfo());
         String sql = String.format("SELECT r.* from sys_relation_user_role ur,sys_role r where ur.role_id=r.id and ur.user_id='%s'", id);
         return userInfo.setRoles(JdbcUtil.jdbcHelper().query(SysRole.class, sql).orElse(Collections.EMPTY_LIST));
+    }
+
+    public void updatePwd(UpdatePwdReq req) {
+        SysUser sysUser = sysUserRepository.findById(req.getId().trim()).orElseThrow(() -> UncheckedException.of("记录不存在"));
+        Assert.isTrue("旧密码不正确", passwordEncoder.matches(req.getOldPwd().trim(), sysUser.getPwd()));
+        sysUser.setPwd(passwordEncoder.encode(req.getNewPwd().trim()));
+        sysUserRepository.saveAndFlush(sysUser);
+    }
+
+    public void updateUser(SysUser sysUser) {
+        SysUser user = sysUserRepository.findById(sysUser.getId().trim()).orElseThrow(() -> UncheckedException.of("记录不存在"));
+        if (StringUtils.isNotBlank(sysUser.getNickname())) {
+            user.setNickname(sysUser.getNickname().trim());
+        }
+        if (StringUtils.isNotBlank(sysUser.getPhone())) {
+            user.setPhone(sysUser.getPhone().trim());
+        }
+        if (StringUtils.isNotBlank(sysUser.getEmail())) {
+            user.setEmail(sysUser.getEmail().trim());
+        }
+        if (StringUtils.isNotBlank(sysUser.getCertNo())) {
+            user.setCertNo(sysUser.getCertNo().trim());
+        }
+        if (null != sysUser.getStat()) {
+            UserStat.code(sysUser.getStat()).orElseThrow(() -> new UncheckedException("请选择一个正确的状态"));
+            user.setStat(sysUser.getStat());
+        }
+        user.setLastUpdateTime(LocalDateTime.now());
+        sysUserRepository.saveAndFlush(sysUser);
     }
 }

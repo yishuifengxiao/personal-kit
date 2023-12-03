@@ -1,14 +1,16 @@
 package com.yishuifengxiao.tool.personalkit.web;
 
+import com.yishuifengxiao.common.tool.validate.Group;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -31,5 +33,17 @@ public class UserController {
     @GetMapping("/info/{id}")
     public UserInfo info(@PathVariable String id) {
         return userService.userInfo(id);
+    }
+
+    @ApiOperation("修改密码")
+    @PostMapping("/pwd/update")
+    public void updatePwd(@Validated(Group.Update.class) @RequestBody UpdatePwdReq req, BindingResult errors) {
+        userService.updatePwd(req);
+    }
+
+    @ApiOperation("修改基本信息")
+    @PostMapping("/info/update")
+    public void updateUser(@Validated(Group.Update.class) @RequestBody SysUser req, BindingResult errors) {
+        userService.updateUser(req);
     }
 }

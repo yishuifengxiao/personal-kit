@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.yishuifengxiao.common.tool.validate.Group;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
 import lombok.AllArgsConstructor;
@@ -13,14 +14,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.SQLInsert;
 import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-
-import javax.annotation.Generated;
 import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -46,9 +47,11 @@ import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.GENER
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
+@Valid
 // @formatter:on
 public class SysUser implements Serializable {
 
+    @NotBlank(message = "请选择一条记录", groups = {Group.Update.class})
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "system_uuid")
     @GenericGenerator(name = "system_uuid", strategy = GENERIC_GENERATOR)
@@ -59,15 +62,19 @@ public class SysUser implements Serializable {
     private String username;
 
     @Column(length = 50)
+    @Size(max = 20, message = "昵称最大为20字符", groups = {Group.Update.class})
     private String nickname;
 
+    @Size(max = 11, message = "电话号码最大为11字符", groups = {Group.Update.class})
     @Column(length = 20)
     private String phone;
 
+    @Size(max = 30, message = "电话号码最大为30字符", groups = {Group.Update.class})
     @Column(length = 50)
     private String email;
 
-    @Column(name = "cert_no", length = 18)
+    @Size(max = 20, message = "电话号码最大为20字符", groups = {Group.Update.class})
+    @Column(name = "cert_no", length = 20)
     private String certNo;
 
     @Column(nullable = false, length = 20)

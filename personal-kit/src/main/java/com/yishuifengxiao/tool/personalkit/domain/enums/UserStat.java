@@ -1,6 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.domain.enums;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * @author yishui
@@ -49,7 +50,7 @@ public enum UserStat {
         return code;
     }
 
-    public static UserStat code(int code) {
-        return Arrays.stream(values()).filter(v -> v.code == code).findFirst().orElse(null);
+    public static Optional<UserStat> code(int code) {
+        return Arrays.stream(values()).filter(v -> v.code == code).findFirst();
     }
 }
