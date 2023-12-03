@@ -25,7 +25,7 @@ import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.GENER
  * @date 2023/11/17 11:25
  * @since 1.0.0
  */
-@Table(name = "sys_security_record", indexes = {@Index(name = "idx_name", columnList = "name")})
+@Table(name = "sys_security_record", indexes = {@Index(name = "idx_name", columnList = "username")})
 @Entity(name = "sys_security_record")
 @Data
 @AllArgsConstructor
@@ -39,7 +39,7 @@ public class SysSecurityRecord implements Serializable {
     @Column(name = "id", length = 64, nullable = false, unique = true)
     private String id;
 
-    private String name;
+    private String username;
 
     @Column(length = 50)
     private String token;

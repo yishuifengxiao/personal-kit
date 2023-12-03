@@ -71,7 +71,7 @@ public class SecurityEventListener {
         requestRateLimiter(name, event.getStrategy(), request.getRequestURL().toString());
         //@formatter:off
         SysSecurityRecord sysSecurityRecord = new SysSecurityRecord().setId(IdWorker.snowflakeStringId())
-                .setName(name).setToken(tokenVal)
+                .setUsername(name).setToken(tokenVal)
                 .setContentType(request.getContentType())
                 .setUserAgent(request.getHeader("user-agent"))
                 .setReferer(request.getHeader("referer"))
