@@ -377,3 +377,249 @@ export default http
 app.config.globalProperties.$http = new http(pinia, router, message)
 ```
 
+# 四 配置vue-router
+
+## 4.1 配置路由守卫
+
+参考   路由守卫 https://router.vuejs.org/zh/guide/advanced/navigation-guards.html 
+
+src\router\index.js
+
+内容如下：
+
+```
+import { createRouter, createWebHashHistory } from 'vue-router'
+import routes from './routes'
+import { useUserStore } from '@/stores/user'
+import meun from '@/libs/meun'
+
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: routes,
+  mode: 'hash'
+})
+
+router.beforeEach(async (to, from) => {
+  // 路由守卫 https://router.vuejs.org/zh/guide/advanced/navigation-guards.html
+  const store = useUserStore()
+  const isLogin = store.isLogin
+  console.log('======================> 登录状态为 ' + isLogin + '  登录token 为 ' + store.tokenVal)
+  if (to.meta.requiresAuth) {
+    // 需要登录
+    if (
+      // 检查用户是否已登录
+      !isLogin &&
+      // ❗️ 避免无限重定向
+      to.name !== 'login'
+    ) {
+      // 将用户重定向到登录页面
+      return { name: 'login' }
+    }
+  }
+  const matched = to.matched
+  let paths = new Array()
+  if (null != matched && typeof matched != 'undefined') {
+    matched.forEach((route) => {
+      const flag = typeof route.meta.label != 'undefined'
+      if (flag) {
+        paths.push({ name: route.meta.label, val: route.path })
+      }
+    })
+  }
+  to.meta.paths = paths
+})
+//全局后置钩子
+router.afterEach((to, from) => {
+  // 获取左侧菜单
+  const lctxn = meun(to, router.getRoutes())
+  to.meta.lctxn = lctxn
+  // localStorage.setItem('currentPosition', JSON.stringify(to))
+})
+export default router
+
+```
+
+## 4.2 增加路由配置
+
+文件地址为 src\router\index.js
+
+
+
+```js
+const routes = [{
+        path: '/',
+        name: 'index',
+        redirect: {
+            name: 'login'
+        }
+    },
+    {
+        path: '/login',
+        name: 'login',
+        component: () => import('@/views/Login.vue'),
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/view',
+        component: () => import('@/views/Home.vue'),
+        children: [{
+                // 当 /user/:id/profile 匹配成功
+                // UserProfile 将被渲染到 User 的 <router-view> 内部
+                path: 'user',
+                component: () => import('@/views/user/home.vue'),
+                meta: {
+                    label: '用户管理'
+                },
+                children: [{
+                        path: 'userIndex',
+                        name: 'userIndexName',
+                        component: () => import('@/views/user/index.vue'),
+                        meta: {
+                            requiresAuth: true,
+                            topLevel: 'user',
+                            label: '用户列表'
+                        }
+                    },
+                    {
+                        path: 'userRecord',
+                        name: 'userRecordName',
+                        component: () => import('@/views/user/record.vue'),
+                        meta: {
+                            requiresAuth: true,
+                            topLevel: 'user',
+                            label: '登录记录'
+                        }
+                    }
+                ]
+            },
+            {
+                // 当 /user/:id/profile 匹配成功
+                // UserProfile 将被渲染到 User 的 <router-view> 内部
+                path: 'file',
+                component: () => import('@/views/files/home.vue'),
+                meta: {
+                    label: '文件管理'
+                },
+                children: [{
+                        path: 'fxindex',
+                        name: 'fxindexName',
+                        component: () => import('@/views/files/index.vue'),
+                        meta: {
+                            requiresAuth: true,
+                            topLevel: 'disk',
+                            label: '个人网盘'
+                        }
+                    },
+                    {
+                        path: 'fxUpload',
+                        name: 'fxUploadName',
+                        component: () => import('@/views/files/upload.vue'),
+                        meta: {
+                            requiresAuth: true,
+                            topLevel: 'disk',
+                            label: '断点上传'
+                        }
+                    }
+                ]
+            },
+            {
+                // 当 /user/:id/profile 匹配成功
+                // UserProfile 将被渲染到 User 的 <router-view> 内部
+                path: 'spider',
+                component: () => import('@/views/spider/home.vue'),
+                meta: {
+                    label: '爬虫'
+                },
+                children: [{
+                        path: 'spindex',
+                        name: 'spindexIndexName',
+                        component: () => import('@/views/spider/index.vue'),
+                        meta: {
+                            requiresAuth: true,
+                            topLevel: 'spider',
+                            label: '爬虫管理'
+                        }
+                    },
+                    {
+                        path: 'spData',
+                        name: 'spindexDataName',
+                        component: () => import('@/views/spider/data.vue'),
+                        meta: {
+                            requiresAuth: true,
+                            topLevel: 'spider',
+                            label: '数据中心'
+                        }
+                    },
+                    {
+                        path: 'spOut',
+                        name: 'spindexOutName',
+                        component: () => import('@/views/spider/out.vue'),
+                        meta: {
+                            requiresAuth: true,
+                            topLevel: 'spider',
+                            label: '导出记录'
+                        }
+                    }
+                ]
+            },
+            {
+                // 当 /user/:id/profile 匹配成功
+                // UserProfile 将被渲染到 User 的 <router-view> 内部
+                path: 'sql',
+                component: () => import('@/views/sql/home.vue'),
+                meta: {
+                    label: '数据管理'
+                },
+                children: [{
+                        path: 'sqlIndex',
+                        name: 'sqlIndexName',
+                        component: () => import('@/views/sql/sql.vue'),
+                        meta: {
+                            requiresAuth: false,
+                            topLevel: 'sql',
+                            label: 'SQL编排'
+                        }
+                    },
+                    {
+                        path: 'sqlData',
+                        name: 'sqlDataName',
+                        component: () => import('@/views/sql/data.vue'),
+                        meta: {
+                            requiresAuth: false,
+                            topLevel: 'sql',
+                            label: '数据中心'
+                        }
+                    },
+                    {
+                        path: 'sqlPreview',
+                        name: 'sqlPreviewName',
+                        component: () => import('@/views/sql/preview.vue'),
+                        meta: {
+                            requiresAuth: false,
+                            topLevel: 'sql',
+                            label: '数据导入'
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        path: '/sql111111111',
+        name: 'sql111111111',
+        component: () => import('@/views/sql/sql.vue')
+    }
+]
+export default routes
+```
+
+## 4.3 修改main.js
+
+```js
+import router from './router'
+
+app.use(router)
+```
+
