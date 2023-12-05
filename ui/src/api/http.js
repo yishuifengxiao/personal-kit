@@ -106,8 +106,6 @@ class http {
     const uri = this.url(url)
     const baseUrl = this.baseUrl(url)
 
-    // console.log('======> url = ' + url + '  baseUrl = ' + baseUrl + ' uri= ' + uri)
-
     options.url = uri
     options.method =
       typeof options.method === 'undefined' || options.method.trim().length === 0
@@ -163,7 +161,9 @@ class http {
         }
         if (data.code === 401) {
           that.message.warn(data.msg, 5, () => {
-            that.router.push({ name: 'login' })
+            that.router.push({
+              name: 'login'
+            })
           })
           return Promise.reject(Promise.reject(data.msg))
         }
