@@ -18,18 +18,18 @@
             label="账号"
             name="username"
             class="username"
-            :rules="[{ required: true, message: 'Please input your username!' }]"
+            :rules="[{ required: true, message: '账号不能为空' }]"
           >
-            <a-input v-model:value="formState.username" size="large" />
+            <a-input v-model:value="formState.username" size="large" allowClear />
           </a-form-item>
 
           <a-form-item
             label="密码"
             name="password"
             class="password"
-            :rules="[{ required: true, message: 'Please input your password!' }]"
+            :rules="[{ required: true, message: '密码不能为空' }]"
           >
-            <a-input-password v-model:value="formState.password" size="large" />
+            <a-input-password v-model:value="formState.password" size="large" allowClear />
           </a-form-item>
 
           <a-form-item label="记住账号" name="remember">
@@ -53,6 +53,8 @@
 import { reactive, defineComponent } from 'vue'
 import backgroundImage from '@/assets/backgroup/login-bg.png'
 import loginFormImage from '@/assets/backgroup/login_form.png'
+import { mapActions } from 'pinia'
+import { useUserStore } from '@/stores/user'
 export default defineComponent({
   data() {
     return {
@@ -60,23 +62,43 @@ export default defineComponent({
       loginFormImage
     }
   },
+
+  methods: {
+    ...mapActions(useUserStore, ['setToken']),
+    onFinish(values) {
+      console.log('Success:', values)
+
+      this.$http
+        .request({
+          url: '/personkit/login',
+          data: values,
+          method: 'post'
+        })
+        .then((res) => {
+          console.log(res)
+          if (res.code != 200) {
+            this.$msg.error(res.msg)
+          } else {
+            alert('---------')
+            const token = res.data.value
+            this.setToken(token)
+            this.$router.push({ name: 'sqlDataName' })
+          }
+        })
+    },
+
+    onFinishFailed(errorInfo) {
+      console.log('Failed:', errorInfo)
+    }
+  },
   setup() {
     const formState = reactive({
-      username: 'demo',
+      username: 'admin',
       password: '123456',
       remember: true
     })
-
-    const onFinish = (values) => {
-      console.log('Success:', values)
-    }
-    const onFinishFailed = (errorInfo) => {
-      console.log('Failed:', errorInfo)
-    }
     return {
-      formState,
-      onFinish,
-      onFinishFailed
+      formState
     }
   }
 })
@@ -134,11 +156,11 @@ export default defineComponent({
   justify-content: center;
 }
 
-.form_tail div{
-    display: inline-block;
+.form_tail div {
+  display: inline-block;
 }
 
-.form_tail_right{
-    float: right;
+.form_tail_right {
+  float: right;
 }
 </style>
