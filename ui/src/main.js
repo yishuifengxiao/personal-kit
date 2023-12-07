@@ -29,7 +29,7 @@ import cfg from "./config"
 
 // 全局注册 message
 import {
-    message
+    message, Modal
 } from 'ant-design-vue'
 
 // 全局注册http工具
@@ -53,7 +53,7 @@ app.config.globalProperties.$msg = message
 // 注册全局配置
 app.config.globalProperties.$cfg = cfg
 // 全局注册http工具
-app.config.globalProperties.$http = new http(pinia, router, message)
+app.config.globalProperties.$http = new http(pinia, router, message,Modal)
 
 
 app.mount('#app')

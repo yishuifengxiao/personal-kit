@@ -6,9 +6,6 @@ import config from '@/config'
 import { useUserStore } from '@/stores/user'
 
 axios.defaults.withCredentials = true
-const regex = new RegExp(
-  '^http[s]?://[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+.?(:[0-9]+)?'
-)
 
 class http {
   /**
@@ -24,20 +21,10 @@ class http {
   }
 
   /**
-   * 获取请求的请求头信息
+   * 提取请求的域名和端口
+   * @param {*} url
+   * @returns
    */
-  headers(options) {
-    const token = this.getTokenVal()
-    let headers = typeof options.headers === 'undefined' ? {} : options.headers
-    if (token.length === 0) {
-      return headers
-    }
-    // debugger
-    return Object.assign(headers, {
-      Authorization: `xtoken ${token}`
-    })
-  }
-
   protocolAndDomainAndPort(url) {
     try {
       if (!url.match('^http[s]?://')) {
@@ -96,28 +83,39 @@ class http {
   }
 
   /**
+   * 获取请求的请求头信息
+   */
+  headers(options) {
+    const token = this.getTokenVal()
+    let headers = typeof options.headers === 'undefined' ? {} : options.headers
+    if (token.length === 0) {
+      return headers
+    }
+    // debugger
+    return Object.assign(headers, {
+      Authorization: `xtoken ${token}`
+    })
+  }
+
+  /**
    * 开始真正的请求
    * @param {*} options
    */
   request(options) {
     //定义一个全局的请求头
-    const url = options.url
 
-    const uri = this.url(url)
-    const baseUrl = this.baseUrl(url)
-
-    options.url = uri
+    options.url = this.url(options.url)
     options.method =
       typeof options.method === 'undefined' || options.method.trim().length === 0
         ? 'get'
         : options.method
 
     const config = {
-      baseURL: baseUrl,
+      baseURL: this.baseUrl(options.url),
       headers: this.headers(options)
     }
-    const instance = axios.create()
     options = Object.assign(config, options)
+    const instance = axios.create()
     this.interceptors(instance, options.url)
     return instance(options)
   }
@@ -151,25 +149,36 @@ class http {
       (res) => {
         this.destroy(url)
         const { data, status } = res
-        // return { data, status };
-        // if (data.code !== 200) {
-        //   this.$Message.error(data.msg);
-        //   return false;
-        // }
+    
         if (status !== 200) {
+          // 请求处理失败
           data.code = status
         }
-        if (data.code === 401) {
-          that.message.warn(data.msg, 5, () => {
-            that.router.push({
-              name: 'login'
+        if (data.code !== 200) {
+          if (data.code === 401) {
+            this.modal.error({
+              title: '未经授权',
+              content: '您还未登陆或登陆状态已过,请重新登录后再访问此问题',
+              onOk() {
+                that.router.push({
+                  name: 'login'
+                })
+              },
+              onCancel() {
+                that.router.push({
+                  name: 'login'
+                })
+              }
             })
-          })
-          return Promise.reject(Promise.reject(data.msg))
+          } else {
+            // 非401
+            this.message.error(data.msg)
+          }
+
+          return Promise.reject(data.msg)
         }
 
-        return data
-        // return status === 200 ? data : { code: status };
+        return !data.data ? {} : data.data
       },
       (error) => {
         this.destroy(url)
@@ -178,11 +187,12 @@ class http {
     )
   }
 
-  constructor(pinia, router, message) {
+  constructor(pinia, router, message, modal) {
     this.userStore = useUserStore(pinia)
     this.router = router
     this.queue = {}
     this.message = message
+    this.modal = modal
   }
 }
 

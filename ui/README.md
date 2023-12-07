@@ -132,12 +132,23 @@ export const useUserStore = defineStore('useUserStore', {
 
 ## 2.1 安装
 
+
+
+应该使用
+
+```bash
+ npm i --save ant-design-vue@next -S 
+```
+
+类似下面官网的方式存在兼容性问题
+
 ```bash
 $ npm install ant-design-vue@4.x --save
 
 或
 
 $ yarn add ant-design-vue@4.x
+
 ```
 
 ## 2.2  **全局完整注册** 
