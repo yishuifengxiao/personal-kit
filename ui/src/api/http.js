@@ -149,7 +149,7 @@ class http {
       (res) => {
         this.destroy(url)
         const { data, status } = res
-    
+
         if (status !== 200) {
           // 请求处理失败
           data.code = status
@@ -172,7 +172,7 @@ class http {
             })
           } else {
             // 非401
-            this.message.error(data.msg)
+            that.message.error(data.msg)
           }
 
           return Promise.reject(data.msg)

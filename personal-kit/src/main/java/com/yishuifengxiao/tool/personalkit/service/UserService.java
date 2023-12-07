@@ -52,7 +52,9 @@ public class UserService {
 
     public LoginVo login(HttpServletRequest request, HttpServletResponse response, LoginQuery query) throws CustomException {
 
-        SysUser sysUser = sysUserDao.findActiveSysUser(query.getUsername().trim()).orElseThrow(() -> new UncheckedException(String.format("用户名%s不存在", query.getUsername())));
+        SysUser sysUser =
+                sysUserDao.findActiveSysUser(query.getUsername().trim()).orElseThrow(() -> new UncheckedException(
+                        "用户不存在"));
         Assert.isTrue("账号已过期", UserStat.ACCOUNT_EXPIRED.getCode() != sysUser.getStat());
         Assert.isTrue("密码已过期", UserStat.CREDENTIALS_EXPIRED.getCode() != sysUser.getStat());
         Assert.isTrue("账号已锁定", UserStat.ACCOUNT_LOCKED.getCode() != sysUser.getStat());
