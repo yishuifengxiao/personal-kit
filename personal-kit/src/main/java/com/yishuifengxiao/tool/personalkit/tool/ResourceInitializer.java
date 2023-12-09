@@ -146,7 +146,7 @@ public class ResourceInitializer implements CommandLineRunner {
         //初始化角色
         SysRole sysRole = JdbcUtil.jdbcHelper().saveOrUpdate(new SysRole(Constant.DEFAULT_ROOT_ID, "系统角色", "系统初始化数据," +
                 "内置超级管理员，具有系统全部权限", Constant.DEFAULT_ROOT_ID, DEFAULT_HOME_URL, RoleStat.ROLE_ENABLE.getCode(),
-                BoolStat.True.code(), LocalDateTime.now()));
+                BoolStat.True.code(), LocalDateTime.now(),1));
         // 初始化用户
         SysUser sysUser = JdbcUtil.jdbcHelper().saveOrUpdate(new SysUser().setUsername(Constant.DEFAULT_USER).setPwd(passwordEncoder.encode(Constant.DEFAULT_PWD)).setId(Constant.DEFAULT_ROOT_ID).setEmbedded(BoolStat.True.code())
                 //

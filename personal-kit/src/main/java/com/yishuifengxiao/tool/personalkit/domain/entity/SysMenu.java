@@ -1,5 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yishuifengxiao.common.tool.validate.Group;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -67,6 +68,10 @@ public class SysMenu implements Serializable {
 
     @Column(name = "idx")
     private Integer idx;
+
+    @JsonIgnore
+    @Column(name = "is_show", length = 1, columnDefinition = "tinyint(1) default 1")
+    private Integer isShow;
 
 
 

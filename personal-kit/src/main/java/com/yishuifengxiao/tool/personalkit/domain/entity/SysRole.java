@@ -76,4 +76,8 @@ public class SysRole implements Serializable {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createTime;
 
+    @JsonIgnore
+    @Column(name = "is_show", length = 1, columnDefinition = "tinyint(1) default 1")
+    private Integer isShow;
+
 }

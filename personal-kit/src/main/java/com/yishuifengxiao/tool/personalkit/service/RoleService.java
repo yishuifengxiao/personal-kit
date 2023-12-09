@@ -23,10 +23,7 @@ import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -76,15 +73,8 @@ public class RoleService {
 
         JdbcUtil.jdbcHelper().insertSelective(sysRole);
 
-        List<SysRoleMenu> rolePermissions = DataUtil.stream(param.getMenus())
-                .filter(Objects::nonNull)
-                .filter(v -> StringUtils.isNotBlank(v.getId()))
-                .filter(v -> JdbcUtil.jdbcHelper().countAll(new SysMenu().setId(v.getId().trim())) > 0)
-                .distinct()
-                .map(v -> new SysRoleMenu(IdWorker.snowflakeStringId(), sysRole.getId(), v.getId()))
-                .collect(Collectors.toList());
-        rolePermissions.stream().forEach(JdbcUtil.jdbcHelper()::insertSelective);
-
+        this.updateRoleMenu(param.getId(),param.getMenus());
+        //@formatter:on
     }
 
     public void updateRole(RoleVo param) {
@@ -108,17 +98,30 @@ public class RoleService {
         }
 
         JdbcUtil.jdbcHelper().updateByPrimaryKeySelective(role);
-        //删除旧的关联关系
-        JdbcUtil.jdbcHelper().delete(new SysRoleMenu().setRoleId(role.getId()));
+        this.updateRoleMenu(param.getId(),param.getMenus());
 
-        List<SysRoleMenu> rolePermissions = DataUtil.stream(param.getMenus())
+        //@formatter:on
+    }
+
+    public void updateRoleMenu(String roleId, List<SysMenu> menus) {
+        //@formatter:off
+        //删除旧的关联关系
+        JdbcUtil.jdbcHelper().delete(new SysRoleMenu().setRoleId(roleId));
+
+        Set<String> menuIds = DataUtil.stream(menus)
                 .filter(Objects::nonNull)
                 .filter(v -> StringUtils.isNotBlank(v.getId()))
-                .filter(v -> JdbcUtil.jdbcHelper().countAll(new SysPermission().setId(v.getId().trim())) > 0)
+                .filter(v -> JdbcUtil.jdbcHelper().countAll(new SysMenu().setId(v.getId().trim())) > 0)
                 .distinct()
-                .map(v -> new SysRoleMenu(IdWorker.snowflakeStringId(), role.getId(), v.getId()))
-                .collect(Collectors.toList());
-        rolePermissions.stream().forEach(JdbcUtil.jdbcHelper()::insertSelective);
+                .map(SysMenu::getId)
+                .collect(Collectors.toSet());
+
+        //增加隐藏菜单
+        menuIds.addAll(JdbcUtil.jdbcHelper().findAll(new SysMenu().setIsShow(BoolStat.True.code())).stream().map(SysMenu::getId).filter(menuId->menuIds.stream().noneMatch(s->s.equals(menuId)))
+                .distinct().collect(Collectors.toList()));
+
+
+        menuIds.stream().filter(StringUtils::isNotBlank).map(v -> new SysRoleMenu(IdWorker.snowflakeStringId(),roleId, v)).forEach(JdbcUtil.jdbcHelper()::insertSelective);
         //@formatter:on
     }
 
@@ -182,8 +185,7 @@ public class RoleService {
             Assert.isNotNull(String.format("角色%s不存在", roleId), sysRole);
             Assert.isFalse(String.format("角色%s已禁用", sysRole.getName()), RoleStat.ROLE_DISABLE.getCode() == sysRole.getStat());
 
-            JdbcUtil.jdbcHelper().insertSelective(new SysUserRole(IdWorker.snowflakeStringId(), user.getId(),
-                    sysRole.getId()));
+            JdbcUtil.jdbcHelper().insertSelective(new SysUserRole(IdWorker.snowflakeStringId(), user.getId(), sysRole.getId()));
         }
 
     }

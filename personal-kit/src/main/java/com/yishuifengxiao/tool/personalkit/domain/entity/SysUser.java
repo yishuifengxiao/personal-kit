@@ -112,4 +112,8 @@ public class SysUser implements Serializable {
     @Column(name = "is_embedded", length = 1, columnDefinition = "tinyint(1) default 0")
     @JsonIgnore
     private Integer embedded;
+
+    @JsonIgnore
+    @Column(name = "is_show", length = 1, columnDefinition = "tinyint(1) default 1")
+    private Integer isShow;
 }
