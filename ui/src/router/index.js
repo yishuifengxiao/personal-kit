@@ -19,7 +19,6 @@ router.beforeEach(async (to, from) => {
   // 路由守卫 https://router.vuejs.org/zh/guide/advanced/navigation-guards.html
   const store = useUserStore()
   const isLogin = store.isLogin
-  console.log('======================> 登录状态为 ' + isLogin + '  登录token 为 ' + store.tokenVal)
   if (to.meta.requiresAuth) {
     // 需要登录
     if (

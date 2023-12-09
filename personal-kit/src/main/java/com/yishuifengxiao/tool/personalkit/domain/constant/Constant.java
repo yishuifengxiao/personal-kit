@@ -44,4 +44,9 @@ public final class Constant {
      * 默认的首页路径
      */
     public final static String DEFAULT_HOME_URL = "/";
+
+    /**
+     * 当前角色
+     */
+    public final static String CURRENT_ROLE = "current_role";
 }

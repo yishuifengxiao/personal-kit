@@ -28,6 +28,7 @@
         </div>
       </div>
     </div>
+    <ViewChoose></ViewChoose>
   </div>
 </template>
 
@@ -37,6 +38,7 @@ import backgroundImage from '@/assets/backgroup/login-bg.png'
 import loginFormImage from '@/assets/backgroup/login_form.png'
 import { mapActions } from 'pinia'
 import { useUserStore } from '@/stores/user'
+import ViewChoose from './login/ViewChoose.vue'
 export default defineComponent({
   data() {
     return {
@@ -58,24 +60,32 @@ export default defineComponent({
           console.log(res)
           const token = res.value
           this.setToken(token)
-          this.$router.push({ name: 'sqlDataName' })
+          this.doAction(res)
         })
         .catch((err) => console.log(err))
     },
 
     onFinishFailed(errorInfo) {
       console.log('Failed:', errorInfo)
+    },
+
+    doAction(res) {
+      this.$router.push({ name: 'home' })
+
     }
   },
   setup() {
     const formState = reactive({
-      username: 'admin',
+      username: 'yishui',
       password: '123456',
       remember: true
     })
     return {
       formState
     }
+  },
+  components: {
+    ViewChoose
   }
 })
 </script>
@@ -130,6 +140,7 @@ export default defineComponent({
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
 }
 
 .form_tail div {

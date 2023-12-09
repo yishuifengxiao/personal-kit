@@ -12,20 +12,20 @@ import java.io.Serializable;
 import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.GENERIC_GENERATOR;
 
 /**
- * @author yishui
+ * @author qingteng
  * @version 1.0.0
- * @date 2023/11/7-13:24
+ * @date 2023/12/9 18:08
  * @since 1.0.0
  */
-@Table(name = "sys_relation_user_role", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_user_role", columnNames = {"user_id", "role_id"})
+@Table(name = "sys_role_menu", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_role_menu", columnNames = {"role_id", "menu_id"})
 })
-@Entity(name = "sys_relation_user_role")
+@Entity(name = "sys_role_menu")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class SysRelationUserRole implements Serializable {
+public class SysRoleMenu implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "system_uuid")
@@ -33,15 +33,16 @@ public class SysRelationUserRole implements Serializable {
     @Column(name = "id", length = 64, nullable = false, unique = true)
     private String id;
 
-    @Column(name = "user_id", nullable = false, length = 64)
-    private String userId;
 
     @Column(name = "role_id", nullable = false, length = 64)
     private String roleId;
 
+    @Column(name = "menu_id", nullable = false, length = 64)
+    private String menuId;
 
-    public SysRelationUserRole(String userId, String roleId) {
+
+    public SysRoleMenu(String roleId, String menuId) {
         this.roleId = roleId;
-        this.userId = userId;
+        this.menuId = menuId;
     }
 }

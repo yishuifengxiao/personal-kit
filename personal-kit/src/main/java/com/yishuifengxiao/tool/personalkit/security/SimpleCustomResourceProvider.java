@@ -5,11 +5,16 @@ import com.yishuifengxiao.common.security.httpsecurity.authorize.custom.CustomRe
 import com.yishuifengxiao.common.security.support.PropertyResource;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.collections.DataUtil;
+import com.yishuifengxiao.common.tool.entity.BoolStat;
+import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
+import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.tool.ResourceInitializer;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -29,8 +34,8 @@ import java.util.stream.Collectors;
  */
 @Component
 public class SimpleCustomResourceProvider implements CustomResourceProvider {
-
-
+    @Autowired
+    private SysUserDao sysUserDao;
     @Autowired
     private PropertyResource propertyResource;
     @Autowired
@@ -39,11 +44,20 @@ public class SimpleCustomResourceProvider implements CustomResourceProvider {
     @Override
     public boolean hasPermission(HttpServletRequest request, Authentication authentication) {
         //包含context-path
-        String uri = request.getRequestURI().toLowerCase();
-        String uriWithoutContextPath = StringUtils.substringAfter(uri, propertyResource.contextPath());
+        SysUser sysUser = sysUserDao.findActiveSysUser(authentication.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("账号%s不存在", authentication.getName())));
+        if (StringUtils.equalsIgnoreCase(sysUser.getId(), Constant.DEFAULT_ROOT_ID) || BoolStat.isTrue(sysUser.getEmbedded())) {
+            return true;
+        }
+        //当前角色
+        String currentRole = currentRole(request);
 
-        String sql = "SELECT  DISTINCT sp.* FROM sys_user su JOIN sys_relation_user_role sur ON su.id = sur.user_id " + "JOIN " + "sys_role sr ON sur.role_id = sr.id AND sr.stat = 1" + " JOIN sys_relation_role_permission srp ON sr.id = srp.role_id JOIN sys_permission sp ON srp.permission_id = sp.id " + "WHERE su.username = '%s' AND su.ver = 0";
-        sql = String.format(sql, authentication.getName());
+        String sql = "SELECT DISTINCT sp.* FROM sys_permission sp, sys_menu_permission smp, sys_menu sm, " +
+                "sys_role_menu srm WHERE smp.permission_id = sp.id AND smp.menu_id = sm.id AND sm.id = srm.menu_id ";
+
+        if (StringUtils.isNotBlank(currentRole)) {
+            sql += " AND srm.menu_id = " + currentRole;
+        }
 
         List<SysPermission> list = JdbcUtil.jdbcHelper().query(SysPermission.class, sql).orElse(Collections.EMPTY_LIST);
 
@@ -53,6 +67,15 @@ public class SimpleCustomResourceProvider implements CustomResourceProvider {
 
         boolean anyMatch = orRequestMatcher.matches(request);
         return anyMatch;
+    }
+
+
+    private String currentRole(HttpServletRequest request) {
+        String currentRole = request.getHeader(Constant.CURRENT_ROLE);
+        if (StringUtils.isNotBlank(currentRole)) {
+            return currentRole.trim();
+        }
+        return request.getParameter(Constant.CURRENT_ROLE);
     }
 
     @Override

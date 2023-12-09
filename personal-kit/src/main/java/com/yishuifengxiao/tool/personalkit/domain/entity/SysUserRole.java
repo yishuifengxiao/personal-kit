@@ -17,15 +17,15 @@ import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.GENER
  * @date 2023/11/7-13:24
  * @since 1.0.0
  */
-@Table(name = "sys_relation_role_permission", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_role_permission", columnNames = {"role_id", "permission_id"})
+@Table(name = "sys_user_role", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_user_role", columnNames = {"user_id", "role_id"})
 })
-@Entity(name = "sys_relation_role_permission")
+@Entity(name = "sys_user_role")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class SysRelationRolePermission implements Serializable {
+public class SysUserRole implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "system_uuid")
@@ -33,16 +33,15 @@ public class SysRelationRolePermission implements Serializable {
     @Column(name = "id", length = 64, nullable = false, unique = true)
     private String id;
 
+    @Column(name = "user_id", nullable = false, length = 64)
+    private String userId;
 
     @Column(name = "role_id", nullable = false, length = 64)
     private String roleId;
 
-    @Column(name = "permission_id", nullable = false, length = 64)
-    private String permissionId;
 
-
-    public SysRelationRolePermission(String roleId, String permissionId) {
+    public SysUserRole(String userId, String roleId) {
         this.roleId = roleId;
-        this.permissionId = permissionId;
+        this.userId = userId;
     }
 }

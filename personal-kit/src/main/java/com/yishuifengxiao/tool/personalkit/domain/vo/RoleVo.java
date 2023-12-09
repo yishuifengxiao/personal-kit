@@ -1,6 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.domain.vo;
 
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
@@ -20,5 +20,5 @@ import java.util.List;
 public class RoleVo extends SysRole implements Serializable {
 
     @Valid
-    private List<SysPermission> permissions;
+    private List<SysMenu> menus;
 }

@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author yishui
@@ -32,22 +31,5 @@ public class LoginVo implements Serializable {
 
     @JsonIgnore
     private transient SecurityToken securityToken;
-
-    private List<Role> roles;
-
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Accessors(chain = true)
-    public static class Role implements Serializable {
-        private String id;
-        private String name;
-
-
-        private String description;
-
-        private String homeUrl;
-    }
 
 }

@@ -56,29 +56,26 @@ public class SysService {
      * @return
      */
     public Page<RoleVo> findPageRole(BaseQuery<RoleQuery> pageQuery) {
-        String sql = "SELECT DISTINCT sr.* from sys_role sr,sys_relation_role_permission srp,sys_permission sp where " + "sr.id=srp" + ".role_id and srp.permission_id=sp.id ";
-        sql += QueryUtil.createAndSql(pageQuery.getQuery(), false, "sp");
+        String sql = "SELECT DISTINCT sr.* from sys_role sr ,sys_role_menu srm ,sys_menu sm WHERE sr.id=srm.role_id and srm.menu_id=sm.id ";
+        sql += QueryUtil.createAndSql(pageQuery.getQuery(), false, "sm");
         sql += QueryUtil.createAndSql(pageQuery.getQuery(), true, "sr");
 
         Page<SysRole> page = JdbcUtil.jdbcHelper().query(SysRole.class, pageQuery, sql);
         return page.map(v -> {
             RoleVo roleVo = BeanUtil.copy(v, new RoleVo());
-            String psql = "SELECT DISTINCT sp.* from sys_permission sp,sys_relation_role_permission srp where sp.id=srp" + ".permission_id and srp.role_id=" + v.getId();
-            roleVo.setPermissions(JdbcUtil.jdbcHelper().query(SysPermission.class, psql).orElse(Collections.EMPTY_LIST));
+            String psql = "SELECT DISTINCT sm.* from sys_role sr ,sys_role_menu srm ,sys_menu sm WHERE sr.id=srm.role_id and srm.menu_id=sm.id AND sr.id= ？";
+            roleVo.setMenus(JdbcUtil.jdbcHelper().query(SysMenu.class, psql, v.getId()).orElse(Collections.EMPTY_LIST));
             return roleVo;
         });
     }
 
 
     public void addRole(RoleVo param) {
+        //@formatter:off
 
         Assert.isNull("角色已存在", JdbcUtil.jdbcHelper().findOne(new SysRole().setName(param.getName().trim())));
         SysRole sysRole = BeanUtil.copy(param, new SysRole()).setId(IdWorker.snowflakeStringId()).setEmbedded(BoolStat.False.code()).setCreateTime(LocalDateTime.now()).setName(param.getName().trim());
-        if (null == param.getStat()) {
-            sysRole.setStat(RoleStat.ROLE_ENABLE.getCode());
-        } else {
-            sysRole.setStat(RoleStat.code(param.getStat()).orElse(RoleStat.ROLE_DISABLE).getCode());
-        }
+        sysRole.setStat(null == param.getStat() ? RoleStat.ROLE_ENABLE.getCode() : RoleStat.code(param.getStat()).orElse(RoleStat.ROLE_DISABLE).getCode());
         if (StringUtils.isNotBlank(param.getParentId())) {
             Assert.lteZeroN("父角色不存在", JdbcUtil.jdbcHelper().countAll(new SysRole().setId(param.getParentId().trim())));
             sysRole.setParentId(param.getParentId().trim());
@@ -88,11 +85,19 @@ public class SysService {
 
         JdbcUtil.jdbcHelper().insertSelective(sysRole);
 
-        List<SysRelationRolePermission> rolePermissions = DataUtil.stream(param.getPermissions()).filter(Objects::nonNull).filter(v -> StringUtils.isNotBlank(v.getId()) && JdbcUtil.jdbcHelper().countAll(new SysPermission().setId(v.getId().trim())) > 0).distinct().map(v -> new SysRelationRolePermission(IdWorker.snowflakeStringId(), sysRole.getId(), v.getId())).collect(Collectors.toList());
+        List<SysRoleMenu> rolePermissions = DataUtil.stream(param.getMenus())
+                .filter(Objects::nonNull)
+                .filter(v -> StringUtils.isNotBlank(v.getId()))
+                .filter(v -> JdbcUtil.jdbcHelper().countAll(new SysMenu().setId(v.getId().trim())) > 0)
+                .distinct()
+                .map(v -> new SysRoleMenu(IdWorker.snowflakeStringId(), sysRole.getId(), v.getId()))
+                .collect(Collectors.toList());
         rolePermissions.stream().forEach(JdbcUtil.jdbcHelper()::insertSelective);
+
     }
 
     public void updateRole(RoleVo param) {
+        //@formatter:off
         SysRole role = JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, param.getId());
         Assert.isNotNull("记录不存在", role);
         if (StringUtils.isNotBlank(param.getName()) && !StringUtils.equalsIgnoreCase(param.getName().trim(), role.getName())) {
@@ -110,11 +115,20 @@ public class SysService {
             Assert.lteZeroN("父角色不存在", JdbcUtil.jdbcHelper().countAll(new SysRole().setId(param.getParentId().trim())));
             role.setParentId(param.getParentId().trim());
         }
-        JdbcUtil.jdbcHelper().updateByPrimaryKeySelective(role);
-        JdbcUtil.jdbcHelper().delete(new SysRelationRolePermission().setRoleId(role.getId()));
 
-        List<SysRelationRolePermission> rolePermissions = DataUtil.stream(param.getPermissions()).filter(Objects::nonNull).filter(v -> StringUtils.isNotBlank(v.getId()) && JdbcUtil.jdbcHelper().countAll(new SysPermission().setId(v.getId().trim())) > 0).distinct().map(v -> new SysRelationRolePermission(IdWorker.snowflakeStringId(), role.getId(), v.getId())).collect(Collectors.toList());
+        JdbcUtil.jdbcHelper().updateByPrimaryKeySelective(role);
+        //删除旧的关联关系
+        JdbcUtil.jdbcHelper().delete(new SysRoleMenu().setRoleId(role.getId()));
+
+        List<SysRoleMenu> rolePermissions = DataUtil.stream(param.getMenus())
+                .filter(Objects::nonNull)
+                .filter(v -> StringUtils.isNotBlank(v.getId()))
+                .filter(v -> JdbcUtil.jdbcHelper().countAll(new SysPermission().setId(v.getId().trim())) > 0)
+                .distinct()
+                .map(v -> new SysRoleMenu(IdWorker.snowflakeStringId(), role.getId(), v.getId()))
+                .collect(Collectors.toList());
         rolePermissions.stream().forEach(JdbcUtil.jdbcHelper()::insertSelective);
+        //@formatter:on
     }
 
 
@@ -126,18 +140,21 @@ public class SysService {
             Assert.isFalse("内置角色不允许删除", sysRole.getEmbedded() == BoolStat.True.code());
             Assert.isFalse("未禁用的角色不允许删除", sysRole.getStat() == RoleStat.ROLE_ENABLE.getCode());
             JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysRole.class, id.trim());
+            // 删除关联关系
+            JdbcUtil.jdbcHelper().delete(new SysRoleMenu().setRoleId(id.trim()));
+            JdbcUtil.jdbcHelper().delete(new SysUserRole().setRoleId(id.trim()));
         }
     }
 
 
     public Page<UserVo> findPageUser(BaseQuery<UserQuery> pageQuery) {
-        String sql = "SELECT  DISTINCT su.* from sys_user su,sys_relation_user_role sur,sys_role sr where su.id=sur" + ".user_id  and sur.role_id=sr.id ";
+        String sql = "SELECT  DISTINCT su.* from sys_user su,sys_user_role sur,sys_role sr where su.id=sur" + ".user_id  and sur.role_id=sr.id ";
         sql += QueryUtil.createAndSql(pageQuery.getQuery(), false, "sr");
         sql += QueryUtil.createAndSql(pageQuery.getQuery(), true, "su");
         Page<SysUser> page = JdbcUtil.jdbcHelper().query(SysUser.class, pageQuery, sql);
         return page.map(v -> {
             UserVo userVo = BeanUtil.copy(v, new UserVo());
-            String psql = "SELECT  DISTINCT sr.* from sys_relation_user_role sur,sys_role sr where sur.role_id=sr.id " + "and sur.user_id=?";
+            String psql = "SELECT  DISTINCT sr.* from sys_user_role sur,sys_role sr where sur.role_id=sr.id " + "and sur.user_id=?";
             Optional<List<SysRole>> roles = JdbcUtil.jdbcHelper().query(SysRole.class, psql, v.getId());
             userVo.setRoles(roles.orElse(Collections.EMPTY_LIST));
             return userVo;
@@ -145,23 +162,37 @@ public class SysService {
     }
 
     public void updateRoleUser(RoleUserReq roleUserReq) {
+        //@formatter:off
         SysRole sysRole = JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, roleUserReq.getId().trim());
         Assert.isNotNull("角色不存在", sysRole);
         Assert.isFalse("角色已禁用", RoleStat.ROLE_DISABLE.getCode() == sysRole.getStat());
-        DataUtil.stream(roleUserReq.getUserIds()).filter(StringUtils::isNotBlank).distinct().filter(v -> !StringUtils.equalsIgnoreCase(v, Constant.DEFAULT_ROOT_ID)).filter(v -> null == JdbcUtil.jdbcHelper().findOne(new SysRelationUserRole(v.trim(), roleUserReq.getId().trim()))).map(v -> new SysRelationUserRole(IdWorker.snowflakeStringId(), v.trim(), roleUserReq.getId().trim())).forEach(JdbcUtil.jdbcHelper()::insertSelective);
+          DataUtil.stream(roleUserReq.getUserIds())
+                .filter(StringUtils::isNotBlank)
+                .map(String::trim)
+                .distinct()
+                  // 排除超级管理员
+                .filter(v -> !StringUtils.equalsIgnoreCase(v, Constant.DEFAULT_ROOT_ID))
+                .filter(v->null!= JdbcUtil.jdbcHelper().findByPrimaryKey(SysUser.class,v))
+                  //删除旧的关联关系
+               .filter(v-> JdbcUtil.jdbcHelper().delete(new SysUserRole(v,roleUserReq.getId().trim()))>0)
+                .map(v -> new SysUserRole(IdWorker.snowflakeStringId(), v.trim(), roleUserReq.getId().trim()))
+                .forEach(JdbcUtil.jdbcHelper()::insertSelective);
+        //@formatter:on
     }
 
     public void updateUserRole(UserRoleReq userRoleReq) {
         SysUser user = JdbcUtil.jdbcHelper().findByPrimaryKey(SysUser.class, userRoleReq.getId().trim());
         Assert.isNotNull("用户不存在", user);
         Assert.isFalse("内置用户禁止编辑", BoolStat.True.code() == user.getEmbedded());
-        JdbcUtil.jdbcHelper().delete(new SysRelationUserRole().setUserId(user.getId()));
-        DataUtil.stream(userRoleReq.getRoleIds()).distinct().filter(StringUtils::isNotBlank).map(String::trim).map(v -> {
-            SysRole sysRole = JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, v.trim());
-            Assert.isNotNull(String.format("角色%s不存在", v), sysRole);
+        //删除旧的关联关系
+        JdbcUtil.jdbcHelper().delete(new SysUserRole().setUserId(user.getId()));
+        for (String roleId : DataUtil.stream(userRoleReq.getRoleIds()).distinct().filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList())) {
+            SysRole sysRole = JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, roleId.trim());
+            Assert.isNotNull(String.format("角色%s不存在", roleId), sysRole);
             Assert.isFalse(String.format("角色%s已禁用", sysRole.getName()), RoleStat.ROLE_DISABLE.getCode() == sysRole.getStat());
 
-            return new SysRelationUserRole(IdWorker.snowflakeStringId(), user.getId(), sysRole.getId());
-        }).forEach(JdbcUtil.jdbcHelper()::insertSelective);
+            JdbcUtil.jdbcHelper().insertSelective(new SysUserRole(IdWorker.snowflakeStringId(), user.getId(), sysRole.getId()))
+        }
+
     }
 }

@@ -15,16 +15,9 @@ import javax.persistence.Column;
 public class RoleQuery extends SysRole {
 
     @Column(name = "id")
-    private String permissionId;
+    private String menuId;
 
     @Column(name = "name")
-    private String permissionName;
-
-    private String url;
-
-    @Column(name = "context_path")
-    private String contextPath;
-
-    @Column(name = "application_name")
-    private String applicationName;
+    private String menuName;
+    
 }

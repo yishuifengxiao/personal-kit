@@ -20,6 +20,7 @@ import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.LoginVo;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
+import com.yishuifengxiao.tool.personalkit.domain.vo.UserRoleVo;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -54,7 +55,7 @@ public class UserService {
 
         SysUser sysUser =
                 sysUserDao.findActiveSysUser(query.getUsername().trim()).orElseThrow(() -> new UncheckedException(
-                        "用户不存在"));
+                        "账号不存在"));
         Assert.isTrue("账号已过期", UserStat.ACCOUNT_EXPIRED.getCode() != sysUser.getStat());
         Assert.isTrue("密码已过期", UserStat.CREDENTIALS_EXPIRED.getCode() != sysUser.getStat());
         Assert.isTrue("账号已锁定", UserStat.ACCOUNT_LOCKED.getCode() != sysUser.getStat());
@@ -74,7 +75,7 @@ public class UserService {
         request.getSession().setAttribute(requestParameter, token.getValue());
 
 
-        return new LoginVo(sysUser.getId(), sysUser.getUsername(), sysUser.getNickname(), token.getValue(), token, roles.stream().map(v -> new LoginVo.Role(v.getId(), v.getName(), v.getDescription(), v.getHomeUrl())).collect(Collectors.toList()));
+        return new LoginVo(sysUser.getId(), sysUser.getUsername(), sysUser.getNickname(), token.getValue(), token);
 
     }
 
@@ -119,5 +120,10 @@ public class UserService {
         Assert.isTrue("邮箱不匹配", StringUtils.equalsIgnoreCase(sysUser.getEmail(), req.getEmail()));
         sysUser.setPwd(passwordEncoder.encode(Constant.DEFAULT_PWD));
         sysUserRepository.saveAndFlush(sysUser);
+    }
+
+    public List<UserRoleVo> findUserRoles(String userId) {
+        List<SysRole> roles = sysUserDao.findAllRoleByUserId(userId);
+        return roles.stream().map(v -> new UserRoleVo(v.getId(), v.getName(), v.getDescription(), v.getHomeUrl())).collect(Collectors.toList());
     }
 }

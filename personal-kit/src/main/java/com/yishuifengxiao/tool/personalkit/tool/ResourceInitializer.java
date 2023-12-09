@@ -153,13 +153,14 @@ public class ResourceInitializer implements CommandLineRunner {
                 .setVer(Constant.ACTIVE_DATA_VER).setStat(UserStat.ACCOUNT_ENABLE.getCode()).setCreateTime(LocalDateTime.now()).setLastUpdateTime(LocalDateTime.now()).setNickname("系统超级管理员"));
 
         // 初始化 角色-权限 关联
-        permissions.stream().map(v -> new SysRelationRolePermission(Md5.md5Short(sysRole.getId() + v.getId()), sysRole.getId(), v.getId())).forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
+        permissions.stream().map(v -> new SysMenuPermission(Md5.md5Short(sysRole.getId() + v.getId()), sysRole.getId(), v.getId())).forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
 
         //初始化
-        SysRelationUserRole userRole = new SysRelationUserRole(Md5.md5Short(sysUser.getId() + sysRole.getId()), sysUser.getId(), sysRole.getId());
+        SysUserRole userRole = new SysUserRole(Md5.md5Short(sysUser.getId() + sysRole.getId()), sysUser.getId(), sysRole.getId());
         JdbcUtil.jdbcHelper().saveOrUpdate(userRole);
         this.hasInit = true;
     }
+
 
     @Override
     public void run(String... args) throws Exception {
