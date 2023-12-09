@@ -2,12 +2,18 @@ package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
+import com.yishuifengxiao.common.tool.entity.BaseQuery;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
+import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.vo.MenuTree;
+import com.yishuifengxiao.tool.personalkit.domain.vo.PermissionVo;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +25,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class MenuService {
+
+
 
     public List<MenuTree> findAllMenus() {
         // 顶部菜单

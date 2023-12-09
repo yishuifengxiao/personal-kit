@@ -15,7 +15,6 @@ import com.yishuifengxiao.tool.personalkit.domain.query.RoleQuery;
 import com.yishuifengxiao.tool.personalkit.domain.query.UserQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.RoleUserReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UserRoleReq;
-import com.yishuifengxiao.tool.personalkit.domain.vo.PermissionVo;
 import com.yishuifengxiao.tool.personalkit.domain.vo.RoleVo;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserVo;
 import com.yishuifengxiao.tool.personalkit.utils.QueryUtil;
@@ -38,16 +37,8 @@ import java.util.stream.Collectors;
  */
 @Component
 @Transactional(rollbackOn = {Exception.class})
-public class SysService {
+public class RoleService {
 
-    public Page<PermissionVo> findPagePermission(BaseQuery<SysPermission> pageQuery) {
-        return JdbcUtil.jdbcHelper().findPage(pageQuery.query().orElse(new SysPermission()), pageQuery.size().intValue(), pageQuery.num().intValue()).map(v -> {
-            PermissionVo permissionVo = BeanUtil.copy(v, new PermissionVo());
-            String sql = "SELECT DISTINCT sr.* from sys_role sr,sys_relation_role_permission srp where sr.id=srp" + ".role_id AND srp.permission_id = ?";
-            permissionVo.setRoles(JdbcUtil.jdbcHelper().query(SysRole.class, sql, v.getId()).orElse(Collections.EMPTY_LIST));
-            return permissionVo;
-        });
-    }
 
     /**
      * 分页查询角色
@@ -191,7 +182,8 @@ public class SysService {
             Assert.isNotNull(String.format("角色%s不存在", roleId), sysRole);
             Assert.isFalse(String.format("角色%s已禁用", sysRole.getName()), RoleStat.ROLE_DISABLE.getCode() == sysRole.getStat());
 
-            JdbcUtil.jdbcHelper().insertSelective(new SysUserRole(IdWorker.snowflakeStringId(), user.getId(), sysRole.getId()))
+            JdbcUtil.jdbcHelper().insertSelective(new SysUserRole(IdWorker.snowflakeStringId(), user.getId(),
+                    sysRole.getId()));
         }
 
     }
