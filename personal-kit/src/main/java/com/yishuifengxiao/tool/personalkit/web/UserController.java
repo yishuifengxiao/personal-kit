@@ -2,11 +2,9 @@ package com.yishuifengxiao.tool.personalkit.web;
 
 import com.yishuifengxiao.common.tool.validate.Group;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
-import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
-import com.yishuifengxiao.tool.personalkit.domain.vo.UserRoleVo;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,7 +14,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 /**
  * @author yishui
@@ -58,9 +55,5 @@ public class UserController {
         userService.updateUser(req);
     }
 
-    @ApiOperation("用户拥有的角色")
-    @PostMapping("/roles")
-    public List<UserRoleVo> roles(@Valid @RequestBody IdReq req) {
-        return userService.findUserRoles(req.getId());
-    }
+
 }

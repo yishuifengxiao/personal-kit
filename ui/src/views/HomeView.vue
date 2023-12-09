@@ -109,7 +109,7 @@
 <script>
 import { ref, defineComponent } from 'vue'
 
-import { UserOutlined, LaptopOutlined, NotificationOutlined, AntDesignOutlined } from '@ant-design/icons-vue'
+import { UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/icons-vue'
 export default defineComponent({
   setup() {
     const selectedKeys1 = ref(['2'])
@@ -121,8 +121,7 @@ export default defineComponent({
   components: {
     UserOutlined,
     LaptopOutlined,
-    NotificationOutlined,
-    AntDesignOutlined
+    NotificationOutlined
   }
 })
 </script>

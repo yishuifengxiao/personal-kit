@@ -6,7 +6,6 @@ import com.yishuifengxiao.common.security.support.PropertyResource;
 import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.TokenUtil;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
-import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
 import com.yishuifengxiao.common.tool.utils.Assert;
@@ -21,7 +20,6 @@ import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.LoginVo;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
-import com.yishuifengxiao.tool.personalkit.domain.vo.UserRoleVo;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,11 +29,8 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @author yishui
@@ -123,11 +118,5 @@ public class UserService {
         sysUserRepository.saveAndFlush(sysUser);
     }
 
-    public List<UserRoleVo> findUserRoles(String userId) {
-        SysUser user = sysUserRepository.findById(StringUtils.trim(userId)).orElseThrow(() -> new UncheckedException("记录不存在"));
 
-        List<SysRole> roles = BoolStat.isTrue(user.getEmbedded()) ? Arrays.asList(JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, Constant.DEFAULT_ROOT_ID)) : sysUserDao.findAllRoleByUserId(user.getId());
-        return roles.stream().filter(Objects::nonNull).map(v -> new UserRoleVo(v.getId(), v.getName(), v.getDescription(),
-                v.getHomeUrl())).collect(Collectors.toList());
-    }
 }
