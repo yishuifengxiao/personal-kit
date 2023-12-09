@@ -3,6 +3,7 @@ package com.yishuifengxiao.tool.personalkit.domain.request;
 import com.yishuifengxiao.common.security.support.Strategy;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,7 +14,7 @@ import java.util.List;
  * @since 1.0.0
  */
 @Data
-public class RecordReq {
+public class RecordReq implements Serializable {
 
     private LocalDateTime startTime;
 

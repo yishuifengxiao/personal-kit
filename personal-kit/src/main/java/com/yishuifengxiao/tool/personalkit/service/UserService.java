@@ -6,6 +6,7 @@ import com.yishuifengxiao.common.security.support.PropertyResource;
 import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.TokenUtil;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
+import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
 import com.yishuifengxiao.common.tool.utils.Assert;
@@ -30,8 +31,10 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -53,9 +56,7 @@ public class UserService {
 
     public LoginVo login(HttpServletRequest request, HttpServletResponse response, LoginQuery query) throws CustomException {
 
-        SysUser sysUser =
-                sysUserDao.findActiveSysUser(query.getUsername().trim()).orElseThrow(() -> new UncheckedException(
-                        "账号不存在"));
+        SysUser sysUser = sysUserDao.findActiveSysUser(query.getUsername().trim()).orElseThrow(() -> new UncheckedException("账号不存在"));
         Assert.isTrue("账号已过期", UserStat.ACCOUNT_EXPIRED.getCode() != sysUser.getStat());
         Assert.isTrue("密码已过期", UserStat.CREDENTIALS_EXPIRED.getCode() != sysUser.getStat());
         Assert.isTrue("账号已锁定", UserStat.ACCOUNT_LOCKED.getCode() != sysUser.getStat());
@@ -123,7 +124,10 @@ public class UserService {
     }
 
     public List<UserRoleVo> findUserRoles(String userId) {
-        List<SysRole> roles = sysUserDao.findAllRoleByUserId(userId);
-        return roles.stream().map(v -> new UserRoleVo(v.getId(), v.getName(), v.getDescription(), v.getHomeUrl())).collect(Collectors.toList());
+        SysUser user = sysUserRepository.findById(StringUtils.trim(userId)).orElseThrow(() -> new UncheckedException("记录不存在"));
+
+        List<SysRole> roles = BoolStat.isTrue(user.getEmbedded()) ? Arrays.asList(JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, Constant.DEFAULT_ROOT_ID)) : sysUserDao.findAllRoleByUserId(user.getId());
+        return roles.stream().filter(Objects::nonNull).map(v -> new UserRoleVo(v.getId(), v.getName(), v.getDescription(),
+                v.getHomeUrl())).collect(Collectors.toList());
     }
 }

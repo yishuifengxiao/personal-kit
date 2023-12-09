@@ -4,17 +4,16 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
 import lombok.Data;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
- * @author yishui
+ * @author qingteng
  * @version 1.0.0
- * @date 2023/11/23 19:44
+ * @date 2023/12/9 22:07
  * @since 1.0.0
  */
 @Data
-public class PermissionVo extends SysPermission implements Serializable {
+public class MenuVo extends SysMenu {
 
-    private List<SysMenu> menus;
+    private List<SysPermission> permissions;
 }
