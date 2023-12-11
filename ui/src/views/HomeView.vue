@@ -67,10 +67,12 @@
       <a-layout-sider width="200" style="background: #fff">
         <!-- 左侧菜单 -->
         <a-menu
-          v-model:selectedKeys="selectedLeftKeys"
-          v-model:openKeys="openKeys"
+          v-model:selectedKeys="selectedLeftKeysSource"
+          v-model:openKeys="openKeysSource"
           mode="inline"
           :items="leftMenuSource"
+          @select="onLeftMenuSelect"
+          @click="onLeftClick"
           :style="{ height: '100%', borderRight: 0 }"
         >
         </a-menu>
@@ -85,8 +87,8 @@
         <a-layout-content
           :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
         >
-          Content {{ menu.topMenus }}
-          <br />     <br />
+          Content {{ menu.topMenus }} <br />
+          <br />
           == currentTopMenuId========= {{ currentTopMenuId }}
 
           <br />
@@ -121,8 +123,8 @@ export default defineComponent({
       topMenus: []
     })
     const selectedTopKeys = ref(['knowledge_graph'])
-    const selectedLeftKeys = ref(['1'])
-    const openKeys = ref(['sub1'])
+    const selectedLeftKeys = ''
+    const openKeys = ''
     return { user, menu, selectedTopKeys, selectedLeftKeys, openKeys }
   },
   computed: {
@@ -148,11 +150,49 @@ export default defineComponent({
             }
           })
         }
-
-     
-
         return item
       })
+    },
+    //左侧选中的菜单
+    selectedLeftKeysSource: {
+      // getter
+      get() {
+        if (this.selectedLeftKeys.length > 0) {
+          return [this.selectedLeftKeys]
+        }
+        const leftOne = this.menu.leftMenus[0]
+        if (typeof leftOne === 'undefined') {
+          return []
+        }
+        if (typeof leftOne.childrens !== 'undefined' && leftOne.childrens.length > 0) {
+          const routerName = leftOne.childrens[0].routerName
+
+          return [routerName]
+        }
+        return [leftOne.routerName]
+      },
+      // setter
+      set(newValue) {
+        this.selectedLeftKeys = newValue
+      }
+    },
+    // 左侧展开的菜单
+    openKeysSource: {
+      get() {
+        if (this.openKeys.length > 0) {
+          return [this.openKeys]
+        }
+
+        return this.menu.leftMenus
+          .filter((v) => {
+            return typeof v.childrens !== 'undefined' && v.childrens.length > 0
+          })
+          .map((v) => v.routerName)
+      },
+      // setter
+      set(newValue) {
+        this.openKeys = newValue
+      }
     }
   },
   methods: {
@@ -219,6 +259,18 @@ export default defineComponent({
       this.selectedTopKeys = ref([key])
       //查询菜单
       // this.findRoleMenu()
+    },
+    /**
+     * 选择左侧菜单
+     * @param {*} param0
+     */
+    onLeftMenuSelect({ item, key }) {
+      this.selectedLeftKeys = key
+      debugger
+    },
+    //点击左侧菜单
+    onLeftClick({ item, key, keyPath }) {
+      debugger
     }
   },
   updated() {
