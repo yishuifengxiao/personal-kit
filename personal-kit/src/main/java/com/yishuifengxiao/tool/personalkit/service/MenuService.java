@@ -103,7 +103,8 @@ public class MenuService {
             return new RoleMenuVo(Collections.EMPTY_LIST, Collections.EMPTY_LIST);
         }
         //选中的上部菜单
-        SysMenu selectTopMenu = topMenus.stream().filter(v -> StringUtils.equalsIgnoreCase(v.getId(), topMenuId)).findFirst().orElse(DataUtil.first(topMenus));
+        SysMenu selectTopMenu =
+                topMenus.stream().filter(v -> StringUtils.equalsIgnoreCase(v.getRouterName(), topMenuId)).findFirst().orElse(DataUtil.first(topMenus));
         // 左侧的一级菜单
         List<SysMenu> leftFirsts =
                 menus.stream().filter(v -> BoolStat.isTrue(v.getType())).filter(v -> StringUtils.equalsIgnoreCase(v.getParentId(), selectTopMenu.getId())).collect(Collectors.toList());

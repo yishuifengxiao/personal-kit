@@ -238,15 +238,6 @@ export default defineComponent({
         })
         .then((res) => {
           this.menu = reactive(res)
-
-          // 上部选择的菜单
-          if (null !== this.currentTopMenuId && typeof this.currentTopMenuId !== 'undefined') {
-            const topMenuId = res.topMenus[0].routerName
-            this.setTopMenuId(topMenuId)
-            this.selectedTopKeys = ref([topMenuId])
-          }
-
-          // 左侧选择的菜单
         })
         .catch((err) => console.log(err))
     },
@@ -258,7 +249,7 @@ export default defineComponent({
       this.setTopMenuId(key)
       this.selectedTopKeys = ref([key])
       //查询菜单
-      // this.findRoleMenu()
+      this.findRoleMenu()
     },
     /**
      * 选择左侧菜单
