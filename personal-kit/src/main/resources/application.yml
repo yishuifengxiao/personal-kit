@@ -32,4 +32,5 @@ spring:
 
 yishuifengxiao:
   web:
-    unified-response-format: true
+    response:
+      enable: true

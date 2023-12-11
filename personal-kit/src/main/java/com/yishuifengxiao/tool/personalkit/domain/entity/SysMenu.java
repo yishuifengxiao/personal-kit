@@ -50,6 +50,17 @@ public class SysMenu implements Serializable {
     private String parentId;
 
 
+    @Column(name = "router_name", length = 64)
+    private String routerName;
+
+
+    @Column(name = "router_path", length = 64)
+    private String routerPath;
+
+    @Column(name = "icon", length = 64)
+    private String icon;
+
+
     /**
      * 菜单位置，0:上部，1:侧边菜单
      *
@@ -72,7 +83,6 @@ public class SysMenu implements Serializable {
     @JsonIgnore
     @Column(name = "is_show", length = 1, columnDefinition = "tinyint(1) default 1")
     private Integer isShow;
-
 
 
 }

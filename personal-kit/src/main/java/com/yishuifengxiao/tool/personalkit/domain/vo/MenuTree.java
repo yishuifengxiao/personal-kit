@@ -32,5 +32,11 @@ public class MenuTree implements Serializable {
 
     private Integer idx;
 
+    private String routerName;
+
+    private String routerPath;
+
+    private String icon;
+
     private List<MenuTree> childrens;
 }

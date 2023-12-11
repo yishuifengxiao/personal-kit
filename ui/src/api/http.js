@@ -91,9 +91,10 @@ class http {
     if (token.length === 0) {
       return headers
     }
-    // debugger
+    const currentRoleId = this.userStore.currentRoleId
     return Object.assign(headers, {
-      Authorization: `xtoken ${token}`
+      Authorization: `xtoken ${token}`,
+      role: `${currentRoleId}`
     })
   }
 

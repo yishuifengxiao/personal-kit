@@ -90,7 +90,7 @@ public class MenuService {
         SysRole sysRole = JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, roleId.trim());
         Assert.isNotNull("请选择一个正确的角色", sysRole);
         List<SysMenu> menus = null;
-        if (BoolStat.isTrue(sysRole.getEmbedded()) && BoolStat.isFalse(sysRole.getIsShow())) {
+        if (BoolStat.isTrue(sysRole.getEmbedded())) {
             //内置且隐藏的角色
             menus = JdbcUtil.jdbcHelper().findAll(new SysMenu());
         } else {
@@ -105,12 +105,13 @@ public class MenuService {
         //选中的上部菜单
         SysMenu selectTopMenu = topMenus.stream().filter(v -> StringUtils.equalsIgnoreCase(v.getId(), topMenuId)).findFirst().orElse(DataUtil.first(topMenus));
         // 左侧的一级菜单
-        List<SysMenu> leftFirsts = menus.stream().filter(v -> StringUtils.equalsIgnoreCase(v.getParentId(), selectTopMenu.getParentId())).collect(Collectors.toList());
+        List<SysMenu> leftFirsts =
+                menus.stream().filter(v -> BoolStat.isTrue(v.getType())).filter(v -> StringUtils.equalsIgnoreCase(v.getParentId(), selectTopMenu.getId())).collect(Collectors.toList());
 
         List<SysMenu> allMenus = menus;
-        List<MenuTree> menuTrees = leftFirsts.stream().filter(v -> BoolStat.isFalse(v.getType())).map(v -> {
+        List<MenuTree> menuTrees = leftFirsts.stream().map(v -> {
                     MenuTree menuTree = BeanUtil.copy(v, new MenuTree());
-                    List<MenuTree> children = buildTree(allMenus, v.getParentId());
+                    List<MenuTree> children = buildTree(allMenus, v.getId());
                     menuTree.setChildrens(children);
                     return menuTree;
                 }

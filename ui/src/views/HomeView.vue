@@ -1,35 +1,44 @@
 <template>
   <a-layout class="root_view">
-    <a-layout-header class="header" style="vertical-align: middle; display: flex; float: right; font-size: 1.3rem">
+    <!-- 顶部导航栏 -->
+    <a-layout-header
+      class="header"
+      style="vertical-align: middle; display: flex; float: right; font-size: 1rem"
+    >
       <div class="logo" style="width: 10vw" />
-      <div :style="{ lineHeight: '64px', width: '70vw', 'font-size': '1.3rem !important' }">
-        <a-menu v-model:selectedKeys="selectedKeys1" theme="dark" mode="horizontal"
-          :style="{ lineHeight: '64px', 'font-size': '1.3rem !important' }">
-          <a-menu-item key="1">知识图谱</a-menu-item>
-          <a-menu-item key="2">在线网盘</a-menu-item>
-          <a-menu-item key="3">数据爬虫</a-menu-item>
-          <a-menu-item key="4">垂直搜索</a-menu-item>
-          <a-menu-item key="5">在线工具</a-menu-item>
-          <a-menu-item key="6">系统管理</a-menu-item>
+      <div :style="{ lineHeight: '64px', width: '70vw', 'font-size': '1rem !important' }">
+        <!-- 顶部菜单 -->
+        <a-menu
+          v-model:selectedKeys="selectedTopKeys"
+          theme="dark"
+          mode="horizontal"
+          @select="onTopMenuSelect"
+          :style="{ lineHeight: '64px', 'font-size': '1.3rem !important' }"
+        >
+          <a-menu-item v-for="item in menu.topMenus" :key="item.routerName">{{
+            item.name
+          }}</a-menu-item>
         </a-menu>
+        <!-- 顶部菜单 -->
       </div>
 
       <!-- 头部菜单最右侧 -->
-      <div :style="{
-        lineHeight: '64px',
-        color: 'white',
-        float: 'right',
-        width: '20vw',
-        display: 'inline-block',
-        'text-align': 'right',
-        'vertical-align': 'middle',
-        'padding-right': '-1vw'
-      }">
-        <span>易水</span>
+      <div
+        :style="{
+          lineHeight: '64px',
+          color: 'white',
+          float: 'right',
+          width: '20vw',
+          display: 'inline-block',
+          'text-align': 'right',
+          'vertical-align': 'middle',
+          'padding-right': '-1vw'
+        }"
+      >
+        <span>{{ user.nickname }}</span>
         <a-dropdown>
           <a class="ant-dropdown-link" @click.prevent>
-
-            <a-avatar size="large" style="position: relative;top: -1vh;">
+            <a-avatar size="large" style="position: relative; top: -1vh">
               <template #icon>
                 <UserOutlined />
               </template>
@@ -53,45 +62,19 @@
       </div>
       <!-- 头部菜单最右侧 -->
     </a-layout-header>
+    <!-- 顶部导航栏 -->
     <a-layout>
       <a-layout-sider width="200" style="background: #fff">
-        <a-menu v-model:selectedKeys="selectedKeys2" v-model:openKeys="openKeys" mode="inline"
-          :style="{ height: '100%', borderRight: 0 }">
-          <a-sub-menu key="sub1">
-            <template #title>
-              <span>
-                <user-outlined />
-               数据中心
-              </span>
-            </template>
-            <a-menu-item key="1">数据源管理</a-menu-item>
-            <a-menu-item key="2">数据集管理</a-menu-item>
-          </a-sub-menu>
-          <a-sub-menu key="sub2">
-            <template #title>
-              <span>
-                <laptop-outlined />
-                图谱中心
-              </span>
-            </template>
-      
-            <a-menu-item key="6">本体管理</a-menu-item>
-            <a-menu-item key="7">图谱管理</a-menu-item>
-            <a-menu-item key="8">图谱应用</a-menu-item>
-          </a-sub-menu>
-          <a-sub-menu key="sub3">
-            <template #title>
-              <span>
-                <notification-outlined />
-                subnav 3
-              </span>
-            </template>
-            <a-menu-item key="9">option9</a-menu-item>
-            <a-menu-item key="10">option10</a-menu-item>
-            <a-menu-item key="11">option11</a-menu-item>
-            <a-menu-item key="12">option12</a-menu-item>
-          </a-sub-menu>
+        <!-- 左侧菜单 -->
+        <a-menu
+          v-model:selectedKeys="selectedLeftKeys"
+          v-model:openKeys="openKeys"
+          mode="inline"
+          :items="leftMenuSource"
+          :style="{ height: '100%', borderRight: 0 }"
+        >
         </a-menu>
+        <!-- 左侧菜单 -->
       </a-layout-sider>
       <a-layout style="padding: 0 24px 24px">
         <a-breadcrumb style="margin: 16px 0">
@@ -99,29 +82,157 @@
           <a-breadcrumb-item>List</a-breadcrumb-item>
           <a-breadcrumb-item>App</a-breadcrumb-item>
         </a-breadcrumb>
-        <a-layout-content :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }">
-          Content
+        <a-layout-content
+          :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
+        >
+          Content {{ menu.topMenus }}
+          <br />     <br />
+          == currentTopMenuId========= {{ currentTopMenuId }}
+
+          <br />
+
+          === selectedTopKeys ==== {{ selectedTopKeys }}
+
+          <br />
+
+          <br />
+
+          ===== leftMenuSource = {{ leftMenuSource }}
         </a-layout-content>
       </a-layout>
     </a-layout>
   </a-layout>
 </template>
 <script>
-import { ref, defineComponent } from 'vue'
-
-import { UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/icons-vue'
+import { ref, reactive, defineComponent } from 'vue'
+import { mapState, mapActions } from 'pinia'
+import { useUserStore } from '@/stores/user'
+import {
+  UserOutlined,
+  LaptopOutlined,
+  NotificationOutlined,
+  DownOutlined
+} from '@ant-design/icons-vue'
 export default defineComponent({
-  setup() {
-    const selectedKeys1 = ref(['2'])
-    const selectedKeys2 = ref(['1'])
+  data() {
+    const user = reactive({})
+    const menu = reactive({
+      leftMenus: [],
+      topMenus: []
+    })
+    const selectedTopKeys = ref(['knowledge_graph'])
+    const selectedLeftKeys = ref(['1'])
     const openKeys = ref(['sub1'])
-
-    return { selectedKeys1, selectedKeys2, openKeys }
+    return { user, menu, selectedTopKeys, selectedLeftKeys, openKeys }
   },
+  computed: {
+    ...mapState(useUserStore, ['currentUserId', 'currentRoleId', 'currentTopMenuId']),
+
+    /**
+     * 左侧的菜单数据
+     */
+    leftMenuSource: function () {
+      return this.menu.leftMenus.map((v) => {
+        const item = {
+          key: v.routerName,
+          label: v.name,
+          title: v.name
+        }
+        if (typeof v.childrens !== 'undefined' && v.childrens.length > 0) {
+          // 存在子菜单
+          item.children = v.childrens.map((m) => {
+            return {
+              key: m.routerName,
+              label: m.name,
+              title: m.name
+            }
+          })
+        }
+
+     
+
+        return item
+      })
+    }
+  },
+  methods: {
+    ...mapActions(useUserStore, ['setRole', 'setUser', 'setTopMenuId']),
+    /**
+     * 加载用户基本信息
+     */
+    async loadUserInfo() {
+      this.$http
+        .request({
+          url: '/personkit/user/info/' + this.currentUserId
+        })
+        .then((res) => {
+          this.user = reactive(res)
+
+          this.setUser(res)
+          if (res.roles.length > 1) {
+            //多于一个角色
+          } else {
+            //一个角色
+            const role = res.roles[0]
+
+            this.setRole(role)
+          }
+          //查询菜单
+          this.findRoleMenu()
+        })
+        .catch((err) => console.log(err))
+    },
+
+    /**
+     * 加载用户基本菜单
+     */
+    findRoleMenu() {
+      this.$http
+        .request({
+          url: '/personkit/menu/findRoleMenu',
+          method: 'post',
+          data: {
+            roleId: this.currentRoleId,
+            topMenuId: this.currentTopMenuId
+          }
+        })
+        .then((res) => {
+          this.menu = reactive(res)
+
+          // 上部选择的菜单
+          if (null !== this.currentTopMenuId && typeof this.currentTopMenuId !== 'undefined') {
+            const topMenuId = res.topMenus[0].routerName
+            this.setTopMenuId(topMenuId)
+            this.selectedTopKeys = ref([topMenuId])
+          }
+
+          // 左侧选择的菜单
+        })
+        .catch((err) => console.log(err))
+    },
+    /**
+     * 选择顶部菜单
+     * @param {*} param0
+     */
+    onTopMenuSelect({ key }) {
+      this.setTopMenuId(key)
+      this.selectedTopKeys = ref([key])
+      //查询菜单
+      // this.findRoleMenu()
+    }
+  },
+  updated() {
+    this.loadUserInfo()
+  },
+  created() {
+    this.loadUserInfo()
+  },
+
   components: {
     UserOutlined,
     LaptopOutlined,
-    NotificationOutlined
+    NotificationOutlined,
+    DownOutlined
   }
 })
 </script>
