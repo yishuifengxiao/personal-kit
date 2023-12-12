@@ -92,7 +92,7 @@
           == currentTopMenuId========= {{ currentTopMenuId }}
 
           <br />
-          ==== selectedTopKeysSource  === {{ selectedTopKeysSource }}
+          ==== selectedTopKeysSource === {{ selectedTopKeysSource }}
           <br />
           === selectedTopKeys ==== {{ selectedTopKeys }}
 
@@ -281,17 +281,18 @@ export default defineComponent({
       this.selectedTopKeys = ref([key])
       //查询菜单
       this.findRoleMenu()
+
+      // 重置左侧选择
+      this.onLeftMenuSelect({ key: '' })
     },
     /**
      * 选择左侧菜单
      * @param {*} param0
      */
-    onLeftMenuSelect({ item, key }) {
+    onLeftMenuSelect({ key }) {
       this.selectedLeftKeys = key
       this.setLeftMenuId(key)
-    },
-    //点击左侧菜单
-    onLeftClick({ item, key, keyPath }) {}
+    }
   },
   updated() {
     this.loadUserInfo()
