@@ -9,7 +9,7 @@
       <div :style="{ lineHeight: '64px', width: '70vw', 'font-size': '1rem !important' }">
         <!-- 顶部菜单 -->
         <a-menu
-          v-model:selectedKeys="selectedTopKeys"
+          v-model:selectedKeys="selectedTopKeysSource"
           theme="dark"
           mode="horizontal"
           @select="onTopMenuSelect"
@@ -92,7 +92,8 @@
           == currentTopMenuId========= {{ currentTopMenuId }}
 
           <br />
-
+          ==== selectedTopKeysSource  === {{ selectedTopKeysSource }}
+          <br />
           === selectedTopKeys ==== {{ selectedTopKeys }}
 
           <br />
@@ -122,13 +123,39 @@ export default defineComponent({
       leftMenus: [],
       topMenus: []
     })
-    const selectedTopKeys = ref(['knowledge_graph'])
+    const selectedTopKeys = 'knowledge_graph'
     const selectedLeftKeys = ''
     const openKeys = ''
     return { user, menu, selectedTopKeys, selectedLeftKeys, openKeys }
   },
   computed: {
-    ...mapState(useUserStore, ['currentUserId', 'currentRoleId', 'currentTopMenuId']),
+    ...mapState(useUserStore, [
+      'currentUserId',
+      'currentRoleId',
+      'currentTopMenuId',
+      'currentLeftMenuId'
+    ]),
+
+    // 上部选中的菜单
+    selectedTopKeysSource: {
+      get() {
+        debugger
+        if (this.currentTopMenuId.length > 0) {
+          return [this.currentTopMenuId]
+        }
+        if (this.selectedTopKeys.length > 0) {
+          return [this.selectedTopKeys]
+        }
+
+        const routerName = this.menu.topMenus[0].routerName
+
+        return [routerName]
+      },
+      // setter
+      set(newValue) {
+        this.selectedTopKeys = newValue
+      }
+    },
 
     /**
      * 左侧的菜单数据
@@ -160,6 +187,10 @@ export default defineComponent({
         if (this.selectedLeftKeys.length > 0) {
           return [this.selectedLeftKeys]
         }
+        if (this.currentLeftMenuId.length > 0) {
+          return [this.currentLeftMenuId]
+        }
+
         const leftOne = this.menu.leftMenus[0]
         if (typeof leftOne === 'undefined') {
           return []
@@ -196,7 +227,7 @@ export default defineComponent({
     }
   },
   methods: {
-    ...mapActions(useUserStore, ['setRole', 'setUser', 'setTopMenuId']),
+    ...mapActions(useUserStore, ['setRole', 'setUser', 'setTopMenuId', 'setLeftMenuId']),
     /**
      * 加载用户基本信息
      */
@@ -257,12 +288,10 @@ export default defineComponent({
      */
     onLeftMenuSelect({ item, key }) {
       this.selectedLeftKeys = key
-      debugger
+      this.setLeftMenuId(key)
     },
     //点击左侧菜单
-    onLeftClick({ item, key, keyPath }) {
-      debugger
-    }
+    onLeftClick({ item, key, keyPath }) {}
   },
   updated() {
     this.loadUserInfo()
