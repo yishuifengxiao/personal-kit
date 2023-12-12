@@ -54,7 +54,7 @@
                 <a href="javascript:;">修改密码</a>
               </a-menu-item>
               <a-menu-item>
-                <a href="javascript:;">退出</a>
+                <a href="javascript:;" @click="exit">退出</a>
               </a-menu-item>
             </a-menu>
           </template>
@@ -87,20 +87,9 @@
         <a-layout-content
           :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
         >
-          Content {{ menu.topMenus }} <br />
-          <br />
-          == currentTopMenuId========= {{ currentTopMenuId }}
-
-          <br />
-          ==== selectedTopKeysSource === {{ selectedTopKeysSource }}
-          <br />
-          === selectedTopKeys ==== {{ selectedTopKeys }}
-
-          <br />
-
-          <br />
-
-          ===== leftMenuSource = {{ leftMenuSource }}
+          <!-- 内容区 -->
+          <RouterView />
+          <!-- 内容区 -->
         </a-layout-content>
       </a-layout>
     </a-layout>
@@ -136,6 +125,9 @@ export default defineComponent({
       'currentLeftMenuId'
     ]),
 
+    aa: function () {
+      return this.$route
+    },
     // 上部选中的菜单
     selectedTopKeysSource: {
       get() {
@@ -292,6 +284,12 @@ export default defineComponent({
     onLeftMenuSelect({ key }) {
       this.selectedLeftKeys = key
       this.setLeftMenuId(key)
+    },
+    /**
+     * 退出登陆
+     */
+    exit() {
+      this.$router.push({ name: 'login' })
     }
   },
   updated() {
