@@ -10,7 +10,8 @@ export const useUserStore = defineStore('useUserStore', {
       currentPath: '',
       role: { id: '' },
       user: {},
-      topMenuId: ""
+      topMenuId: "",
+      leftMenuId: ''
     }
   },
   getters: {
@@ -19,7 +20,8 @@ export const useUserStore = defineStore('useUserStore', {
     currentUserId: (state) => state.userId,
     currentRoleId: (state) => state.role.id,
     hasRole: (state) => null !== state.role.id && typeof state.role.id !== "undefined",
-    currentTopMenuId: (state) => state.topMenuId
+    currentTopMenuId: (state) => state.topMenuId,
+    currentLeftMenuId: (state) => state.leftMenuId
   },
   actions: {
     setToken(payload) {
@@ -40,6 +42,9 @@ export const useUserStore = defineStore('useUserStore', {
     },
     setTopMenuId(topMenuId) {
       this.topMenuId = topMenuId;
+    },
+    setLeftMenuId(leftMenuId) {
+      this.leftMenuId = leftMenuId;
     }
   },
   persist: true
