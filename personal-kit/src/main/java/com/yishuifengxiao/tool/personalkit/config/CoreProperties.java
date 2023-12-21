@@ -31,8 +31,8 @@ public class CoreProperties {
     private Long limitTimeInSecond = 60 * 60 * 24L;
 
     /**
-     * 单个IP每秒中最大访问频率，默认为 允许的最大尝试次数为每分钟600次，即将速率值设置为每秒10=(600/60)次，若设置为0或负数则表示禁用此功能
+     * 单个IP每秒中最大访问频率，默认为 允许的最大尝试次数为每秒1次.若设置为0或负数则表示禁用此功能
      */
 
-    private Double ipMaxVisitPerSecond = 10D;
+    private Double ipMaxVisitPerSecond = 1D;
 }
