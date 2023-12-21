@@ -1,13 +1,11 @@
 package com.yishuifengxiao.tool.personalkit.security;
 
 import com.yishuifengxiao.common.tool.collections.DataUtil;
-import com.yishuifengxiao.common.tool.exception.UncheckedException;
-import com.yishuifengxiao.tool.personalkit.config.CoreProperties;
+import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
-import com.yishuifengxiao.tool.personalkit.tool.CacheRateLimiter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -17,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,11 +31,6 @@ public class SimpleUserDetailsService implements UserDetailsService {
 
     private final SysUserDao sysUserDao;
 
-    private final CoreProperties coreProperties;
-
-
-    private final CacheRateLimiter cacheRateLimiter;
-
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -44,9 +38,7 @@ public class SimpleUserDetailsService implements UserDetailsService {
         SysUser sysUser = sysUserDao.findActiveSysUser(username)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("用户名%s不存在", username)));
 
-        if (cacheRateLimiter.get(sysUser.getId())){
-            throw new UncheckedException(String.format("短时间内越权请求过多,请在%d秒后重新请求",coreProperties.getLimitTimeInSecond()));
-        }
+        Assert.isFalse("账户已禁用，请稍候一段时候再重试",null!=sysUser.getLockTime()&&sysUser.getLockTime().isAfter(LocalDateTime.now()));
 
         List<SysRole> roles = sysUserDao.findAllRoleByUserId(sysUser.getId());
 

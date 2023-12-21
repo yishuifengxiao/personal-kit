@@ -46,6 +46,7 @@ public class SimpleCustomResourceProvider implements CustomResourceProvider {
         //包含context-path
         SysUser sysUser = sysUserDao.findActiveSysUser(authentication.getName())
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("账号%s不存在", authentication.getName())));
+        // 内置账号默认通过校验
         if (StringUtils.equalsIgnoreCase(sysUser.getId(), Constant.DEFAULT_ROOT_ID) || BoolStat.isTrue(sysUser.getEmbedded())) {
             return true;
         }

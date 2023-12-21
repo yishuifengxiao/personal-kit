@@ -96,6 +96,13 @@ public class SysUser implements Serializable {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createTime;
 
+    @Column(name = "lock_time", updatable = false)
+    @CreatedDate
+    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime lockTime;
+
 
     @Column(length = 11, nullable = false, columnDefinition = "int(11) default 0")
     @JsonIgnore

@@ -9,8 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
+import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -42,5 +44,14 @@ public class SysUserDao {
         String sql = String.format("SELECT r.* from sys_user_role ur ,sys_role r where r.id=ur.role_id and r.stat=1 and ur.user_id=%s", userId);
         return jdbcHelper.query(SysRole.class, sql).orElse(Collections.EMPTY_LIST);
 
+    }
+
+    public void updateDisableTime(String id, LocalDateTime time) {
+        String sql = "update sys_user set lock_time = ? where id = ?";
+        jdbcHelper.jdbcTemplate().execute(sql, (PreparedStatementCallback) ps -> {
+            ps.setObject(1, time);
+            ps.setObject(2, id);
+            return ps.executeBatch();
+        });
     }
 }
