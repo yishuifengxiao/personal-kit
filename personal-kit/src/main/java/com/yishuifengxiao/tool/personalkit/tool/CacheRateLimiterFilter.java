@@ -2,10 +2,12 @@ package com.yishuifengxiao.tool.personalkit.tool;
 
 import com.google.common.util.concurrent.RateLimiter;
 import com.yishuifengxiao.common.guava.GuavaCache;
+import com.yishuifengxiao.common.tool.collections.DataUtil;
 import com.yishuifengxiao.common.tool.entity.Response;
 import com.yishuifengxiao.common.tool.http.HttpUtil;
 import com.yishuifengxiao.common.utils.HttpUtils;
 import com.yishuifengxiao.tool.personalkit.config.CoreProperties;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -16,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Set;
 
 /**
  * @author yishui
@@ -28,9 +31,11 @@ public class CacheRateLimiterFilter extends OncePerRequestFilter {
     @Autowired
     private CoreProperties coreproperties;
 
+    private final Set<String> excludes = DataUtil.asSet("api-docs", "swagger");
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (coreproperties.getIpMaxVisitPerSecond() > 0 && !request.getRequestURI().contains(".")) {
+        if (coreproperties.getIpMaxVisitPerSecond() > 0 && !request.getRequestURI().contains(".") && excludes.stream().noneMatch(v -> StringUtils.containsIgnoreCase(request.getRequestURI(), v))) {
             //开启了限流功能
             String visitorIp = HttpUtil.getVisitorIp(request);
             RateLimiter rateLimiter = GuavaCache.get(visitorIp,

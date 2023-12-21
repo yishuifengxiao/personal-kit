@@ -43,7 +43,7 @@ public class MenuController {
 
     @ApiOperation(value = "分页查询菜单")
     @PostMapping("/page")
-    public Page<MenuVo> findPage(BaseQuery<SysMenu> pageQuery) {
+    public Page<MenuVo> findPage(@RequestBody BaseQuery<SysMenu> pageQuery) {
         return menuService.findPage(pageQuery);
     }
 
