@@ -2,8 +2,8 @@ package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
-import com.yishuifengxiao.common.tool.entity.BaseQuery;
 import com.yishuifengxiao.common.tool.entity.Page;
+import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.dao.MongoDao;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
@@ -28,7 +28,7 @@ public class DataService {
     private MongoDao mongoDao;
 
 
-    public Page<DiskUploadRecordVo> findPageDataRecord(BaseQuery<DiskUploadRecord> pageQuery) {
+    public Page<DiskUploadRecordVo> findPageDataRecord(PageQuery<DiskUploadRecord> pageQuery) {
         return JdbcUtil.jdbcHelper().findPage(pageQuery.query().orElse(new DiskUploadRecord()), pageQuery.size().intValue(), pageQuery.num().intValue()).map(v -> {
 
             DiskFile file = JdbcUtil.jdbcHelper().findOne(new DiskFile().setUploadId(v.getId()));
@@ -47,4 +47,6 @@ public class DataService {
             return vo;
         });
     }
+
+
 }

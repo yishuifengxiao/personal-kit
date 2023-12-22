@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.web;
 
-import com.yishuifengxiao.common.tool.entity.BaseQuery;
 import com.yishuifengxiao.common.tool.entity.Page;
+import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
 import com.yishuifengxiao.tool.personalkit.domain.vo.DiskUploadRecordVo;
 import com.yishuifengxiao.tool.personalkit.service.DataService;
@@ -36,7 +36,7 @@ public class DataController {
 
     @ApiOperation(value = "上传记录", notes = "上传记录")
     @PostMapping("/data/record/page")
-    public Page<DiskUploadRecordVo> reacordPage(@RequestBody BaseQuery<DiskUploadRecord> pageQuery) {
+    public Page<DiskUploadRecordVo> reacordPage(@RequestBody PageQuery<DiskUploadRecord> pageQuery) {
 
         return dataService.findPageDataRecord(pageQuery);
     }

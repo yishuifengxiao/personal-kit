@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.web;
 
 import com.yishuifengxiao.common.security.support.Strategy;
-import com.yishuifengxiao.common.tool.entity.BaseQuery;
+import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysSecurityRecord;
 import com.yishuifengxiao.tool.personalkit.domain.request.RecordReq;
@@ -35,7 +35,7 @@ public class RecordController {
 
     @ApiOperation(value = "个人的登陆记录")
     @PostMapping("/personal/login/page")
-    public Page<SysSecurityRecord> loginRecord(BaseQuery<RecordReq> param) {
+    public Page<SysSecurityRecord> loginRecord(PageQuery<RecordReq> param) {
 
         RecordReq recordReq = param.query().orElse(new RecordReq());
         recordReq.setUsername(ContextUser.currentUser().getUsername());

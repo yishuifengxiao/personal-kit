@@ -2,8 +2,8 @@ package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
-import com.yishuifengxiao.common.tool.entity.BaseQuery;
 import com.yishuifengxiao.common.tool.entity.Page;
+import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
 import com.yishuifengxiao.tool.personalkit.domain.vo.PermissionVo;
@@ -21,7 +21,7 @@ import java.util.Collections;
 @Component
 @Transactional(rollbackOn = {Exception.class})
 public class PermissionService {
-    public Page<PermissionVo> findPagePermission(BaseQuery<SysPermission> pageQuery) {
+    public Page<PermissionVo> findPagePermission(PageQuery<SysPermission> pageQuery) {
         return JdbcUtil.jdbcHelper().findPage(pageQuery.query().orElse(new SysPermission()), pageQuery.size().intValue(), pageQuery.num().intValue()).map(v -> {
             PermissionVo permissionVo = BeanUtil.copy(v, new PermissionVo());
             String sql = "SELECT DISTINCT sm.* from sys_permission sp,sys_menu_permission smp,sys_menu sm where smp.menu_id=sm.id and smp.permission_id =sp.id and sp.id=?";

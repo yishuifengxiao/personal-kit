@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.web;
 
-import com.yishuifengxiao.common.tool.entity.BaseQuery;
 import com.yishuifengxiao.common.tool.entity.Page;
+import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
 import com.yishuifengxiao.tool.personalkit.domain.query.MenuQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.MenuPermissionReq;
@@ -43,7 +43,7 @@ public class MenuController {
 
     @ApiOperation(value = "分页查询菜单")
     @PostMapping("/page")
-    public Page<MenuVo> findPage(@RequestBody BaseQuery<SysMenu> pageQuery) {
+    public Page<MenuVo> findPage(@RequestBody PageQuery<SysMenu> pageQuery) {
         return menuService.findPage(pageQuery);
     }
 

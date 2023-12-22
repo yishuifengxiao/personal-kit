@@ -49,6 +49,7 @@ public class FileAnalysisEventListener {
 
     @Subscribe
     public void onFileAnalysisEvent(FileAnalysisEvent fileAnalysisEvent) {
+        //@formatter:off
         List<CompletableFuture> futures = new ArrayList<>();
         File file = new File(fileAnalysisEvent.getFilePath());
         AtomicReference<DiskFile> reference = new AtomicReference<>();
@@ -58,8 +59,13 @@ public class FileAnalysisEventListener {
 
             try {
                 String objectName = uploadClient.upload(fileAnalysisEvent.getSysUser(), file);
-                DiskFile diskFile = new DiskFile(fileId, file.getName(), fileAnalysisEvent.getDiskFolder().getId(), fileAnalysisEvent.getSysUser().getId(), objectName, Md5.md5Short(file), IoUtil.suffix(file), null, file.getName(), fileAnalysisEvent.getUploadRecord().getId(), file.length(), fileAnalysisEvent.getUploadMode().getCode(), LocalDateTime.now());
+                DiskFile diskFile = new DiskFile(
+                        fileId, file.getName(), fileAnalysisEvent.getDiskFolder().getId(),
+                        fileAnalysisEvent.getSysUser().getId(), objectName, Md5.md5Short(file),
+                        IoUtil.suffix(file), null, file.getName(), fileAnalysisEvent.getUploadRecord().getId(),
+                        file.length(), fileAnalysisEvent.getUploadMode().getCode(), LocalDateTime.now());
                 reference.set(diskFile);
+
                 if (UploadMode.ANALYSIS.equals(fileAnalysisEvent.getUploadMode())) {
                     //需要解析
                     if (!SupportedSuffix.of(IoUtil.suffix(file)).isPresent()) {
@@ -68,11 +74,14 @@ public class FileAnalysisEventListener {
                     List<ParserResult> parserResults = FileParserHelper.parse(file);
                     for (ParserResult parserResult : parserResults) {
 
-                        VirtuallyFile virtuallyFile =
-                                mongotemplate.save(new VirtuallyFile(IdWorker.snowflakeStringId(), diskFile.getId(),
-                                        fileAnalysisEvent.getSysUser().getId(), parserResult.getSheetName(), parserResult.getHeaders()));
+                        VirtuallyFile virtuallyFile = mongotemplate.save(new VirtuallyFile(
+                                IdWorker.snowflakeStringId(), diskFile.getId(), fileAnalysisEvent.getSysUser().getId(), parserResult.getSheetName(), parserResult.getHeaders()));
 
-                        parserResult.getRows().stream().map(s -> new VirtuallyRow(s.getRowIndex(), s.getCells(), IdWorker.snowflakeStringId(), virtuallyFile.getFileId(), fileAnalysisEvent.getSysUser().getId(), virtuallyFile.getId(), s.getCells().stream().allMatch(v -> BooleanUtils.isNotFalse(v.getIsNormal())))).forEach(mongotemplate::save);
+                        parserResult.getRows().stream().map(s -> new VirtuallyRow(
+                                s.getRowIndex(), s.getCells(), IdWorker.snowflakeStringId(), virtuallyFile.getFileId(),
+                                fileAnalysisEvent.getSysUser().getId(), virtuallyFile.getId(),
+                                s.getCells().stream().allMatch(v -> BooleanUtils.isNotFalse(v.getIsNormal())))
+                                ).forEach(mongotemplate::save);
 
                     }
                 }
@@ -97,6 +106,7 @@ public class FileAnalysisEventListener {
         String msg = null == throwable.get() ? null : StringUtils.substring(throwable.get().getMessage(), 0, 255);
         DiskUploadRecord uploadRecord = fileAnalysisEvent.getUploadRecord().setStat(uploadStat.getCode()).setMsg(msg).setFinishTime(LocalDateTime.now());
         JdbcUtil.jdbcHelper().updateByPrimaryKeySelective(uploadRecord);
+        //@formatter:on
     }
 
 

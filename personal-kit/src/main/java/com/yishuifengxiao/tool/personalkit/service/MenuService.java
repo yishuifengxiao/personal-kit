@@ -4,9 +4,9 @@ import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.collections.DataUtil;
-import com.yishuifengxiao.common.tool.entity.BaseQuery;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.common.tool.entity.Page;
+import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenuPermission;
@@ -61,7 +61,7 @@ public class MenuService {
         return tree;
     }
 
-    public Page<MenuVo> findPage(BaseQuery<SysMenu> pageQuery) {
+    public Page<MenuVo> findPage(PageQuery<SysMenu> pageQuery) {
         return JdbcUtil.jdbcHelper().findPage(pageQuery.query().orElse(new SysMenu()), pageQuery.size().intValue(), pageQuery.num().intValue()).map(v -> {
             MenuVo vo = BeanUtil.copy(v, new MenuVo());
             String sql = "SELECT DISTINCT sp.* from sys_permission sp,sys_menu_permission smp where  smp.permission_id " + "=sp.id and smp.menu_id=?";

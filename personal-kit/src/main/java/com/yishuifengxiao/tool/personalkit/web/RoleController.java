@@ -1,6 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.web;
 
-import com.yishuifengxiao.common.tool.entity.BaseQuery;
+import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.validate.Group;
 import com.yishuifengxiao.tool.personalkit.domain.query.RoleQuery;
@@ -40,7 +40,7 @@ public class RoleController {
 
     @ApiOperation(value = "分页查询角色")
     @PostMapping("/page")
-    public Page<RoleVo> findPageRole(@RequestBody BaseQuery<RoleQuery> pageQuery) {
+    public Page<RoleVo> findPageRole(@RequestBody PageQuery<RoleQuery> pageQuery) {
         Page<RoleVo> page = roleService.findPageRole(pageQuery);
 
         return page;
@@ -49,7 +49,7 @@ public class RoleController {
 
     @ApiOperation(value = "分页查询用户")
     @PostMapping("/user/page")
-    public Page<UserVo> findPageUser(@RequestBody BaseQuery<UserQuery> pageQuery) {
+    public Page<UserVo> findPageUser(@RequestBody PageQuery<UserQuery> pageQuery) {
         Page<UserVo> page = roleService.findPageUser(pageQuery);
         return page;
     }

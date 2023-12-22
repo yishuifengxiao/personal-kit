@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.web;
 
-import com.yishuifengxiao.common.tool.entity.BaseQuery;
 import com.yishuifengxiao.common.tool.entity.Page;
+import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
 import com.yishuifengxiao.tool.personalkit.domain.vo.PermissionVo;
 import com.yishuifengxiao.tool.personalkit.service.PermissionService;
@@ -32,7 +32,7 @@ public class PermissionController {
 
     @ApiOperation(value = "分页查询资源")
     @PostMapping("/page")
-    public Page<PermissionVo> findPagePermission(@RequestBody BaseQuery<SysPermission> pageQuery) {
+    public Page<PermissionVo> findPagePermission(@RequestBody PageQuery<SysPermission> pageQuery) {
         Page<PermissionVo> page = permissionService.findPagePermission(pageQuery);
 
         return page;

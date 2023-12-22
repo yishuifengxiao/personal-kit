@@ -3,7 +3,7 @@ package com.yishuifengxiao.tool.personalkit.service;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.collections.DataUtil;
-import com.yishuifengxiao.common.tool.entity.BaseQuery;
+import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.random.IdWorker;
@@ -43,7 +43,7 @@ public class RoleService {
      * @param pageQuery
      * @return
      */
-    public Page<RoleVo> findPageRole(BaseQuery<RoleQuery> pageQuery) {
+    public Page<RoleVo> findPageRole(PageQuery<RoleQuery> pageQuery) {
         String sql = "SELECT DISTINCT sr.* from sys_role sr ,sys_role_menu srm ,sys_menu sm WHERE sr.id=srm.role_id and srm.menu_id=sm.id ";
         sql += QueryUtil.createAndSql(pageQuery.getQuery(), false, "sm");
         sql += QueryUtil.createAndSql(pageQuery.getQuery(), true, "sr");
@@ -141,7 +141,7 @@ public class RoleService {
     }
 
 
-    public Page<UserVo> findPageUser(BaseQuery<UserQuery> pageQuery) {
+    public Page<UserVo> findPageUser(PageQuery<UserQuery> pageQuery) {
         String sql = "SELECT  DISTINCT su.* from sys_user su,sys_user_role sur,sys_role sr where su.id=sur" + ".user_id  and sur.role_id=sr.id ";
         sql += QueryUtil.createAndSql(pageQuery.getQuery(), false, "sr");
         sql += QueryUtil.createAndSql(pageQuery.getQuery(), true, "su");

@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
-import com.yishuifengxiao.common.tool.entity.BaseQuery;
+import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysSecurityRecord;
 import com.yishuifengxiao.tool.personalkit.domain.request.RecordReq;
@@ -22,7 +22,7 @@ import java.util.List;
 @Transactional(rollbackOn = {Exception.class})
 public class RecordService {
 
-    public Page<SysSecurityRecord> findPageSysSecurityRecord(BaseQuery<RecordReq> param) {
+    public Page<SysSecurityRecord> findPageSysSecurityRecord(PageQuery<RecordReq> param) {
         String sql = "select * from sys_security_record s and 1=1 ";
         List<Object> params = new ArrayList<>();
         if (null != param.getQuery()) {
