@@ -6,7 +6,7 @@ import com.yishuifengxiao.common.tool.text.RegexUtil;
 import com.yishuifengxiao.common.tool.utils.CertNoUtil;
 import com.yishuifengxiao.common.tool.utils.OsUtils;
 import com.yishuifengxiao.tool.personalkit.domain.enums.DataType;
-import com.yishuifengxiao.tool.personalkit.domain.model.VirtuallyRow;
+import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyRow;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;

@@ -5,7 +5,7 @@ import com.yishuifengxiao.common.tool.io.IoUtil;
 import com.yishuifengxiao.tool.personalkit.domain.bo.ExcelRow;
 import com.yishuifengxiao.tool.personalkit.domain.enums.DataType;
 import com.yishuifengxiao.tool.personalkit.domain.enums.SupportedSuffix;
-import com.yishuifengxiao.tool.personalkit.domain.model.VirtuallyFile;
+import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
 import com.yishuifengxiao.tool.personalkit.helper.data.BaseFileParser;
 import com.yishuifengxiao.tool.personalkit.helper.data.ParserResult;
 import lombok.extern.slf4j.Slf4j;

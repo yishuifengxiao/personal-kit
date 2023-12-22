@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.helper.data;
 
-import com.yishuifengxiao.tool.personalkit.domain.model.VirtuallyFile;
-import com.yishuifengxiao.tool.personalkit.domain.model.VirtuallyRow;
+import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
+import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyRow;
 
 import java.util.List;
 

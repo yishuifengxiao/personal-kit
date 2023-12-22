@@ -1,4 +1,4 @@
-package com.yishuifengxiao.tool.personalkit.domain.model;
+package com.yishuifengxiao.tool.personalkit.domain.mongo;
 
 import com.yishuifengxiao.tool.personalkit.domain.enums.ScriptType;
 import lombok.AllArgsConstructor;

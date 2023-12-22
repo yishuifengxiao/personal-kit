@@ -2,8 +2,8 @@ package com.yishuifengxiao.tool.personalkit.helper.data;
 
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
 import com.yishuifengxiao.tool.personalkit.domain.enums.DataType;
-import com.yishuifengxiao.tool.personalkit.domain.model.VirtuallyFile;
-import com.yishuifengxiao.tool.personalkit.domain.model.VirtuallyRow;
+import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
+import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyRow;
 import com.yishuifengxiao.tool.personalkit.helper.data.impl.*;
 import org.apache.commons.lang3.StringUtils;
 

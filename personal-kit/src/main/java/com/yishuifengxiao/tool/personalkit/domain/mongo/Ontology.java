@@ -1,4 +1,4 @@
-package com.yishuifengxiao.tool.personalkit.domain.model;
+package com.yishuifengxiao.tool.personalkit.domain.mongo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;

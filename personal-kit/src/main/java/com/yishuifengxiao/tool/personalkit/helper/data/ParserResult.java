@@ -2,7 +2,7 @@ package com.yishuifengxiao.tool.personalkit.helper.data;
 
 import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.tool.personalkit.domain.bo.ExcelRow;
-import com.yishuifengxiao.tool.personalkit.domain.model.VirtuallyFile;
+import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -7,7 +7,7 @@ import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.tool.personalkit.dao.MongoDao;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
-import com.yishuifengxiao.tool.personalkit.domain.model.VirtuallyFile;
+import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
 import com.yishuifengxiao.tool.personalkit.domain.vo.DiskUploadRecordVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

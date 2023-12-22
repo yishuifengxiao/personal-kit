@@ -1,4 +1,4 @@
-package com.yishuifengxiao.tool.personalkit.domain.model;
+package com.yishuifengxiao.tool.personalkit.domain.mongo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -48,7 +48,10 @@ public class GraphDefine implements Serializable {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createTime;
 
-    private List<DataSource> datasources;
+    private List<DataSource> dataSources;
+
+    private List<DataFusion> dataFusions;
+
 
     @Data
     @AllArgsConstructor
@@ -85,11 +88,30 @@ public class GraphDefine implements Serializable {
 
     }
 
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Accessors(chain = true)
+    public static class DataFusion implements Serializable {
+        private String nodeName;
+
+        private String script;
+
+    }
+
     public enum ExtractRule {
-        ANY("原始值", DataType.ANY), CONVERT_TEXT("转换为单值文本", DataType.TEXT), CONVERT_LONG("转换为单值整数", DataType.LONG), CONVERT_DOUBLE("转换为单值小数", DataType.DOUBLE), SPILT("切割", DataType.TEXT_ARRAY),
-
+        ANY("原始值", DataType.ANY),
+        //
+        CONVERT_TEXT("转换为单值文本", DataType.TEXT),
+        //
+        CONVERT_LONG("转换为单值整数", DataType.LONG),
+        //
+        CONVERT_DOUBLE("转换为单值小数", DataType.DOUBLE),
+        //
+        SPILT("切割", DataType.TEXT_ARRAY),
+        //
         REGEX("正则单值", DataType.TEXT),
-
+        //
         REGEX_ARRAY("正则数组", DataType.TEXT);
 
 

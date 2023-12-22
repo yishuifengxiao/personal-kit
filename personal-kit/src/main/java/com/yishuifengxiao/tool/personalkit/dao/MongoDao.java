@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.dao;
 
 import com.mongodb.client.MongoClient;
-import com.yishuifengxiao.tool.personalkit.domain.model.VirtuallyFile;
+import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
