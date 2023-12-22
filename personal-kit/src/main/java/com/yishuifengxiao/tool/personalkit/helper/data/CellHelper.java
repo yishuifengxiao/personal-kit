@@ -4,6 +4,7 @@ import com.yishuifengxiao.common.tool.datetime.DateTimeUtil;
 import com.yishuifengxiao.common.tool.lang.NumberUtil;
 import com.yishuifengxiao.common.tool.text.RegexUtil;
 import com.yishuifengxiao.common.tool.utils.CertNoUtil;
+import com.yishuifengxiao.common.tool.utils.OsUtils;
 import com.yishuifengxiao.tool.personalkit.domain.enums.DataType;
 import com.yishuifengxiao.tool.personalkit.domain.model.VirtuallyRow;
 import org.apache.commons.lang3.StringUtils;
@@ -32,15 +33,17 @@ public class CellHelper {
         }
         if (CertNoUtil.isValid(text.trim())) {
             //身份证
-            return new VirtuallyRow.ExcelCell(columnIndex, columnName, text.trim(), null, null, true, DataType.ID_CARD);
+            return new VirtuallyRow.ExcelCell(columnIndex, columnName, text.trim(), null, null, true, DataType.TEXT);
         }
         if (RegexUtil.match(REGEX_PHONE, text.trim())) {
             //手机
-            return new VirtuallyRow.ExcelCell(columnIndex, columnName, text.trim(), null, null, true, DataType.PHONE);
+            return new VirtuallyRow.ExcelCell(columnIndex, columnName, text.trim(), null, null, true, DataType.TEXT);
         }
         Number number = NumberUtil.parse(text.trim());
         if (null != number) {
-            return new VirtuallyRow.ExcelCell(columnIndex, columnName, text.trim(), new BigDecimal(String.valueOf(number)), null, true, DataType.NUMBER);
+            return new VirtuallyRow.ExcelCell(columnIndex, columnName, text.trim(),
+                    new BigDecimal(String.valueOf(number)), null, true, text.trim().contains(OsUtils.SPOT) ?
+                    DataType.DOUBLE : DataType.LONG);
         }
         return new VirtuallyRow.ExcelCell(columnIndex, columnName, text.trim(), null, null, true, DataType.TEXT);
     }

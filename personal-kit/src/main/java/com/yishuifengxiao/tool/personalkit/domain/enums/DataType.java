@@ -8,15 +8,54 @@ package com.yishuifengxiao.tool.personalkit.domain.enums;
  */
 public enum DataType {
 
-    TEXT,
+    TEXT("字符串", false, DataKind.TEXT),
 
-    NUMBER,
+    //
+    LONG("整数", false, DataKind.LONG),
 
-    PHONE,
+    //
+    DOUBLE("小数", false, DataKind.DOUBLE),
 
-    ID_CARD,
+    //
+    DATE("日期", false, DataKind.DATE),
 
-    DATE_TIME,
+    //
+    DATE_TIME("日期时间", false, DataKind.DATE_TIME),
 
-    ANY
+    //
+    TIME("时间", false, DataKind.TIME),
+
+    //
+    TEXT_ARRAY("字符串数组", true, DataKind.TEXT),
+
+    //
+    LONG_ARRAY("整数数组", true, DataKind.LONG),
+
+    //
+    DOUBLE_ARRAY("小数数组", true, DataKind.DOUBLE),
+
+    //
+    DATE_ARRAY("日期数组", true, DataKind.DATE),
+
+    //
+    DATE_TIME_ARRAY("日期时间数组", true, DataKind.DATE_TIME),
+
+    //
+    TIME_ARRAY("时间数组", true, DataKind.TIME),
+
+    //
+    ANY("其他类型", false, DataKind.TEXT);
+
+    DataType(String name, boolean array, DataKind dataKind) {
+        this.name = name;
+        this.array = array;
+        this.dataKind = dataKind;
+    }
+
+    private String name;
+
+    private boolean array;
+
+    private DataKind dataKind;
+
 }

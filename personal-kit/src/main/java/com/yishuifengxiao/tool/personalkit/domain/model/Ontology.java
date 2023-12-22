@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.yishuifengxiao.tool.personalkit.domain.enums.DataType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -57,6 +58,18 @@ public class Ontology implements Serializable {
     @Accessors(chain = true)
     public static class Node implements Serializable {
         private String nodeName;
+
+        private List<NodeProperty> nodeProperties;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Accessors(chain = true)
+    public static class NodeProperty implements Serializable {
+        private String nodePropertyName;
+
+        private DataType dataType;
     }
 
     @Data
@@ -67,7 +80,12 @@ public class Ontology implements Serializable {
         private String edgeName;
 
         private String formNodeName;
+
+        private String formNodePropertyName;
+
         private String toNodeName;
+
+        private String toNodePropertyName;
 
         private BigDecimal weight;
     }
