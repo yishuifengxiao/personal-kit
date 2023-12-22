@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.yishuifengxiao.tool.personalkit.domain.enums.DataType;
+import com.yishuifengxiao.tool.personalkit.domain.enums.ExtractRule;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -97,39 +97,6 @@ public class GraphDefine implements Serializable {
 
         private String script;
 
-    }
-
-    public enum ExtractRule {
-        ANY("原始值", DataType.ANY),
-        //
-        CONVERT_TEXT("转换为单值文本", DataType.TEXT),
-        //
-        CONVERT_LONG("转换为单值整数", DataType.LONG),
-        //
-        CONVERT_DOUBLE("转换为单值小数", DataType.DOUBLE),
-        //
-        SPILT("切割", DataType.TEXT_ARRAY),
-        //
-        REGEX("正则单值", DataType.TEXT),
-        //
-        REGEX_ARRAY("正则数组", DataType.TEXT);
-
-
-        private String name;
-        private DataType resultType;
-
-        ExtractRule(String name, DataType resultType) {
-            this.name = name;
-            this.resultType = resultType;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public DataType getResultType() {
-            return resultType;
-        }
     }
 
 
