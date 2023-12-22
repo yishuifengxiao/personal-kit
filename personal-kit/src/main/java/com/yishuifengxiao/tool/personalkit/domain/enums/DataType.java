@@ -58,4 +58,15 @@ public enum DataType {
 
     private DataKind dataKind;
 
+    public String getName() {
+        return name;
+    }
+
+    public boolean isArray() {
+        return array;
+    }
+
+    public DataKind getDataKind() {
+        return dataKind;
+    }
 }
