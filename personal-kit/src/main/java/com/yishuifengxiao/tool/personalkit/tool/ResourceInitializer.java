@@ -8,7 +8,6 @@ import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.*;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
-import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -146,11 +145,10 @@ public class ResourceInitializer implements CommandLineRunner {
         //初始化角色
         SysRole sysRole = JdbcUtil.jdbcHelper().saveOrUpdate(new SysRole(Constant.DEFAULT_ROOT_ID, "系统角色", "系统初始化数据," +
                 "内置超级管理员，具有系统全部权限", Constant.DEFAULT_ROOT_ID, DEFAULT_HOME_URL, RoleStat.ROLE_ENABLE.getCode(),
-                BoolStat.True.code(), LocalDateTime.now(),1));
+                BoolStat.True.code(), LocalDateTime.now(), 1));
         // 初始化用户
-        SysUser sysUser = JdbcUtil.jdbcHelper().saveOrUpdate(new SysUser().setUsername(Constant.DEFAULT_USER).setPwd(passwordEncoder.encode(Constant.DEFAULT_PWD)).setId(Constant.DEFAULT_ROOT_ID).setEmbedded(BoolStat.True.code())
-                //
-                .setVer(Constant.ACTIVE_DATA_VER).setStat(UserStat.ACCOUNT_ENABLE.getCode()).setCreateTime(LocalDateTime.now()).setLastUpdateTime(LocalDateTime.now()).setNickname("系统超级管理员"));
+        SysUser sysUser = JdbcUtil.jdbcHelper().saveOrUpdate(SysUser.ofEmbedded(Constant.DEFAULT_ROOT_ID,
+                Constant.DEFAULT_USER, "系统超级管理员", Constant.DEFAULT_PWD));
 
         // 初始化 角色-权限 关联
         permissions.stream().map(v -> new SysMenuPermission(Md5.md5Short(sysRole.getId() + v.getId()), sysRole.getId(), v.getId())).forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);

@@ -1,6 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.security;
 
 import com.yishuifengxiao.common.tool.collections.DataUtil;
+import com.yishuifengxiao.common.tool.encoder.DES;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -31,6 +33,8 @@ public class SimpleUserDetailsService implements UserDetailsService {
 
     private final SysUserDao sysUserDao;
 
+    private final PasswordEncoder passwordEncoder;
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -42,7 +46,9 @@ public class SimpleUserDetailsService implements UserDetailsService {
 
         List<SysRole> roles = sysUserDao.findAllRoleByUserId(sysUser.getId());
 
-        return new User(username, sysUser.getPwd(),
+        String password=passwordEncoder.encode(DES.decrypt(sysUser.getSalt(),sysUser.getPwd()));
+
+        return new User(username, password,
                 UserStat.ACCOUNT_ENABLE.getCode()==sysUser.getStat(),
                 UserStat.ACCOUNT_EXPIRED.getCode()!=sysUser.getStat(),
                 UserStat.CREDENTIALS_EXPIRED.getCode()!=sysUser.getStat(),

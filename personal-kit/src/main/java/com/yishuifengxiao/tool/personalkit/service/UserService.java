@@ -6,6 +6,7 @@ import com.yishuifengxiao.common.security.support.PropertyResource;
 import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.TokenUtil;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
+import com.yishuifengxiao.common.tool.encoder.DES;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
 import com.yishuifengxiao.common.tool.utils.Assert;
@@ -23,7 +24,6 @@ import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,7 +45,6 @@ public class UserService {
 
     private final SysUserRepository sysUserRepository;
 
-    private final PasswordEncoder passwordEncoder;
 
     private final PropertyResource propertyResource;
 
@@ -56,7 +55,9 @@ public class UserService {
         Assert.isTrue("密码已过期", UserStat.CREDENTIALS_EXPIRED.getCode() != sysUser.getStat());
         Assert.isTrue("账号已锁定", UserStat.ACCOUNT_LOCKED.getCode() != sysUser.getStat());
         Assert.isTrue("账号未启用", UserStat.ACCOUNT_ENABLE.getCode() == sysUser.getStat());
-        Assert.isTrue("密码错误", passwordEncoder.matches(query.getPassword(), sysUser.getPwd()));
+
+        Assert.isTrue("密码错误", StringUtils.equals(DES.encrypt(sysUser.getSalt(), query.getPassword()),
+                sysUser.getPwd()));
 
         List<SysRole> roles = sysUserDao.findAllRoleByUserId(sysUser.getId());
         //判断权限
@@ -84,8 +85,9 @@ public class UserService {
 
     public void updatePwd(UpdatePwdReq req) {
         SysUser sysUser = sysUserRepository.findById(req.getId().trim()).orElseThrow(() -> UncheckedException.of("记录不存在"));
-        Assert.isTrue("旧密码不正确", passwordEncoder.matches(req.getOldPwd().trim(), sysUser.getPwd()));
-        sysUser.setPwd(passwordEncoder.encode(req.getNewPwd().trim()));
+        Assert.isTrue("旧密码不正确", StringUtils.equals(DES.encrypt(sysUser.getSalt(), req.getOldPwd().trim()),
+                sysUser.getPwd()));
+        sysUser.setPwd(DES.encrypt(sysUser.getSalt(), req.getNewPwd().trim()));
         sysUserRepository.saveAndFlush(sysUser);
     }
 
@@ -114,7 +116,7 @@ public class UserService {
     public void updateResetPwd(ResetPwdReq req) {
         SysUser sysUser = sysUserDao.findActiveSysUser(req.getUsername().trim()).orElseThrow(() -> new UsernameNotFoundException(String.format("用户名%s不存在", req.getUsername().trim())));
         Assert.isTrue("邮箱不匹配", StringUtils.equalsIgnoreCase(sysUser.getEmail(), req.getEmail()));
-        sysUser.setPwd(passwordEncoder.encode(Constant.DEFAULT_PWD));
+        sysUser.setPwd(DES.encrypt(sysUser.getSalt(), Constant.DEFAULT_PWD));
         sysUserRepository.saveAndFlush(sysUser);
     }
 
