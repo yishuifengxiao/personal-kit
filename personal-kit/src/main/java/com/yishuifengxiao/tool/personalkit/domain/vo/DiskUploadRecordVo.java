@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author qingteng
@@ -33,4 +34,29 @@ public class DiskUploadRecordVo extends DiskUploadRecord implements Serializable
     private String statName;
 
     private String  userName;
+
+    private List<FileItem> files;
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Accessors(chain = true)
+    public static class FileItem implements Serializable{
+        /**
+         * 实际数据的数量
+         */
+        private Long actualTotalNum;
+
+        /**
+         * 全部数据数量
+         */
+        private Long uploadNum;
+        private String fileId;
+        private String fileName;
+
+        private String   VirtualFileId;
+        private String   VirtualFileName;
+
+
+    }
 }

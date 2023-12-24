@@ -10,6 +10,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * @author qingteng
  * @version 1.0.0
@@ -24,10 +26,10 @@ public class MongoDao {
     @Autowired
     private MongoClient mongoClient;
 
-    public VirtuallyFile findVirtuallyFileByFileId(String fileId) {
+    public List<VirtuallyFile> findVirtuallyFileByFileId(String fileId) {
         Query query = new Query();
         query.addCriteria(new Criteria("fileId").is(fileId));
-        return mongotemplate.find(query, VirtuallyFile.class).stream().findFirst().orElse(null);
+        return mongotemplate.find(query, VirtuallyFile.class);
     }
 
     public Long findMaxRowIndexByVirtuallyFileId(String virtuallyFileId) {

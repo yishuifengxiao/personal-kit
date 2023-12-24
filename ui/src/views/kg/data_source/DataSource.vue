@@ -34,9 +34,11 @@
     <!-- 中间内容区域 -->
     <!-- 表格区 -->
     <a-table :columns="columns" :data-source="tableData" :pagination="false">
-      <template #bodyCell="{ column, text }">
+      <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'action'">
-          <a-space> <a>详情</a> <a>删除</a></a-space>
+          <a-space>
+            <a href="javascript:void(0);" @click="showDetail(record)">详情</a> <a>删除</a></a-space
+          >
         </template>
       </template>
     </a-table>
@@ -121,6 +123,12 @@ export default defineComponent({
     onPaginationChange(page, pageSize) {
       this.pagination.current = page
       this.query()
+    },
+    //查看详情
+    showDetail(record) {
+      sessionStorage.setItem('current_view_file', JSON.stringify(record))
+
+      this.$router.push({ name: 'data_source_detail', query: { record: record.id } })
     }
   },
   components: {
@@ -151,30 +159,31 @@ export default defineComponent({
         align: 'center'
       },
       {
-        title: '完成时间',
-        dataIndex: 'finishTime',
-        key: 'finishTime',
-        ellipsis: true,
-        align: 'center'
-      },
-      {
-        title: '上传者',
-        dataIndex: 'userName',
-        key: 'userName',
-        ellipsis: true,
-        align: 'center'
-      },
-      {
-        title: '上传总数',
+        title: '上传数据总数',
         dataIndex: 'uploadNum',
         key: 'uploadNum',
         ellipsis: true,
         align: 'center'
       },
       {
-        title: '数据总数',
+        title: '有效数据总数',
         dataIndex: 'actualTotalNum',
         key: 'actualTotalNum',
+        ellipsis: true,
+        align: 'center'
+      },
+      {
+        title: '完成时间',
+        dataIndex: 'finishTime',
+        key: 'finishTime',
+        ellipsis: true,
+        align: 'center'
+      },
+
+      {
+        title: '上传者',
+        dataIndex: 'userName',
+        key: 'userName',
         ellipsis: true,
         align: 'center'
       },

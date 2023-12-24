@@ -5,6 +5,8 @@ import config from '@/config'
 // 外部文件使用 pinia
 import { useUserStore } from '@/stores/user'
 
+let unAuth = false;
+
 axios.defaults.withCredentials = true
 
 class http {
@@ -157,20 +159,27 @@ class http {
         }
         if (data.code !== 200) {
           if (data.code === 401) {
-            this.modal.error({
-              title: '未经授权',
-              content: '您还未登陆或登陆状态已过,请重新登录后再访问此问题',
-              onOk() {
-                that.router.push({
-                  name: 'login'
-                })
-              },
-              onCancel() {
-                that.router.push({
-                  name: 'login'
-                })
-              }
-            })
+            if (unAuth === false) {
+              //防止多次弹窗
+              unAuth = true
+              this.modal.error({
+                title: '未经授权',
+                content: '您还未登陆或登陆状态已过,请重新登录后再访问此问题',
+                onOk() {
+                  unAuth = false
+                  that.router.push({
+                    name: 'login'
+                  })
+                },
+                onCancel() {
+                  unAuth = false
+                  that.router.push({
+                    name: 'login'
+                  })
+                }
+              })
+            }
+
           } else {
             // 非401
             that.message.error(data.msg)
