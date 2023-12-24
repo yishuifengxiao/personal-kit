@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -26,8 +27,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
+@Document(GraphDefine.COLLECTION_NAME)
 public class GraphDefine implements Serializable {
-
+    public final static String COLLECTION_NAME = "graph_define";
     @Id
     private String id;
 

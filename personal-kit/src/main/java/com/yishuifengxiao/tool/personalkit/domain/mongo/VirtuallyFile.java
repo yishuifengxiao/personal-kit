@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.persistence.Id;
 import java.io.Serializable;
@@ -20,8 +21,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
+@Document(VirtuallyFile.COLLECTION_NAME)
 public class VirtuallyFile implements Serializable {
-
+    public final static String COLLECTION_NAME = "virtually_file";
 
     @Id
     private String id;

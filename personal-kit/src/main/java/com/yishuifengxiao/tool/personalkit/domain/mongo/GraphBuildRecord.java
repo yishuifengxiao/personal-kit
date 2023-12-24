@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -24,7 +25,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
+@Document(GraphBuildRecord.COLLECTION_NAME)
 public class GraphBuildRecord implements Serializable {
+
+    public final static String COLLECTION_NAME = "graph_build_record";
+
     @Id
     private String id;
 

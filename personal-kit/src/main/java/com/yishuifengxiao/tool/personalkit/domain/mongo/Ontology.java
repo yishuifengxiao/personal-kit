@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -27,8 +28,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
+@Document(Ontology.COLLECTION_NAME)
 public class Ontology implements Serializable {
-
+    public final static String COLLECTION_NAME = "ontology";
     @Id
     private String id;
 

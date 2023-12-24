@@ -2,6 +2,7 @@ package com.yishuifengxiao.tool.personalkit.dao;
 
 import com.mongodb.client.MongoClient;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
+import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyRow;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -29,7 +30,7 @@ public class MongoDao {
     public List<VirtuallyFile> findVirtuallyFileByFileId(String fileId) {
         Query query = new Query();
         query.addCriteria(new Criteria("fileId").is(fileId));
-        return mongotemplate.find(query, VirtuallyFile.class);
+        return mongotemplate.find(query, VirtuallyFile.class, VirtuallyFile.COLLECTION_NAME);
     }
 
     public Long findMaxRowIndexByVirtuallyFileId(String virtuallyFileId) {
@@ -43,7 +44,7 @@ public class MongoDao {
         Query query = new Query(criteria).with(sort).limit(1);
 
         // 执行查询
-        Document result = mongotemplate.findOne(query, Document.class, "virtuallyRow");
+        Document result = mongotemplate.findOne(query, Document.class, VirtuallyRow.COLLECTION_NAME);
 
         // 处理查询结果
         if (result != null) {
@@ -65,10 +66,10 @@ public class MongoDao {
         Query query = new Query(criteria);
 
 
-        return mongotemplate.count(query, "virtuallyRow");
+        return mongotemplate.count(query, VirtuallyRow.COLLECTION_NAME);
     }
 
     public VirtuallyFile findVirtuallyFileById(String id) {
-        return mongotemplate.findById(id, VirtuallyFile.class, "VirtuallyFile");
+        return mongotemplate.findById(id, VirtuallyFile.class, VirtuallyFile.COLLECTION_NAME);
     }
 }
