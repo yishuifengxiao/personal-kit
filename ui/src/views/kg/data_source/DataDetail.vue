@@ -21,12 +21,13 @@
 
     <!-- 上部内容展示区 -->
     <!-- 中间内容区 -->
-    fileId========={{ currentFile }} <br />----------------<br />
-    {{ fileStrcuts }}
-
-    <br />----------------<br />
-
-    {{ result }}
+    <a-table :columns="colDefines" :data-source="tableData">
+      <template #bodyCell="{ column, text }">
+        <template v-if="column.dataIndex === 'name'">
+          <a>{{ text }}</a>
+        </template>
+      </template>
+    </a-table>
     <!-- 中间内容区 -->
   </div>
 </template>
@@ -72,6 +73,32 @@ export default defineComponent({
       set(newValue) {
         this.openKeys = newValue
       }
+    },
+    //列名定义
+    colDefines: function () {
+      return this.fileStrcuts.map((v) => {
+        return {
+          title: v.name,
+          dataIndex: v.name,
+          key: v.name,
+          align: 'left'
+        }
+      })
+    },
+    //表格数据
+    tableData: function () {
+      const data = this.result.data
+      if (typeof data === 'undefined' || null === data) {
+        return []
+      }
+      return data.map((v) => {
+        let tmp = {}
+        for (let item of v.cells) {
+          tmp[item.columnName] = item.text
+        }
+        tmp.___data = v
+        return tmp
+      })
     }
   },
   methods: {

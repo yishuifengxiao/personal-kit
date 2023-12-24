@@ -17,7 +17,7 @@ public abstract class BaseFileParser implements FileParser {
 
     protected VirtuallyRow.ExcelCell excelCell(Integer columnIndex, List<VirtuallyFile.VirtuallyHeader> headers, String text) {
        String columnName=
-               headers.stream().filter(v -> v.equals(columnIndex)).map(VirtuallyFile.VirtuallyHeader::getName).findFirst().orElse(null);
+               headers.stream().filter(v -> v.getColumnIndex().equals(columnIndex)).map(VirtuallyFile.VirtuallyHeader::getName).findFirst().orElse(null);
         return cellHelper.excelCell(columnIndex, columnName, text);
     }
 }
