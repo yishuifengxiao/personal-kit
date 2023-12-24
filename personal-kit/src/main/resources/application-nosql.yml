@@ -8,3 +8,8 @@ spring:
       storage:
         database-dir: ./mongo
       version: 3.5.5
+  redis:
+    host: 47.111.112.103
+    port: 6380
+    password: Yishuifengxiao@36
+    database: 2
