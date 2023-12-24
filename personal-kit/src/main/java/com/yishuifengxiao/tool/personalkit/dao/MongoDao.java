@@ -63,9 +63,12 @@ public class MongoDao {
 
         // 构造查询对象
         Query query = new Query(criteria);
-    
 
 
         return mongotemplate.count(query, "virtuallyRow");
+    }
+
+    public VirtuallyFile findVirtuallyFileById(String id) {
+        return mongotemplate.findById(id, VirtuallyFile.class, "VirtuallyFile");
     }
 }

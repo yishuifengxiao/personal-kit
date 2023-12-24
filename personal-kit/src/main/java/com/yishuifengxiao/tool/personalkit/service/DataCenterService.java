@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @Transactional(rollbackOn = {Exception.class})
-public class DataService {
+public class DataCenterService {
 
     @Autowired
     private MongoDao mongoDao;
@@ -38,6 +39,12 @@ public class DataService {
     private SysUserDao sysUserDao;
 
 
+    /**
+     * 查询出所有的文件上传记录
+     *
+     * @param pageQuery
+     * @return
+     */
     public Page<DiskUploadRecordVo> findPageDataRecord(PageQuery<DiskUploadRecord> pageQuery) {
         DiskUploadRecord uploadRecord = pageQuery.query().orElse(new DiskUploadRecord());
         uploadRecord.setUploadMode(UploadMode.ANALYSIS.getCode());
@@ -62,10 +69,10 @@ public class DataService {
             }).collect(Collectors.toList());
 
             //实际数据的数量
-            Long actualTotalNum=   items.stream().mapToLong(DiskUploadRecordVo.FileItem::getActualTotalNum).sum();
+            Long actualTotalNum = items.stream().mapToLong(DiskUploadRecordVo.FileItem::getActualTotalNum).sum();
 
             //全部数据数量
-            Long uploadNum=   items.stream().mapToLong(DiskUploadRecordVo.FileItem::getUploadNum).sum();
+            Long uploadNum = items.stream().mapToLong(DiskUploadRecordVo.FileItem::getUploadNum).sum();
 
             DiskUploadRecordVo vo = BeanUtil.copy(v, new DiskUploadRecordVo());
             vo.setActualTotalNum(actualTotalNum).setUploadNum(uploadNum).setFiles(items)
@@ -77,6 +84,17 @@ public class DataService {
             ;
             return vo;
         });
+    }
+
+    /**
+     * 查询虚拟文件定义
+     *
+     * @param virtuallyFileId
+     * @return
+     */
+    public List<VirtuallyFile.VirtuallyHeader> findVirtuallyFileDefine(String virtuallyFileId) {
+        VirtuallyFile virtuallyFile = mongoDao.findVirtuallyFileById(virtuallyFileId);
+        return null == virtuallyFile ? Collections.EMPTY_LIST : virtuallyFile.getHeaders();
     }
 
 
