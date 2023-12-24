@@ -72,7 +72,6 @@
           mode="inline"
           :items="leftMenuSource"
           @select="onLeftMenuSelect"
-          @click="onLeftClick"
           :style="{ height: '100%', borderRight: 0 }"
         >
         </a-menu>
@@ -131,7 +130,7 @@ export default defineComponent({
     // 上部选中的菜单
     selectedTopKeysSource: {
       get() {
-        debugger
+    
         if (this.currentTopMenuId.length > 0) {
           return [this.currentTopMenuId]
         }
@@ -226,7 +225,8 @@ export default defineComponent({
     async loadUserInfo() {
       this.$http
         .request({
-          url: '/personkit/user/info/' + this.currentUserId
+          url: '/personkit/user/info/' + this.currentUserId,
+          method:"get"
         })
         .then((res) => {
           this.user = reactive(res)
@@ -284,6 +284,8 @@ export default defineComponent({
     onLeftMenuSelect({ key }) {
       this.selectedLeftKeys = key
       this.setLeftMenuId(key)
+      //路由跳转
+      this.$router.push({ name: key })
     },
     /**
      * 退出登陆

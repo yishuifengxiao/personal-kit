@@ -108,7 +108,7 @@ class http {
     options.url = this.url(options.url)
     options.method =
       typeof options.method === 'undefined' || options.method.trim().length === 0
-        ? 'get'
+        ? 'post'
         : options.method
 
     const config = {

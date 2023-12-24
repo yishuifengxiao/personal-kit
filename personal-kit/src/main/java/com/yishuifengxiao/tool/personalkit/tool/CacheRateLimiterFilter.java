@@ -17,7 +17,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Set;
 
 /**
@@ -31,15 +30,21 @@ public class CacheRateLimiterFilter extends OncePerRequestFilter {
     @Autowired
     private CoreProperties coreproperties;
 
-    private final Set<String> excludes = DataUtil.asSet("api-docs", "swagger");
+    private final Set<String> excludes = DataUtil.asSet("api-docs", "swagger",".css",".js",".html");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (coreproperties.getIpMaxVisitPerSecond() > 0 && !request.getRequestURI().contains(".") && excludes.stream().noneMatch(v -> StringUtils.containsIgnoreCase(request.getRequestURI(), v))) {
-            //开启了限流功能
+        if (coreproperties.getIpMaxVisitPerSecond() > 0 &&
+                //
+                !request.getRequestURI().contains(".") &&
+                //
+                excludes.stream().noneMatch(v -> StringUtils.containsIgnoreCase(request.getRequestURI(), v))
+        //
+        ) {
+            //开启了限流功能WE
             String visitorIp = HttpUtil.getVisitorIp(request);
             RateLimiter rateLimiter = GuavaCache.get(visitorIp,
-                    () -> RateLimiter.create(coreproperties.getIpMaxVisitPerSecond(), Duration.ofSeconds(1)));
+                    () -> RateLimiter.create(coreproperties.getIpMaxVisitPerSecond()));
             if (!rateLimiter.tryAcquire()) {
                 // 触发了限流
                 HttpUtils.write(request, response, Response.error("您的访问较为频繁，请稍后一段时间后再试"));

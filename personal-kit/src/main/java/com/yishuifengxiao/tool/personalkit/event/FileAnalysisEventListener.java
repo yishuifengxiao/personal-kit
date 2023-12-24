@@ -102,7 +102,7 @@ public class FileAnalysisEventListener {
         if (null != file) {
             file.delete();
         }
-        UploadStat uploadStat = null == throwable.get() ? UploadStat.UPLOAD_FAIL : UploadStat.UPLOAD_SUCCESS;
+        UploadStat uploadStat = null == throwable.get() ? UploadStat.UPLOAD_SUCCESS : UploadStat.UPLOAD_FAIL;
         String msg = null == throwable.get() ? null : StringUtils.substring(throwable.get().getMessage(), 0, 255);
         DiskUploadRecord uploadRecord = fileAnalysisEvent.getUploadRecord().setStat(uploadStat.getCode()).setMsg(msg).setFinishTime(LocalDateTime.now());
         JdbcUtil.jdbcHelper().updateByPrimaryKeySelective(uploadRecord);

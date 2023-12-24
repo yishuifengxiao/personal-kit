@@ -52,6 +52,7 @@ public class FileService {
     }
 
     public String upload(HttpServletRequest request, SysUser sysUser, String folder, UploadMode uploadMode, MultipartFile multipartFile, String traceId) {
+        uploadMode=null==uploadMode?UploadMode.ANALYSIS:uploadMode;
         File root = new File(new File(OsUtils.currentWorkPath(), "tmp"), IdWorker.snowflakeStringId());
         if (!root.exists()) {
             root.mkdirs();
@@ -61,7 +62,9 @@ public class FileService {
         DiskUploadRecord uploadRecord = null;
         try {
             IoUtil.inputStream2File(multipartFile.getInputStream(), file);
-            uploadRecord = new DiskUploadRecord(IdWorker.snowflakeStringId(), multipartFile.getOriginalFilename(), sysUser.getId(), UploadStat.UPLOAD_HANDING.getCode(), null, LocalDateTime.now(), null);
+            uploadRecord = new DiskUploadRecord(IdWorker.snowflakeStringId(), multipartFile.getOriginalFilename(), sysUser.getId(), UploadStat.UPLOAD_HANDING.getCode(),
+                    uploadMode.getCode(),
+                    null, LocalDateTime.now(), null);
             JdbcUtil.jdbcHelper().insertSelective(uploadRecord);
 
             eventPublisher.post(new FileAnalysisEvent(diskFolder, sysUser, file.getAbsolutePath(), uploadMode, uploadRecord));

@@ -20,7 +20,17 @@ import java.io.Serializable;
 @Accessors(chain = true)
 public class DiskUploadRecordVo extends DiskUploadRecord implements Serializable {
 
-    private Long allNum;
+    /**
+     * 实际数据的数量
+     */
+    private Long actualTotalNum;
 
-    private Long maxNum;
+    /**
+     * 全部数据数量
+     */
+    private Long uploadNum;
+
+    private String statName;
+
+    private String  userName;
 }

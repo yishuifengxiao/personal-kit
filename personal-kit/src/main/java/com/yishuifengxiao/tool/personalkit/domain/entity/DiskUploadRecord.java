@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadStat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -52,6 +53,14 @@ public class DiskUploadRecord implements Serializable {
 
     @Column(name = "stat", length = 1, columnDefinition = "tinyint(1) default 1")
     private Integer stat;
+
+
+    /**
+     * 上传模式 上传：0，解析：1
+     * @see UploadMode
+     */
+    @Column(name = "upload_mode", length = 1, columnDefinition = "tinyint(1) default 1")
+    private Integer uploadMode;
 
     private String msg;
 

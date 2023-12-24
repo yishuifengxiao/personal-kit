@@ -34,5 +34,5 @@ public class CoreProperties {
      * 单个IP每秒中最大访问频率，默认为 允许的最大尝试次数为每秒10次.若设置为0或负数则表示禁用此功能
      */
 
-    private Double ipMaxVisitPerSecond = 10D;
+    private Double ipMaxVisitPerSecond = 1000D;
 }

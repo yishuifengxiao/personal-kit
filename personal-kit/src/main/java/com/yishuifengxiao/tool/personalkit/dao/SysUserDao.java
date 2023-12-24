@@ -54,4 +54,11 @@ public class SysUserDao {
             return ps.executeBatch();
         });
     }
+
+    public String findUserNameById(String id){
+        if(StringUtils.isBlank(id)){
+            return null;
+        }
+        return sysUserRepository.findById(id.trim()).map(SysUser::getNickname).orElse(null);
+    }
 }

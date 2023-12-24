@@ -35,7 +35,7 @@ public class MongoDao {
         Criteria criteria = Criteria.where("virtuallyFileId").is(virtuallyFileId);
 
         // 构造排序方式
-        Sort sort = Sort.by(Sort.Direction.DESC, "rowIndex.$numberLong");
+        Sort sort = Sort.by(Sort.Direction.DESC, "rowIndex");
 
         // 构造查询对象
         Query query = new Query(criteria).with(sort).limit(1);
@@ -53,6 +53,7 @@ public class MongoDao {
     }
 
     public Long countByVirtuallyFileId(String virtuallyFileId) {
+
         // 构造查询条件
         Criteria criteria = Criteria.where("virtuallyFileId").is(virtuallyFileId);
 
@@ -60,6 +61,7 @@ public class MongoDao {
 
         // 构造查询对象
         Query query = new Query(criteria);
+    
 
 
         return mongotemplate.count(query, "virtuallyRow");
