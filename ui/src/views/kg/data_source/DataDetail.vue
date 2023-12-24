@@ -21,11 +21,10 @@
 
     <!-- 上部内容展示区 -->
     <!-- 中间内容区 -->
-    fileId========={{ currentFile }}
-    <br/>----------------<br/>
+    fileId========={{ currentFile }} <br />----------------<br />
     {{ fileStrcuts }}
 
-    <br/>----------------<br/>
+    <br />----------------<br />
 
     {{ result }}
     <!-- 中间内容区 -->
@@ -40,8 +39,8 @@ export default defineComponent({
   },
   data() {
     const fileStrcuts = []
-    const result={}
-    return { fileStrcuts ,result}
+    const result = {}
+    return { fileStrcuts, result }
   },
   computed: {
     //所有的总数据
@@ -87,7 +86,7 @@ export default defineComponent({
         })
         .then((res) => {
           this.fileStrcuts = res
-          this.query();
+          this.query()
         })
         .catch((err) => console.log(err))
     },
@@ -97,7 +96,11 @@ export default defineComponent({
         .request({
           url: '/personkit/data/virtuallyFile/findPageVirtuallyRow',
           data: {
-          
+            num: 1,
+            query: {
+              virtuallyFileId: this.currentFile
+            },
+            size: 10
           }
         })
         .then((res) => {
