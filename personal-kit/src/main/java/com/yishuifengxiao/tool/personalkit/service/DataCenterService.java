@@ -13,6 +13,7 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadStat;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
+import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyRow;
 import com.yishuifengxiao.tool.personalkit.domain.vo.DiskUploadRecordVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -97,6 +98,10 @@ public class DataCenterService {
     public List<VirtuallyFile.VirtuallyHeader> findVirtuallyFileDefine(String virtuallyFileId) {
         VirtuallyFile virtuallyFile = mongoDao.findVirtuallyFileById(virtuallyFileId);
         return null == virtuallyFile ? Collections.EMPTY_LIST : virtuallyFile.getHeaders();
+    }
+
+    public Page<VirtuallyRow> findPageVirtuallyRow(PageQuery<VirtuallyRow> pageQuery) {
+        return mongoDao.findPageVirtuallyRow(pageQuery);
     }
 
 

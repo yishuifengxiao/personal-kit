@@ -1,6 +1,8 @@
 package com.yishuifengxiao.tool.personalkit.dao;
 
 import com.mongodb.client.MongoClient;
+import com.yishuifengxiao.common.tool.entity.Page;
+import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyRow;
 import org.bson.Document;
@@ -71,5 +73,21 @@ public class MongoDao {
 
     public VirtuallyFile findVirtuallyFileById(String id) {
         return mongotemplate.findById(id, VirtuallyFile.class, VirtuallyFile.COLLECTION_NAME);
+    }
+
+    public Page<VirtuallyRow> findPageVirtuallyRow(PageQuery<VirtuallyRow> pageQuery) {
+        VirtuallyRow virtuallyRow = pageQuery.query().orElse(new VirtuallyRow());
+        // 构造查询条件
+        Criteria criteria = Criteria.where("virtuallyFileId").is(virtuallyRow.getVirtuallyFileId());
+
+        // 构造排序方式
+        Sort sort = Sort.by(Sort.Direction.DESC, "rowIndex");
+
+        // 构造查询对象
+        Query query =
+                new Query(criteria).with(sort).skip(pageQuery.startOffset().longValue()).limit(pageQuery.size().intValue());
+        long count = mongotemplate.count(new Query(criteria), VirtuallyRow.COLLECTION_NAME);
+        List<VirtuallyRow> rows = mongotemplate.find(query, VirtuallyRow.class, VirtuallyRow.COLLECTION_NAME);
+        return Page.of(rows, count, pageQuery);
     }
 }

@@ -18,8 +18,17 @@
       >
     </div>
     <a-divider />
-    fileId========={{ currentFile }}
+
     <!-- 上部内容展示区 -->
+    <!-- 中间内容区 -->
+    fileId========={{ currentFile }}
+    <br/>----------------<br/>
+    {{ fileStrcuts }}
+
+    <br/>----------------<br/>
+
+    {{ result }}
+    <!-- 中间内容区 -->
   </div>
 </template>
 
@@ -28,6 +37,11 @@ import { reactive, defineComponent, ref } from 'vue'
 export default defineComponent({
   props: {
     record: String
+  },
+  data() {
+    const fileStrcuts = []
+    const result={}
+    return { fileStrcuts ,result}
   },
   computed: {
     //所有的总数据
@@ -43,7 +57,6 @@ export default defineComponent({
     currentItem: {
       get() {
         const tmp = this.viewFiles
-        debugger
         return tmp[0]
       },
       // setter
@@ -61,6 +74,40 @@ export default defineComponent({
         this.openKeys = newValue
       }
     }
+  },
+  methods: {
+    // 查询文件结构
+    loadStruct() {
+      this.$http
+        .request({
+          url: '/personkit/data/virtuallyFile/findVirtuallyFileDefine',
+          data: {
+            id: this.currentFile
+          }
+        })
+        .then((res) => {
+          this.fileStrcuts = res
+          this.query();
+        })
+        .catch((err) => console.log(err))
+    },
+    //查询数据
+    query() {
+      this.$http
+        .request({
+          url: '/personkit/data/virtuallyFile/findPageVirtuallyRow',
+          data: {
+          
+          }
+        })
+        .then((res) => {
+          this.result = res
+        })
+        .catch((err) => console.log(err))
+    }
+  },
+  mounted() {
+    this.loadStruct()
   }
 })
 </script>

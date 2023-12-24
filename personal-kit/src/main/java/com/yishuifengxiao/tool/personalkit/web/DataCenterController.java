@@ -4,6 +4,7 @@ import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
+import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyRow;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.DiskUploadRecordVo;
 import com.yishuifengxiao.tool.personalkit.service.DataCenterService;
@@ -45,8 +46,14 @@ public class DataCenterController {
     }
 
     @ApiOperation(value = "查询虚拟文件定义", notes = "根据主键查询虚拟文件定义")
-    @PostMapping("/data/findVirtuallyFileDefine")
+    @PostMapping("/virtuallyFile/findVirtuallyFileDefine")
     public List<VirtuallyFile.VirtuallyHeader> findVirtuallyFileDefine(@Valid @RequestBody IdReq req) {
         return dataCenterService.findVirtuallyFileDefine(req.getId());
+    }
+
+    @ApiOperation(value = "分页查询文件内容", notes = "分页查询虚拟文件的文件内容")
+    @PostMapping("/virtuallyFile/findPageVirtuallyRow")
+    public Page<VirtuallyRow> findPageVirtuallyRow(@Valid @RequestBody PageQuery<VirtuallyRow> pageQuery) {
+        return dataCenterService.findPageVirtuallyRow(pageQuery);
     }
 }
