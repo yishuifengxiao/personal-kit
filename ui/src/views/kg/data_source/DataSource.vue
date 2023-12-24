@@ -37,7 +37,13 @@
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'action'">
           <a-space>
-            <a href="javascript:void(0);" @click="showDetail(record)">详情</a> <a>删除</a></a-space
+            <a-button
+              type="link"
+              @click="showDetail(record)"
+              :disabled="record.stat != 2 || record.actualTotalNum === 0"
+              >详情</a-button
+            >
+            <a>删除</a></a-space
           >
         </template>
       </template>

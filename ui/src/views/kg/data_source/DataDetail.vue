@@ -42,7 +42,9 @@ export default defineComponent({
     //当前选择的文件
     currentItem: {
       get() {
-        return this.viewFiles[0]
+        const tmp = this.viewFiles
+        debugger
+        return tmp[0]
       },
       // setter
       set(newValue) {

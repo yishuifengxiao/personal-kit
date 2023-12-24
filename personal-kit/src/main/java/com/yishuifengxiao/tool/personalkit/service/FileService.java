@@ -52,7 +52,7 @@ public class FileService {
     }
 
     public String upload(HttpServletRequest request, SysUser sysUser, String folder, UploadMode uploadMode, MultipartFile multipartFile, String traceId) {
-        uploadMode=null==uploadMode?UploadMode.ANALYSIS:uploadMode;
+        uploadMode = null == uploadMode ? UploadMode.ANALYSIS : uploadMode;
         File root = new File(new File(OsUtils.currentWorkPath(), "tmp"), IdWorker.snowflakeStringId());
         if (!root.exists()) {
             root.mkdirs();
@@ -81,9 +81,15 @@ public class FileService {
 
     public DiskFolder diskFolder(String folder) {
         if (StringUtils.isBlank(folder)) {
-            DiskFolder diskFolder = new DiskFolder().setId(IdWorker.snowflakeStringId()).setFolderName(DEFAULT_FOLDER_NAME).setParentId(DEFAULT_PARENT_ROOT_ID).setUserId(ContextUser.currentUserId()).setCreateTime(LocalDateTime.now());
+            DiskFolder diskFolder = new DiskFolder().setId(IdWorker.snowflakeStringId()).setFolderName(DEFAULT_FOLDER_NAME)
+                    //
+                    .setParentId(DEFAULT_PARENT_ROOT_ID).setUserId(ContextUser.currentUserId()).setCreateTime(LocalDateTime.now());
+            if (JdbcUtil.jdbcHelper().countAll(new DiskFolder().setFolderName(diskFolder.getFolderName()).setUserId(diskFolder.getUserId())) == 0) {
+                //不存在则新增
+                JdbcUtil.jdbcHelper().insertSelective(diskFolder);
+            }
 
-            JdbcUtil.jdbcHelper().insertSelective(diskFolder);
+
             return diskFolder;
         }
         DiskFolder diskFolder = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFolder.class, folder.trim());

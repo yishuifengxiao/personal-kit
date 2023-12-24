@@ -1,6 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
+import com.yishuifengxiao.common.jdbc.entity.Order;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.collections.DataUtil;
 import com.yishuifengxiao.common.tool.entity.Page;
@@ -48,7 +49,8 @@ public class DataCenterService {
     public Page<DiskUploadRecordVo> findPageDataRecord(PageQuery<DiskUploadRecord> pageQuery) {
         DiskUploadRecord uploadRecord = pageQuery.query().orElse(new DiskUploadRecord());
         uploadRecord.setUploadMode(UploadMode.ANALYSIS.getCode());
-        return JdbcUtil.jdbcHelper().findPage(uploadRecord, pageQuery.size().intValue(), pageQuery.num().intValue()).map(v -> {
+        return JdbcUtil.jdbcHelper().findPage(uploadRecord, pageQuery.size().intValue(), pageQuery.num().intValue(),
+                Order.desc("create_time")).map(v -> {
 
             //上传记录关联的全部文件
             List<DiskFile> files = JdbcUtil.jdbcHelper().findAll(new DiskFile().setUploadId(v.getId()));
