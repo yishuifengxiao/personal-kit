@@ -77,6 +77,7 @@ public class ExcelFileParser extends BaseFileParser {
                     @Override
                     public void doAfterAllAnalysed(AnalysisContext analysisContext) {
                         parserResult.setRows(rows);
+                        list.add(parserResult);
                     }
                 }).sheet(sheet.getSheetName()).doRead();
 

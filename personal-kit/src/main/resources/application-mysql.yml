@@ -18,8 +18,10 @@ spring:
         bootstrap-mode: default
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    password: "Yishui@36"
-    url: jdbc:mysql://47.111.112.103:3306/personkit?useUnicode=true&characterEncoding=UTF-8&pinGlobalTxToPhysicalConnection=true&useSSL=false&createDatabaseIfNotExist=true
+#    password: "Yishui@36"
+#    url: jdbc:mysql://47.111.112.103:3306/personkit?useUnicode=true&characterEncoding=UTF-8&pinGlobalTxToPhysicalConnection=true&useSSL=false&createDatabaseIfNotExist=true
+    password: "123456ss"
+    url: jdbc:mysql://10.168.1.115:3306/personkit?useUnicode=true&characterEncoding=UTF-8&pinGlobalTxToPhysicalConnection=true&useSSL=false&createDatabaseIfNotExist=true
     username: root
     #https://cloud.tencent.com/developer/article/1707872
     hikari:

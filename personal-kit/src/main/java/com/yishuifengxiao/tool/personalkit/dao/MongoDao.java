@@ -81,7 +81,7 @@ public class MongoDao {
         Criteria criteria = Criteria.where("virtuallyFileId").is(virtuallyRow.getVirtuallyFileId());
 
         // 构造排序方式
-        Sort sort = Sort.by(Sort.Direction.DESC, "rowIndex");
+        Sort sort = Sort.by(Sort.Direction.ASC, "rowIndex");
 
         // 构造查询对象
         Query query =

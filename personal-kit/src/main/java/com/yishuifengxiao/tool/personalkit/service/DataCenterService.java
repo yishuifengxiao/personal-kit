@@ -19,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -72,10 +69,10 @@ public class DataCenterService {
             }).collect(Collectors.toList());
 
             //实际数据的数量
-            Long actualTotalNum = items.stream().mapToLong(DiskUploadRecordVo.FileItem::getActualTotalNum).sum();
+            Long actualTotalNum = items.stream().filter(Objects::nonNull).mapToLong(s -> Optional.ofNullable(s.getActualTotalNum()).orElse(0L)).filter(Objects::nonNull).sum();
 
             //全部数据数量
-            Long uploadNum = items.stream().mapToLong(DiskUploadRecordVo.FileItem::getUploadNum).sum();
+            Long uploadNum = items.stream().filter(Objects::nonNull).mapToLong(s -> Optional.ofNullable(s.getUploadNum()).orElse(0L)).filter(Objects::nonNull).sum();
 
             DiskUploadRecordVo vo = BeanUtil.copy(v, new DiskUploadRecordVo());
             vo.setActualTotalNum(actualTotalNum).setUploadNum(uploadNum).setFiles(items)
@@ -97,7 +94,7 @@ public class DataCenterService {
      */
     public List<VirtuallyFile.VirtuallyHeader> findVirtuallyFileDefine(String virtuallyFileId) {
         VirtuallyFile virtuallyFile = mongoDao.findVirtuallyFileById(virtuallyFileId);
-        return null == virtuallyFile ? Collections.EMPTY_LIST : virtuallyFile.getHeaders();
+        return null == virtuallyFile || null == virtuallyFile.getHeaders() ? Collections.EMPTY_LIST : virtuallyFile.getHeaders();
     }
 
     public Page<VirtuallyRow> findPageVirtuallyRow(PageQuery<VirtuallyRow> pageQuery) {
