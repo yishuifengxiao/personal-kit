@@ -68,7 +68,11 @@ public class ExcelFileParser extends BaseFileParser {
                         List<VirtuallyRow.ExcelCell> cells = new ArrayList<>();
 
                         integerStringMap.forEach((k, v) -> {
-                            cells.add(excelCell(k, parserResult.getHeaders(), v));
+                            if (k <= parserResult.getHeaders().size()) {
+                                // 以表头为准
+                                cells.add(excelCell(k, parserResult.getHeaders(), v));
+                            }
+
                         });
 
                         rows.add(new ExcelRow(atomic.incrementAndGet(), cells));

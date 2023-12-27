@@ -13,3 +13,12 @@ spring:
     port: 6380
     password: Yishuifengxiao@36
     database: 2
+    connect-timeout: 1000
+    lettuce:
+      pool:
+        enabled: true
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+
