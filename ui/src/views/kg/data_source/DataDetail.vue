@@ -3,7 +3,7 @@
     <!-- 上部内容展示区 -->
     <div>
       当前文件名称:
-      <a-select v-model:value="currentFileId" style="width: 20rem;" @change="onSelectChange">
+      <a-select v-model:value="currentFileId" style="width: 20rem" @change="onSelectChange">
         <a-select-option
           :value="item.virtualFileId"
           v-for="item in allRecord.files"
@@ -11,27 +11,29 @@
           >{{ item.virtualFileName }}</a-select-option
         >
       </a-select>
-      <a-space style="margin-left: 10rem; float: right;">
+      <a-space style="margin-left: 10rem; float: right">
         <span>上传数据总数:{{ currentFile.uploadNum }} </span>
         <span>有效数据总数:{{ currentFile.actualTotalNum }} </span
         ><span>上传时间 {{ currentFile.createTime }}</span></a-space
       >
     </div>
     <a-divider />
-    {{ currentFile }}
+    currentFile==={{ currentFile }}
+    <br />
+    columns===== {{ colDefines }}
     <!-- 上部内容展示区 -->
     <!-- 中间内容区 -->
     <!-- 表格区 -->
-    <a-table :columns="colDefines" :data-source="tableData" :pagination="false">
-      <template #bodyCell="{ column, text }">
-        <template v-if="column.dataIndex === 'name'">
+    <a-table :columns="colDefines" :data-source="tableData" :pagination="false" v-if="colDefines.length > 0">
+      <template #bodyCell="{ column, text }" >
+        <template v-if="typeof column.dataIndex != 'undefined' && column.dataIndex === 'name'">
           <a>{{ text }}</a>
         </template>
       </template>
     </a-table>
     <!-- 表格区 -->
     <!-- 分页区 -->
-    <div style="margin-top: 15px; float: right;">
+    <div style="margin-top: 15px; float: right">
       <a-pagination
         v-model:current="result.num"
         :total="result.total"
@@ -64,10 +66,11 @@ export default defineComponent({
     //列名定义
     colDefines: function () {
       return this.fileStrcuts.map((v) => {
+        const name = null === v.name ? '' : v.name
         return {
-          title: v.name,
-          dataIndex: v.name,
-          key: v.name,
+          title: name,
+          dataIndex: name,
+          key: name,
           align: 'left'
         }
       })
@@ -83,6 +86,7 @@ export default defineComponent({
         for (let item of v.cells) {
           tmp[item.columnName] = item.text
         }
+
         tmp.___data = v
         return tmp
       })
