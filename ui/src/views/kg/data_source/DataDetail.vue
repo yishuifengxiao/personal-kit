@@ -18,9 +18,7 @@
       >
     </div>
     <a-divider />
-    currentFile==={{ currentFile }}
-    <br />
-    columns===== {{ colDefines }}
+
     <!-- 上部内容展示区 -->
     <!-- 中间内容区 -->
     <!-- 表格区 -->
