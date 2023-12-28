@@ -46,11 +46,11 @@ const routes = [{
 
         path: 'dataSet',
         name: "dataset_management",
-        component: () => import('@/views/kg/DataSet.vue'),
+        component: () => import('@/views/kg/data_set/DataSet.vue'),
 
         meta: {
             label: "数据集",
-            breadcrumbName: ["知识图谱", "数据中心", "数据集原理"]
+            breadcrumbName: ["知识图谱", "数据中心", "数据集管理"]
         }
     },
     ]
