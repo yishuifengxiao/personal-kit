@@ -3,7 +3,7 @@
     <!-- 上部内容展示区 -->
     <div>
       当前文件名称:
-      <a-select v-model:value="currentFileId" style="width: 20rem;" @change="onSelectChange">
+      <a-select v-model:value="currentFileId" style="width: 20rem" @change="onSelectChange">
         <a-select-option
           :value="item.virtualFileId"
           v-for="item in allRecord.files"
@@ -11,14 +11,14 @@
           >{{ item.virtualFileName }}</a-select-option
         >
       </a-select>
-      <a-space style="margin-left: 10rem; float: right;">
+      <a-space style="margin-left: 10rem; float: right">
         <span>上传数据总数:{{ currentFile.uploadNum }} </span>
         <span>有效数据总数:{{ currentFile.actualTotalNum }} </span
         ><span>上传时间 {{ currentFile.createTime }}</span></a-space
       >
     </div>
     <a-divider />
-
+    {{ currentFile }}
     <!-- 上部内容展示区 -->
     <!-- 中间内容区 -->
     <!-- 表格区 -->
@@ -36,10 +36,10 @@
     </a-table>
     <!-- 表格区 -->
     <!-- 分页区 -->
-    <div style="margin-top: 15px; float: right;">
+    <div style="margin-top: 15px; float: right">
       <a-pagination
-        v-model:current="result.num"
-        :total="result.total"
+        v-model:current="result.page.num"
+        :total="result.page.total"
         :show-total="(total) => `共 ${total} 条数据`"
         @change="onPaginationChange"
       />
@@ -97,18 +97,6 @@ export default defineComponent({
         tmp.___data = v
         return tmp
       })
-    },
-    //当前选中的文件
-    currentFile() {
-      let currentFile = this.allRecord.files.filter((v) => {
-        return v.virtualFileId === this.currentFileId
-      })[0]
-
-      if (typeof currentFile==="undefined"){
-        currentFile={};
-      }
-
-      return currentFile
     }
   },
   methods: {
@@ -138,16 +126,22 @@ export default defineComponent({
     //下拉选项发生变化,即预览文件发生变化
     onSelectChange(value) {
       this.currentFileId = value
+      this.currentFile = this.allRecord.files.filter((v) => {
+        return v.virtualFileId === this.currentFileId
+      })[0]
       this.query()
     }
   },
   mounted() {
+    console.log('--------------------- 2222222 ')
     this.query()
   },
   setup() {
+    console.log('--------------------- 111111 ')
     const allRecord = JSON.parse(sessionStorage.getItem('current_view_file'))
-    const currentFileId = allRecord.files[0].currentFileId
-    return { allRecord, currentFileId }
+    const currentFile = allRecord.files[0]
+    const currentFileId = allRecord.files[0].virtualFileId
+    return { allRecord, currentFile, currentFileId }
   }
 })
 </script>

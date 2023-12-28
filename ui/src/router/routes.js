@@ -17,7 +17,7 @@ const routes = [{
     path: '/view',
     name: 'home',
     component: () => import('@/views/HomeView.vue'),
-
+    redirect: { name: "data_source_management" },
     children: [{
 
         path: '',
@@ -25,7 +25,7 @@ const routes = [{
         component: () => import('@/views/kg/data_source/DataSource.vue'),
         meta: {
             label: "数据源",
-            breadcrumbName: ["知识图谱","数据中心","数据源管理"]
+            breadcrumbName: ["知识图谱", "数据中心", "数据源管理"]
         }
     },
     {
@@ -39,7 +39,7 @@ const routes = [{
 
         meta: {
             label: "数据详情",
-            breadcrumbName: ["知识图谱","数据中心","数据详情"]
+            breadcrumbName: ["知识图谱", "数据中心", "数据详情"]
         }
     },
     {
@@ -50,7 +50,7 @@ const routes = [{
 
         meta: {
             label: "数据集",
-            breadcrumbName: ["知识图谱","数据中心","数据集原理"]
+            breadcrumbName: ["知识图谱", "数据中心", "数据集原理"]
         }
     },
     ]

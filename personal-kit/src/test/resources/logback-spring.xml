@@ -48,7 +48,7 @@
     <root level="info">
         <appender-ref ref="STDOUT"/>
         <!--不输出日志到文件-->
-        <appender-ref ref="file"/>
+<!--        <appender-ref ref="file"/>-->
     </root>
 
 
@@ -74,7 +74,7 @@
     <logger name="com.dtflys" level="warn"/>
     <logger name="com.arangodb" level="warn"/>
     <logger name="org.elasticsearch" level="info"/>
-    <logger name="com.yishuifengxiao" level="info"/>
+    <logger name="com.yishuifengxiao" level="warn"/>
     <logger name="com.alibaba" level="warn"/>
     <logger name="org.hibernate.SQL" level="info"/>
     <!--    <logger name="org.hibernate.loader.entity" level="debug"/>-->
