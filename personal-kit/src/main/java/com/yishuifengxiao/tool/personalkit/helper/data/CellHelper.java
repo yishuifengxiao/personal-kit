@@ -39,10 +39,10 @@ public class CellHelper {
             //手机
             return new VirtuallyRow.ExcelCell(columnIndex, columnName, text.trim(), null, null, true, DataType.TEXT);
         }
-        Number number = NumberUtil.parse(text.trim());
+        BigDecimal number = NumberUtil.parse(text.trim(),null);
         if (null != number) {
             return new VirtuallyRow.ExcelCell(columnIndex, columnName, text.trim(),
-                    new BigDecimal(String.valueOf(number)), null, true, text.trim().contains(OsUtils.SPOT) ?
+                    number, null, true, text.trim().contains(OsUtils.SPOT) ?
                     DataType.DOUBLE : DataType.LONG);
         }
         return new VirtuallyRow.ExcelCell(columnIndex, columnName, text.trim(), null, null, true, DataType.TEXT);

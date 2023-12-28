@@ -7,6 +7,7 @@ import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyRow;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.DiskUploadRecordVo;
+import com.yishuifengxiao.tool.personalkit.domain.vo.VirtuallyFileVo;
 import com.yishuifengxiao.tool.personalkit.service.DataCenterService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -39,21 +40,27 @@ public class DataCenterController {
     private DataCenterService dataCenterService;
 
     @ApiOperation(value = "上传记录", notes = "上传记录")
-    @PostMapping("/data/record/page")
+    @PostMapping("/upload/record/page")
     public Page<DiskUploadRecordVo> reacordPage(@RequestBody PageQuery<DiskUploadRecord> pageQuery) {
 
         return dataCenterService.findPageDataRecord(pageQuery);
     }
 
     @ApiOperation(value = "查询虚拟文件定义", notes = "根据主键查询虚拟文件定义")
-    @PostMapping("/virtuallyFile/findVirtuallyFileDefine")
-    public List<VirtuallyFile.VirtuallyHeader> findVirtuallyFileDefine(@Valid @RequestBody IdReq req) {
+    @PostMapping("/file/struct")
+    public List<VirtuallyFile.VirtuallyHeader> struct(@Valid @RequestBody IdReq req) {
         return dataCenterService.findVirtuallyFileDefine(req.getId());
     }
 
     @ApiOperation(value = "分页查询文件内容", notes = "分页查询虚拟文件的文件内容")
-    @PostMapping("/virtuallyFile/findPageVirtuallyRow")
-    public Page<VirtuallyRow> findPageVirtuallyRow(@Valid @RequestBody PageQuery<VirtuallyRow> pageQuery) {
+    @PostMapping("/file/contents")
+    public Page<VirtuallyRow> contents(@Valid @RequestBody PageQuery<VirtuallyRow> pageQuery) {
         return dataCenterService.findPageVirtuallyRow(pageQuery);
+    }
+
+    @ApiOperation(value = "分页查询文件定义和内容", notes = "分页查询文件定义和内容")
+    @PostMapping("/file/view")
+    public VirtuallyFileVo view(@Valid @RequestBody PageQuery<VirtuallyRow> pageQuery) {
+        return dataCenterService.findPageVirtuallyData(pageQuery);
     }
 }

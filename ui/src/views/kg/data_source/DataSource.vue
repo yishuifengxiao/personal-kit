@@ -99,7 +99,7 @@ export default defineComponent({
     query() {
       this.$http
         .request({
-          url: '/personkit/data/data/record/page',
+          url: '/personkit/data/upload/record/page',
           data: {
             num: this.pagination.current,
             query: this.formState,

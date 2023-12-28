@@ -3,7 +3,7 @@
     <!-- 上部内容展示区 -->
     <div>
       当前文件名称:
-      <a-select v-model:value="currentFileId" style="width: 20rem" @change="onSelectChange">
+      <a-select v-model:value="currentFileId" style="width: 20rem;" @change="onSelectChange">
         <a-select-option
           :value="item.virtualFileId"
           v-for="item in allRecord.files"
@@ -11,7 +11,7 @@
           >{{ item.virtualFileName }}</a-select-option
         >
       </a-select>
-      <a-space style="margin-left: 10rem; float: right">
+      <a-space style="margin-left: 10rem; float: right;">
         <span>上传数据总数:{{ currentFile.uploadNum }} </span>
         <span>有效数据总数:{{ currentFile.actualTotalNum }} </span
         ><span>上传时间 {{ currentFile.createTime }}</span></a-space
@@ -22,8 +22,13 @@
     <!-- 上部内容展示区 -->
     <!-- 中间内容区 -->
     <!-- 表格区 -->
-    <a-table :columns="colDefines" :data-source="tableData" :pagination="false" v-if="colDefines.length > 0">
-      <template #bodyCell="{ column, text }" >
+    <a-table
+      :columns="colDefines"
+      :data-source="tableData"
+      :pagination="false"
+      v-if="colDefines.length > 0"
+    >
+      <template #bodyCell="{ column, text }">
         <template v-if="typeof column.dataIndex != 'undefined' && column.dataIndex === 'name'">
           <a>{{ text }}</a>
         </template>
@@ -31,7 +36,7 @@
     </a-table>
     <!-- 表格区 -->
     <!-- 分页区 -->
-    <div style="margin-top: 15px; float: right">
+    <div style="margin-top: 15px; float: right;">
       <a-pagination
         v-model:current="result.num"
         :total="result.total"
@@ -51,19 +56,23 @@ export default defineComponent({
     record: String
   },
   data() {
-    const fileStrcuts = []
     const result = {
-      num: 1,
-      total: 0,
-      data: []
+      headers: [],
+      page: {
+        data: [],
+        empty: true,
+        num: 1,
+        pages: 0,
+        size: 10,
+        total: 0
+      }
     }
-    const currentFileId = this.currentFile.virtualFileId
-    return { fileStrcuts, result, currentFileId }
+    return { result }
   },
   computed: {
     //列名定义
     colDefines: function () {
-      return this.fileStrcuts.map((v) => {
+      return this.result.headers.map((v) => {
         const name = null === v.name ? '' : v.name
         return {
           title: name,
@@ -75,7 +84,7 @@ export default defineComponent({
     },
     //表格数据
     tableData: function () {
-      const data = this.result.data
+      const data = this.result.page.data
       if (typeof data === 'undefined' || null === data) {
         return []
       }
@@ -88,31 +97,28 @@ export default defineComponent({
         tmp.___data = v
         return tmp
       })
+    },
+    //当前选中的文件
+    currentFile() {
+      let currentFile = this.allRecord.files.filter((v) => {
+        return v.virtualFileId === this.currentFileId
+      })[0]
+
+      if (typeof currentFile==="undefined"){
+        currentFile={};
+      }
+
+      return currentFile
     }
   },
   methods: {
-    // 查询文件结构
-    loadStruct() {
-      this.$http
-        .request({
-          url: '/personkit/data/virtuallyFile/findVirtuallyFileDefine',
-          data: {
-            id: this.currentFileId
-          }
-        })
-        .then((res) => {
-          this.fileStrcuts = res
-          this.query()
-        })
-        .catch((err) => console.log(err))
-    },
-    //查询数据
+    //查询文件结构和内容
     query() {
       this.$http
         .request({
-          url: '/personkit/data/virtuallyFile/findPageVirtuallyRow',
+          url: '/personkit/data/file/view',
           data: {
-            num: this.result.num,
+            num: this.result.page.num,
             query: {
               virtuallyFileId: this.currentFileId
             },
@@ -126,28 +132,22 @@ export default defineComponent({
     },
     //分页变化
     onPaginationChange(page, pageSize) {
-      this.result.num = page
+      this.result.page.num = page
       this.query()
     },
-    //下拉选项发生变化
+    //下拉选项发生变化,即预览文件发生变化
     onSelectChange(value) {
       this.currentFileId = value
-      const files = this.allRecord.files
-
-      this.currentFile = files.filter((v) => {
-        return v.virtualFileId == value
-      })[0]
       this.query()
     }
   },
   mounted() {
-    this.loadStruct()
+    this.query()
   },
   setup() {
     const allRecord = JSON.parse(sessionStorage.getItem('current_view_file'))
-    const currentFile = allRecord.files[0]
-
-    return { allRecord, currentFile }
+    const currentFileId = allRecord.files[0].currentFileId
+    return { allRecord, currentFileId }
   }
 })
 </script>
