@@ -226,7 +226,7 @@ export default defineComponent({
     async loadUserInfo() {
       this.$http
         .request({
-          url: '/personkit/user/info/' + this.currentUserId,
+          url: '/personkit/sys/user/info/' + this.currentUserId,
           method:"get"
         })
         .then((res) => {
@@ -253,7 +253,7 @@ export default defineComponent({
     findRoleMenu() {
       this.$http
         .request({
-          url: '/personkit/menu/findRoleMenu',
+          url: '/personkit/sys/menu/findRoleMenu',
           method: 'post',
           data: {
             roleId: this.currentRoleId,

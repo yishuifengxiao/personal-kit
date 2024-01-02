@@ -32,7 +32,7 @@ import javax.validation.Valid;
 @Api(tags = {"角色接口"})
 @Valid
 @RestController
-@RequestMapping("/system/role")
+@RequestMapping("/sys/role")
 @RequiredArgsConstructor
 public class RoleController {
 

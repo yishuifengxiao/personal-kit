@@ -27,7 +27,7 @@
         <template #cover>
           <img
             alt="example"
-            src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png"
+            :src="card_bg_url"
           />
         </template>
         <template #actions>
@@ -54,13 +54,15 @@ import {
   SettingOutlined,
   DeleteOutlined
 } from '@ant-design/icons-vue'
+
+import card_bg_url from "@/assets/images/graph/card_bg.png"
 export default defineComponent({
   data() {
     const formState = reactive({
       user: '',
       password: ''
     })
-    return { formState }
+    return { formState ,card_bg_url}
   },
   computed: {
     tableData: function () {

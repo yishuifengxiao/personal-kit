@@ -24,7 +24,7 @@ import javax.validation.Valid;
 @Api(tags = {"用户接口"})
 @Valid
 @RestController
-@RequestMapping("/system/user")
+@RequestMapping("/sys/user")
 @RequiredArgsConstructor
 public class UserController {
 
