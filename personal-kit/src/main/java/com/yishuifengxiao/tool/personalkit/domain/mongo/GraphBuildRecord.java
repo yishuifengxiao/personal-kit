@@ -39,6 +39,8 @@ public class GraphBuildRecord implements Serializable {
 
     private String createUserId;
 
+    private Long useTime;
+
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
