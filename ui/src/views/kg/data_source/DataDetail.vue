@@ -104,7 +104,7 @@ export default defineComponent({
     query() {
       this.$http
         .request({
-          url: '/personkit/data/file/view',
+          url: '/personkit/data/center/view',
           data: {
             num: this.result.page.num,
             query: {
