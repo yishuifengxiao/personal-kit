@@ -29,7 +29,7 @@ import javax.validation.Valid;
 @Valid
 @Validated
 @Slf4j
-@RequestMapping("/folder")
+@RequestMapping("/disk/folder")
 public class FolderController {
     @Autowired
     private FolderService folderService;
@@ -38,7 +38,8 @@ public class FolderController {
     @ApiImplicitParams(@ApiImplicitParam(name = "folderId", value = "文件夹目录的id", required = false))
     @ApiOperation(value = "查询文件夹下面所有资源", notes = "若文件夹目录的id为空或不存在则表示查询根目录下所有的资源")
     @GetMapping("/list")
-    public ResourceVo list(HttpServletRequest request, @RequestParam(name = "folderId", required = false) String folderId) {
+    public ResourceVo list(HttpServletRequest request,
+                           @RequestParam(name = "folderId", required = false) String folderId) {
         final ResourceVo resourceVo = folderService.list(folderId);
         return resourceVo;
     }

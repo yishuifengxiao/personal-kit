@@ -34,7 +34,7 @@ import java.io.IOException;
 @Valid
 @Validated
 @Slf4j
-@RequestMapping("/file")
+@RequestMapping("/disk/file")
 public class FileController {
 
     @Autowired
@@ -43,7 +43,8 @@ public class FileController {
 
     @ApiImplicitParams({
             //
-            @ApiImplicitParam(name = "file[]", value = "文件流对象,接收数组格式", required = true, dataType = "MultipartFile", allowMultiple = true),
+            @ApiImplicitParam(name = "file[]", value = "文件流对象,接收数组格式", required = true, dataType = "MultipartFile",
+                    allowMultiple = true),
             //
             @ApiImplicitParam(name = "folder", value = "文件夹目录", required = false),
             //
@@ -51,7 +52,8 @@ public class FileController {
     @ApiOperation(value = "多文件上传", notes = "使用多文件方式上传")
     @PostMapping("/imports")
     @ResponseBody
-    public void importFiles(HttpServletRequest request, @RequestParam(value = "file[]", required = true) MultipartFile[] files,
+    public void importFiles(HttpServletRequest request,
+                            @RequestParam(value = "file[]", required = true) MultipartFile[] files,
                             //
                             @RequestParam(value = "folder", required = false) String folder,
                             //
@@ -62,7 +64,8 @@ public class FileController {
 
     @ApiImplicitParams({
             //
-            @ApiImplicitParam(name = "file", value = "文件流对象,接收数组格式", allowMultiple = true, dataTypeClass = MultipartFile.class, required = true, dataType = "MultipartFile"),
+            @ApiImplicitParam(name = "file", value = "文件流对象,接收数组格式", allowMultiple = true, dataTypeClass =
+                    MultipartFile.class, required = true, dataType = "MultipartFile"),
             //
             @ApiImplicitParam(name = "folder", value = "文件夹目录", required = false),
 

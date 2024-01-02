@@ -32,34 +32,34 @@ import java.util.List;
 @Valid
 @Validated
 @Slf4j
-@RequestMapping("/data")
+@RequestMapping("/data/center")
 @RestController
-public class DataCenterController {
+public class DataSourceController {
 
     @Autowired
     private DataCenterService dataCenterService;
 
     @ApiOperation(value = "上传记录", notes = "上传记录")
-    @PostMapping("/upload/record/page")
+    @PostMapping("/upload/page")
     public Page<DiskUploadRecordVo> reacordPage(@RequestBody PageQuery<DiskUploadRecord> pageQuery) {
 
         return dataCenterService.findPageDataRecord(pageQuery);
     }
 
     @ApiOperation(value = "查询虚拟文件定义", notes = "根据主键查询虚拟文件定义")
-    @PostMapping("/file/struct")
+    @PostMapping("/struct")
     public List<VirtuallyFile.VirtuallyHeader> struct(@Valid @RequestBody IdReq req) {
         return dataCenterService.findVirtuallyFileDefine(req.getId());
     }
 
     @ApiOperation(value = "分页查询文件内容", notes = "分页查询虚拟文件的文件内容")
-    @PostMapping("/file/contents")
+    @PostMapping("/contents")
     public Page<VirtuallyRow> contents(@Valid @RequestBody PageQuery<VirtuallyRow> pageQuery) {
         return dataCenterService.findPageVirtuallyRow(pageQuery);
     }
 
     @ApiOperation(value = "分页查询文件定义和内容", notes = "分页查询文件定义和内容")
-    @PostMapping("/file/view")
+    @PostMapping("/view")
     public VirtuallyFileVo view(@Valid @RequestBody PageQuery<VirtuallyRow> pageQuery) {
         return dataCenterService.findPageVirtuallyData(pageQuery);
     }

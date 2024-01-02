@@ -1,6 +1,5 @@
-package com.yishuifengxiao.tool.personalkit.dao;
+package com.yishuifengxiao.tool.personalkit.dao.mongo;
 
-import com.mongodb.client.MongoClient;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
@@ -11,7 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -21,13 +20,10 @@ import java.util.List;
  * @date 2023/12/2 22:55
  * @since 1.0.0
  */
-@Component
-public class MongoDao {
+@Repository
+public class DataSourceDao {
     @Autowired
     private MongoTemplate mongotemplate;
-
-    @Autowired
-    private MongoClient mongoClient;
 
     public List<VirtuallyFile> findVirtuallyFileByFileId(String fileId) {
         Query query = new Query();
