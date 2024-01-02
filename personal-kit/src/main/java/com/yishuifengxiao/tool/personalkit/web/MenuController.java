@@ -29,7 +29,7 @@ import java.util.List;
 @Api(tags = {"菜单接口"})
 @Valid
 @RestController
-@RequestMapping("/menu")
+@RequestMapping("/system/menu")
 @RequiredArgsConstructor
 public class MenuController {
 

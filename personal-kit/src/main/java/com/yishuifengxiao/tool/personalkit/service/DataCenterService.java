@@ -7,7 +7,7 @@ import com.yishuifengxiao.common.tool.collections.DataUtil;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.exception.IllegalParameterException;
-import com.yishuifengxiao.tool.personalkit.dao.MongoDao;
+import com.yishuifengxiao.tool.personalkit.dao.mongo.DataSourceDao;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 public class DataCenterService {
 
     @Autowired
-    private MongoDao mongoDao;
+    private DataSourceDao dataSourceDao;
     @Autowired
     private SysUserDao sysUserDao;
 
@@ -55,14 +55,14 @@ public class DataCenterService {
             //上传记录关联的全部文件
             List<DiskFile> files = JdbcUtil.jdbcHelper().findAll(new DiskFile().setUploadId(v.getId()));
             List<VirtuallyFile> virtuallyFiles =
-                    DataUtil.stream(files).map(diskFile -> mongoDao.findVirtuallyFileByFileId(diskFile.getId())).filter(Objects::nonNull)
+                    DataUtil.stream(files).map(diskFile -> dataSourceDao.findVirtuallyFileByFileId(diskFile.getId())).filter(Objects::nonNull)
                             //
                             .flatMap(Collection::stream).filter(Objects::nonNull).distinct().collect(Collectors.toList());
 
 
             List<DiskUploadRecordVo.FileItem> items = virtuallyFiles.stream().map(virtuallyFile -> {
-                Long uploadNum = mongoDao.findMaxRowIndexByVirtuallyFileId(virtuallyFile.getId());
-                Long actualTotalNum = mongoDao.countByVirtuallyFileId(virtuallyFile.getId());
+                Long uploadNum = dataSourceDao.findMaxRowIndexByVirtuallyFileId(virtuallyFile.getId());
+                Long actualTotalNum = dataSourceDao.countByVirtuallyFileId(virtuallyFile.getId());
 
                 return new DiskUploadRecordVo.FileItem(actualTotalNum, uploadNum, virtuallyFile.getFileId(),
                         //
@@ -98,13 +98,13 @@ public class DataCenterService {
      * @return
      */
     public List<VirtuallyFile.VirtuallyHeader> findVirtuallyFileDefine(String virtuallyFileId) {
-        VirtuallyFile virtuallyFile = mongoDao.findVirtuallyFileById(virtuallyFileId);
+        VirtuallyFile virtuallyFile = dataSourceDao.findVirtuallyFileById(virtuallyFileId);
         return null == virtuallyFile || null == virtuallyFile.getHeaders() ? Collections.EMPTY_LIST :
                 virtuallyFile.getHeaders();
     }
 
     public Page<VirtuallyRow> findPageVirtuallyRow(PageQuery<VirtuallyRow> pageQuery) {
-        return mongoDao.findPageVirtuallyRow(pageQuery);
+        return dataSourceDao.findPageVirtuallyRow(pageQuery);
     }
 
 

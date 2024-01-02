@@ -1,8 +1,8 @@
 package com.yishuifengxiao.tool.personalkit.web;
 
 import com.yishuifengxiao.common.security.support.Strategy;
-import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.entity.Page;
+import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysSecurityRecord;
 import com.yishuifengxiao.tool.personalkit.domain.request.RecordReq;
 import com.yishuifengxiao.tool.personalkit.service.RecordService;
@@ -44,5 +44,6 @@ public class RecordController {
 
         return recordService.findPageSysSecurityRecord(param);
     }
+
 
 }

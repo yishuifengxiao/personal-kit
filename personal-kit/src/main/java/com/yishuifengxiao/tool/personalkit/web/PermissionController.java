@@ -24,7 +24,7 @@ import javax.validation.Valid;
 @Api(tags = {"资源接口"})
 @Valid
 @RestController
-@RequestMapping("/permission")
+@RequestMapping("/system/permission")
 @RequiredArgsConstructor
 public class PermissionController {
 
