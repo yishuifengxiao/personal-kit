@@ -16,7 +16,7 @@
         <a-button type="primary" html-type="submit"> 搜索 </a-button>
       </a-form-item>
       <a-form-item>
-        <a-button type="primary"> 添加数据集 </a-button>
+        <a-button type="primary" @click="addDataSet"> 添加数据集 </a-button>
       </a-form-item>
     </a-form>
     <!-- 上部搜索条件区域 -->
@@ -43,6 +43,9 @@
       </a-card>
     </a-flex>
     <!-- 中间内容区域 -->  
+    <!-- 弹窗区域 -->
+    <DataSetAdd ref="DataSetAdd"></DataSetAdd>
+      <!-- 弹窗区域 -->
   </div>
 </template>
 
@@ -56,6 +59,7 @@ import {
 } from '@ant-design/icons-vue'
 
 import card_bg_url from "@/assets/images/graph/card_bg.png"
+import DataSetAdd from "./DataSetAdd.vue"
 export default defineComponent({
   data() {
     const formState = reactive({
@@ -71,13 +75,17 @@ export default defineComponent({
   },
   methods: {
     handleFinish() {},
-    handleFinishFailed() {}
+    handleFinishFailed() {},
+    addDataSet(){
+      this.$refs.DataSetAdd.showDrawer();
+    }
   },
   components: {
     UserOutlined,
     EditOutlined,
     SettingOutlined,
-    DeleteOutlined
+    DeleteOutlined,
+    DataSetAdd
   },
   setup() {}
 })

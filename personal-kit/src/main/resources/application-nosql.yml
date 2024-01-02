@@ -9,7 +9,7 @@ spring:
         database-dir: ./mongo
       version: 3.5.5
   redis:
-    host: 47.111.112.103
+    host: 10.168.1.115
     port: 6380
     password: Yishuifengxiao@36
     database: 2
