@@ -52,7 +52,7 @@
         </a-form-item>
       </a-form>
       <a-divider orientation="left">已选择的数据源</a-divider>
-
+      formState==={{ formState }}
       <p><span>Some contents...</span><span>已选择</span><span>已提交</span></p>
     </a-drawer>
   </div>
@@ -109,6 +109,15 @@ export default defineComponent({
           that.$msg.success('创建成功')
         })
         .catch((err) => console.log(err))
+    },
+    showDrawer(param) {
+      this.open = true
+      
+      this.title = typeof param === 'undefined' ? '添加数据集' : '编辑数据集'
+      if (typeof param != 'undefined') {
+        this.formState = param
+        console.log('-----------------------' + JSON.stringify(param))
+      }
     }
   },
   mounted() {
@@ -119,28 +128,23 @@ export default defineComponent({
 
     const open = ref(false)
     let title = ref('添加数据集')
-    const showDrawer = (param) => {
-      open.value = true
-      title.value = typeof param === 'undefined' ? '添加数据集' : '编辑数据集'
-    }
+    let formState = reactive({
+      description: '',
+      name: '',
+      virtuallyFileIds: []
+    })
+
     const onClose = () => {
       open.value = false
     }
 
     const data = ref([])
 
-    const formState = reactive({
-      description: '',
-      name: '',
-      virtuallyFileIds: []
-    })
-
     const selectOptions = ref([])
 
     return {
       placement,
       open,
-      showDrawer,
       onClose,
       title,
       data,

@@ -14,7 +14,7 @@ spring:
     password: Yishuifengxiao@36
     database: 2
     connect-timeout: 1000
-    lettuce:
+    jedis:
       pool:
         enabled: true
         max-active: 8
