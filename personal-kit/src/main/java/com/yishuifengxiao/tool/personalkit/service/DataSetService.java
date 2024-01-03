@@ -1,5 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
+import com.yishuifengxiao.common.jdbc.JdbcUtil;
+import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
@@ -7,8 +9,10 @@ import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.dao.mongo.DataSetDao;
 import com.yishuifengxiao.tool.personalkit.dao.mongo.repository.DataSetRepository;
+import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.DataSet;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
+import com.yishuifengxiao.tool.personalkit.domain.vo.DataSetVo;
 import com.yishuifengxiao.tool.personalkit.tool.ContextUser;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +20,8 @@ import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -34,11 +40,25 @@ public class DataSetService {
     private DataSetRepository dataSetRepository;
 
 
-    public Page<DataSet> findPageDataSet(PageQuery<DataSet> param) {
+    public Page<DataSetVo> findPageDataSet(PageQuery<DataSet> param) {
         DataSet dataSet = param.query().orElse(new DataSet());
         dataSet.setCreateUserId(ContextUser.currentUserId());
         param.setQuery(dataSet);
-        return dataSetDao.findPage(param);
+        return dataSetDao.findPage(param).map(v -> {
+
+            DataSetVo vo = BeanUtil.copy(v, new DataSetVo());
+
+            List<DataSetVo.Item> items = v.getVirtuallyFileIds().stream().map(s -> {
+                DiskFile diskFile = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFile.class, v.getId());
+                if (null == diskFile) {
+                    return null;
+                }
+                return new DataSetVo.Item(diskFile.getId(), diskFile.getFileName());
+            }).filter(Objects::nonNull).collect(Collectors.toList());
+
+            vo.setSources(items);
+            return vo;
+        });
     }
 
     public void save(DataSet param) {

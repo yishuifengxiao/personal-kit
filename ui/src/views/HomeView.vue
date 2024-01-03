@@ -63,7 +63,7 @@
       <!-- 头部菜单最右侧 -->
     </a-layout-header>
     <!-- 顶部导航栏 -->
-    <a-layout>
+    <a-layout style="overflow-x: hidden;">
       <a-layout-sider width="200" style="background: #fff">
         <!-- 左侧菜单 -->
         <a-menu

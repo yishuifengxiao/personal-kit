@@ -4,10 +4,12 @@ import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.DataSet;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
+import com.yishuifengxiao.tool.personalkit.domain.vo.DataSetVo;
 import com.yishuifengxiao.tool.personalkit.service.DataSetService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,11 +32,12 @@ import javax.validation.Valid;
 @RestController
 public class DataSetController {
 
+    @Autowired
     private DataSetService dataSetService;
 
     @ApiOperation(value = "分页查询数据集", notes = "分页查询数据集")
     @PostMapping("/page")
-    public Page<DataSet> reacordPage(@RequestBody PageQuery<DataSet> pageQuery) {
+    public Page<DataSetVo> reacordPage(@RequestBody PageQuery<DataSet> pageQuery) {
 
         return dataSetService.findPageDataSet(pageQuery);
     }
