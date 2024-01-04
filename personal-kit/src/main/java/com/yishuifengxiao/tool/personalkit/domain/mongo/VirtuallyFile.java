@@ -1,13 +1,13 @@
 package com.yishuifengxiao.tool.personalkit.domain.mongo;
 
 import com.yishuifengxiao.tool.personalkit.domain.enums.DataType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Id;
 import java.io.Serializable;
 import java.util.List;
 

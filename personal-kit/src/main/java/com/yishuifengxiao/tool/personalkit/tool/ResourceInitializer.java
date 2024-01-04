@@ -8,8 +8,7 @@ import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.*;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,14 +59,14 @@ public class ResourceInitializer implements CommandLineRunner {
         map.putAll(context.getBeansWithAnnotation(Controller.class));
         map.values().stream().filter(Objects::nonNull).filter(v -> !sets.stream().anyMatch(s -> StringUtils.containsIgnoreCase(v.getClass().getPackageName(), s))).forEach(c -> {
             // 得到的是controller
-            Api api = c.getClass().getAnnotation(Api.class);
+            Schema api = c.getClass().getAnnotation(Schema.class);
             RequestMapping requestMapping = c.getClass().getAnnotation(RequestMapping.class);
             String[] classUrls = null != requestMapping ? requestMapping.value() : null;
             String moduleName = null;
             if (null != api) {
-                moduleName = api.value();
+                moduleName = api.name();
                 if (StringUtils.isBlank(moduleName)) {
-                    moduleName = DataUtil.stream(api.tags()).collect(Collectors.joining(","));
+                    moduleName = DataUtil.stream(api.types()).collect(Collectors.joining(","));
                 }
             }
 
@@ -84,9 +83,9 @@ public class ResourceInitializer implements CommandLineRunner {
         Arrays.stream(declaredMethods).forEach(m -> {
             String[] methodPaths = methodPath(m);
             if (null != methodPaths) {
-                ApiOperation apiOperation = AnnotationUtils.findAnnotation(m, ApiOperation.class);
-                String name = null != apiOperation ? apiOperation.value() : "";
-                String note = null != apiOperation ? apiOperation.notes() : "";
+                Schema apiOperation = AnnotationUtils.findAnnotation(m, Schema.class);
+                String name = null != apiOperation ? apiOperation.name() : "";
+                String note = null != apiOperation ? apiOperation.description() : "";
 
                 if (null != classUrls && classUrls.length > 0) {
                     DataUtil.stream(classUrls).forEach(classUrl -> DataUtil.stream(methodPaths).forEach(methodPath -> this.assemble(list, moduleName, name, note, new StringBuilder(null == classUrl ? "" : classUrl.trim()).append(null == methodPath ? "" : methodPath.trim()).toString())));

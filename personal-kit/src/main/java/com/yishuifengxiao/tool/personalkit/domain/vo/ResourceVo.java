@@ -1,6 +1,5 @@
 package com.yishuifengxiao.tool.personalkit.domain.vo;
 
-import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +13,6 @@ import java.util.List;
  * @version 1.0.0
  * @since 1.0.0
  */
-@ApiModel(description = "资源信息")
 @Accessors(chain = true)
 @Data
 @AllArgsConstructor
@@ -47,7 +45,6 @@ public class ResourceVo implements Serializable {
      */
     private List<Item> files;
 
-    @ApiModel(description = "资源信息-资源项")
     @Accessors(chain = true)
     @Data
     @AllArgsConstructor

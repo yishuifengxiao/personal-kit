@@ -2,10 +2,10 @@ package com.yishuifengxiao.tool.personalkit.domain.vo;
 
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
+import jakarta.validation.Valid;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import java.io.Serializable;
 import java.util.List;
 

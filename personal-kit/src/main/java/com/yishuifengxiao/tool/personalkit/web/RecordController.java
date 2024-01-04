@@ -7,14 +7,12 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.SysSecurityRecord;
 import com.yishuifengxiao.tool.personalkit.domain.request.RecordReq;
 import com.yishuifengxiao.tool.personalkit.service.RecordService;
 import com.yishuifengxiao.tool.personalkit.tool.ContextUser;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.Arrays;
 
 /**
@@ -23,7 +21,6 @@ import java.util.Arrays;
  * @date 2023/12/3 18:35
  * @since 1.0.0
  */
-@Api(tags = {"记录接口"})
 @Valid
 @RestController
 @RequestMapping("/record")
@@ -33,7 +30,6 @@ public class RecordController {
     private final RecordService recordService;
 
 
-    @ApiOperation(value = "个人的登陆记录")
     @PostMapping("/personal/login/page")
     public Page<SysSecurityRecord> loginRecord(PageQuery<RecordReq> param) {
 

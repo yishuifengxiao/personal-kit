@@ -1,9 +1,9 @@
 package com.yishuifengxiao.tool.personalkit.domain.query;
 
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import jakarta.persistence.Column;
 import lombok.Data;
 
-import javax.persistence.Column;
 import java.io.Serializable;
 
 /**

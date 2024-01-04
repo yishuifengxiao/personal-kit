@@ -1,9 +1,9 @@
 package com.yishuifengxiao.tool.personalkit.domain.query;
 
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
+import jakarta.persistence.Column;
 import lombok.Data;
 
-import javax.persistence.Column;
 
 /**
  * @author yishui

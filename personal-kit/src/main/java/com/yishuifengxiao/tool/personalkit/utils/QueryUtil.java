@@ -4,9 +4,9 @@ import com.yishuifengxiao.common.jdbc.entity.FieldValue;
 import com.yishuifengxiao.common.jdbc.extractor.FieldExtractor;
 import com.yishuifengxiao.common.jdbc.extractor.SimpleFieldExtractor;
 import com.yishuifengxiao.common.tool.bean.ClassUtil;
+import jakarta.persistence.Column;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.persistence.Column;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;

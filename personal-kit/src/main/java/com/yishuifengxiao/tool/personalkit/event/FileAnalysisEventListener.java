@@ -17,13 +17,13 @@ import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyRow;
 import com.yishuifengxiao.tool.personalkit.helper.data.FileParserHelper;
 import com.yishuifengxiao.tool.personalkit.helper.data.ParserResult;
 import com.yishuifengxiao.tool.personalkit.tool.UploadClient;
+import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
