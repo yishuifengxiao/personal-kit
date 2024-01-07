@@ -1,5 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.web;
 
+import com.yishuifengxiao.common.security.user.CurrentUser;
 import com.yishuifengxiao.common.tool.validate.Group;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
@@ -8,6 +9,9 @@ import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +32,9 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/info/{id}")
-    public UserInfo info(@PathVariable String id) {
+    public UserInfo info(@PathVariable String id, @CurrentUser UserDetails user) {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(authentication);
         return userService.userInfo(id);
     }
 
