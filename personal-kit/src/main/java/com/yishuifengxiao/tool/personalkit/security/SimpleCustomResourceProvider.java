@@ -4,7 +4,6 @@ import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.security.httpsecurity.authorize.custom.CustomResourceProvider;
 import com.yishuifengxiao.common.security.support.PropertyResource;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
-import com.yishuifengxiao.common.tool.collections.DataUtil;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
@@ -14,16 +13,16 @@ import com.yishuifengxiao.tool.personalkit.tool.ResourceInitializer;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.security.web.util.matcher.OrRequestMatcher;
-import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
+import org.springframework.security.web.util.matcher.*;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -41,14 +40,24 @@ public class SimpleCustomResourceProvider implements CustomResourceProvider {
     @Autowired
     private ResourceInitializer resourceInitializer;
 
+
+    private String currentRole(HttpServletRequest request) {
+        String currentRole = request.getHeader(Constant.CURRENT_ROLE);
+        if (StringUtils.isNotBlank(currentRole)) {
+            return currentRole.trim();
+        }
+        return request.getParameter(Constant.CURRENT_ROLE);
+    }
+
     @Override
-    public boolean hasPermission(HttpServletRequest request, Authentication authentication) {
+    public AuthorizationDecision check(Supplier<Authentication> authentication, RequestAuthorizationContext object) {
         //包含context-path
-        SysUser sysUser = sysUserDao.findActiveSysUser(authentication.getName())
-                .orElseThrow(() -> new UsernameNotFoundException(String.format("账号%s不存在", authentication.getName())));
+        HttpServletRequest request = object.getRequest();
+        SysUser sysUser = sysUserDao.findActiveSysUser(authentication.get().getName())
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("账号%s不存在", authentication.get().getName())));
         // 内置账号默认通过校验
         if (StringUtils.equalsIgnoreCase(sysUser.getId(), Constant.DEFAULT_ROOT_ID) || BoolStat.isTrue(sysUser.getEmbedded())) {
-            return true;
+            return new AuthorizationDecision(true);
         }
         //当前角色
         String currentRole = currentRole(request);
@@ -67,16 +76,8 @@ public class SimpleCustomResourceProvider implements CustomResourceProvider {
 
 
         boolean anyMatch = orRequestMatcher.matches(request);
-        return anyMatch;
-    }
 
-
-    private String currentRole(HttpServletRequest request) {
-        String currentRole = request.getHeader(Constant.CURRENT_ROLE);
-        if (StringUtils.isNotBlank(currentRole)) {
-            return currentRole.trim();
-        }
-        return request.getParameter(Constant.CURRENT_ROLE);
+        return new AuthorizationDecision(anyMatch);
     }
 
     @Override
@@ -87,11 +88,10 @@ public class SimpleCustomResourceProvider implements CustomResourceProvider {
         if (CollUtil.isEmpty(list)) {
             return null;
         }
-        Set<String> definedUrls = propertyResource.definedUrls();
-        return new OrRequestMatcher(DataUtil.stream(list).filter(v -> !definedUrls.contains(v)).filter(StringUtils::isNotBlank).map(AntPathRequestMatcher::new).collect(Collectors.toList()));
+//        return new NegatedRequestMatcher(new OrRequestMatcher(propertyResource.permitAll(), propertyResource.anonymous()));
+
+        return AnyRequestMatcher.INSTANCE;
     }
 
-    private RequestMatcher requestMatchers() {
-        return new OrRequestMatcher();
-    }
+
 }

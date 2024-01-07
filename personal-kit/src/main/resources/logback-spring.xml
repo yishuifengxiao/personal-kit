@@ -100,7 +100,7 @@
     <logger name="org.springframework.cloud" level="ERROR"></logger>
     <!-- 显示加载的配置-->
     <logger name="org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener"
-            level="ERROR"/>
+            level="trace"/>
 
 
     <logger name="org.springframework.boot.autoconfigure.mongo.embedded" level="WARN"/>
