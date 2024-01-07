@@ -2,7 +2,7 @@ package com.yishuifengxiao.tool.personalkit.security;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.security.SecurityPropertyResource;
-import com.yishuifengxiao.common.security.httpsecurity.authorize.custom.CustomResourceProvider;
+import com.yishuifengxiao.common.security.httpsecurity.authorize.custom.CustomResourceConfigurator;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * @since 1.0.0
  */
 @Component
-public class SimpleCustomResourceProvider implements CustomResourceProvider {
+public class SimpleCustomResourceConfigurator implements CustomResourceConfigurator {
     @Autowired
     private SysUserDao sysUserDao;
     @Autowired
