@@ -1,8 +1,8 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
+import com.yishuifengxiao.common.security.SecurityPropertyResource;
 import com.yishuifengxiao.common.security.constant.TokenConstant;
-import com.yishuifengxiao.common.security.support.PropertyResource;
 import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.TokenUtil;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
@@ -46,7 +46,7 @@ public class UserService {
     private final SysUserRepository sysUserRepository;
 
 
-    private final PropertyResource propertyResource;
+    private final SecurityPropertyResource securityPropertyResource;
 
     public LoginVo login(HttpServletRequest request, HttpServletResponse response, LoginQuery query) throws CustomException {
 
@@ -65,7 +65,7 @@ public class UserService {
         //获取token
         SecurityToken token = TokenUtil.createUnsafe(request, query.getUsername().trim());
 
-        String requestParameter = propertyResource.security().getToken().getRequestParameter();
+        String requestParameter = securityPropertyResource.security().getToken().getRequestParameter();
         if (StringUtils.isBlank(requestParameter)) {
             requestParameter = TokenConstant.TOKEN_REQUEST_PARAM;
         }

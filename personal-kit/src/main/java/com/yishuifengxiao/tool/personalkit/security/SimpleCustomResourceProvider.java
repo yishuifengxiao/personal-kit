@@ -1,8 +1,8 @@
 package com.yishuifengxiao.tool.personalkit.security;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
+import com.yishuifengxiao.common.security.SecurityPropertyResource;
 import com.yishuifengxiao.common.security.httpsecurity.authorize.custom.CustomResourceProvider;
-import com.yishuifengxiao.common.security.support.PropertyResource;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
@@ -17,7 +17,10 @@ import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
-import org.springframework.security.web.util.matcher.*;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.AnyRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -36,7 +39,7 @@ public class SimpleCustomResourceProvider implements CustomResourceProvider {
     @Autowired
     private SysUserDao sysUserDao;
     @Autowired
-    private PropertyResource propertyResource;
+    private SecurityPropertyResource securityPropertyResource;
     @Autowired
     private ResourceInitializer resourceInitializer;
 
@@ -83,7 +86,7 @@ public class SimpleCustomResourceProvider implements CustomResourceProvider {
     @Override
     public RequestMatcher requestMatcher() {
         resourceInitializer.doInit();
-        String sql = StringUtils.isBlank(propertyResource.contextPath()) ? "SELECT DISTINCT sp.url FROM sys_permission sp WHERE ISNULL(sp.context_path)" : String.format("SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='%s'", propertyResource.contextPath());
+        String sql = StringUtils.isBlank(securityPropertyResource.contextPath()) ? "SELECT DISTINCT sp.url FROM sys_permission sp WHERE ISNULL(sp.context_path)" : String.format("SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='%s'", securityPropertyResource.contextPath());
         List<String> list = JdbcUtil.jdbcTemplate().queryForList(sql, String.class);
         if (CollUtil.isEmpty(list)) {
             return null;

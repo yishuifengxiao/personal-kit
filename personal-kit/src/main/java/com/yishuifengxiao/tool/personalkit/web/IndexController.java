@@ -1,6 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.web;
 
-import com.yishuifengxiao.common.security.support.PropertyResource;
+import com.yishuifengxiao.common.security.SecurityPropertyResource;
 import com.yishuifengxiao.common.security.support.SecurityEvent;
 import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.security.token.SecurityToken;
@@ -89,7 +89,7 @@ public class IndexController {
     }
 
     @Autowired
-    private PropertyResource propertyResource;
+    private SecurityPropertyResource securityPropertyResource;
 
     @PostMapping("/login")
     @org.springframework.web.bind.annotation.ResponseBody
@@ -97,11 +97,11 @@ public class IndexController {
 
         try {
             LoginVo loginVo = userService.login(request, response, query);
-            SpringContext.publishEvent(new SecurityEvent(this, request, response, propertyResource, Strategy.AUTHENTICATION_SUCCESS, loginVo.getSecurityToken(), null));
+            SpringContext.publishEvent(new SecurityEvent(this, request, response, securityPropertyResource, Strategy.AUTHENTICATION_SUCCESS, loginVo.getSecurityToken(), null));
 
             return loginVo;
         } catch (Exception e) {
-            SpringContext.publishEvent(new SecurityEvent(this, request, response, propertyResource,
+            SpringContext.publishEvent(new SecurityEvent(this, request, response, securityPropertyResource,
                     Strategy.AUTHENTICATION_SUCCESS, new SecurityToken(Collections.EMPTY_LIST) {
                 @Override
                 public String getName() {
