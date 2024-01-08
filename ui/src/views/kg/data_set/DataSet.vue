@@ -54,7 +54,7 @@
     </div>
     <!-- 分页区 -->
     <!-- 弹窗区域 -->
-    <DataSetAdd ref="DataSetAdd" @ok="onAddOk"></DataSetAdd>
+    <ConfigurePopup ref="ConfigurePopup" @ok="onAddOk"></ConfigurePopup>
     <!-- 弹窗区域 -->
   </div>
 </template>
@@ -64,7 +64,7 @@ import { reactive, defineComponent } from 'vue'
 import { EditOutlined, SettingOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 
 import card_bg_url from '@/assets/images/graph/card_bg.png'
-import DataSetAdd from './DataSetAdd.vue'
+import ConfigurePopup from './ConfigurePopup.vue'
 export default defineComponent({
   data() {
     const formState = reactive({
@@ -84,7 +84,7 @@ export default defineComponent({
       this.query()
     },
     addDataSet() {
-      this.$refs.DataSetAdd.showDrawer()
+      this.$refs.ConfigurePopup.showDrawer()
     },
     query() {
       this.$http
@@ -115,7 +115,7 @@ export default defineComponent({
     },
     //触发编辑操作
     doEdit(val) {
-      this.$refs.DataSetAdd.showDrawer(val)
+      this.$refs.ConfigurePopup.showDrawer(val)
     }
   },
   mounted() {
@@ -125,7 +125,7 @@ export default defineComponent({
     EditOutlined,
     SettingOutlined,
     DeleteOutlined,
-    DataSetAdd
+    ConfigurePopup
   },
   setup() {}
 })
