@@ -13,6 +13,7 @@ import com.yishuifengxiao.tool.personalkit.tool.ResourceInitializer;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -42,6 +43,9 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
     private SecurityPropertyResource securityPropertyResource;
     @Autowired
     private ResourceInitializer resourceInitializer;
+
+    @Value("${server.servlet.context-path:''}")
+    private String contextPath;
 
 
     private String currentRole(HttpServletRequest request) {
@@ -86,7 +90,8 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
     @Override
     public RequestMatcher requestMatcher() {
         resourceInitializer.doInit();
-        String sql = StringUtils.isBlank(securityPropertyResource.contextPath()) ? "SELECT DISTINCT sp.url FROM sys_permission sp WHERE ISNULL(sp.context_path)" : String.format("SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='%s'", securityPropertyResource.contextPath());
+        String sql = StringUtils.isBlank(contextPath) ? "SELECT DISTINCT sp.url FROM sys_permission sp WHERE ISNULL(sp.context_path)" :
+                String.format("SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='%s'", contextPath);
         List<String> list = JdbcUtil.jdbcTemplate().queryForList(sql, String.class);
         if (CollUtil.isEmpty(list)) {
             return null;

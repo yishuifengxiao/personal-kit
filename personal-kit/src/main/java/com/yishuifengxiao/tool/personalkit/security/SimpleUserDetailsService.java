@@ -56,6 +56,7 @@ public class SimpleUserDetailsService implements UserDetailsService {
                 AuthorityUtils.commaSeparatedStringToAuthorityList(
                         DataUtil.stream(roles).map(SysRole::getName)
                                 .filter(StringUtils::isNotBlank)
-                                .distinct().collect(Collectors.joining(",")))).setCurrentUser(sysUser);
+                                .distinct().collect(Collectors.joining(","))))
+                .setCurrentUser(sysUser);
     }
 }
