@@ -1,13 +1,48 @@
 <template>
   <div>
-    <!-- 参见 https://www.relation-graph.com/#/docs/start-vue3 -->
-    <div id="mountNode" style="border: red solid thin; height: 80vh; width: 60vw">
-      <RelationGraph ref="graphRef" :options="options"></RelationGraph>
-    </div>
+    <a-row>
+      <a-col :span="14">
+        <!-- 参见 https://www.relation-graph.com/#/docs/start-vue3 -->
+        <div id="mountNode" style="border: red solid thin; height: 80vh; width: 50vw">
+          <RelationGraph ref="graphRef" :options="options"></RelationGraph></div
+      ></a-col>
+      <a-col :span="10">
+        <div>
+          <a-form
+            :model="formState"
+            :label-col="{ span: 6 }"
+            :wrapper-col="{ span: 18 }"
+            name="basic"
+            autocomplete="off"
+          >
+            <a-form-item
+              label="名称"
+              name="username"
+              :rules="[{ required: true, message: 'Please input your username!' }]"
+            >
+              <a-input v-model:value="formState.username" allowClear />
+            </a-form-item>
+
+            <a-form-item label="描述" name="password">
+              <a-textarea
+                v-model:value="formState.desc"
+                allowClear
+                showCount
+                :autoSize="{ minRows: 4, maxRows: 6 }"
+              />
+            </a-form-item>
+          </a-form>
+        </div>
+        <div><a-space>
+          
+        </a-space></div
+      ></a-col>
+    </a-row>
   </div>
 </template>
 
 <script>
+import { reactive, defineComponent } from 'vue'
 import RelationGraph from 'relation-graph/vue3'
 
 export default {
@@ -83,7 +118,13 @@ export default {
         }
       ]
     }
-    return { options }
+
+    const formState = reactive({
+      username: '',
+      password: '',
+      remember: true
+    })
+    return { options, formState }
   },
   components: {
     RelationGraph
