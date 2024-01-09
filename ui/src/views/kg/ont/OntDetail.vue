@@ -121,7 +121,7 @@
       <div class="c-node-menu-item">图标:{currentNode.data.myicon}</div>
     </div>
     <!-- 悬浮图案 -->
-    <!-- 悬浮图案 -->
+    <!-- 当在图谱中点击右键时 -->
     <div
       v-if="isShowTipsPanel"
       :style="{ left: nodeMenuPanelPosition.x + 'px', top: nodeMenuPanelPosition.y + 'px' }"
@@ -135,12 +135,12 @@
       "
     >
       <div style="line-height: 25px; padding-left: 10px; color: #888888; font-size: 12px">
-        节点名称：{{ currentNode.text }}
+        节点AAA名称：{{ currentNode.text }}
       </div>
       <div class="c-node-menu-item">id:{ currentNode.text }}</div>
       <div class="c-node-menu-item">图标:{currentNode.data.myicon}</div>
     </div>
-    <!-- 悬浮图案 -->
+    <!-- 当在图谱中点击右键时 -->
   </div>
 </template>
 
@@ -221,9 +221,13 @@ export default {
         // 这些写上当图谱初始化完成后需要执行的代码
       })
     },
-    onContextmenu() {
+    onContextmenu($event) {
       console.log('当在图谱中点击右键时')
+      this.isShowNodeTipsPanel = false
       this.isShowTipsPanel = !this.isShowTipsPanel
+      const _base_position = this.$refs.myPage.getBoundingClientRect()
+      this.nodeMenuPanelPosition.x = $event.clientX - _base_position.x + 250
+      this.nodeMenuPanelPosition.y = $event.clientY - _base_position.y + 50
     },
     onNodeClick(nodeObject, $event) {
       console.log('onNodeClick:', nodeObject)
@@ -231,20 +235,29 @@ export default {
     onLineClick(lineObject, linkObject, $event) {
       console.log('onLineClick:', lineObject)
     },
-    nodeSlotOver(nodeObject) {
+    nodeSlotOver(nodeObject, $event) {
       console.log('nodeSlotOver:', nodeObject)
       this.currentNode = nodeObject
+      this.isShowNodeMenuPanel = false
       this.isShowNodeTipsPanel = true
+      const _base_position = this.$refs.myPage.getBoundingClientRect()
+      this.nodeMenuPanelPosition.x = $event.clientX - _base_position.x
+      this.nodeMenuPanelPosition.y = $event.clientY - _base_position.y
     },
-    nodeSlotOut(nodeObject) {
+    nodeSlotOut(nodeObject, $event) {
       console.log('nodeSlotOut:', nodeObject)
       this.isShowNodeTipsPanel = false
+      const _base_position = this.$refs.myPage.getBoundingClientRect()
+      this.nodeMenuPanelPosition.x = $event.clientX - _base_position.x
+      this.nodeMenuPanelPosition.y = $event.clientY - _base_position.y
     },
     showNodeMenus(nodeObject, $event) {
       this.currentNode = nodeObject
       const _base_position = this.$refs.myPage.getBoundingClientRect()
       console.log('showNodeMenus:', $event, _base_position)
+      this.isShowNodeTipsPanel = false
       this.isShowNodeMenuPanel = true
+      this.isShowTipsPanel = false
       this.nodeMenuPanelPosition.x = $event.clientX - _base_position.x
       this.nodeMenuPanelPosition.y = $event.clientY - _base_position.y
     },
