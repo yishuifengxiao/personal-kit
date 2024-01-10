@@ -4,7 +4,11 @@
       <!-- 左侧图谱区 -->
       <a-col :span="14">
         <!-- 参见 https://www.relation-graph.com/#/docs/start-vue3 -->
-        <div id="mountNode" ref="myPage" style="border: red solid thin; height: 80vh; width: 50vw">
+        <div
+          id="mountNode"
+          ref="myPage"
+          style="border: gray dashed thin; height: 80vh; width: 50vw"
+        >
           <RelationGraph
             ref="graphRef"
             :options="graphOptions"
@@ -46,34 +50,116 @@
       </a-col>
       <!-- 左侧图谱区 -->
       <!-- 右侧配置区 -->
-      <a-col :span="10">
-        <div>
-          <a-form
-            :model="formState"
-            :label-col="{ span: 6 }"
-            :wrapper-col="{ span: 18 }"
-            name="basic"
-            autocomplete="off"
-          >
-            <a-form-item
-              label="名称"
-              name="username"
-              :rules="[{ required: true, message: 'Please input your username!' }]"
-            >
-              <a-input v-model:value="formState.username" allowClear />
-            </a-form-item>
+      <a-col :span="9" :offset="1">
+        <a-tabs v-model:activeKey="activeKey">
+          <!-- 节点属性配置区 -->
+          <a-tab-pane key="1" tab="普通模式配置">
+            <div>
+              <a-form
+                :model="formState"
+                :label-col="{ span: 4 }"
+                :wrapper-col="{ span: 18 }"
+                name="basic"
+                autocomplete="off"
+              >
+                <a-form-item
+                  label="名称"
+                  name="username"
+                  :rules="[{ required: true, message: 'Please input your username!' }]"
+                >
+                  <a-input v-model:value="formState.username" allowClear />
+                </a-form-item>
 
-            <a-form-item label="描述" name="password">
-              <a-textarea
-                v-model:value="formState.desc"
-                allowClear
-                showCount
-                :autoSize="{ minRows: 4, maxRows: 6 }"
-              />
-            </a-form-item>
-          </a-form>
-        </div>
-        <div><a-space> </a-space></div>
+                <a-form-item label="描述" name="password">
+                  <a-textarea
+                    v-model:value="formState.desc"
+                    allowClear
+                    showCount
+                    :autoSize="{ minRows: 4, maxRows: 6 }"
+                  />
+                </a-form-item>
+              </a-form>
+            </div>
+
+            <!-- 属性配置区 -->
+            <a-row>
+              <!-- 按钮区 -->
+              <a-col :span="20" :offset="4"
+                ><a-space> <a-button type="primary">添加节点</a-button> </a-space></a-col
+              >
+              <!-- 按钮区 -->
+              <a-col :span="20" :offset="4"> <a-divider /></a-col>
+              <a-col :span="20" :offset="4">
+                <span>节点名称</span> <a-input placeholder="节点名称" allowClear
+              /></a-col>
+              <a-col :span="20" :offset="4"> <a-divider /></a-col>
+
+              <!-- 节点项配置 -->
+              <a-col :span="20" :offset="4">
+                <a-form
+                  ref="dynamic_form_nest_item"
+                  name="dynamic_form_nest_item"
+                  :model="dynamicValidateForm"
+                  @finish="onFinish"
+                >
+                  <a-space
+                    v-for="(user, index) in dynamicValidateForm.users"
+                    :key="user.id"
+                    style="display: flex; margin-bottom: 8px"
+                    align="baseline"
+                  >
+                    <a-form-item
+                      :name="['users', index, 'nodePropertyName']"
+                      :rules="{
+                        required: true,
+                        message: '节点属性名字不能为空'
+                      }"
+                    >
+                      <a-input v-model:value="user.nodePropertyName" placeholder="节点属性名字" />
+                    </a-form-item>
+                    <a-form-item
+                      :name="['users', index, 'dataType']"
+                      :rules="{
+                        required: true,
+                        message: '属性数据类型不能为空'
+                      }"
+                    >
+                      <a-select
+                        ref="select"
+                        style="width: 120px"
+                        v-model:value="user.dataType"
+                        :options="selectOptions"
+                      ></a-select>
+                    </a-form-item>
+                    <MinusCircleOutlined @click="removeUser(user)" />
+                  </a-space>
+                  <a-form-item>
+                    <a-button type="dashed" block @click="addUser">
+                      <PlusOutlined />
+                      Add user
+                    </a-button>
+                  </a-form-item>
+                  <a-form-item>
+                    <a-button style="visibility: hidden" type="primary" html-type="submit"
+                      >Submit</a-button
+                    >
+                  </a-form-item>
+                </a-form></a-col
+              >
+              <!-- 节点项配置 -->
+            </a-row>
+            <!-- 属性配置区 -->
+          </a-tab-pane>
+
+          <!-- 节点属性配置区 -->
+          <!-- 代码编辑区 -->
+          <a-tab-pane key="3" tab="代码模式配置">
+            <a-textarea v-model:value="code" placeholder="配置代码" :rows="20" />
+            <a-divider />
+            <a-button type="primary" @click="render">确定</a-button>
+          </a-tab-pane>
+          <!-- 代码编辑区 -->
+        </a-tabs>
       </a-col>
       <!-- 右侧配置区 -->
     </a-row>
@@ -95,10 +181,9 @@
       <div style="line-height: 25px; padding-left: 10px; color: #888888; font-size: 12px">
         对这个节点进行操作：
       </div>
-      <div class="c-node-menu-item" @click.stop="doAction('操作1')">添加关系</div>
-      <div class="c-node-menu-item" @click.stop="doAction('操作1')">添加属性</div>
-      <div class="c-node-menu-item" @click.stop="doAction('操作1')">删除节点</div>
-      <div class="c-node-menu-item" @click.stop="doAction('操作1')">操作4</div>
+      <div class="c-node-menu-item" @click.stop="doAction('addRelation')">添加关系</div>
+      <div class="c-node-menu-item" @click.stop="doAction('addProperty')">添加属性</div>
+      <div class="c-node-menu-item" @click.stop="doAction('deleteNode')">删除节点</div>
     </div>
     <!-- 弹窗区 -->
     <!-- 悬浮图案 -->
@@ -134,19 +219,32 @@
         position: absolute;
       "
     >
-      <div style="line-height: 25px; padding-left: 10px; color: #888888; font-size: 12px">
-        节点AAA名称：{{ currentNode.text }}
-      </div>
-      <div class="c-node-menu-item">id:{ currentNode.text }}</div>
-      <div class="c-node-menu-item">图标:{currentNode.data.myicon}</div>
+
+      <div class="c-node-menu-item">添加节点</div>
     </div>
     <!-- 当在图谱中点击右键时 -->
   </div>
 </template>
 
 <script>
-import { reactive, defineComponent } from 'vue'
+import { reactive, ref } from 'vue'
 import RelationGraph from 'relation-graph/vue3'
+import { MinusCircleOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+
+function jsonNode(json_data) {
+  var cache = []
+  var json_str = JSON.stringify(json_data, function (key, value) {
+    if (typeof value === 'object' && value !== null) {
+      if (cache.indexOf(value) !== -1) {
+        return
+      }
+      cache.push(value)
+    }
+    return value
+  })
+  cache = null //释放cache
+  return json_str
+}
 
 export default {
   data() {
@@ -211,8 +309,20 @@ export default {
       isShowNodeMenuPanel: false,
       isShowNodeTipsPanel: false,
       isShowTipsPanel: false,
-      currentNode: {},
+      currentNode: reactive({}),
+      activeKey: '1',
+
       nodeMenuPanelPosition: { x: 0, y: 0 }
+    }
+  },
+  computed: {
+    code: {
+      get() {
+        return JSON.stringify(this.graph_json_data)
+      },
+      set(newVal) {
+        this.graph_json_data = JSON.parse(newVal)
+      }
     }
   },
   methods: {
@@ -221,14 +331,7 @@ export default {
         // 这些写上当图谱初始化完成后需要执行的代码
       })
     },
-    onContextmenu($event) {
-      console.log('当在图谱中点击右键时')
-      this.isShowNodeTipsPanel = false
-      this.isShowTipsPanel = !this.isShowTipsPanel
-      const _base_position = this.$refs.myPage.getBoundingClientRect()
-      this.nodeMenuPanelPosition.x = $event.clientX - _base_position.x + 250
-      this.nodeMenuPanelPosition.y = $event.clientY - _base_position.y + 50
-    },
+    onContextmenu($event) {},
     onNodeClick(nodeObject, $event) {
       console.log('onNodeClick:', nodeObject)
     },
@@ -237,29 +340,25 @@ export default {
     },
     nodeSlotOver(nodeObject, $event) {
       console.log('nodeSlotOver:', nodeObject)
-      this.currentNode = nodeObject
+      // const {id,text,styleClass,nodeShape,data}=
+      this.currentNode = reactive(JSON.parse(jsonNode(nodeObject)))
       this.isShowNodeMenuPanel = false
       this.isShowNodeTipsPanel = true
-      const _base_position = this.$refs.myPage.getBoundingClientRect()
-      this.nodeMenuPanelPosition.x = $event.clientX - _base_position.x
-      this.nodeMenuPanelPosition.y = $event.clientY - _base_position.y
+
+      this.nodeMenuPanelPosition.x = $event.clientX
+      this.nodeMenuPanelPosition.y = $event.clientY
     },
     nodeSlotOut(nodeObject, $event) {
       console.log('nodeSlotOut:', nodeObject)
       this.isShowNodeTipsPanel = false
-      const _base_position = this.$refs.myPage.getBoundingClientRect()
-      this.nodeMenuPanelPosition.x = $event.clientX - _base_position.x
-      this.nodeMenuPanelPosition.y = $event.clientY - _base_position.y
     },
     showNodeMenus(nodeObject, $event) {
-      this.currentNode = nodeObject
       const _base_position = this.$refs.myPage.getBoundingClientRect()
       console.log('showNodeMenus:', $event, _base_position)
+      this.nodeMenuPanelPosition.x = $event.clientX + 10
+      this.nodeMenuPanelPosition.y = $event.clientY
       this.isShowNodeTipsPanel = false
       this.isShowNodeMenuPanel = true
-      this.isShowTipsPanel = false
-      this.nodeMenuPanelPosition.x = $event.clientX - _base_position.x
-      this.nodeMenuPanelPosition.y = $event.clientY - _base_position.y
     },
     doAction(actionName) {
       this.$notify({
@@ -291,15 +390,58 @@ export default {
       ]
     }
 
+    const formRef = ref()
+    const dynamicValidateForm = reactive({
+      users: []
+    })
+    const removeUser = (item) => {
+      const index = dynamicValidateForm.users.indexOf(item)
+      if (index !== -1) {
+        dynamicValidateForm.users.splice(index, 1)
+      }
+    }
+    const addUser = () => {
+      dynamicValidateForm.users.push({
+        nodePropertyName: '',
+        dataType: '',
+        id: Date.now()
+      })
+    }
+    const onFinish = (values) => {
+      console.log('Received values of form:', values)
+      console.log('dynamicValidateForm.users:', dynamicValidateForm.users)
+    }
+
     const formState = reactive({
       username: '',
       password: '',
       remember: true
     })
-    return { graphOptions, formState }
+
+    const selectOptions = ref([
+      { value: 'TEXT', label: '字符串' },
+      { value: 'LONG', label: '整数' },
+      { value: 'DOUBLE', label: '小数' },
+      { value: 'DATE', label: '日期' },
+      { value: 'DATE_TIME', label: '日期时间' },
+      { value: 'TIME', label: '时间' }
+    ])
+
+    return {
+      graphOptions,
+      formState,
+      formRef,
+      removeUser,
+      addUser,
+      onFinish,
+      dynamicValidateForm,
+      selectOptions
+    }
   },
   components: {
-    RelationGraph
+    RelationGraph,
+    MinusCircleOutlined,
+    PlusOutlined
   }
 }
 </script>

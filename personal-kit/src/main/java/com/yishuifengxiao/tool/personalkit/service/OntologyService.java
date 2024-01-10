@@ -8,6 +8,7 @@ import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.dao.mongo.OntologyDao;
 import com.yishuifengxiao.tool.personalkit.dao.mongo.repository.GraphDefineRepository;
 import com.yishuifengxiao.tool.personalkit.dao.mongo.repository.OntologyRepository;
+import com.yishuifengxiao.tool.personalkit.domain.bo.GraphData;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.Ontology;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.tool.ContextUser;
@@ -42,23 +43,25 @@ public class OntologyService {
         return ontologyDao.findPage(param);
     }
 
-    public void save(Ontology param) {
+    public void save(GraphData param) {
         Assert.lteZero("已经存在相同名称的本体",
-                ontologyRepository.countAllByOntologyNameAndCreateUserId(param.getOntologyName(),
+                ontologyRepository.countAllByOntologyNameAndCreateUserId(param.getGraphName(),
                         ContextUser.currentUserId()));
-        param.setCreateUserId(ContextUser.currentUserId()).setCreateTime(LocalDateTime.now()).setVersion(NumberUtil.ZERO.intValue()).setMaster(true);
-        ontologyRepository.save(param);
+
+
+        Ontology ontology = new Ontology().setCreateUserId(ContextUser.currentUserId()).setCreateTime(LocalDateTime.now()).setVersion(NumberUtil.ZERO.intValue()).setMaster(true);
+        ontologyRepository.save(ontology);
     }
 
-    public void update(Ontology param) {
+    public void update(GraphData param) {
         Ontology ontology = ontologyRepository.findById(param.getId()).orElseThrow(() -> new UncheckedException(
                 "记录不存在"));
         Assert.lteZero("本体正在被使用,不能进行更新", graphDefineRepository.countAllByOntologyId(ontology.getId()));
-        if (!StringUtils.equalsIgnoreCase(param.getOntologyName(), ontology.getOntologyName())) {
+        if (!StringUtils.equalsIgnoreCase(param.getGraphName(), ontology.getOntologyName())) {
             throw new UncheckedException("已经存在相同名称的本体");
         }
-        ontology.setOntologyName(param.getOntologyName()).setDescription(param.getDescription()).setNodes(param.getNodes()).setEdges(param.getEdges());
-        ontologyRepository.save(param);
+        ontology.setOntologyName(param.getGraphName()).setDescription(param.getDescription());
+        ontologyRepository.save(ontology);
     }
 
     public void delete(IdReq param) {
