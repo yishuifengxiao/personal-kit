@@ -54,6 +54,8 @@ public class Ontology implements Serializable {
 
     private List<Edge> edges;
 
+    private String text;
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor

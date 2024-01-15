@@ -39,6 +39,7 @@ public class OntologyController {
     @PostMapping("/save")
     public void add(@RequestBody GraphData param) {
 
+
         ontologyService.save(param);
     }
 

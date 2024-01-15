@@ -20,6 +20,8 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class GraphData implements Serializable {
+
+    public final static String NODE_PROPERTIES = "nodeProperties";
     private String id;
     private String rootId;
 

@@ -1,5 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
+import com.yishuifengxiao.common.tool.collections.DataUtil;
+import com.yishuifengxiao.common.tool.collections.JsonUtil;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
@@ -13,11 +15,16 @@ import com.yishuifengxiao.tool.personalkit.domain.mongo.Ontology;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.tool.ContextUser;
 import jakarta.transaction.Transactional;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author yishui
@@ -49,7 +56,22 @@ public class OntologyService {
                         ContextUser.currentUserId()));
 
 
-        Ontology ontology = new Ontology().setCreateUserId(ContextUser.currentUserId()).setCreateTime(LocalDateTime.now()).setVersion(NumberUtil.ZERO.intValue()).setMaster(true);
+        Ontology ontology = new Ontology().setCreateUserId(ContextUser.currentUserId())
+                .setCreateTime(LocalDateTime.now())
+                .setVersion(NumberUtil.ZERO.intValue())
+                .setMaster(true);
+
+        ontology.setOntologyName(param.getGraphName()).setDescription(param.getDescription());
+
+        List<Object> nodes = DataUtil.stream(param.getNodes()).map(v -> {
+            String nodeName = v.getText();
+            List<Ontology.NodeProperty> nodeProperties = JsonUtil.str2List(MapUtils.getString(v.getData(), GraphData.NODE_PROPERTIES), Ontology.NodeProperty.class);
+            List<Ontology.NodeProperty> properties = DataUtil.stream(nodeProperties).filter(Objects::nonNull).filter(s -> StringUtils.isNotBlank(s.getNodePropertyName()) && null != s.getDataType())
+                    .distinct().collect(Collectors.toList());
+            new Ontology.Node(nodeName, properties);
+        }).filter(Objects::nonNull).collect(Collectors.toList());
+
+
         ontologyRepository.save(ontology);
     }
 
