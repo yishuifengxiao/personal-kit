@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -63,15 +62,25 @@ public class OntologyService {
 
         ontology.setOntologyName(param.getGraphName()).setDescription(param.getDescription());
 
-        List<Object> nodes = DataUtil.stream(param.getNodes()).map(v -> {
+        List<Ontology.Node> nodes = DataUtil.stream(param.getNodes()).map(v -> {
             String nodeName = v.getText();
             List<Ontology.NodeProperty> nodeProperties = JsonUtil.str2List(MapUtils.getString(v.getData(), GraphData.NODE_PROPERTIES), Ontology.NodeProperty.class);
             List<Ontology.NodeProperty> properties = DataUtil.stream(nodeProperties).filter(Objects::nonNull).filter(s -> StringUtils.isNotBlank(s.getNodePropertyName()) && null != s.getDataType())
                     .distinct().collect(Collectors.toList());
-            new Ontology.Node(nodeName, properties);
+            return new Ontology.Node(nodeName, properties);
         }).filter(Objects::nonNull).collect(Collectors.toList());
 
-
+        List<Ontology.Edge> edges = DataUtil.stream(param.getLines()).map(v -> {
+            String edgeName = v.getText();
+            String fromNodeName = DataUtil.stream(param.getNodes()).filter(s -> StringUtils.equals(s.getText(),
+                    v.getFrom())).findFirst().map(GraphData.Node::getText).orElse(null);
+            String toNodeName = DataUtil.stream(param.getNodes()).filter(s -> StringUtils.equals(s.getText(),
+                    v.getFrom())).findFirst().map(GraphData.Node::getText).orElse(null);
+            return new Ontology.Edge(edgeName, fromNodeName, toNodeName);
+        }).collect(Collectors.toList());
+        ontology.setNodes(nodes);
+        ontology.setEdges(edges);
+        ontology.setText(JsonUtil.toJSONString(param));
         ontologyRepository.save(ontology);
     }
 

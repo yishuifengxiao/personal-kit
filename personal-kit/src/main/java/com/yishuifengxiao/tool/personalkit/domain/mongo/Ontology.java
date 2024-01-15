@@ -92,5 +92,11 @@ public class Ontology implements Serializable {
         private String toNodePropertyName;
 
         private BigDecimal weight;
+
+        public Edge(String edgeName, String formNodeName, String toNodeName) {
+            this.edgeName = edgeName;
+            this.formNodeName = formNodeName;
+            this.toNodeName = toNodeName;
+        }
     }
 }
