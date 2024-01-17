@@ -91,18 +91,37 @@
                 </a-space></a-col
               >
               <!-- 按钮区 -->
+            </a-row>
+            <a-row>
               <a-col :span="20" :offset="4"> <a-divider /></a-col>
+            </a-row>
+            <a-row>
               <a-col :span="20" :offset="4">
-                <span>节点名称:</span>
-     
+                <span>概念名称:</span>
+
                 <a-input
                   placeholder="概念名称"
                   v-model:value="currentNode.text"
                   allowClear
+                  @change="onNodeNameChange"
+                  style="width: 300px; margin-left: 10px"
+              /></a-col>
+            </a-row>
+            <a-row style="margin-top: 10px;"> 
+              <a-col :span="20" :offset="4">
+                <span>概念颜色:</span>
+
+                <a-input
+                  placeholder="概念颜色"
+                  v-model:value="currentNode.color"
+                  type="color"
+                  allowClear
+                  @change="onNodeColorChange"
                   style="width: 300px; margin-left: 10px"
               /></a-col>
               <a-col :span="20" :offset="4"> <a-divider /></a-col>
-
+            </a-row>
+            <a-row>
               <!-- 节点项配置 -->
               <a-col :span="20" :offset="4">
                 <a-form
@@ -191,6 +210,7 @@
       <div style="line-height: 25px; padding-left: 10px; color: #888888; font-size: 12px">
         对这个节点进行操作：
       </div>
+      <div class="c-node-menu-item" @click.stop="doAction('editNode')">编辑</div>
       <div class="c-node-menu-item" @click.stop="doAction('addRelation')">添加关系</div>
       <div class="c-node-menu-item" @click.stop="doAction('addProperty')">添加属性</div>
       <div class="c-node-menu-item" @click.stop="doAction('deleteNode')">删除节点</div>
@@ -214,7 +234,7 @@
       </div>
       <div class="c-node-menu-item">id:{{ currentNode.id }}</div>
       <div class="c-node-menu-item">名称:{{ currentNode.text }}</div>
-      <div class="c-node-menu-item">图标:{{currentNode.data.myicon}}</div>
+      <div class="c-node-menu-item">图标:{{ currentNode.data.myicon }}</div>
     </div>
     <!-- 鼠标悬浮时的弹窗 -->
     <!-- 当在图谱中点击右键时 -->
@@ -274,7 +294,7 @@ export default {
       rootId: '2',
       graphName: '',
       description: '',
-      nodes: [{id:'root', opacity:0}],
+      nodes: [{ id: 'root', opacity: 0 }],
       lines: []
     }
     return {
@@ -339,11 +359,6 @@ export default {
       this.isShowNodeMenuPanel = true
     },
     doAction(actionName) {
-      this.$notify({
-        title: '提示',
-        message: '对节点【' + this.currentNode.text + '】进行了：' + actionName,
-        type: 'success'
-      })
       this.isShowNodeMenuPanel = false
     },
     // 添加节点按钮
@@ -359,6 +374,18 @@ export default {
       // this.$refs.graphRef.refresh();
       // console.log(this.graph_json_data)
       this.render(nodeId)
+    },
+    // 节点名称变化
+    onNodeNameChange(val) {
+      const currentNode = this.currentNode
+      const nodes = this.graph_json_data.nodes.filter((v) => v.id != currentNode.id)
+      nodes.push(currentNode)
+      this.graph_json_data.nodes = nodes
+      this.render(currentNode.id)
+    },
+    // 节点颜色变化
+    onNodeColorChange(val) {
+      this.onNodeNameChange()
     }
   },
   mounted() {
