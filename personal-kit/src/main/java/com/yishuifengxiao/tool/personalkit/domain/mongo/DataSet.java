@@ -42,7 +42,7 @@ public class DataSet implements Serializable {
 
     private String createUserId;
 
-    private List<String> virtuallyFileIds;
+    private List<String> diskFiles;
 
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)

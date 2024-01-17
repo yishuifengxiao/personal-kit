@@ -55,7 +55,9 @@ public class DataSetService {
 
     public void save(DataSet param) {
         Assert.lteZero("已经存在相同名称的数据集", dataSetDao.countByNameAndUser(param.getName(), ContextUser.currentUserId()));
-        param.setId(IdWorker.snowflakeStringId()).setCreateTime(LocalDateTime.now()).setCreateUserId(ContextUser.currentUserId());
+        param.setId(IdWorker.snowflakeStringId())
+                .setCreateTime(LocalDateTime.now())
+                .setCreateUserId(ContextUser.currentUserId());
         dataSetRepository.save(param);
     }
 
@@ -66,7 +68,8 @@ public class DataSetService {
             Assert.lteZero("已经存在相同名称的数据集", dataSetDao.countByNameAndUser(param.getName(), dataSet.getCreateUserId()));
         }
         dataSet.setName(param.getName()).setDescription(param.getDescription())
-                .setVirtuallyFileIds(param.getVirtuallyFileIds().stream().filter(StringUtils::isNotBlank).distinct().collect(Collectors.toList()));
+                .setDiskFiles(param.getDiskFiles().stream()
+                        .filter(StringUtils::isNotBlank).distinct().collect(Collectors.toList()));
         dataSetRepository.save(param);
     }
 
@@ -78,8 +81,8 @@ public class DataSetService {
         DataSet dataSet = dataSetRepository.findById(param.getId()).orElseThrow(() -> UncheckedException.of("记录不存在"));
         DataSetDetail detail = BeanUtil.copy(dataSet, new DataSetDetail());
 
-        List<DataSetDetail.Item> items = detail.getVirtuallyFileIds().stream().map(s -> {
-            DiskFile diskFile = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFile.class, v.getId());
+        List<DataSetDetail.Item> items = dataSet.getDiskFiles().stream().map(s -> {
+            DiskFile diskFile = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFile.class, s);
             if (null == diskFile) {
                 return null;
             }
