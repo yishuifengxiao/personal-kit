@@ -41,7 +41,8 @@
                     background-color: rgba(66, 187, 66, 0.2);
                   "
                 >
-                  {{ node.data.myicon }}
+                  {{ node.text }}
+                  <!-- {{ node.data.myicon }} -->
                 </div>
               </div>
             </template>
@@ -56,7 +57,7 @@
           <a-tab-pane key="1" tab="普通模式配置">
             <div>
               <a-form
-                :model="formState"
+                :model="graph_json_data"
                 :label-col="{ span: 4 }"
                 :wrapper-col="{ span: 18 }"
                 name="basic"
@@ -64,15 +65,15 @@
               >
                 <a-form-item
                   label="名称"
-                  name="username"
-                  :rules="[{ required: true, message: 'Please input your username!' }]"
+                  name="graphName"
+                  :rules="[{ required: true, message: 'Please input your graphName!' }]"
                 >
-                  <a-input v-model:value="formState.username" allowClear />
+                  <a-input v-model:value="graph_json_data.graphName" allowClear />
                 </a-form-item>
 
-                <a-form-item label="描述" name="password">
+                <a-form-item label="描述" name="description">
                   <a-textarea
-                    v-model:value="formState.desc"
+                    v-model:value="graph_json_data.description"
                     allowClear
                     showCount
                     :autoSize="{ minRows: 4, maxRows: 6 }"
@@ -85,7 +86,9 @@
             <a-row>
               <!-- 按钮区 -->
               <a-col :span="20" :offset="4"
-                ><a-space> <a-button type="primary">添加节点</a-button> </a-space></a-col
+                ><a-space>
+                  <a-button type="primary" @click="addNodeAction">添加概念</a-button>
+                </a-space></a-col
               >
               <!-- 按钮区 -->
               <a-col :span="20" :offset="4"> <a-divider /></a-col>
@@ -155,7 +158,7 @@
           <!-- 代码编辑区 -->
           <a-tab-pane key="3" tab="代码模式配置">
             <!-- <a-textarea v-model:value="code" placeholder="配置代码" :rows="20" /> -->
-            <JsonEditorVue  class="editor" v-model ="code" style="height: 50vh;"></JsonEditorVue>
+            <JsonEditorVue class="editor" v-model="code" style="height: 50vh"></JsonEditorVue>
             <a-divider />
             <a-button type="primary" @click="render">确定</a-button>
           </a-tab-pane>
@@ -228,6 +231,7 @@
 
 <script>
 import { reactive, ref } from 'vue'
+// https://www.relation-graph.com/#/docs/start-vue3
 import RelationGraph from 'relation-graph/vue3'
 import { MinusCircleOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 // https://github.com/guyue88/json-editor-vue3
@@ -248,62 +252,28 @@ function jsonNode(json_data) {
   return json_str
 }
 
+function color16() {
+  //十六进制颜色随机
+  var r = Math.floor(Math.random() * 256)
+  var g = Math.floor(Math.random() * 256)
+  var b = Math.floor(Math.random() * 256)
+  var color = '#' + r.toString(16) + g.toString(16) + b.toString(16)
+  return color
+}
+
 export default {
   data() {
     const __graph_json_data = {
       rootId: '2',
+      graphName: '',
+      description: '',
       nodes: [
         // 注意：在节点配置信息中，你的自定义属性需要像下面这样放到data标签中，否则数据会丢失
         { id: '1', text: '节点-1', data: { myicon: 'el-icon-star-on' } },
         { id: '2', text: '节点-2', data: { myicon: 'el-icon-setting' } },
-        { id: '3', text: '节点-3', data: { myicon: 'el-icon-setting' } },
-        { id: '4', text: '节点-4', data: { myicon: 'el-icon-star-on' } },
-        { id: '6', text: '节点-6', data: { myicon: 'el-icon-setting' } },
-        { id: '7', text: '节点-7', data: { myicon: 'el-icon-setting' } },
-        { id: '8', text: '节点-8', data: { myicon: 'el-icon-star-on' } },
-        { id: '9', text: '节点-9', data: { myicon: 'el-icon-headset' } },
-        { id: '71', text: '节点-71', data: { myicon: 'el-icon-headset' } },
-        { id: '72', text: '节点-72', data: { myicon: 'el-icon-s-tools' } },
-        { id: '73', text: '节点-73', data: { myicon: 'el-icon-star-on' } },
-        { id: '81', text: '节点-81', data: { myicon: 'el-icon-s-promotion' } },
-        { id: '82', text: '节点-82', data: { myicon: 'el-icon-s-promotion' } },
-        { id: '83', text: '节点-83', data: { myicon: 'el-icon-star-on' } },
-        { id: '84', text: '节点-84', data: { myicon: 'el-icon-s-promotion' } },
-        { id: '85', text: '节点-85', data: { myicon: 'el-icon-sunny' } },
-        { id: '91', text: '节点-91', data: { myicon: 'el-icon-sunny' } },
-        { id: '92', text: '节点-82', data: { myicon: 'el-icon-sunny' } },
-        { id: '51', text: '节点-51', data: { myicon: 'el-icon-sunny' } },
-        { id: '52', text: '节点-52', data: { myicon: 'el-icon-sunny' } },
-        { id: '53', text: '节点-53', data: { myicon: 'el-icon-sunny' } },
-        { id: '54', text: '节点-54', data: { myicon: 'el-icon-sunny' } },
-        { id: '55', text: '节点-55', data: { myicon: 'el-icon-sunny' } },
-        { id: '5', text: '节点-5', data: { myicon: 'el-icon-sunny' } }
+        { id: '3', text: '节点-3', data: { myicon: 'el-icon-setting' } }
       ],
-      lines: [
-        { from: '7', to: '71', text: '投资' },
-        { from: '7', to: '72', text: '投资' },
-        { from: '7', to: '73', text: '投资' },
-        { from: '8', to: '81', text: '投资' },
-        { from: '8', to: '82', text: '投资' },
-        { from: '8', to: '83', text: '投资' },
-        { from: '8', to: '84', text: '投资' },
-        { from: '8', to: '85', text: '投资' },
-        { from: '9', to: '91', text: '投资' },
-        { from: '9', to: '92', text: '投资' },
-        { from: '5', to: '51', text: '投资1' },
-        { from: '5', to: '52', text: '投资' },
-        { from: '5', to: '53', text: '投资3' },
-        { from: '5', to: '54', text: '投资4' },
-        { from: '5', to: '55', text: '投资' },
-        { from: '1', to: '2', text: '投资' },
-        { from: '3', to: '1', text: '高管' },
-        { from: '4', to: '2', text: '高管' },
-        { from: '6', to: '2', text: '高管' },
-        { from: '7', to: '2', text: '高管' },
-        { from: '8', to: '2', text: '高管' },
-        { from: '9', to: '2', text: '高管' },
-        { from: '1', to: '5', text: '投资' }
-      ]
+      lines: []
     }
     return {
       graph_json_data: __graph_json_data,
@@ -328,9 +298,13 @@ export default {
     }
   },
   methods: {
-    render() {
+    render(nodeId) {
       this.$refs.graphRef.setJsonData(this.graph_json_data, (graphInstance) => {
         // 这些写上当图谱初始化完成后需要执行的代码
+        if (typeof nodeId != 'undefined' && nodeId.length > 0) {
+          //   //根据节点id在图谱中选中该节点并居中;
+          graphInstance.focusNodeById(nodeId)
+        }
       })
     },
     onContextmenu($event) {},
@@ -369,6 +343,21 @@ export default {
         type: 'success'
       })
       this.isShowNodeMenuPanel = false
+    },
+    // 添加节点按钮
+    addNodeAction() {
+      const random = Math.floor(Math.random() * 100000)
+      const nodeId = random + ''
+      this.graph_json_data.nodes.push({
+        id: nodeId,
+        text: '节点-' + random,
+        color: color16(),
+        data: { myicon: 'el-icon-star-on' }
+      })
+      // this.$refs.graphRef.refresh();
+      // console.log(this.graph_json_data)
+      this.render(nodeId)
+  
     }
   },
   mounted() {

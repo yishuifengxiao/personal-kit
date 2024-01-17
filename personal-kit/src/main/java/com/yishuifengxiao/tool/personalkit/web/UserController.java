@@ -33,7 +33,6 @@ public class UserController {
     @GetMapping("/info/{id}")
     public UserInfo info(@PathVariable String id, @CurrentUser UserDetails user) {
         SysUser sysUser = ContextUser.currentUser();
-        System.out.println(sysUser);
         return userService.userInfo(id);
     }
 
