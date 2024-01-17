@@ -154,7 +154,8 @@
           <!-- 节点属性配置区 -->
           <!-- 代码编辑区 -->
           <a-tab-pane key="3" tab="代码模式配置">
-            <a-textarea v-model:value="code" placeholder="配置代码" :rows="20" />
+            <!-- <a-textarea v-model:value="code" placeholder="配置代码" :rows="20" /> -->
+            <JsonEditorVue  class="editor" v-model ="code" style="height: 50vh;"></JsonEditorVue>
             <a-divider />
             <a-button type="primary" @click="render">确定</a-button>
           </a-tab-pane>
@@ -219,7 +220,6 @@
         position: absolute;
       "
     >
-
       <div class="c-node-menu-item">添加节点</div>
     </div>
     <!-- 当在图谱中点击右键时 -->
@@ -230,6 +230,8 @@
 import { reactive, ref } from 'vue'
 import RelationGraph from 'relation-graph/vue3'
 import { MinusCircleOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+// https://github.com/guyue88/json-editor-vue3
+import JsonEditorVue from 'json-editor-vue3'
 
 function jsonNode(json_data) {
   var cache = []
@@ -318,7 +320,7 @@ export default {
   computed: {
     code: {
       get() {
-        return JSON.stringify(this.graph_json_data)
+        return this.graph_json_data
       },
       set(newVal) {
         this.graph_json_data = JSON.parse(newVal)
@@ -441,7 +443,8 @@ export default {
   components: {
     RelationGraph,
     MinusCircleOutlined,
-    PlusOutlined
+    PlusOutlined,
+    JsonEditorVue
   }
 }
 </script>

@@ -52,6 +52,9 @@ public class GraphDefine implements Serializable {
 
     private DataSource dataSource;
 
+    private List<NodeMapping> nodeMappings;
+
+
     private List<DataFusion> dataFusions;
 
 
@@ -75,7 +78,22 @@ public class GraphDefine implements Serializable {
         private String diskFileName;
         private String virtuallyFileId;
         private String virtuallyFileName;
-        private List<NodeMapping> nodeMappings;
+        private String nodeName;
+        private List<DataMapping> dataMappings;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Accessors(chain = true)
+    public static class DataMapping implements Serializable {
+
+        private String nodePropertyName;
+
+        private String rowName;
+
+        private List<DataExtractRule> dataExtractRules;
+
     }
 
     @Data
@@ -83,13 +101,16 @@ public class GraphDefine implements Serializable {
     @NoArgsConstructor
     @Accessors(chain = true)
     public static class NodeMapping implements Serializable {
-        private String nodeName;
 
-        private String nodePropertyName;
+        private String id;
 
-        private String rowName;
+        private String fromNode;
 
-        private List<DataExtractRule> dataExtractRules;
+        private String fromNodeProperty;
+
+        private String toNode;
+
+        private String toNodeProperty;
 
     }
 
