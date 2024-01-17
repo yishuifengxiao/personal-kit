@@ -60,7 +60,9 @@ public class GraphDefine implements Serializable {
     @NoArgsConstructor
     @Accessors(chain = true)
     public static class DataSource implements Serializable {
+        private String id;
         private String dataSetId;
+        private String dataSetName;
         private List<SourceItem> sourceItems;
     }
 
@@ -70,7 +72,9 @@ public class GraphDefine implements Serializable {
     @Accessors(chain = true)
     public static class SourceItem implements Serializable {
         private String diskFileId;
+        private String diskFileName;
         private String virtuallyFileId;
+        private String virtuallyFileName;
         private List<NodeMapping> nodeMappings;
     }
 
