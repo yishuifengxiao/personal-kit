@@ -7,7 +7,7 @@ import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
-import com.yishuifengxiao.tool.personalkit.tool.ContextUser;
+import com.yishuifengxiao.tool.personalkit.support.ContextUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,6 +1,5 @@
 package com.yishuifengxiao.tool.personalkit.web;
 
-import com.yishuifengxiao.common.security.SecurityPropertyResource;
 import com.yishuifengxiao.common.security.support.SecurityEvent;
 import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.security.token.SecurityToken;
@@ -84,24 +83,26 @@ public class IndexController {
             headerMap.put(element, header);
         }
 
-        Map map = MapUtil.map().put("requestURL", requestURL).put("requestURI", requestURI).put("contextPath", contextPath).put("servletPath", servletPath).put("parameterMap", parameterMap).put("headerMap", headerMap).build();
+        Map map = MapUtil.map().put("requestURL", requestURL).put("requestURI", requestURI).put("contextPath",
+                contextPath).put("servletPath", servletPath).put("parameterMap", parameterMap).put("headerMap",
+                headerMap).build();
         return map;
     }
 
-    @Autowired
-    private SecurityPropertyResource securityPropertyResource;
 
     @PostMapping("/login")
     @org.springframework.web.bind.annotation.ResponseBody
-    public LoginVo login(HttpServletRequest request, HttpServletResponse response, @Valid @RequestBody LoginQuery query, BindingResult error) throws CustomException {
+    public LoginVo login(HttpServletRequest request, HttpServletResponse response,
+                         @Valid @RequestBody LoginQuery query, BindingResult error) throws CustomException {
 
         try {
             LoginVo loginVo = userService.login(request, response, query);
-            SpringContext.publishEvent(new SecurityEvent(this, request, response, securityPropertyResource, Strategy.AUTHENTICATION_SUCCESS, loginVo.getSecurityToken(), null));
+            SpringContext.publishEvent(new SecurityEvent(this, request, response, Strategy.AUTHENTICATION_SUCCESS,
+                    loginVo.getSecurityToken(), null));
 
             return loginVo;
         } catch (Exception e) {
-            SpringContext.publishEvent(new SecurityEvent(this, request, response, securityPropertyResource,
+            SpringContext.publishEvent(new SecurityEvent(this, request, response,
                     Strategy.AUTHENTICATION_SUCCESS, new SecurityToken(Collections.EMPTY_LIST) {
                 @Override
                 public String getName() {

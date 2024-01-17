@@ -12,7 +12,7 @@ import com.yishuifengxiao.tool.personalkit.dao.mongo.repository.OntologyReposito
 import com.yishuifengxiao.tool.personalkit.domain.mongo.GraphBuildRecord;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.GraphDefine;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
-import com.yishuifengxiao.tool.personalkit.tool.ContextUser;
+import com.yishuifengxiao.tool.personalkit.support.ContextUser;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

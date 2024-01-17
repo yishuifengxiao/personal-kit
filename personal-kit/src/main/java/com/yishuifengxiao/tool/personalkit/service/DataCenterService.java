@@ -6,7 +6,7 @@ import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.collections.DataUtil;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
-import com.yishuifengxiao.common.tool.exception.IllegalParameterException;
+import com.yishuifengxiao.common.tool.exception.UncheckedException;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.dao.mongo.DataSourceDao;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
@@ -110,7 +110,7 @@ public class DataCenterService {
 
     public VirtuallyFileVo findPageVirtuallyData(PageQuery<VirtuallyRow> pageQuery) {
         String virtuallyFileId =
-                pageQuery.query().map(VirtuallyRow::getVirtuallyFileId).orElseThrow(() -> new IllegalParameterException(
+                pageQuery.query().map(VirtuallyRow::getVirtuallyFileId).orElseThrow(() -> new UncheckedException(
                         "请选择一个文件"));
 
         return new VirtuallyFileVo(findVirtuallyFileDefine(virtuallyFileId), findPageVirtuallyRow(pageQuery));

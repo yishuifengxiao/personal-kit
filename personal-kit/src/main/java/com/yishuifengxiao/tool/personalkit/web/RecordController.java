@@ -6,7 +6,7 @@ import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysSecurityRecord;
 import com.yishuifengxiao.tool.personalkit.domain.request.RecordReq;
 import com.yishuifengxiao.tool.personalkit.service.RecordService;
-import com.yishuifengxiao.tool.personalkit.tool.ContextUser;
+import com.yishuifengxiao.tool.personalkit.support.ContextUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

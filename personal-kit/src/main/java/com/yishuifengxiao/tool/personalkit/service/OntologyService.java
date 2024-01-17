@@ -1,7 +1,5 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
-import com.yishuifengxiao.common.tool.collections.DataUtil;
-import com.yishuifengxiao.common.tool.collections.JsonUtil;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
@@ -13,17 +11,14 @@ import com.yishuifengxiao.tool.personalkit.dao.mongo.repository.OntologyReposito
 import com.yishuifengxiao.tool.personalkit.domain.bo.GraphData;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.Ontology;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
-import com.yishuifengxiao.tool.personalkit.tool.ContextUser;
+import com.yishuifengxiao.tool.personalkit.support.ContextUser;
+import com.yishuifengxiao.tool.personalkit.tool.OntHelper;
 import jakarta.transaction.Transactional;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @author yishui
@@ -55,32 +50,12 @@ public class OntologyService {
                         ContextUser.currentUserId()));
 
 
-        Ontology ontology = new Ontology().setCreateUserId(ContextUser.currentUserId())
+        Ontology ontology = OntHelper.convert(param).setCreateUserId(ContextUser.currentUserId())
                 .setCreateTime(LocalDateTime.now())
                 .setVersion(NumberUtil.ZERO.intValue())
                 .setMaster(true);
 
-        ontology.setOntologyName(param.getGraphName()).setDescription(param.getDescription());
 
-        List<Ontology.Node> nodes = DataUtil.stream(param.getNodes()).map(v -> {
-            String nodeName = v.getText();
-            List<Ontology.NodeProperty> nodeProperties = JsonUtil.str2List(MapUtils.getString(v.getData(), GraphData.NODE_PROPERTIES), Ontology.NodeProperty.class);
-            List<Ontology.NodeProperty> properties = DataUtil.stream(nodeProperties).filter(Objects::nonNull).filter(s -> StringUtils.isNotBlank(s.getNodePropertyName()) && null != s.getDataType())
-                    .distinct().collect(Collectors.toList());
-            return new Ontology.Node(nodeName, properties);
-        }).filter(Objects::nonNull).collect(Collectors.toList());
-
-        List<Ontology.Edge> edges = DataUtil.stream(param.getLines()).map(v -> {
-            String edgeName = v.getText();
-            String fromNodeName = DataUtil.stream(param.getNodes()).filter(s -> StringUtils.equals(s.getText(),
-                    v.getFrom())).findFirst().map(GraphData.Node::getText).orElse(null);
-            String toNodeName = DataUtil.stream(param.getNodes()).filter(s -> StringUtils.equals(s.getText(),
-                    v.getFrom())).findFirst().map(GraphData.Node::getText).orElse(null);
-            return new Ontology.Edge(edgeName, fromNodeName, toNodeName);
-        }).collect(Collectors.toList());
-        ontology.setNodes(nodes);
-        ontology.setEdges(edges);
-        ontology.setText(JsonUtil.toJSONString(param));
         ontologyRepository.save(ontology);
     }
 

@@ -1,4 +1,4 @@
-package com.yishuifengxiao.tool.personalkit.tool;
+package com.yishuifengxiao.tool.personalkit.support;
 
 import com.google.common.util.concurrent.RateLimiter;
 import com.yishuifengxiao.common.guava.GuavaCache;

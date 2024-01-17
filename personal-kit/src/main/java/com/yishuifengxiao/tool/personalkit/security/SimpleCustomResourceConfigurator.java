@@ -9,7 +9,7 @@ import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
-import com.yishuifengxiao.tool.personalkit.tool.ResourceInitializer;
+import com.yishuifengxiao.tool.personalkit.support.ResourceInitializer;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -16,7 +16,7 @@ import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyRow;
 import com.yishuifengxiao.tool.personalkit.helper.data.FileParserHelper;
 import com.yishuifengxiao.tool.personalkit.helper.data.ParserResult;
-import com.yishuifengxiao.tool.personalkit.tool.UploadClient;
+import com.yishuifengxiao.tool.personalkit.support.UploadClient;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
