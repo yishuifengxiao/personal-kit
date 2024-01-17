@@ -53,4 +53,10 @@ public class GraphController {
         graphService.delete(param);
     }
 
+    @PostMapping("/detail")
+    public void detail(@Valid @RequestBody IdReq param) {
+
+//       return graphService.detail(param);
+    }
+
 }

@@ -12,6 +12,7 @@ import com.yishuifengxiao.tool.personalkit.dao.mongo.repository.DataSetRepositor
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.DataSet;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
+import com.yishuifengxiao.tool.personalkit.domain.vo.DataSetDetail;
 import com.yishuifengxiao.tool.personalkit.domain.vo.DataSetVo;
 import com.yishuifengxiao.tool.personalkit.support.ContextUser;
 import jakarta.transaction.Transactional;
@@ -48,15 +49,6 @@ public class DataSetService {
 
             DataSetVo vo = BeanUtil.copy(v, new DataSetVo());
 
-            List<DataSetVo.Item> items = v.getVirtuallyFileIds().stream().map(s -> {
-                DiskFile diskFile = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFile.class, v.getId());
-                if (null == diskFile) {
-                    return null;
-                }
-                return new DataSetVo.Item(diskFile.getId(), diskFile.getFileName());
-            }).filter(Objects::nonNull).collect(Collectors.toList());
-
-            vo.setSources(items);
             return vo;
         });
     }
@@ -80,5 +72,21 @@ public class DataSetService {
 
     public void delete(IdReq req) {
         dataSetRepository.deleteById(req.getId());
+    }
+
+    public DataSetDetail detail(IdReq param) {
+        DataSet dataSet = dataSetRepository.findById(param.getId()).orElseThrow(() -> UncheckedException.of("记录不存在"));
+        DataSetDetail detail = BeanUtil.copy(dataSet, new DataSetDetail());
+
+        List<DataSetDetail.Item> items = detail.getVirtuallyFileIds().stream().map(s -> {
+            DiskFile diskFile = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFile.class, v.getId());
+            if (null == diskFile) {
+                return null;
+            }
+            return new DataSetDetail.Item(diskFile.getId(), diskFile.getFileName());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
+
+        detail.setSources(items);
+        return detail;
     }
 }

@@ -4,6 +4,7 @@ import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.DataSet;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
+import com.yishuifengxiao.tool.personalkit.domain.vo.DataSetDetail;
 import com.yishuifengxiao.tool.personalkit.domain.vo.DataSetVo;
 import com.yishuifengxiao.tool.personalkit.service.DataSetService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -63,5 +64,10 @@ public class DataSetController {
         dataSetService.delete(param);
     }
 
+    @Operation(summary = "数据集详情", description = "数据集详情")
+    @PostMapping("/detail")
+    public DataSetDetail detail(@Valid @RequestBody IdReq param) {
 
+        return dataSetService.detail(param);
+    }
 }

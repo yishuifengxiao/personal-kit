@@ -5,9 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.util.List;
-
 /**
  * @author qingteng
  * @version 1.0.0
@@ -19,15 +16,5 @@ import java.util.List;
 @Data
 public class DataSetVo extends DataSet {
 
-    private List<Item> sources;
 
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Data
-    public static class Item implements Serializable {
-
-        private String id;
-
-        private String name;
-    }
 }

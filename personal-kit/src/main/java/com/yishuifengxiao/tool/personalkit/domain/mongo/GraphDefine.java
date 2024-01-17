@@ -50,7 +50,7 @@ public class GraphDefine implements Serializable {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createTime;
 
-    private List<DataSource> dataSources;
+    private DataSource dataSource;
 
     private List<DataFusion> dataFusions;
 
@@ -60,6 +60,16 @@ public class GraphDefine implements Serializable {
     @NoArgsConstructor
     @Accessors(chain = true)
     public static class DataSource implements Serializable {
+        private String dataSetId;
+        private List<SourceItem> sourceItems;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Accessors(chain = true)
+    public static class SourceItem implements Serializable {
+        private String diskFileId;
         private String virtuallyFileId;
         private List<NodeMapping> nodeMappings;
     }

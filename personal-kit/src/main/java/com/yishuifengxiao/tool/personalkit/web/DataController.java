@@ -31,7 +31,7 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/data/center")
 @RestController
-public class DataSourceController {
+public class DataController {
 
     @Autowired
     private DataCenterService dataCenterService;

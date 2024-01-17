@@ -55,4 +55,10 @@ public class OntologyController {
         ontologyService.delete(param);
     }
 
+    @PostMapping("/detail")
+    public GraphData detail(@Valid @RequestBody IdReq param) {
+
+        return ontologyService.detail(param.getId());
+    }
+
 }
