@@ -93,7 +93,13 @@
               <!-- 按钮区 -->
               <a-col :span="20" :offset="4"> <a-divider /></a-col>
               <a-col :span="20" :offset="4">
-                <span>节点名称</span> <a-input placeholder="节点名称" allowClear
+                <span>节点名称:</span>
+     
+                <a-input
+                  placeholder="概念名称"
+                  v-model:value="currentNode.text"
+                  allowClear
+                  style="width: 300px; margin-left: 10px"
               /></a-col>
               <a-col :span="20" :offset="4"> <a-divider /></a-col>
 
@@ -190,7 +196,7 @@
       <div class="c-node-menu-item" @click.stop="doAction('deleteNode')">删除节点</div>
     </div>
     <!-- 弹窗区 -->
-    <!-- 悬浮图案 -->
+    <!-- 鼠标悬浮时的弹窗 -->
     <div
       v-if="isShowNodeTipsPanel"
       :style="{ left: nodeMenuPanelPosition.x + 'px', top: nodeMenuPanelPosition.y + 'px' }"
@@ -206,10 +212,11 @@
       <div style="line-height: 25px; padding-left: 10px; color: #888888; font-size: 12px">
         节点名称：{{ currentNode.text }}
       </div>
-      <div class="c-node-menu-item">id:{{ currentNode.text }}</div>
-      <div class="c-node-menu-item">图标:{currentNode.data.myicon}</div>
+      <div class="c-node-menu-item">id:{{ currentNode.id }}</div>
+      <div class="c-node-menu-item">名称:{{ currentNode.text }}</div>
+      <div class="c-node-menu-item">图标:{{currentNode.data.myicon}}</div>
     </div>
-    <!-- 悬浮图案 -->
+    <!-- 鼠标悬浮时的弹窗 -->
     <!-- 当在图谱中点击右键时 -->
     <div
       v-if="isShowTipsPanel"
@@ -267,12 +274,7 @@ export default {
       rootId: '2',
       graphName: '',
       description: '',
-      nodes: [
-        // 注意：在节点配置信息中，你的自定义属性需要像下面这样放到data标签中，否则数据会丢失
-        { id: '1', text: '节点-1', data: { myicon: 'el-icon-star-on' } },
-        { id: '2', text: '节点-2', data: { myicon: 'el-icon-setting' } },
-        { id: '3', text: '节点-3', data: { myicon: 'el-icon-setting' } }
-      ],
+      nodes: [{id:'root', opacity:0}],
       lines: []
     }
     return {
@@ -357,7 +359,6 @@ export default {
       // this.$refs.graphRef.refresh();
       // console.log(this.graph_json_data)
       this.render(nodeId)
-  
     }
   },
   mounted() {
