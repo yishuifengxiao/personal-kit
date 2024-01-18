@@ -4,6 +4,8 @@ import com.yishuifengxiao.tool.personalkit.domain.mongo.GraphBuildRecord;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * @author yishui
  * @version 1.0.0
@@ -16,4 +18,7 @@ public interface GraphBuildRecordRepository extends MongoRepository<GraphBuildRe
     long countByGraphIdAndBuildstat(String graphId, GraphBuildRecord.BuildStat buildstat);
 
     long countByGraphId(String graphId);
+
+    Optional<GraphBuildRecord> findTop1ByGraphIdOrderByCreateTimeDesc(String graphId);
+
 }

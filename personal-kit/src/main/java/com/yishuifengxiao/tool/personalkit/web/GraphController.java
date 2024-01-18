@@ -4,6 +4,7 @@ import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.GraphDefine;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
+import com.yishuifengxiao.tool.personalkit.domain.vo.GraphDefineVo;
 import com.yishuifengxiao.tool.personalkit.service.GraphService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class GraphController {
     private GraphService graphService;
 
     @PostMapping("/page")
-    public Page<GraphDefine> findPage(@RequestBody PageQuery<GraphDefine> pageQuery) {
+    public Page<GraphDefineVo> findPage(@RequestBody PageQuery<GraphDefine> pageQuery) {
 
         return graphService.findPage(pageQuery);
     }
@@ -56,9 +57,9 @@ public class GraphController {
     }
 
     @PostMapping("/detail")
-    public void detail(@Valid @RequestBody IdReq param) {
+    public GraphDefine detail(@Valid @RequestBody IdReq param) {
 
-//       return graphService.detail(param);
+        return graphService.detail(param);
     }
 
     @PostMapping("/updateDataSource")

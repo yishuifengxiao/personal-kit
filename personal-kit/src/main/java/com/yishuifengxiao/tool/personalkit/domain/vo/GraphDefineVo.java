@@ -1,16 +1,15 @@
-package com.yishuifengxiao.tool.personalkit.domain.mongo;
+package com.yishuifengxiao.tool.personalkit.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.yishuifengxiao.tool.personalkit.domain.mongo.GraphBuildRecord;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -18,40 +17,24 @@ import java.time.LocalDateTime;
 /**
  * @author yishui
  * @version 1.0.0
- * @date 2023/12/21 19:27
+ * @date 2024/1/18 15:47
  * @since 1.0.0
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-@Document(GraphBuildRecord.COLLECTION_NAME)
-public class GraphBuildRecord implements Serializable {
-
-    public final static String COLLECTION_NAME = "graph_build_record";
-
-    @Id
+public class GraphDefineVo implements Serializable {
     private String id;
 
-    private String graphId;
+    private String graphName;
 
-    private BuildStat buildstat;
-
-    private String createUserId;
-
-    private Long useTime;
+    private String description;
 
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createTime;
 
-    @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime updateTime;
-
-    public enum BuildStat {
-        NO_BUILD,BUILDING, BUILD_SUC, BUILD_FAIL
-    }
+    private GraphBuildRecord.BuildStat buildStat;
 }

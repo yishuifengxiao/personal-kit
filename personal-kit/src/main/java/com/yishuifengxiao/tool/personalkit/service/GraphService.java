@@ -15,6 +15,7 @@ import com.yishuifengxiao.tool.personalkit.domain.mongo.GraphBuildRecord;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.GraphDefine;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
+import com.yishuifengxiao.tool.personalkit.domain.vo.GraphDefineVo;
 import com.yishuifengxiao.tool.personalkit.support.ContextUser;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
@@ -52,11 +53,16 @@ public class GraphService {
     @Autowired
     private VirtuallyFileRepository virtuallyFileRepository;
 
-    public Page<GraphDefine> findPage(PageQuery<GraphDefine> param) {
+    public Page<GraphDefineVo> findPage(PageQuery<GraphDefine> param) {
         GraphDefine dataSet = param.query().orElse(new GraphDefine());
         dataSet.setCreateUserId(ContextUser.currentUserId());
         param.setQuery(dataSet);
-        return graphDefineDao.findPage(param);
+        return graphDefineDao.findPage(param).map(v -> {
+            GraphBuildRecord.BuildStat buildStat =
+                    graphBuildRecordRepository.findTop1ByGraphIdOrderByCreateTimeDesc(v.getId()).map(GraphBuildRecord::getBuildstat).orElse(GraphBuildRecord.BuildStat.NO_BUILD);
+
+            return new GraphDefineVo(v.getId(), v.getGraphName(), v.getDescription(), v.getCreateTime(), buildStat);
+        });
     }
 
     public void save(GraphDefine param) {
@@ -137,9 +143,7 @@ public class GraphService {
     public void updateNodeMapping(GraphDefine.NodeMapping nodeMapping) {
         GraphDefine graphDefine = validate(nodeMapping.getId());
         List<GraphDefine.NodeMapping> mappings =
-                DataUtil.stream(graphDefine.getNodeMappings()).filter(Objects::nonNull)
-                        .filter(v -> StringUtils.equals(v.getEdgeName(), nodeMapping.getEdgeName()))
-                        .collect(Collectors.toList());
+                DataUtil.stream(graphDefine.getNodeMappings()).filter(Objects::nonNull).filter(v -> StringUtils.equals(v.getEdgeName(), nodeMapping.getEdgeName())).collect(Collectors.toList());
         mappings.add(nodeMapping);
         graphDefine.setNodeMappings(mappings);
         graphDefineRepository.save(graphDefine);
@@ -162,4 +166,10 @@ public class GraphService {
     }
 
 
+    public GraphDefine detail(IdReq param) {
+        GraphDefine graphDefine = graphDefineRepository.findById(param.getId()).orElseThrow(() -> new UncheckedException(
+                "记录不存在"));
+        graphDefine.setDataSource(null).setNodeMappings(Collections.EMPTY_LIST).setDataFusions(Collections.EMPTY_LIST);
+        return graphDefine;
+    }
 }
