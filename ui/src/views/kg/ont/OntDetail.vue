@@ -96,7 +96,7 @@
               <a-col :span="20" :offset="4"> <a-divider /></a-col>
             </a-row>
             <a-row>
-              <a-col :span="20" :offset="4">
+              <a-col :span="14" :offset="4">
                 <span>概念名称:</span>
 
                 <a-input
@@ -104,49 +104,50 @@
                   v-model:value="currentNode.text"
                   allowClear
                   @change="onNodeNameChange"
-                  style="width: 300px; margin-left: 10px"
+                  style="width: 13vw; margin-left: 10px"
               /></a-col>
-            </a-row>
-            <a-row style="margin-top: 10px;"> 
-              <a-col :span="20" :offset="4">
+              <a-col :span="6">
                 <span>概念颜色:</span>
 
                 <a-input
                   placeholder="概念颜色"
                   v-model:value="currentNode.color"
                   type="color"
-                  allowClear
                   @change="onNodeColorChange"
-                  style="width: 300px; margin-left: 10px"
+                  style="width: 3vw; margin-left: 10px"
               /></a-col>
-              <a-col :span="20" :offset="4"> <a-divider /></a-col>
             </a-row>
-            <a-row>
-              <!-- 节点项配置 -->
+            <a-row
+              style="margin-top: 10px; max-height: 200px; overflow-y: auto; overflow-x: hidden"
+            >
+              <!-- 节点属性项配置 -->
               <a-col :span="20" :offset="4">
                 <a-form
                   ref="dynamic_form_nest_item"
                   name="dynamic_form_nest_item"
-                  :model="dynamicValidateForm"
+                  :model="currentNode"
                   @finish="onFinish"
                 >
                   <a-space
-                    v-for="(user, index) in dynamicValidateForm.users"
-                    :key="user.id"
-                    style="display: flex; margin-bottom: 8px"
+                    v-for="(nodeProperty, index) in currentNode.nodeProperties"
+                    :key="index"
+                    style="display: flex"
                     align="baseline"
                   >
                     <a-form-item
-                      :name="['users', index, 'nodePropertyName']"
+                      :name="['nodeProperties', index, 'nodePropertyName']"
                       :rules="{
                         required: true,
                         message: '节点属性名字不能为空'
                       }"
                     >
-                      <a-input v-model:value="user.nodePropertyName" placeholder="节点属性名字" />
+                      <a-input
+                        v-model:value="nodeProperty.nodePropertyName"
+                        placeholder="节点属性名字"
+                      />
                     </a-form-item>
                     <a-form-item
-                      :name="['users', index, 'dataType']"
+                      :name="['nodeProperties', index, 'dataType']"
                       :rules="{
                         required: true,
                         message: '属性数据类型不能为空'
@@ -155,16 +156,16 @@
                       <a-select
                         ref="select"
                         style="width: 120px"
-                        v-model:value="user.dataType"
+                        v-model:value="nodeProperty.dataType"
                         :options="selectOptions"
                       ></a-select>
                     </a-form-item>
-                    <MinusCircleOutlined @click="removeUser(user)" />
+                    <MinusCircleOutlined @click="removeUser(nodeProperty)" />
                   </a-space>
                   <a-form-item>
                     <a-button type="dashed" block @click="addUser">
                       <PlusOutlined />
-                      Add user
+                      添加属性
                     </a-button>
                   </a-form-item>
                   <a-form-item>
@@ -174,7 +175,7 @@
                   </a-form-item>
                 </a-form></a-col
               >
-              <!-- 节点项配置 -->
+              <!-- 节点属性项配置 -->
             </a-row>
             <!-- 属性配置区 -->
           </a-tab-pane>
@@ -184,11 +185,10 @@
           <a-tab-pane key="3" tab="代码模式配置">
             <!-- <a-textarea v-model:value="code" placeholder="配置代码" :rows="20" /> -->
             <JsonEditorVue class="editor" v-model="code" style="height: 50vh"></JsonEditorVue>
-            <a-divider />
-            <a-button type="primary" @click="render">确定</a-button>
           </a-tab-pane>
           <!-- 代码编辑区 -->
         </a-tabs>
+        <div><a-divider /> <a-button type="primary" @click="onSaveAction">保存</a-button></div>
       </a-col>
       <!-- 右侧配置区 -->
     </a-row>
@@ -212,7 +212,6 @@
       </div>
       <div class="c-node-menu-item" @click.stop="doAction('editNode')">编辑</div>
       <div class="c-node-menu-item" @click.stop="doAction('addRelation')">添加关系</div>
-      <div class="c-node-menu-item" @click.stop="doAction('addProperty')">添加属性</div>
       <div class="c-node-menu-item" @click.stop="doAction('deleteNode')">删除节点</div>
     </div>
     <!-- 弹窗区 -->
@@ -303,9 +302,8 @@ export default {
       isShowNodeMenuPanel: false,
       isShowNodeTipsPanel: false,
       isShowTipsPanel: false,
-      currentNode: reactive({}),
+      currentNode: reactive({ nodeProperties: [] }),
       activeKey: '1',
-
       nodeMenuPanelPosition: { x: 0, y: 0 }
     }
   },
@@ -360,23 +358,26 @@ export default {
     },
     doAction(actionName) {
       this.isShowNodeMenuPanel = false
+      if ('deleteNode' === actionName) {
+        alert('删除当前节点')
+      }
     },
     // 添加节点按钮
     addNodeAction() {
       const random = Math.floor(Math.random() * 100000)
       const nodeId = random + ''
-      this.graph_json_data.nodes.push({
+      const currentNode = {
         id: nodeId,
         text: '节点-' + random,
         color: color16(),
-        data: { myicon: 'el-icon-star-on' }
-      })
-      // this.$refs.graphRef.refresh();
-      // console.log(this.graph_json_data)
+        data: { myicon: 'el-icon-star-on', nodeProperties: [] }
+      }
+      this.graph_json_data.nodes.push(currentNode)
+      this.currentNode = reactive(currentNode)
       this.render(nodeId)
     },
     // 节点名称变化
-    onNodeNameChange(val) {
+    onNodeNameChange() {
       const currentNode = this.currentNode
       const nodes = this.graph_json_data.nodes.filter((v) => v.id != currentNode.id)
       nodes.push(currentNode)
@@ -384,8 +385,38 @@ export default {
       this.render(currentNode.id)
     },
     // 节点颜色变化
-    onNodeColorChange(val) {
+    onNodeColorChange() {
       this.onNodeNameChange()
+    },
+    // 动态移除一个表单项
+    removeUser(item) {
+      const index = this.currentNode.nodeProperties.indexOf(item)
+      if (index !== -1) {
+        this.currentNode.nodeProperties.splice(index, 1)
+      }
+    },
+    //动态增加一个表单项
+    addUser() {
+      const currentNode = this.currentNode
+      if (typeof currentNode.nodeProperties === 'undefined') {
+        currentNode.nodeProperties = []
+      }
+      currentNode.nodeProperties.push({
+        nodePropertyName: '属性' + new Date().getTime(),
+        dataType: 'TEXT',
+        id: Date.now()
+      })
+      this.currentNode = currentNode
+    },
+    // 确定保存操作
+    onSaveAction() {
+      const currentNode = this.currentNode
+      const nodes = this.graph_json_data.nodes.filter(
+        (v) => v.nodePropertyName !== currentNode.nodePropertyName
+      )
+      nodes.push(currentNode)
+      this.graph_json_data.nodes = nodes
+      this.render()
     }
   },
   mounted() {
@@ -410,32 +441,10 @@ export default {
     }
 
     const formRef = ref()
-    const dynamicValidateForm = reactive({
-      users: []
-    })
-    const removeUser = (item) => {
-      const index = dynamicValidateForm.users.indexOf(item)
-      if (index !== -1) {
-        dynamicValidateForm.users.splice(index, 1)
-      }
-    }
-    const addUser = () => {
-      dynamicValidateForm.users.push({
-        nodePropertyName: '',
-        dataType: '',
-        id: Date.now()
-      })
-    }
+
     const onFinish = (values) => {
       console.log('Received values of form:', values)
-      console.log('dynamicValidateForm.users:', dynamicValidateForm.users)
     }
-
-    const formState = reactive({
-      username: '',
-      password: '',
-      remember: true
-    })
 
     const selectOptions = ref([
       { value: 'TEXT', label: '字符串' },
@@ -448,12 +457,11 @@ export default {
 
     return {
       graphOptions,
-      formState,
+
       formRef,
-      removeUser,
-      addUser,
+
       onFinish,
-      dynamicValidateForm,
+
       selectOptions
     }
   },
