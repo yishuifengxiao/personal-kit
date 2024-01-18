@@ -15,6 +15,7 @@
             :on-node-click="onNodeClick"
             :on-line-click="onLineClick"
             :on-contextmenu="onContextmenu"
+            :on-canvas-click="onCanvasClick"
           >
             <template #node="{ node }">
               <div>
@@ -58,8 +59,8 @@
             <div>
               <a-form
                 :model="graph_json_data"
-                :label-col="{ span: 4 }"
-                :wrapper-col="{ span: 18 }"
+                :label-col="{ span: 3 }"
+                :wrapper-col="{ span: 21 }"
                 name="basic"
                 autocomplete="off"
               >
@@ -85,7 +86,7 @@
             <!-- 属性配置区 -->
             <a-row>
               <!-- 按钮区 -->
-              <a-col :span="20" :offset="4"
+              <a-col :span="20"
                 ><a-space>
                   <a-button type="primary" @click="addNodeAction">添加概念</a-button>
                 </a-space></a-col
@@ -93,10 +94,10 @@
               <!-- 按钮区 -->
             </a-row>
             <a-row>
-              <a-col :span="20" :offset="4"> <a-divider /></a-col>
+              <a-col :span="24"> <a-divider /></a-col>
             </a-row>
             <a-row>
-              <a-col :span="14" :offset="4">
+              <a-col :span="16">
                 <span>概念名称:</span>
 
                 <a-input
@@ -106,7 +107,7 @@
                   @change="onNodeNameChange"
                   style="width: 13vw; margin-left: 10px"
               /></a-col>
-              <a-col :span="6">
+              <a-col :span="8">
                 <span>概念颜色:</span>
 
                 <a-input
@@ -121,7 +122,7 @@
               style="margin-top: 10px; max-height: 200px; overflow-y: auto; overflow-x: hidden"
             >
               <!-- 节点属性项配置 -->
-              <a-col :span="20" :offset="4">
+              <a-col :span="24">
                 <a-form
                   ref="dynamic_form_nest_item"
                   name="dynamic_form_nest_item"
@@ -195,7 +196,7 @@
 
     <!-- 弹窗区 -->
     <div
-      v-show="isShowNodeMenuPanel"
+      v-show="isShowNodeOperateDialog"
       :style="{ left: nodeMenuPanelPosition.x + 'px', top: nodeMenuPanelPosition.y + 'px' }"
       style="
         z-index: 999;
@@ -252,6 +253,26 @@
       <div class="c-node-menu-item">添加节点</div>
     </div>
     <!-- 当在图谱中点击右键时 -->
+    <!-- 添加关系弹窗 -->
+    <div
+      v-if="isSHowAddRelationDialog"
+      :style="{ left: nodeMenuPanelPosition.x + 'px', top: nodeMenuPanelPosition.y + 'px' }"
+      style="
+        z-index: 999;
+        padding: 10px;
+        background-color: #ffffff;
+        border: #eeeeee solid 1px;
+        box-shadow: 0px 0px 8px #cccccc;
+        position: absolute;
+      "
+    >
+      <a-select style="width: 120px">
+        <a-select-option :value="item.id" v-for="item in relationNodes" :key="item.id">{{
+          item.text
+        }}</a-select-option>
+      </a-select>
+    </div>
+    <!-- 添加关系弹窗 -->
   </div>
 </template>
 
@@ -293,16 +314,18 @@ export default {
       rootId: '2',
       graphName: '',
       description: '',
-      nodes: [{ id: 'root', opacity: 0 }],
+      nodes: [{ id: 'root', opacity: 0, text: '' }],
       lines: []
     }
     return {
       graph_json_data: __graph_json_data,
       isShowCodePanel: false,
-      isShowNodeMenuPanel: false,
+      isShowNodeOperateDialog: false, //节点操作弹窗
       isShowNodeTipsPanel: false,
       isShowTipsPanel: false,
+      isSHowAddRelationDialog: false, //添加关系弹窗
       currentNode: reactive({ nodeProperties: [] }),
+      currentLine:reactive({}),
       activeKey: '1',
       nodeMenuPanelPosition: { x: 0, y: 0 }
     }
@@ -315,6 +338,10 @@ export default {
       set(newVal) {
         this.graph_json_data = JSON.parse(newVal)
       }
+    },
+    //可选的关系目标节点
+    relationNodes: function () {
+      return this.graph_json_data.nodes.filter((v) => v.text.length > 0)
     }
   },
   methods: {
@@ -338,7 +365,7 @@ export default {
       console.log('nodeSlotOver:', nodeObject)
       // const {id,text,styleClass,nodeShape,data}=
       this.currentNode = reactive(JSON.parse(jsonNode(nodeObject)))
-      this.isShowNodeMenuPanel = false
+      this.isShowNodeOperateDialog = false
       this.isShowNodeTipsPanel = true
 
       this.nodeMenuPanelPosition.x = $event.clientX
@@ -354,13 +381,26 @@ export default {
       this.nodeMenuPanelPosition.x = $event.clientX + 10
       this.nodeMenuPanelPosition.y = $event.clientY
       this.isShowNodeTipsPanel = false
-      this.isShowNodeMenuPanel = true
+      this.isShowNodeOperateDialog = true
     },
     doAction(actionName) {
-      this.isShowNodeMenuPanel = false
+      this.isShowNodeOperateDialog = false
       if ('deleteNode' === actionName) {
         alert('删除当前节点')
+        const currentNode = this.currentNode
+        const nodes = this.graph_json_data.nodes
+        const results = nodes.filter((v) => v.text !== currentNode.text)
+        this.graph_json_data.nodes = results
+        this.render()
+      } else if ('addRelation' === actionName) {
+        //添加关系
+        this.isShowNodeOperateDialog = false
+        this.isSHowAddRelationDialog = true
       }
+    },
+    //点击画布事件
+    onCanvasClick(e) {
+      debugger
     },
     // 添加节点按钮
     addNodeAction() {
@@ -431,6 +471,10 @@ export default {
       defaultLineShape: 3,
       defaultJunctionPoint: 'ltrb',
       placeOtherGroup: true,
+      allowSwitchLineShape: true,
+      allowSwitchJunctionPoint: true,
+      moveToCenterWhenRefresh: true,
+
       layouts: [
         {
           label: '中心',
