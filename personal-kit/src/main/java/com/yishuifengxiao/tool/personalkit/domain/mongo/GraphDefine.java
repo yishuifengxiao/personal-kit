@@ -79,6 +79,7 @@ public class GraphDefine implements Serializable {
         private String virtuallyFileId;
         private String virtuallyFileName;
         private String nodeName;
+        private Boolean isStruct;
         private List<DataMapping> dataMappings;
     }
 
@@ -103,6 +104,8 @@ public class GraphDefine implements Serializable {
     public static class NodeMapping implements Serializable {
 
         private String id;
+
+        private String edgeName;
 
         private String fromNode;
 

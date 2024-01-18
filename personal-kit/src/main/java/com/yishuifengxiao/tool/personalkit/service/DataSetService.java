@@ -8,6 +8,7 @@ import com.yishuifengxiao.common.tool.exception.UncheckedException;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.dao.mongo.DataSetDao;
+import com.yishuifengxiao.tool.personalkit.dao.mongo.GraphDefineDao;
 import com.yishuifengxiao.tool.personalkit.dao.mongo.repository.DataSetRepository;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.DataSet;
@@ -39,6 +40,8 @@ public class DataSetService {
     private DataSetDao dataSetDao;
     @Autowired
     private DataSetRepository dataSetRepository;
+    @Autowired
+    private GraphDefineDao graphDefineDao;
 
 
     public Page<DataSetVo> findPageDataSet(PageQuery<DataSet> param) {
@@ -67,6 +70,8 @@ public class DataSetService {
         if (!StringUtils.equals(param.getName(), dataSet.getName())) {
             Assert.lteZero("已经存在相同名称的数据集", dataSetDao.countByNameAndUser(param.getName(), dataSet.getCreateUserId()));
         }
+        Assert.lteZeroN("该数据集已被使用，不能更新", graphDefineDao.countByDatasetId(dataSet.getId()));
+
         dataSet.setName(param.getName()).setDescription(param.getDescription())
                 .setDiskFiles(param.getDiskFiles().stream()
                         .filter(StringUtils::isNotBlank).distinct().collect(Collectors.toList()));
@@ -74,6 +79,7 @@ public class DataSetService {
     }
 
     public void delete(IdReq req) {
+        Assert.lteZeroN("该数据集已被使用，不能删除", graphDefineDao.countByDatasetId(req.getId()));
         dataSetRepository.deleteById(req.getId());
     }
 

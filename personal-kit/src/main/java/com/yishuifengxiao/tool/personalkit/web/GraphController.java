@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 
 /**
  * @author yishui
@@ -58,5 +60,26 @@ public class GraphController {
 
 //       return graphService.detail(param);
     }
+
+    @PostMapping("/updateDataSource")
+    public void updateDataSource(@Valid @RequestBody GraphDefine.DataSource dataSource) {
+        graphService.updateDataSource(dataSource);
+    }
+
+    @PostMapping("/dataSource")
+    public GraphDefine.DataSource dataSource(@Valid @RequestBody IdReq param) {
+        return graphService.dataSource(param.getId());
+    }
+
+    @PostMapping("/updateNodeMapping")
+    public void updateNodeMapping(@Valid @RequestBody GraphDefine.NodeMapping nodeMapping) {
+        graphService.updateNodeMapping(nodeMapping);
+    }
+
+    @PostMapping("/nodeMapping")
+    public List<GraphDefine.NodeMapping> nodeMapping(@Valid @RequestBody IdReq param) {
+        return graphService.nodeMapping(param.getId());
+    }
+
 
 }

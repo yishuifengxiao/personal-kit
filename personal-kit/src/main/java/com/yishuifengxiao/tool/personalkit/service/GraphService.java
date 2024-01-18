@@ -23,6 +23,10 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author yishui
@@ -91,8 +95,7 @@ public class GraphService {
                     DiskFile diskFile = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFile.class, v.getDiskFileId());
                     Assert.isNotNull("记录文件不存在", diskFile);
                     VirtuallyFile virtuallyFile =
-                            virtuallyFileRepository.findById(v.getVirtuallyFileId()).orElseThrow(() -> UncheckedException.of(
-                                    "数据源文件不存在"));
+                            virtuallyFileRepository.findById(v.getVirtuallyFileId()).orElseThrow(() -> UncheckedException.of("数据源文件不存在"));
                     return null;
                 });
             }
@@ -104,9 +107,51 @@ public class GraphService {
         graphDefineRepository.save(graphDefine);
     }
 
+    public GraphDefine.DataSource dataSource(String id) {
+        GraphDefine graphDefine = validate(id);
+        GraphDefine.DataSource dataSource = graphDefine.getDataSource();
+        if (null == dataSource) {
+            return new GraphDefine.DataSource();
+        }
+        DataSet dataSet =
+                dataSetRepository.findById(dataSource.getDataSetId()).orElseThrow((() -> UncheckedException.of(
+                        "数据源已被删除")));
+        dataSource.setDataSetName(dataSet.getName());
+        if (null == dataSource.getSourceItems()) {
+            dataSource.setSourceItems(Collections.emptyList());
+        } else {
+            List<GraphDefine.SourceItem> items = dataSource.getSourceItems().stream().map(v -> {
+                v.setDiskFileName(Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFile.class,
+                        v.getDiskFileId())).map(DiskFile::getFileName).orElseThrow(() -> UncheckedException.of(
+                        "数据文件不存在")));
+                v.setVirtuallyFileName(virtuallyFileRepository.findById(v.getVirtuallyFileId()).map(VirtuallyFile::getSheetName).orElseThrow(() -> UncheckedException.of("数据文件不存在")));
+                return v;
+            }).filter(Objects::nonNull).collect(Collectors.toList());
+            dataSource.setSourceItems(items);
+        }
+
+        return dataSource;
+    }
+
+
+    public void updateNodeMapping(GraphDefine.NodeMapping nodeMapping) {
+        GraphDefine graphDefine = validate(nodeMapping.getId());
+        List<GraphDefine.NodeMapping> mappings =
+                DataUtil.stream(graphDefine.getNodeMappings()).filter(Objects::nonNull)
+                        .filter(v -> StringUtils.equals(v.getEdgeName(), nodeMapping.getEdgeName()))
+                        .collect(Collectors.toList());
+        mappings.add(nodeMapping);
+        graphDefine.setNodeMappings(mappings);
+        graphDefineRepository.save(graphDefine);
+    }
+
+    public List<GraphDefine.NodeMapping> nodeMapping(String id) {
+        GraphDefine graphDefine = validate(id);
+        return graphDefine.getNodeMappings();
+    }
+
     private GraphDefine validate(String id) {
-        GraphDefine graphDefine =
-                graphDefineRepository.findById(id).orElseThrow(() -> new UncheckedException("记录不存在"));
+        GraphDefine graphDefine = graphDefineRepository.findById(id).orElseThrow(() -> new UncheckedException("记录不存在"));
         Assert.lteZero("该图谱已存在构建记录，不能更新", graphBuildRecordRepository.countByGraphIdAndBuildstat(graphDefine.getId(),
                 GraphBuildRecord.BuildStat.BUILD_SUC));
         Assert.lteZero("该图谱正在构建中，不能更新", graphBuildRecordRepository.countByGraphIdAndBuildstat(graphDefine.getId(),
@@ -115,4 +160,6 @@ public class GraphService {
         return graphDefine;
 
     }
+
+
 }

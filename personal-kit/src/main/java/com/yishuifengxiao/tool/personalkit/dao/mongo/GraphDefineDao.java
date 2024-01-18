@@ -53,4 +53,10 @@ public class GraphDefineDao {
         query.addCriteria(Criteria.where("ontologyId").is(ontId));
         return mongotemplate.count(query, GraphDefine.COLLECTION_NAME);
     }
+
+    public long countByDatasetId(String datasetId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("dataSource.dataSetId").is(datasetId));
+        return mongotemplate.count(query, GraphDefine.COLLECTION_NAME);
+    }
 }

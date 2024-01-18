@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GraphDefineRepository extends MongoRepository<GraphDefine, String> {
 
+
+
     long countAllByOntologyId(String ontId);
 
     long countAllByGraphNameAndCreateUserId(String name, String userId);
