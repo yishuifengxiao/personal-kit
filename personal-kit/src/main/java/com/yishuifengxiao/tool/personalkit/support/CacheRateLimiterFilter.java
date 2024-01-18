@@ -7,6 +7,7 @@ import com.yishuifengxiao.common.tool.entity.Response;
 import com.yishuifengxiao.common.tool.http.HttpUtil;
 import com.yishuifengxiao.common.utils.HttpUtils;
 import com.yishuifengxiao.tool.personalkit.config.CoreProperties;
+import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,28 +31,45 @@ public class CacheRateLimiterFilter extends OncePerRequestFilter {
     @Autowired
     private CoreProperties coreproperties;
 
-    private final Set<String> excludes = DataUtil.asSet("api-docs", "swagger",".css",".js",".html");
+    private final Set<String> excludes = DataUtil.asSet("api-docs", "swagger", ".css", ".js", ".html");
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (coreproperties.getIpMaxVisitPerSecond() > 0 &&
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+
+        try {
+            ContextUser.setRole(currentRole(request));
+            if (coreproperties.getIpMaxVisitPerSecond() > 0 &&
+                    //
+                    !request.getRequestURI().contains(".") &&
+                    //
+                    excludes.stream().noneMatch(v -> StringUtils.containsIgnoreCase(request.getRequestURI(), v))
                 //
-                !request.getRequestURI().contains(".") &&
-                //
-                excludes.stream().noneMatch(v -> StringUtils.containsIgnoreCase(request.getRequestURI(), v))
-        //
-        ) {
-            //开启了限流功能WE
-            String visitorIp = HttpUtil.getVisitorIp(request);
-            RateLimiter rateLimiter = GuavaCache.get(visitorIp,
-                    () -> RateLimiter.create(coreproperties.getIpMaxVisitPerSecond()));
-            if (!rateLimiter.tryAcquire()) {
-                // 触发了限流
-                HttpUtils.write(request, response, Response.error("您的访问较为频繁，请稍后一段时间后再试"));
-                return;
+            ) {
+                //开启了限流功能WE
+                String visitorIp = HttpUtil.getVisitorIp(request);
+                RateLimiter rateLimiter = GuavaCache.get(visitorIp,
+                        () -> RateLimiter.create(coreproperties.getIpMaxVisitPerSecond()));
+                if (!rateLimiter.tryAcquire()) {
+                    // 触发了限流
+                    HttpUtils.write(request, response, Response.error("您的访问较为频繁，请稍后一段时间后再试"));
+                    return;
+                }
             }
+
+            filterChain.doFilter(request, response);
+        } finally {
+            ContextUser.clearRole();
         }
 
-        filterChain.doFilter(request, response);
+    }
+
+
+    private String currentRole(HttpServletRequest request) {
+        String currentRole = request.getHeader(Constant.CURRENT_ROLE);
+        if (StringUtils.isNotBlank(currentRole)) {
+            return currentRole.trim();
+        }
+        return request.getParameter(Constant.CURRENT_ROLE);
     }
 }

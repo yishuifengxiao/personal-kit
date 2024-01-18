@@ -18,22 +18,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class ContextUser {
 
-
+    private final static ThreadLocal<String> currentRole = new ThreadLocal<>();
     private static SysUserDao sysUserDao;
+
 
     public static SysUser currentUser() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Assert.isNotNull("当前用户还未登录或登录状态已过期", authentication);
         if (authentication instanceof SecurityToken securityToken) {
-            if (null != securityToken.getUserDetails()
-                    && securityToken.getUserDetails() instanceof CurrentUserDetails details) {
+            if (null != securityToken.getUserDetails() && securityToken.getUserDetails() instanceof CurrentUserDetails details) {
                 if (null != details) {
                     return (SysUser) details.getCurrentUser();
                 }
             }
         }
         SysUser sysUser = ContextUser.sysUserDao.findActiveSysUser(authentication.getName()).orElse(null);
-//        SysUser sysUser = GuavaCache.get(authentication.getName(), () -> ContextUser.sysUserDao.findActiveSysUser(authentication.getName()).orElse(null));
+//        SysUser sysUser = GuavaCache.get(authentication.getName(), () -> ContextUser.sysUserDao.findActiveSysUser
+//        (authentication.getName()).orElse(null));
         Assert.isNotNull("当前用户还未登录或登录状态已过期", sysUser);
         return sysUser;
     }
@@ -44,5 +45,17 @@ public class ContextUser {
 
     public ContextUser(SysUserDao sysUserDao) {
         ContextUser.sysUserDao = sysUserDao;
+    }
+
+    public static void setRole(String role) {
+        currentRole.set(role);
+    }
+
+    public static String getRole() {
+        return currentRole.get();
+    }
+
+    public static void clearRole() {
+        currentRole.remove();
     }
 }
