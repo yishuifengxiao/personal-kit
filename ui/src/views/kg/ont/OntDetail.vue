@@ -127,7 +127,6 @@
                   ref="dynamic_form_nest_item"
                   name="dynamic_form_nest_item"
                   :model="currentNode"
-                  @finish="onFinish"
                 >
                   <a-space
                     v-for="(nodeProperty, index) in currentNode.nodeProperties"
@@ -189,7 +188,7 @@
           </a-tab-pane>
           <!-- 代码编辑区 -->
         </a-tabs>
-        <div><a-divider /> <a-button type="primary" @click="onSaveAction">保存</a-button></div>
+        <div><a-divider /> <a-button type="primary" @click="onSaveAction">保存本体</a-button></div>
       </a-col>
       <!-- 右侧配置区 -->
     </a-row>
@@ -207,6 +206,7 @@
         position: absolute;
         border-radius: 10px;
       "
+      @mouseleave="isShowNodeOperateDialog = false"
     >
       <div style="line-height: 25px; padding-left: 10px; color: #888888; font-size: 12px">
         对这个节点进行操作：
@@ -266,13 +266,43 @@
         position: absolute;
       "
     >
-      <a-select style="width: 120px">
-        <a-select-option :value="item.id" v-for="item in relationNodes" :key="item.id">{{
-          item.text
-        }}</a-select-option>
-      </a-select>
+      <div style="display: inline-block">
+        <span style="display: inline-block">关系名称</span>
+        <a-input style="width: 200px" v-model:value="currentLine.text" placeholder="关系名称" />
+      </div>
+      <div style="display: inline-block; margin-left: 10px">
+        尾概念
+        <a-select style="width: 120px" v-model:value="currentLine.to">
+          <a-select-option :value="item.id" v-for="item in relationNodes" :key="item.id">{{
+            item.text
+          }}</a-select-option>
+        </a-select>
+      </div>
+      <div style="display: inline-block; margin-left: 10px">
+        <a-button type="primary" @click="doAddRelation">确认</a-button>
+      </div>
     </div>
     <!-- 添加关系弹窗 -->
+    <!-- 删除关系弹窗 -->
+    <div
+      v-if="isSHowDeleteRelationDialog"
+      :style="{
+        left: nodeMenuPanelPosition.x - 100 + 'px',
+        top: nodeMenuPanelPosition.y - 100 + 'px'
+      }"
+      style="
+        z-index: 999;
+        padding: 10px;
+        background-color: #ffffff;
+        border: #eeeeee solid 1px;
+        box-shadow: 0px 0px 8px #cccccc;
+        position: absolute;
+      "
+      @mouseleave="isSHowDeleteRelationDialog = false"
+    >
+      <div class="c-node-menu-item" @click.stop="deleteRelation('deleteRelation')">删除此关系</div>
+    </div>
+    <!-- 删除关系弹窗 -->
   </div>
 </template>
 
@@ -309,6 +339,10 @@ function color16() {
 }
 
 export default {
+  props: {
+    id: String,
+    isAdd: Boolean
+  },
   data() {
     const __graph_json_data = {
       rootId: '2',
@@ -324,10 +358,12 @@ export default {
       isShowNodeTipsPanel: false,
       isShowTipsPanel: false,
       isSHowAddRelationDialog: false, //添加关系弹窗
+      isSHowDeleteRelationDialog: false, // 删除关系弹窗
       currentNode: reactive({ nodeProperties: [] }),
-      currentLine:reactive({}),
+      currentLine: reactive({ from: 'a', to: 'c', text: 'line 2' }),
       activeKey: '1',
-      nodeMenuPanelPosition: { x: 0, y: 0 }
+      nodeMenuPanelPosition: { x: 0, y: 0 },
+      isUpdate: false
     }
   },
   computed: {
@@ -358,8 +394,11 @@ export default {
     onNodeClick(nodeObject, $event) {
       console.log('onNodeClick:', nodeObject)
     },
+    // 点击线条事件
     onLineClick(lineObject, linkObject, $event) {
-      console.log('onLineClick:', lineObject)
+      this.isShowNodeOperateDialog = false
+      this.currentLine = lineObject
+      this.isSHowDeleteRelationDialog = true
     },
     nodeSlotOver(nodeObject, $event) {
       console.log('nodeSlotOver:', nodeObject)
@@ -385,9 +424,9 @@ export default {
     },
     doAction(actionName) {
       this.isShowNodeOperateDialog = false
+      const currentNode = this.currentNode
       if ('deleteNode' === actionName) {
         alert('删除当前节点')
-        const currentNode = this.currentNode
         const nodes = this.graph_json_data.nodes
         const results = nodes.filter((v) => v.text !== currentNode.text)
         this.graph_json_data.nodes = results
@@ -396,11 +435,16 @@ export default {
         //添加关系
         this.isShowNodeOperateDialog = false
         this.isSHowAddRelationDialog = true
+        this.currentLine = reactive({
+          from: currentNode.id,
+          to: '',
+          text: '关系' + new Date().getTime()
+        })
       }
     },
     //点击画布事件
     onCanvasClick(e) {
-      debugger
+      // debugger
     },
     // 添加节点按钮
     addNodeAction() {
@@ -450,12 +494,46 @@ export default {
     },
     // 确定保存操作
     onSaveAction() {
+      if (!this.graph_json_data.graphName) {
+        this.$msg.error('本体名称不能为空')
+        return false
+      }
       const currentNode = this.currentNode
-      const nodes = this.graph_json_data.nodes.filter(
-        (v) => v.nodePropertyName !== currentNode.nodePropertyName
-      )
+      const nodes = this.graph_json_data.nodes.filter((v) => v.text != currentNode.text)
       nodes.push(currentNode)
       this.graph_json_data.nodes = nodes
+      this.render()
+      const url = this.isUpdate ? '/personkit/graph/ont/update' : '/personkit/graph/ont/save'
+      this.$http
+        .request({
+          url: url,
+          data: this.graph_json_data
+        })
+        .then((res) => {
+          this.isUpdate = true
+          this.$msg.success('保存成功')
+        })
+        .catch((err) => console.log(err))
+    },
+    //确认添加关系
+    doAddRelation() {
+      const currentLine = this.currentLine
+      const index = this.graph_json_data.lines.indexOf(currentLine)
+      if (index !== -1) {
+        this.graph_json_data.lines.splice(index, 1)
+      }
+      this.graph_json_data.lines.push(currentLine)
+      this.isSHowAddRelationDialog = false
+      this.render()
+    },
+    // 确认删除关系
+    deleteRelation() {
+      const currentLine = this.currentLine
+
+      const lines = this.graph_json_data.lines.filter(
+        (v) => v.from != currentLine.from || v.to != currentLine.to || v.text != currentLine.text
+      )
+      this.graph_json_data.lines = lines
       this.render()
     }
   },
@@ -484,12 +562,6 @@ export default {
       ]
     }
 
-    const formRef = ref()
-
-    const onFinish = (values) => {
-      console.log('Received values of form:', values)
-    }
-
     const selectOptions = ref([
       { value: 'TEXT', label: '字符串' },
       { value: 'LONG', label: '整数' },
@@ -501,11 +573,6 @@ export default {
 
     return {
       graphOptions,
-
-      formRef,
-
-      onFinish,
-
       selectOptions
     }
   },

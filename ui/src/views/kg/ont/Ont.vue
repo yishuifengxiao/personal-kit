@@ -81,7 +81,7 @@ export default defineComponent({
       this.query()
     },
     addDataSet() {
-      this.$router.push({ name: 'ontology_detail' })
+      this.$router.push({ name: 'ontology_detail', query: { isAdd: true } })
     },
     query() {
       this.$http
@@ -112,7 +112,10 @@ export default defineComponent({
     },
     //触发编辑操作
     doEdit(val) {
-      this.$router.push({ name: 'ontology_detail' })
+      const id = val.id
+      debugger
+
+      this.$router.push({ name: 'ontology_detail', query: { isAdd: false, id: id } })
     }
   },
   mounted() {
