@@ -3,7 +3,9 @@ package com.yishuifengxiao.tool.personalkit.web;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.GraphBuildRecord;
+import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.service.GraphBuildRecordService;
+import com.yishuifengxiao.tool.personalkit.service.GraphBuildService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,9 +26,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class BuildController {
     private final GraphBuildRecordService graphBuildRecordService;
 
+    private final GraphBuildService graphBuildService;
+
     @PostMapping("/page")
     public Page<GraphBuildRecord> findPage(@RequestBody PageQuery<GraphBuildRecord> pageQuery) {
 
         return graphBuildRecordService.findPage(pageQuery);
+    }
+
+    @PostMapping("/start")
+    public void start(@Valid @RequestBody IdReq param) {
+        graphBuildService.start(param.getId());
+    }
+
+    @PostMapping("/stop")
+    public void stop(@Valid @RequestBody IdReq param) {
+        graphBuildService.stop(param.getId());
     }
 }
