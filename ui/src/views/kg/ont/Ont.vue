@@ -30,10 +30,10 @@
           <template #actions>
             <setting-outlined key="setting" />
             <edit-outlined key="edit" @click="doEdit(item)" />
-            <delete-outlined key="ellipsis" />
+            <delete-outlined key="ellipsis" @click="doDelete(item)" />
           </template>
 
-          <a-card-meta :title="item.name" :description="item.description + item.createTime">
+          <a-card-meta :title="item.ontologyName" :description="item.description + item.createTime">
             <template #avatar>
               <a-avatar src="" />
             </template>
@@ -59,7 +59,7 @@
 <script>
 import { reactive, defineComponent } from 'vue'
 import { EditOutlined, SettingOutlined, DeleteOutlined } from '@ant-design/icons-vue'
-
+import { message } from 'ant-design-vue'
 import card_bg_url from '@/assets/images/graph/card_bg.png'
 
 export default defineComponent({
@@ -117,6 +117,21 @@ export default defineComponent({
       sessionStorage.setItem('ontId', id)
 
       this.$router.push({ name: 'ontology_detail', query: { isAdd: false, id: id } })
+    },
+    //删除本体
+    doDelete(item) {
+      this.$http
+        .request({
+          url: '/personkit/graph/ont/delete',
+          data: {
+            id: item.id
+          }
+        })
+        .then((res) => {
+          message.success('操作成功')
+          this.query();
+        })
+        .catch((err) => console.log(err))
     }
   },
   mounted() {

@@ -9,17 +9,18 @@ import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.dao.mongo.OntologyDao;
 import com.yishuifengxiao.tool.personalkit.dao.mongo.repository.GraphDefineRepository;
 import com.yishuifengxiao.tool.personalkit.dao.mongo.repository.OntologyRepository;
-import com.yishuifengxiao.tool.personalkit.domain.bo.GraphData;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.Ontology;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.support.ContextUser;
 import com.yishuifengxiao.tool.personalkit.tool.OntHelper;
 import jakarta.transaction.Transactional;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * @author yishui
@@ -45,28 +46,31 @@ public class OntologyService {
         return ontologyDao.findPage(param);
     }
 
-    public String save(GraphData param) {
+    public String save(Map<String, Object> param) {
+        String graphName = MapUtils.getString(param, "graphName");
         Assert.lteZero("已经存在相同名称的本体",
-                ontologyRepository.countAllByOntologyNameAndCreateUserId(param.getGraphName(),
+                ontologyRepository.countAllByOntologyNameAndCreateUserId(graphName,
                         ContextUser.currentUserId()));
 
 
         Ontology ontology = OntHelper.convert(param).setCreateUserId(ContextUser.currentUserId())
                 .setCreateTime(LocalDateTime.now())
                 .setVersion(NumberUtil.ZERO.intValue())
-                .setMaster(true);
+                .setMaster(true).setText(JsonUtil.toJSONString(param));
 
 
         ontologyRepository.save(ontology);
         return ontology.getId();
     }
 
-    public void update(GraphData param) {
-        Assert.isNotBlank("请选择一条更新记录", param.getId());
-        Ontology ontology = ontologyRepository.findById(param.getId()).orElseThrow(() -> new UncheckedException(
+    public void update(Map<String, Object> param) {
+        String id = MapUtils.getString(param, "id");
+        String graphName = MapUtils.getString(param, "graphName");
+        Assert.isNotBlank("请选择一条更新记录", id);
+        Ontology ontology = ontologyRepository.findById(id).orElseThrow(() -> new UncheckedException(
                 "记录不存在"));
         Assert.lteZero("本体正在被使用,不能进行更新", graphDefineRepository.countAllByOntologyId(ontology.getId()));
-        if (!StringUtils.equalsIgnoreCase(param.getGraphName(), ontology.getOntologyName())) {
+        if (!StringUtils.equalsIgnoreCase(graphName, ontology.getOntologyName())) {
             throw new UncheckedException("已经存在相同名称的本体");
         }
         Ontology ont = OntHelper.convert(param);
@@ -82,8 +86,8 @@ public class OntologyService {
         ontologyRepository.deleteById(param.getId());
     }
 
-    public GraphData detail(String id) {
+    public Object detail(String id) {
         Ontology ontology = ontologyRepository.findById(id).orElseThrow(() -> UncheckedException.of("记录不存在"));
-        return JsonUtil.str2Bean(ontology.getText(), GraphData.class);
+        return ontology.getText();
     }
 }

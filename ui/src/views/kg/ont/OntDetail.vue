@@ -556,8 +556,8 @@ export default {
             data: { id: this.ontId }
           })
           .then((res) => {
-            debugger
-            this.graph_json_data = res
+
+            this.graph_json_data = JSON.parse(res)
             this.render()
           })
           .catch((err) => console.log(err))

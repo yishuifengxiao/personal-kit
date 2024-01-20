@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 
 /**
  * @author yishui
@@ -36,8 +38,8 @@ public class OntologyController {
         return ontologyService.findPage(pageQuery);
     }
 
-    @PostMapping(value = "/save",produces = {"application/json;charset=utf-8"})
-    public String add(@RequestBody GraphData param) {
+    @PostMapping(value = "/save", produces = {"application/json;charset=utf-8"})
+    public String add(@RequestBody Map<String, Object> param) {
 
 
         String saved = ontologyService.save(param);
@@ -45,7 +47,7 @@ public class OntologyController {
     }
 
     @PostMapping("/update")
-    public void update(@RequestBody GraphData param) {
+    public void update(@RequestBody Map<String, Object> param) {
 
         ontologyService.update(param);
     }
@@ -57,7 +59,7 @@ public class OntologyController {
     }
 
     @PostMapping("/detail")
-    public GraphData detail(@Valid @RequestBody IdReq param) {
+    public Object detail(@Valid @RequestBody IdReq param) {
 
         return ontologyService.detail(param.getId());
     }
