@@ -25,9 +25,7 @@
                   @contextmenu.prevent.stop="showNodeMenus(node, $event)"
                   @mouseover="nodeSlotOver(node, $event)"
                   @mouseout="nodeSlotOut(node, $event)"
-                >
-                  <i style="font-size: 30px" :class="node.data.myicon" />
-                </div>
+                ></div>
                 <div
                   style="
                     color: forestgreen;
@@ -331,9 +329,9 @@ function jsonNode(json_data) {
 
 function color16() {
   //十六进制颜色随机
-  var r = Math.floor(Math.random() * 256)
-  var g = Math.floor(Math.random() * 256)
-  var b = Math.floor(Math.random() * 256)
+  var r = Math.floor(Math.random() * 255)
+  var g = Math.floor(Math.random() * 255)
+  var b = Math.floor(Math.random() * 255)
   var color = '#' + r.toString(16) + g.toString(16) + b.toString(16)
   return color
 }
@@ -341,7 +339,7 @@ function color16() {
 export default {
   props: {
     id: String,
-    isAdd: Boolean
+    isAdd: String
   },
   data() {
     const __graph_json_data = {
@@ -359,7 +357,7 @@ export default {
       isShowTipsPanel: false,
       isSHowAddRelationDialog: false, //添加关系弹窗
       isSHowDeleteRelationDialog: false, // 删除关系弹窗
-      currentNode: reactive({ nodeProperties: [] }),
+      currentNode: reactive({ nodeProperties: [], color: '#ffffff' }),
       currentLine: reactive({ from: 'a', to: 'c', text: 'line 2' }),
       activeKey: '1',
       nodeMenuPanelPosition: { x: 0, y: 0 },
@@ -378,6 +376,13 @@ export default {
     //可选的关系目标节点
     relationNodes: function () {
       return this.graph_json_data.nodes.filter((v) => v.text.length > 0)
+    },
+    ontId: function () {
+      return sessionStorage.getItem('ontId')
+    },
+    mode: function () {
+      const ontId = sessionStorage.getItem('ontId')
+      return typeof ontId != 'undefined' && ontId.length > 0
     }
   },
   methods: {
@@ -401,7 +406,7 @@ export default {
       this.isSHowDeleteRelationDialog = true
     },
     nodeSlotOver(nodeObject, $event) {
-      console.log('nodeSlotOver:', nodeObject)
+      // console.log('nodeSlotOver:', nodeObject)
       // const {id,text,styleClass,nodeShape,data}=
       this.currentNode = reactive(JSON.parse(jsonNode(nodeObject)))
       this.isShowNodeOperateDialog = false
@@ -411,12 +416,12 @@ export default {
       this.nodeMenuPanelPosition.y = $event.clientY
     },
     nodeSlotOut(nodeObject, $event) {
-      console.log('nodeSlotOut:', nodeObject)
+      // console.log('nodeSlotOut:', nodeObject)
       this.isShowNodeTipsPanel = false
     },
     showNodeMenus(nodeObject, $event) {
-      const _base_position = this.$refs.myPage.getBoundingClientRect()
-      console.log('showNodeMenus:', $event, _base_position)
+      // const _base_position = this.$refs.myPage.getBoundingClientRect()
+      // console.log('showNodeMenus:', $event, _base_position)
       this.nodeMenuPanelPosition.x = $event.clientX + 10
       this.nodeMenuPanelPosition.y = $event.clientY
       this.isShowNodeTipsPanel = false
@@ -498,19 +503,25 @@ export default {
         this.$msg.error('本体名称不能为空')
         return false
       }
+      if (this.mode) {
+        this.graph_json_data.id = this.ontId
+      }
       const currentNode = this.currentNode
+      if (!currentNode.id) {
+        currentNode.id = new Date().getTime() + ''
+      }
       const nodes = this.graph_json_data.nodes.filter((v) => v.text != currentNode.text)
       nodes.push(currentNode)
       this.graph_json_data.nodes = nodes
       this.render()
-      const url = this.isUpdate ? '/personkit/graph/ont/update' : '/personkit/graph/ont/save'
+      const url = this.mode ? '/personkit/graph/ont/update' : '/personkit/graph/ont/save'
       this.$http
         .request({
           url: url,
           data: this.graph_json_data
         })
         .then((res) => {
-          this.isUpdate = true
+          sessionStorage.setItem('ontId', res)
           this.$msg.success('保存成功')
         })
         .catch((err) => console.log(err))
@@ -529,16 +540,32 @@ export default {
     // 确认删除关系
     deleteRelation() {
       const currentLine = this.currentLine
-
       const lines = this.graph_json_data.lines.filter(
         (v) => v.from != currentLine.from || v.to != currentLine.to || v.text != currentLine.text
       )
       this.graph_json_data.lines = lines
       this.render()
+    },
+    //加载数据
+    load() {
+      if (this.mode) {
+        //更新操作
+        this.$http
+          .request({
+            url: '/personkit/graph/ont/detail',
+            data: { id: this.ontId }
+          })
+          .then((res) => {
+            debugger
+            this.graph_json_data = res
+            this.render()
+          })
+          .catch((err) => console.log(err))
+      }
     }
   },
   mounted() {
-    this.render()
+    this.load()
   },
   setup() {
     const graphOptions = {
@@ -552,7 +579,6 @@ export default {
       allowSwitchLineShape: true,
       allowSwitchJunctionPoint: true,
       moveToCenterWhenRefresh: true,
-
       layouts: [
         {
           label: '中心',

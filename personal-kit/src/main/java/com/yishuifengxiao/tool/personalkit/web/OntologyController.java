@@ -36,11 +36,12 @@ public class OntologyController {
         return ontologyService.findPage(pageQuery);
     }
 
-    @PostMapping("/save")
-    public void add(@RequestBody GraphData param) {
+    @PostMapping(value = "/save",produces = {"application/json;charset=utf-8"})
+    public String add(@RequestBody GraphData param) {
 
 
-        ontologyService.save(param);
+        String saved = ontologyService.save(param);
+        return saved;
     }
 
     @PostMapping("/update")

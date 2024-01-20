@@ -15,7 +15,7 @@
         <a-button type="primary" html-type="submit"> 搜索 </a-button>
       </a-form-item>
       <a-form-item>
-        <a-button type="primary" @click="addDataSet"> 添加本体 </a-button>
+        <a-button type="primary" @click="addOnt"> 添加本体 </a-button>
       </a-form-item>
     </a-form>
     <!-- 上部搜索条件区域 -->
@@ -80,7 +80,8 @@ export default defineComponent({
     handleFinish(val) {
       this.query()
     },
-    addDataSet() {
+    addOnt() {
+      sessionStorage.setItem('ontId', '')
       this.$router.push({ name: 'ontology_detail', query: { isAdd: true } })
     },
     query() {
@@ -113,7 +114,7 @@ export default defineComponent({
     //触发编辑操作
     doEdit(val) {
       const id = val.id
-      debugger
+      sessionStorage.setItem('ontId', id)
 
       this.$router.push({ name: 'ontology_detail', query: { isAdd: false, id: id } })
     }

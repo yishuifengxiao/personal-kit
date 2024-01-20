@@ -45,7 +45,7 @@ public class OntologyService {
         return ontologyDao.findPage(param);
     }
 
-    public void save(GraphData param) {
+    public String save(GraphData param) {
         Assert.lteZero("已经存在相同名称的本体",
                 ontologyRepository.countAllByOntologyNameAndCreateUserId(param.getGraphName(),
                         ContextUser.currentUserId()));
@@ -58,9 +58,11 @@ public class OntologyService {
 
 
         ontologyRepository.save(ontology);
+        return ontology.getId();
     }
 
     public void update(GraphData param) {
+        Assert.isNotBlank("请选择一条更新记录", param.getId());
         Ontology ontology = ontologyRepository.findById(param.getId()).orElseThrow(() -> new UncheckedException(
                 "记录不存在"));
         Assert.lteZero("本体正在被使用,不能进行更新", graphDefineRepository.countAllByOntologyId(ontology.getId()));

@@ -2,6 +2,7 @@ package com.yishuifengxiao.tool.personalkit.tool;
 
 import com.yishuifengxiao.common.tool.collections.DataUtil;
 import com.yishuifengxiao.common.tool.collections.JsonUtil;
+import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.tool.personalkit.domain.bo.GraphData;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.Ontology;
 import org.apache.commons.collections4.MapUtils;
@@ -20,8 +21,11 @@ import java.util.stream.Collectors;
 public class OntHelper {
 
     public static Ontology convert(GraphData graphData) {
+        if (StringUtils.isBlank(graphData.getId())) {
+            graphData.setId(IdWorker.snowflakeStringId());
+        }
         Ontology ontology = new Ontology();
-        ontology.setOntologyName(graphData.getGraphName()).setDescription(graphData.getDescription());
+        ontology.setOntologyName(graphData.getGraphName()).setDescription(graphData.getDescription()).setId(graphData.getId());
 
         List<Ontology.Node> nodes = DataUtil.stream(graphData.getNodes()).map(v -> {
             String nodeName = v.getText();
