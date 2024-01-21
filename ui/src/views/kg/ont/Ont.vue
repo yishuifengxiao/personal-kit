@@ -28,7 +28,7 @@
             <img alt="example" :src="card_bg_url" />
           </template>
           <template #actions>
-            <setting-outlined key="setting" />
+ 
             <edit-outlined key="edit" @click="doEdit(item)" />
             <delete-outlined key="ellipsis" @click="doDelete(item)" />
           </template>

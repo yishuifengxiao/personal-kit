@@ -46,12 +46,15 @@ public class OntHelper {
 
         List<Ontology.Edge> edges = DataUtil.stream(lines).map(v -> {
             String edgeName = v.getText();
-            String fromNodeName = DataUtil.stream(graphNodes).filter(s -> StringUtils.equals(s.getText(),
+            String fromNodeName = DataUtil.stream(graphNodes).filter(s -> StringUtils.equals(s.getId(),
                     v.getFrom())).findFirst().map(GraphData.Node::getText).orElse(null);
-            String toNodeName = DataUtil.stream(graphNodes).filter(s -> StringUtils.equals(s.getText(),
-                    v.getFrom())).findFirst().map(GraphData.Node::getText).orElse(null);
+            String toNodeName = DataUtil.stream(graphNodes).filter(s -> StringUtils.equals(s.getId(),
+                    v.getTo())).findFirst().map(GraphData.Node::getText).orElse(null);
+            if (StringUtils.isNoneBlank(edgeName, fromNodeName, toNodeName)) {
+                return null;
+            }
             return new Ontology.Edge(edgeName, fromNodeName, toNodeName);
-        }).collect(Collectors.toList());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
         ontology.setNodes(nodes);
         ontology.setEdges(edges);
         ontology.setText(JsonUtil.toJSONString(graphData));
