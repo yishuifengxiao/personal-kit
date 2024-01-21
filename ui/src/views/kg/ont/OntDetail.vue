@@ -338,7 +338,7 @@ function color16() {
     Math.floor(Math.random() * 15).toString(16) +
     Math.floor(Math.random() * 15).toString(16) +
     Math.floor(Math.random() * 15).toString(16)
-    console.log("-------------------> color = "+color);
+  console.log('-------------------> color = ' + color)
   return color
 }
 
@@ -384,11 +384,14 @@ export default {
       return this.graph_json_data.nodes.filter((v) => v.text.length > 0)
     },
     ontId: function () {
-      return sessionStorage.getItem('ontId')
+      const ontId = sessionStorage.getItem('ontId')
+      if (typeof ontId != 'undefined' && ontId.length > 0) {
+        return ontId
+      }
+      return typeof this.id != 'undefined' ? this.id : ''
     },
     mode: function () {
-      const ontId = sessionStorage.getItem('ontId')
-      return typeof ontId != 'undefined' && ontId.length > 0
+      return this.ontId.length > 0
     }
   },
   methods: {
