@@ -6,12 +6,14 @@ import com.yishuifengxiao.common.tool.collections.JsonUtil;
 import com.yishuifengxiao.tool.personalkit.domain.bo.GraphData;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.Ontology;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author yishui
@@ -25,6 +27,7 @@ public class OntHelper {
         String id = MapUtils.getString(graphData, "id");
         String graphName = MapUtils.getString(graphData, "graphName");
         String description = MapUtils.getString(graphData, "description");
+
         Ontology ontology = new Ontology();
         ontology.setOntologyName(graphName).setDescription(description).setId(id);
         List<GraphData.Node> graphNodes = JSONArray.parseArray(JSONArray.toJSONString(graphData.get("nodes")),
@@ -53,5 +56,12 @@ public class OntHelper {
         ontology.setEdges(edges);
         ontology.setText(JsonUtil.toJSONString(graphData));
         return ontology;
+    }
+
+    private String randomColor() {
+        StringBuilder sb = new StringBuilder("#");
+        IntStream.range(0, 3).mapToObj(v -> Integer.toHexString(RandomUtils.nextInt(0, 15))).forEach(sb::append);
+        String color = sb.toString();
+        return color;
     }
 }

@@ -6,7 +6,6 @@ import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.security.support.SecurityEvent;
 import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.security.token.SecurityToken;
-import com.yishuifengxiao.common.security.token.authentication.SimpleWebAuthenticationDetails;
 import com.yishuifengxiao.common.tool.collections.DataUtil;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.common.tool.utils.ExceptionUtil;
@@ -58,14 +57,6 @@ public class SecurityEventListener {
             if (authentication instanceof SecurityToken) {
                 SecurityToken securityToken = (SecurityToken) authentication;
                 tokenVal = securityToken.getValue();
-            } else {
-                if (null != authentication.getDetails() && authentication.getDetails() instanceof SimpleWebAuthenticationDetails) {
-                    SimpleWebAuthenticationDetails details = (SimpleWebAuthenticationDetails) authentication.getDetails();
-                    if (null != details && null != details.getToken()) {
-                        tokenVal = details.getToken().getValue();
-                    }
-                }
-
             }
         }
 

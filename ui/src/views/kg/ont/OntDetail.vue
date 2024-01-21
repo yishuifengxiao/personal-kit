@@ -329,10 +329,16 @@ function jsonNode(json_data) {
 
 function color16() {
   //十六进制颜色随机
-  var r = Math.floor(Math.random() * 255)
-  var g = Math.floor(Math.random() * 255)
-  var b = Math.floor(Math.random() * 255)
-  var color = '#' + r.toString(16) + g.toString(16) + b.toString(16)
+
+  var color =
+    '#' +
+    Math.floor(Math.random() * 15).toString(16) +
+    Math.floor(Math.random() * 15).toString(16) +
+    Math.floor(Math.random() * 15).toString(16) +
+    Math.floor(Math.random() * 15).toString(16) +
+    Math.floor(Math.random() * 15).toString(16) +
+    Math.floor(Math.random() * 15).toString(16)
+    console.log("-------------------> color = "+color);
   return color
 }
 
@@ -346,7 +352,7 @@ export default {
       rootId: '2',
       graphName: '',
       description: '',
-      nodes: [{ id: 'root', opacity: 0, text: '' }],
+      nodes: [{ id: 'root', opacity: 0, text: '', isHide: true }],
       lines: []
     }
     return {
@@ -391,7 +397,7 @@ export default {
         // 这些写上当图谱初始化完成后需要执行的代码
         if (typeof nodeId != 'undefined' && nodeId.length > 0) {
           //   //根据节点id在图谱中选中该节点并居中;
-          graphInstance.focusNodeById(nodeId)
+          // graphInstance.focusNodeById(nodeId)
         }
       })
     },
@@ -458,6 +464,7 @@ export default {
       const currentNode = {
         id: nodeId,
         text: '节点-' + random,
+        isHide: false,
         color: color16(),
         data: { myicon: 'el-icon-star-on', nodeProperties: [] }
       }
@@ -556,7 +563,6 @@ export default {
             data: { id: this.ontId }
           })
           .then((res) => {
-
             this.graph_json_data = JSON.parse(res)
             this.render()
           })
