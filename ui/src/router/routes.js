@@ -90,6 +90,16 @@ const routes = [{
 					label: "本体管理",
 					breadcrumbName: ["知识图谱", "图谱中心", "图谱管理"]
 				}
+			}, {
+
+				path: 'graph_config',
+				name: "graph_config",
+				component: () => import('@/views/kg/graph/GraphConfig.vue'),
+
+				meta: {
+					label: "本体管理",
+					breadcrumbName: ["知识图谱", "图谱中心", "图谱配置"]
+				}
 			},
 		]
 	}
