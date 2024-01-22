@@ -35,7 +35,7 @@
 	export default defineComponent({
 		data() {
 			return {
-
+				isUpdate: false
 			}
 		},
 		computed: {
@@ -52,7 +52,7 @@
 			handleSearch(val) {
 				this.$http
 					.request({
-						url: '/personkit/data/center/upload/page',
+						url: '/personkit/data/center/file/page',
 						data: {
 							num: 1,
 							query: {
@@ -72,12 +72,31 @@
 					.validate()
 					.then((res) => {
 						console.info('-=-=-=-=通过' + JSON.stringify(res))
-						this.addDataSet(res)
+						if (this.isUpdate) {
+							this.updateData(Object.assign(this.formState, res));
+						} else {
+							this.addDataSet(Object.assign(this.formState, res))
+						}
+
 					})
 					.catch((err) => {
 						console.info('不通过', err)
 					})
 			},
+			//更新数据
+			updateData(val) {
+				this.$http
+					.request({
+						url: '/personkit/data/dataSet/update',
+						data: val
+					})
+					.then((res) => {
+						this.open = false
+						this.$emit('ok')
+						this.$msg.success('更新成功')
+					})
+			},
+			// 添加数据
 			addDataSet(val) {
 				const that = this
 				this.$http
@@ -112,9 +131,9 @@
 			},
 			showDrawer(param) {
 				this.title = typeof param === 'undefined' ? '添加数据集' : '编辑数据集'
+				this.isUpdate = typeof param != 'undefined';
 				if (typeof param != 'undefined') {
 					this.formState.id = param.id
-
 					console.log('-----------------------' + JSON.stringify(param))
 					this.load()
 				} else {

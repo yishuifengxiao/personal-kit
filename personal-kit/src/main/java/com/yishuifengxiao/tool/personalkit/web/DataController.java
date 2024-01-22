@@ -2,6 +2,7 @@ package com.yishuifengxiao.tool.personalkit.web;
 
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
+import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyRow;
@@ -40,6 +41,12 @@ public class DataController {
     public Page<DiskUploadRecordVo> reacordPage(@RequestBody PageQuery<DiskUploadRecord> pageQuery) {
 
         return dataCenterService.findPageDataRecord(pageQuery);
+    }
+
+    @PostMapping("/file/page")
+    public Page<DiskFile> filesPage(@RequestBody PageQuery<DiskFile> pageQuery) {
+
+        return dataCenterService.findPageDiskFile(pageQuery);
     }
 
     @PostMapping("/struct")
