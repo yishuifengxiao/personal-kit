@@ -19,7 +19,8 @@ router.beforeEach(async (to, from) => {
   // 路由守卫 https://router.vuejs.org/zh/guide/advanced/navigation-guards.html
   const store = useUserStore()
   const isLogin = store.isLogin
-  if (to.meta.requiresAuth) {
+  // 只有明确说明不需要登录的页面才不拦截
+  if (typeof to.meta.requiresAuth==="undefined" || to.meta.requiresAuth) {
     // 需要登录
     if (
       // 检查用户是否已登录
@@ -34,6 +35,7 @@ router.beforeEach(async (to, from) => {
     }
   }
   const matched = to.matched
+
   let paths = new Array()
   if (null != matched && typeof matched != 'undefined') {
     matched.forEach((route) => {

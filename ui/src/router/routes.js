@@ -10,7 +10,7 @@ const routes = [{
         name: 'login',
         component: () => import('@/views/Login.vue'),
         meta: {
-            requiresAuth: true
+            requiresAuth: false
         }
     },
     {
