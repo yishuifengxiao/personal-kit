@@ -6,6 +6,7 @@ import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
 import com.yishuifengxiao.common.tool.lang.NumberUtil;
+import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.dao.mongo.GraphDefineDao;
 import com.yishuifengxiao.tool.personalkit.dao.mongo.repository.*;
@@ -65,14 +66,16 @@ public class GraphService {
         });
     }
 
-    public void save(GraphDefine param) {
+    public String save(GraphDefine param) {
         Assert.lteZero("已经存在相同名称的图谱", graphDefineRepository.countAllByGraphNameAndCreateUserId(param.getGraphName(),
                 ContextUser.currentUserId()));
         param.setCreateUserId(ContextUser.currentUserId()).setCreateTime(LocalDateTime.now()).setVersion(NumberUtil.ZERO.intValue()).setMaster(true);
+        param.setId(IdWorker.snowflakeStringId());
         graphDefineRepository.save(param);
+        return param.getId();
     }
 
-    public void update(GraphDefine param) {
+    public String update(GraphDefine param) {
 
         GraphDefine graphDefine = validate(param.getId());
         if (!StringUtils.equalsIgnoreCase(graphDefine.getGraphName(), param.getGraphName())) {
@@ -82,6 +85,7 @@ public class GraphService {
         }
         graphDefine.setGraphName(param.getGraphName()).setDescription(param.getDescription()).setOntologyId(param.getOntologyId());
         graphDefineRepository.save(graphDefine);
+        return param.getId();
     }
 
     public void delete(IdReq param) {

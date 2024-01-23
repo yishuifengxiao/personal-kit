@@ -39,15 +39,17 @@ public class GraphController {
     }
 
     @PostMapping("/save")
-    public void add(@RequestBody GraphDefine param) {
+    public String add(@RequestBody GraphDefine param) {
 
-        graphService.save(param);
+        String saved = graphService.save(param);
+        return saved;
     }
 
     @PostMapping("/update")
-    public void update(@RequestBody GraphDefine param) {
+    public String update(@RequestBody GraphDefine param) {
 
-        graphService.update(param);
+        String saved = graphService.update(param);
+        return saved;
     }
 
     @PostMapping("/delete")

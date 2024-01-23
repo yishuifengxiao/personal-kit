@@ -79,7 +79,6 @@ public class GraphDefine implements Serializable {
         private String virtuallyFileId;
         private String virtuallyFileName;
         private String nodeName;
-        private Boolean isStruct;
         private List<DataMapping> dataMappings;
     }
 

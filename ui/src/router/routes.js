@@ -94,11 +94,23 @@ const routes = [{
 
 				path: 'graph_config',
 				name: "graph_config",
-				component: () => import('@/views/kg/graph/GraphConfig.vue'),
+				component: () => import('@/views/kg/graph/GraphConfigOnt.vue'),
 
 				meta: {
 					label: "本体管理",
-					breadcrumbName: ["知识图谱", "图谱中心", "图谱配置"]
+					breadcrumbName: ["知识图谱", "图谱中心", "图谱配置", "配置本体"]
+				}
+			}, {
+
+				path: 'graph_config_data',
+				name: "graph_config_data",
+				component: () => import('@/views/kg/graph/GraphConfigData.vue'),
+				props: route => ({
+					id: route.query.id
+				}),
+				meta: {
+					label: "本体管理",
+					breadcrumbName: ["知识图谱", "图谱中心", "图谱配置", "配置数据源"]
 				}
 			},
 		]

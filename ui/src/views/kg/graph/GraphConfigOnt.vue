@@ -1,6 +1,7 @@
 <template>
 	<div style="height: 100%;">
 		<a-steps type="navigation" :current="0" :items="steps"></a-steps>
+		<a-divider></a-divider>
 		<a-row style="height: 89%;">
 			<!-- 左侧图谱区域 -->
 			<a-col :span="12" style="height: 100%;">
@@ -36,14 +37,34 @@
 				<a-row>
 					<a-col :span="20" :offset="2">
 						<div>
+							图谱名称: <a-input v-model:value="graphOptions.graphName" style="width: 90%;"
+								placeholder="图谱名称" />
+						</div>
+					</a-col>
+				</a-row>
+				<a-row style="margin-top: 1rem;">
+					<a-col :span="20" :offset="2">
+						<div>
+							图谱描述: <a-textarea v-model:value="graphOptions.description" style="width: 90%;"
+								placeholder="图谱描述" :auto-size="{ minRows: 4, maxRows: 6 }" />
+						</div>
+					</a-col>
+				</a-row>
+				<a-row style="margin-top: 1rem;">
+					<a-col :span="20" :offset="2">
+						<div>
 							选择本体: <a-select ref="select" placeholder="选择本体" @search="handleSearch" show-search
-								v-model:value="value1" style="width: 320px" :options="ontOptions"
+								v-model:value="ontId" style="width: 90%;" :options="ontOptions"
 								@change="onOntValChange"></a-select>
 						</div>
 					</a-col>
 				</a-row>
 
-
+				<a-row style="margin-top: 3rem;">
+					<a-col :span="20" :offset="2">
+						<a-button type="primary" @click="nextStep">保存配置</a-button>
+					</a-col>
+				</a-row>
 
 			</a-col>
 			<!-- 右侧配置区域 -->
@@ -54,19 +75,39 @@
 <script>
 	import {
 		defineComponent,
-		reactive
+		reactive,
+		ref
 	} from 'vue'
-
+	// https://www.relation-graph.com/#/docs/start-vue3
+	import RelationGraph from 'relation-graph/vue3'
 	export default defineComponent({
+		props: {
+			id: String,
+		},
 		data() {
 			return {
-				ontOptions: reactive([])
+				ontId: ref(""),
+				ontOptions: reactive([]),
+				graphOptions: reactive({})
 			}
 		},
 		methods: {
 			//选择本体
 			onOntValChange(val) {
-				debugger;
+				this.ontId = ref(val)
+
+				this.$http
+					.request({
+						url: '/personkit/graph/ont/detail',
+						data: {
+							id: val
+						}
+					})
+					.then((res) => {
+						this.graphOptions = reactive(JSON.parse(res))
+						this.$refs.graphRef.setJsonData(this.graphOptions)
+					})
+					.catch((err) => console.log(err))
 			},
 			//搜索本体
 			handleSearch(val) {
@@ -91,8 +132,41 @@
 						this.ontOptions = reactive(opts);
 					})
 					.catch((err) => console.log(err))
-			}
+			},
+			//选择节点
+			onNodeClick(val) {
+				debugger
+			},
+			//下一步
+			nextStep() {
+				if (!this.graphOptions.graphName) {
+					this.$msg.error("图谱名称不能为空");
+					return false
+				}
 
+				if (this.ontId.length === 0) {
+					this.$msg.error("请先配置本体");
+					return false
+				}
+				const url = this.id ? "/personkit/graph/define/update" : '/personkit/graph/define/save'
+
+				//新增
+				this.$http
+					.request({
+						url: url,
+						data: this.graphOptions
+					})
+					.then((res) => {
+						this.$router.push({
+							name: "graph_config_data",
+							query: {
+								ontId: res
+							}
+						})
+					})
+					.catch((err) => console.log(err))
+
+			}
 		},
 		mounted() {
 			this.handleSearch('')
@@ -142,6 +216,9 @@
 				steps,
 				graphOptions
 			}
+		},
+		components: {
+			RelationGraph
 		}
 	})
 </script>
