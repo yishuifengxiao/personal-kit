@@ -16,8 +16,12 @@
 				</a-row>
 				<a-divider></a-divider>
 				<a-tabs v-model:activeKey="activeKey">
+					<!-- 结构化数据抽取 -->
 					<a-tab-pane key="1" tab="结构化数据抽取">Content of Tab Pane 1</a-tab-pane>
+					<!-- 结构化数据抽取 -->
+					<!-- 非结构化数据抽取 -->
 					<a-tab-pane key="2" tab="非结构化数据抽取" force-render>Content of Tab Pane 2</a-tab-pane>
+					<!-- 非结构化数据抽取 -->
 				</a-tabs>
 			</a-col>
 			<!-- 左侧图谱区域 -->
