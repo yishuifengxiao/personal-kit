@@ -2,7 +2,6 @@ package com.yishuifengxiao.tool.personalkit.web;
 
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
-import com.yishuifengxiao.tool.personalkit.domain.bo.GraphData;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.Ontology;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.service.OntologyService;

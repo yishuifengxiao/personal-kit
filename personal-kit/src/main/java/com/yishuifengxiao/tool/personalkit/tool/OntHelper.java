@@ -4,7 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.yishuifengxiao.common.tool.collections.DataUtil;
 import com.yishuifengxiao.common.tool.collections.JsonUtil;
-import com.yishuifengxiao.tool.personalkit.domain.bo.GraphData;
+import com.yishuifengxiao.common.tool.encoder.Md5;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.Ontology;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -28,43 +28,51 @@ public class OntHelper {
         String id = MapUtils.getString(graphData, "id");
         String graphName = MapUtils.getString(graphData, "graphName");
         String description = MapUtils.getString(graphData, "description");
-
         Ontology ontology = new Ontology();
         ontology.setOntologyName(graphName).setDescription(description).setId(id);
-        List<GraphData.Node> graphNodes = JSONArray.parseArray(JSONArray.toJSONString(graphData.get("nodes")),
-                GraphData.Node.class);
-        List<GraphData.Line> lines = JSONArray.parseArray(JSONArray.toJSONString(graphData.get("lines")),
-                GraphData.Line.class);
-        List<Ontology.Node> nodes = DataUtil.stream(graphNodes).map(v -> {
-            String nodeName = v.getText();
-            List<Ontology.NodeProperty> nodeProperties = JsonUtil.str2List(MapUtils.getString(v.getData(),
-                    GraphData.NODE_PROPERTIES), Ontology.NodeProperty.class);
-            List<Ontology.NodeProperty> properties =
-                    DataUtil.stream(nodeProperties).filter(Objects::nonNull).filter(s -> StringUtils.isNotBlank(s.getNodePropertyName()) && null != s.getDataType())
-                            .distinct().collect(Collectors.toList());
-            return new Ontology.Node(nodeName, properties);
-        }).filter(Objects::nonNull).collect(Collectors.toList());
 
-        List<Ontology.Edge> edges = DataUtil.stream(lines).map(v -> {
-            String edgeName = v.getText();
-            String fromNodeName = DataUtil.stream(graphNodes).filter(s -> StringUtils.equals(s.getId(),
-                    v.getFrom())).findFirst().map(GraphData.Node::getText).orElse(null);
-            String toNodeName = DataUtil.stream(graphNodes).filter(s -> StringUtils.equals(s.getId(),
-                    v.getTo())).findFirst().map(GraphData.Node::getText).orElse(null);
-            if (StringUtils.isNoneBlank(edgeName, fromNodeName, toNodeName)) {
-                return null;
-            }
-            return new Ontology.Edge(edgeName, fromNodeName, toNodeName);
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+        // 解析节点
+        List<Ontology.Node> nodes =
+                JSONArray.parseArray(JSONArray.toJSONString(graphData.get("nodes"))).stream().map(v -> {
+                    JSONObject jsonObject = JSONObject.from(v);
+                    String nodeId = jsonObject.getString("id");
+                    if (StringUtils.equals(nodeId, "root")) {
+                        return null;
+                    }
+
+                    String nodeName = jsonObject.getString("text");
+                    if (StringUtils.isBlank(nodeName)) {
+                        return null;
+                    }
+                    if (StringUtils.isBlank(nodeId)) {
+                        nodeId = Md5.md5Short(nodeName);
+                    }
 
 
-        Object nodeList = graphData.get("nodes");
-        if (nodeList != null && nodeList instanceof List<?> list) {
-            List<JSONObject> nodeMapList =
-                    list.stream().map(JSONObject::from).filter(v -> StringUtils.isNotBlank(v.getString("text")) && StringUtils.equals("root", String.valueOf(v.get("id")))).collect(Collectors.toList());
-            graphData.put("nodes", nodeMapList);
-        }
+                    Ontology.Node node = new Ontology.Node();
+                    node.setNodeName(nodeName).setNodeId(nodeId);
+                    JSONObject data = jsonObject.getJSONObject("data");
+                    if (null != data && null != data.getJSONArray("nodeProperties")) {
+                        List<Ontology.NodeProperty> nodeProperties =
+                                data.getJSONArray("nodeProperties").stream().map(s -> JSONObject.from(s).to(Ontology.NodeProperty.class)).collect(Collectors.toList());
+                        node.setNodeProperties(nodeProperties);
+                    }
+                    return node;
+                }).filter(Objects::nonNull).collect(Collectors.toList());
 
+        List<Ontology.Edge> edges =
+                JSONArray.parseArray(JSONArray.toJSONString(graphData.get("lines"))).stream().map(v -> {
+                    JSONObject jsonObject = JSONObject.from(v);
+                    String edgeName = jsonObject.getString("text");
+                    String fromNodeName = DataUtil.stream(nodes).filter(s -> StringUtils.equals(s.getNodeId(),
+                            jsonObject.getString("from"))).findFirst().map(Ontology.Node::getNodeName).orElse(null);
+                    String toNodeName = DataUtil.stream(nodes).filter(s -> StringUtils.equals(s.getNodeId(),
+                            jsonObject.getString("to"))).findFirst().map(Ontology.Node::getNodeName).orElse(null);
+                    if (StringUtils.isNoneBlank(edgeName, fromNodeName, toNodeName)) {
+                        return null;
+                    }
+                    return new Ontology.Edge(edgeName, fromNodeName, toNodeName);
+                }).filter(Objects::nonNull).collect(Collectors.toList());
         ontology.setNodes(nodes);
         ontology.setEdges(edges);
         ontology.setText(JsonUtil.toJSONString(graphData));

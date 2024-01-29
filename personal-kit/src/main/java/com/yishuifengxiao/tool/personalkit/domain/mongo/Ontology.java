@@ -61,6 +61,9 @@ public class Ontology implements Serializable {
     @NoArgsConstructor
     @Accessors(chain = true)
     public static class Node implements Serializable {
+
+        private String nodeId;
+
         private String nodeName;
 
         private List<NodeProperty> nodeProperties;
