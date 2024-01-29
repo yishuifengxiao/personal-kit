@@ -1,6 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.tool;
 
 import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.yishuifengxiao.common.tool.collections.DataUtil;
 import com.yishuifengxiao.common.tool.collections.JsonUtil;
 import com.yishuifengxiao.tool.personalkit.domain.bo.GraphData;
@@ -55,6 +56,15 @@ public class OntHelper {
             }
             return new Ontology.Edge(edgeName, fromNodeName, toNodeName);
         }).filter(Objects::nonNull).collect(Collectors.toList());
+
+
+        Object nodeList = graphData.get("nodes");
+        if (nodeList != null && nodeList instanceof List<?> list) {
+            List<JSONObject> nodeMapList =
+                    list.stream().map(JSONObject::from).filter(v -> StringUtils.isNotBlank(v.getString("text")) && StringUtils.equals("root", String.valueOf(v.get("id")))).collect(Collectors.toList());
+            graphData.put("nodes", nodeMapList);
+        }
+
         ontology.setNodes(nodes);
         ontology.setEdges(edges);
         ontology.setText(JsonUtil.toJSONString(graphData));
