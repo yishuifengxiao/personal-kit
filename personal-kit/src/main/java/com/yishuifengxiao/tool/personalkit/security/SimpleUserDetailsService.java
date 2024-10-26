@@ -1,8 +1,8 @@
 package com.yishuifengxiao.tool.personalkit.security;
 
 import com.yishuifengxiao.common.security.user.CurrentUserDetails;
+import com.yishuifengxiao.common.tool.codec.DES;
 import com.yishuifengxiao.common.tool.collections.DataUtil;
-import com.yishuifengxiao.common.tool.encoder.DES;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;

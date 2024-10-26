@@ -4,7 +4,6 @@ import com.google.common.util.concurrent.RateLimiter;
 import com.yishuifengxiao.common.guava.GuavaCache;
 import com.yishuifengxiao.common.tool.collections.DataUtil;
 import com.yishuifengxiao.common.tool.entity.Response;
-import com.yishuifengxiao.common.tool.http.HttpUtil;
 import com.yishuifengxiao.common.utils.HttpUtils;
 import com.yishuifengxiao.tool.personalkit.config.CoreProperties;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
@@ -47,7 +46,7 @@ public class CacheRateLimiterFilter extends OncePerRequestFilter {
                 //
             ) {
                 //开启了限流功能WE
-                String visitorIp = HttpUtil.getVisitorIp(request);
+                String visitorIp = HttpUtils.getVisitorIp(request);
                 RateLimiter rateLimiter = GuavaCache.get(visitorIp,
                         () -> RateLimiter.create(coreproperties.getIpMaxVisitPerSecond()));
                 if (!rateLimiter.tryAcquire()) {

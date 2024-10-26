@@ -5,7 +5,6 @@ import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.holder.TokenHolder;
 import com.yishuifengxiao.common.support.SpringContext;
-import com.yishuifengxiao.common.tool.collections.MapUtil;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.vo.LoginVo;
@@ -83,11 +82,12 @@ public class IndexController {
             headerMap.put(element, header);
         }
 
-        Map map = MapUtil.map().put("requestURL", requestURL).put("requestURI", requestURI).put("contextPath",
-                contextPath).put("servletPath", servletPath).put("parameterMap", parameterMap).put("headerMap",
-                headerMap).build();
+        Map map = Map.of("requestURL", requestURL, "requestURI", requestURI, "contextPath",
+                contextPath, "servletPath", servletPath, "parameterMap", parameterMap, "headerMap",
+                headerMap);
         return map;
     }
+
 
 
     @PostMapping("/login")
@@ -97,7 +97,8 @@ public class IndexController {
 
         try {
             LoginVo loginVo = userService.login(request, response, query);
-            SpringContext.publishEvent(new SecurityEvent(this, request, response, Strategy.AUTHENTICATION_SUCCESS,
+            SpringContext.publishEvent(new SecurityEvent(this, request, response,
+                    Strategy.AUTHENTICATION_SUCCESS,
                     loginVo.getSecurityToken(), null));
 
             return loginVo;

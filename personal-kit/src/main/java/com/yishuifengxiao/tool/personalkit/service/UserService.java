@@ -6,7 +6,7 @@ import com.yishuifengxiao.common.security.constant.TokenConstant;
 import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.TokenUtil;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
-import com.yishuifengxiao.common.tool.encoder.DES;
+import com.yishuifengxiao.common.tool.codec.DES;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
 import com.yishuifengxiao.common.tool.utils.Assert;

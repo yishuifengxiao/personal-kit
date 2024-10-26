@@ -1,8 +1,8 @@
 package com.yishuifengxiao.tool.personalkit.support;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
+import com.yishuifengxiao.common.tool.codec.Md5;
 import com.yishuifengxiao.common.tool.collections.DataUtil;
-import com.yishuifengxiao.common.tool.encoder.Md5;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
@@ -33,7 +33,7 @@ import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.DEFAU
  * @date 2023/11/7-19:37
  * @since 1.0.0
  */
-@Component("resourceInitializer")
+//@Component("resourceInitializer")
 public class ResourceInitializer implements CommandLineRunner {
     private boolean hasInit = false;
     private final static List<String> sets = Arrays.asList("springfox.documentation", "org.springframework");

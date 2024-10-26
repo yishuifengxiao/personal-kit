@@ -1,6 +1,6 @@
 package com.yishuifengxiao.tool.personalkit;
 
-import com.yishuifengxiao.common.tool.encoder.DES;
+import com.yishuifengxiao.common.tool.codec.DES;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 
 /**

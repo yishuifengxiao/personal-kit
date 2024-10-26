@@ -3,7 +3,7 @@ package com.yishuifengxiao.tool.personalkit.event;
 import com.google.common.eventbus.Subscribe;
 import com.yishuifengxiao.common.guava.EventPublisher;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
-import com.yishuifengxiao.common.tool.encoder.Md5;
+import com.yishuifengxiao.common.tool.codec.Md5;
 import com.yishuifengxiao.common.tool.io.IoUtil;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.tool.personalkit.domain.bo.FileAnalysisEvent;

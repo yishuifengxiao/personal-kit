@@ -39,7 +39,7 @@ public class CellHelper {
             //手机
             return new VirtuallyRow.ExcelCell(columnIndex, columnName, text.trim(), null, null, true, DataType.TEXT);
         }
-        BigDecimal number = NumberUtil.parse(text.trim(),null);
+        BigDecimal number = NumberUtil.parse(text.trim()).orElse(null);
         if (null != number) {
             return new VirtuallyRow.ExcelCell(columnIndex, columnName, text.trim(),
                     number, null, true, text.trim().contains(OsUtils.SPOT) ?

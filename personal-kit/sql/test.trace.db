@@ -1,228 +1,390 @@
-2023-11-07 11:06:23 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLNonTransientException: Unknown data type: "DEFAULT"; SQL statement:
-create table sys_user (id varchar(64) not null, cert_no varchar(18), create_time timestamp not null, email varchar(255), last_update_time timestamp not null, nickname varchar(255), phone varchar(255), pwd varchar(20) not null, stat default 0 not null, username varchar(30) not null, ver default 0 not null, primary key (id)) [50004-214]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:554)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:477)
-	at org.h2.message.DbException.get(DbException.java:223)
-	at org.h2.message.DbException.get(DbException.java:199)
-	at org.h2.command.Parser.readIfDataType1(Parser.java:6249)
-	at org.h2.command.Parser.readIfDataType(Parser.java:6087)
-	at org.h2.command.Parser.parseColumnWithType(Parser.java:6069)
-	at org.h2.command.Parser.parseColumnForTable(Parser.java:5948)
-	at org.h2.command.Parser.parseTableColumnDefinition(Parser.java:9331)
-	at org.h2.command.Parser.parseCreateTable(Parser.java:9271)
-	at org.h2.command.Parser.parseCreate(Parser.java:6784)
-	at org.h2.command.Parser.parsePrepared(Parser.java:763)
-	at org.h2.command.Parser.parse(Parser.java:689)
-	at org.h2.command.Parser.parse(Parser.java:661)
-	at org.h2.command.Parser.prepareCommand(Parser.java:569)
-	at org.h2.engine.SessionLocal.prepareLocal(SessionLocal.java:631)
-	at org.h2.engine.SessionLocal.prepareCommand(SessionLocal.java:554)
-	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1116)
-	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:237)
-	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:223)
-	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
-	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
-	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:54)
-	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:581)
-	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:526)
-	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.createTable(AbstractSchemaMigrator.java:293)
-	at org.hibernate.tool.schema.internal.GroupedSchemaMigratorImpl.performTablesMigration(GroupedSchemaMigratorImpl.java:74)
-	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:220)
-	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:123)
-	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:196)
-	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:85)
-	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:335)
-	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:471)
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1498)
-	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:58)
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:365)
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:341)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1863)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1800)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:620)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208)
-	at org.springframework.context.support.AbstractApplicationContext.getBean(AbstractApplicationContext.java:1156)
-	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:910)
-	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:583)
-	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:147)
-	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:731)
-	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:408)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:307)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1303)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1292)
-	at com.yishuifengxiao.tool.personalkit.App.main(App.java:35)
-2023-11-07 11:06:23 jdbc[3]: exception
+2024-10-26 20:15:08.396189+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table disk_file (id varchar(64) not null, create_time timestamp(6) not null, file_md5 varchar(32), file_name varchar(255) not null, file_url varchar(100), folder_id varchar(64), mode tinyint[*](1) default 0 not null, original_file_name varchar(255), oss_id varchar(64), size bigint, suffix varchar(50), upload_id varchar(64), user_id varchar(64), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table disk_file (id varchar(64) not null, create_time timestamp(6) not null, file_md5 varchar(32), file_name varchar(255) not null, file_url varchar(100), folder_id varchar(64), mode tinyint(1) default 0 not null, original_file_name varchar(255), oss_id varchar(64), size bigint, suffix varchar(50), upload_id varchar(64), user_id varchar(64), primary key (id)) [42001-224]
+2024-10-26 20:15:08.411104+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table disk_upload_record (id varchar(64) not null, create_time timestamp(6) not null, file_name varchar(255) not null, finish_time timestamp(6), msg varchar(255), stat tinyint[*](1) default 1, upload_mode tinyint(1) default 1, user_id varchar(64), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table disk_upload_record (id varchar(64) not null, create_time timestamp(6) not null, file_name varchar(255) not null, finish_time timestamp(6), msg varchar(255), stat tinyint(1) default 1, upload_mode tinyint(1) default 1, user_id varchar(64), primary key (id)) [42001-224]
+2024-10-26 20:15:08.416089+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_menu (id varchar(64) not null, auth tinyint[*](1) default 0, description varchar(255), icon varchar(64), idx integer, is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, router_name varchar(64), router_path varchar(64), type tinyint(1) default 0, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_menu (id varchar(64) not null, auth tinyint(1) default 0, description varchar(255), icon varchar(64), idx integer, is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, router_name varchar(64), router_path varchar(64), type tinyint(1) default 0, primary key (id)) [42001-224]
+2024-10-26 20:15:08.420079+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_permission (id varchar(64) not null, application_name varchar(255), context_path varchar(255), description varchar(255), is_embedded tinyint[*](1) default 0, module varchar(255), name varchar(255), url varchar(255), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_permission (id varchar(64) not null, application_name varchar(255), context_path varchar(255), description varchar(255), is_embedded tinyint(1) default 0, module varchar(255), name varchar(255), url varchar(255), primary key (id)) [42001-224]
+2024-10-26 20:15:08.423116+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_role (id varchar(64) not null, create_time timestamp(6) not null, description varchar(255), is_embedded tinyint[*](1) default 0, home_url varchar(255), is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, stat tinyint(1) default 1, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_role (id varchar(64) not null, create_time timestamp(6) not null, description varchar(255), is_embedded tinyint(1) default 0, home_url varchar(255), is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, stat tinyint(1) default 1, primary key (id)) [42001-224]
+2024-10-26 20:15:08.430050+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_user (id varchar(64) not null, cert_no varchar(20), create_time timestamp(6) not null, email varchar(50), is_embedded tinyint[*](1) default 0, is_show tinyint(1) default 1, last_update_time timestamp(6) not null, lock_time timestamp(6), nickname varchar(50), phone varchar(20), pwd varchar(50) not null, salt varchar(16) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_user (id varchar(64) not null, cert_no varchar(20), create_time timestamp(6) not null, email varchar(50), is_embedded tinyint(1) default 0, is_show tinyint(1) default 1, last_update_time timestamp(6) not null, lock_time timestamp(6), nickname varchar(50), phone varchar(20), pwd varchar(50) not null, salt varchar(16) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id)) [42001-224]
+2024-10-26 20:15:08.434040+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_file_name on disk_file (file_name) [42102-224]
+2024-10-26 20:15:08.437039+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_original_file_name on disk_file (original_file_name) [42102-224]
+2024-10-26 20:15:08.439030+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_upload_id on disk_file (upload_id) [42102-224]
+2024-10-26 20:15:08.446036+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_UPLOAD_RECORD" not found; SQL statement:
+create index idx_file_name on disk_upload_record (file_name) [42102-224]
+2024-10-26 20:15:08.449027+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_MENU" not found; SQL statement:
+create index idx_parent_id on sys_menu (parent_id) [42102-224]
+2024-10-26 20:15:08.452989+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+create index idx_name on sys_permission (name) [42102-224]
+2024-10-26 20:15:08.455018+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+create index idx_url on sys_permission (url) [42102-224]
+2024-10-26 20:15:08.456982+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_ROLE" not found; SQL statement:
+create index idx_parent_id on sys_role (parent_id) [42102-224]
+2024-10-26 20:15:08.462965+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_name on sys_user (username) [42102-214]
-2023-11-07 11:06:23 jdbc[3]: exception
+create index idx_phone on sys_user (phone) [42102-224]
+2024-10-26 20:15:08.464957+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_phone on sys_user (phone) [42102-214]
-2023-11-07 11:06:23 jdbc[3]: exception
+create index idx_cert_no on sys_user (cert_no) [42102-224]
+2024-10-26 20:15:08.466984+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_cert_no on sys_user (cert_no) [42102-214]
-2023-11-07 11:06:23 jdbc[3]: exception
+create index idx_email on sys_user (email) [42102-224]
+2024-10-26 20:15:13.321069+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='/personkit' [42102-224]
+2024-10-26 20:15:41.211027+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table disk_file (id varchar(64) not null, create_time timestamp(6) not null, file_md5 varchar(32), file_name varchar(255) not null, file_url varchar(100), folder_id varchar(64), mode tinyint[*](1) default 0 not null, original_file_name varchar(255), oss_id varchar(64), size bigint, suffix varchar(50), upload_id varchar(64), user_id varchar(64), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table disk_file (id varchar(64) not null, create_time timestamp(6) not null, file_md5 varchar(32), file_name varchar(255) not null, file_url varchar(100), folder_id varchar(64), mode tinyint(1) default 0 not null, original_file_name varchar(255), oss_id varchar(64), size bigint, suffix varchar(50), upload_id varchar(64), user_id varchar(64), primary key (id)) [42001-224]
+2024-10-26 20:15:41.220003+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table disk_upload_record (id varchar(64) not null, create_time timestamp(6) not null, file_name varchar(255) not null, finish_time timestamp(6), msg varchar(255), stat tinyint[*](1) default 1, upload_mode tinyint(1) default 1, user_id varchar(64), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table disk_upload_record (id varchar(64) not null, create_time timestamp(6) not null, file_name varchar(255) not null, finish_time timestamp(6), msg varchar(255), stat tinyint(1) default 1, upload_mode tinyint(1) default 1, user_id varchar(64), primary key (id)) [42001-224]
+2024-10-26 20:15:41.225989+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_menu (id varchar(64) not null, auth tinyint[*](1) default 0, description varchar(255), icon varchar(64), idx integer, is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, router_name varchar(64), router_path varchar(64), type tinyint(1) default 0, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_menu (id varchar(64) not null, auth tinyint(1) default 0, description varchar(255), icon varchar(64), idx integer, is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, router_name varchar(64), router_path varchar(64), type tinyint(1) default 0, primary key (id)) [42001-224]
+2024-10-26 20:15:41.229977+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_permission (id varchar(64) not null, application_name varchar(255), context_path varchar(255), description varchar(255), is_embedded tinyint[*](1) default 0, module varchar(255), name varchar(255), url varchar(255), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_permission (id varchar(64) not null, application_name varchar(255), context_path varchar(255), description varchar(255), is_embedded tinyint(1) default 0, module varchar(255), name varchar(255), url varchar(255), primary key (id)) [42001-224]
+2024-10-26 20:15:41.232970+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_role (id varchar(64) not null, create_time timestamp(6) not null, description varchar(255), is_embedded tinyint[*](1) default 0, home_url varchar(255), is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, stat tinyint(1) default 1, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_role (id varchar(64) not null, create_time timestamp(6) not null, description varchar(255), is_embedded tinyint(1) default 0, home_url varchar(255), is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, stat tinyint(1) default 1, primary key (id)) [42001-224]
+2024-10-26 20:15:41.241946+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_user (id varchar(64) not null, cert_no varchar(20), create_time timestamp(6) not null, email varchar(50), is_embedded tinyint[*](1) default 0, is_show tinyint(1) default 1, last_update_time timestamp(6) not null, lock_time timestamp(6), nickname varchar(50), phone varchar(20), pwd varchar(50) not null, salt varchar(16) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_user (id varchar(64) not null, cert_no varchar(20), create_time timestamp(6) not null, email varchar(50), is_embedded tinyint(1) default 0, is_show tinyint(1) default 1, last_update_time timestamp(6) not null, lock_time timestamp(6), nickname varchar(50), phone varchar(20), pwd varchar(50) not null, salt varchar(16) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id)) [42001-224]
+2024-10-26 20:15:41.244962+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_file_name on disk_file (file_name) [42102-224]
+2024-10-26 20:15:41.245960+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_original_file_name on disk_file (original_file_name) [42102-224]
+2024-10-26 20:15:41.247954+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_upload_id on disk_file (upload_id) [42102-224]
+2024-10-26 20:15:41.254938+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_UPLOAD_RECORD" not found; SQL statement:
+create index idx_file_name on disk_upload_record (file_name) [42102-224]
+2024-10-26 20:15:41.258060+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_MENU" not found; SQL statement:
+create index idx_parent_id on sys_menu (parent_id) [42102-224]
+2024-10-26 20:15:41.262034+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+create index idx_name on sys_permission (name) [42102-224]
+2024-10-26 20:15:41.264594+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+create index idx_url on sys_permission (url) [42102-224]
+2024-10-26 20:15:41.266595+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_ROLE" not found; SQL statement:
+create index idx_parent_id on sys_role (parent_id) [42102-224]
+2024-10-26 20:15:41.271579+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_email on sys_user (email) [42102-214]
-2023-11-07 11:06:23 jdbc[3]: exception
+create index idx_phone on sys_user (phone) [42102-224]
+2024-10-26 20:15:41.273620+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-alter table sys_user drop constraint if exists uk_username_ver [42102-214]
-2023-11-07 11:06:23 jdbc[3]: exception
+create index idx_cert_no on sys_user (cert_no) [42102-224]
+2024-10-26 20:15:41.275568+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-alter table sys_user add constraint uk_username_ver unique (username, ver) [42102-214]
-2023-11-07 11:11:38 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLNonTransientException: Unknown data type: "DEFAULT"; SQL statement:
-create table sys_user (id varchar(64) not null, cert_no varchar(18), create_time timestamp not null, email varchar(255), last_update_time timestamp not null, nickname varchar(255), phone varchar(255), pwd varchar(20) not null, stat default 0, username varchar(30) not null, ver default 0, primary key (id)) [50004-214]
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:554)
-	at org.h2.message.DbException.getJdbcSQLException(DbException.java:477)
-	at org.h2.message.DbException.get(DbException.java:223)
-	at org.h2.message.DbException.get(DbException.java:199)
-	at org.h2.command.Parser.readIfDataType1(Parser.java:6249)
-	at org.h2.command.Parser.readIfDataType(Parser.java:6087)
-	at org.h2.command.Parser.parseColumnWithType(Parser.java:6069)
-	at org.h2.command.Parser.parseColumnForTable(Parser.java:5948)
-	at org.h2.command.Parser.parseTableColumnDefinition(Parser.java:9331)
-	at org.h2.command.Parser.parseCreateTable(Parser.java:9271)
-	at org.h2.command.Parser.parseCreate(Parser.java:6784)
-	at org.h2.command.Parser.parsePrepared(Parser.java:763)
-	at org.h2.command.Parser.parse(Parser.java:689)
-	at org.h2.command.Parser.parse(Parser.java:661)
-	at org.h2.command.Parser.prepareCommand(Parser.java:569)
-	at org.h2.engine.SessionLocal.prepareLocal(SessionLocal.java:631)
-	at org.h2.engine.SessionLocal.prepareCommand(SessionLocal.java:554)
-	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1116)
-	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:237)
-	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:223)
-	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94)
-	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
-	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:54)
-	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlString(AbstractSchemaMigrator.java:581)
-	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.applySqlStrings(AbstractSchemaMigrator.java:526)
-	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.createTable(AbstractSchemaMigrator.java:293)
-	at org.hibernate.tool.schema.internal.GroupedSchemaMigratorImpl.performTablesMigration(GroupedSchemaMigratorImpl.java:74)
-	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.performMigration(AbstractSchemaMigrator.java:220)
-	at org.hibernate.tool.schema.internal.AbstractSchemaMigrator.doMigration(AbstractSchemaMigrator.java:123)
-	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:196)
-	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:85)
-	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:335)
-	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:471)
-	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1498)
-	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:58)
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:365)
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409)
-	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396)
-	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:341)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1863)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1800)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:620)
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208)
-	at org.springframework.context.support.AbstractApplicationContext.getBean(AbstractApplicationContext.java:1156)
-	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:910)
-	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:583)
-	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:147)
-	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:731)
-	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:408)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:307)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1303)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1292)
-	at com.yishuifengxiao.tool.personalkit.App.main(App.java:35)
-2023-11-07 11:11:38 jdbc[3]: exception
+create index idx_email on sys_user (email) [42102-224]
+2024-10-26 20:15:44.816273+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='/personkit' [42102-224]
+2024-10-26 20:25:08.762565+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table disk_file (id varchar(64) not null, create_time timestamp(6) not null, file_md5 varchar(32), file_name varchar(255) not null, file_url varchar(100), folder_id varchar(64), mode tinyint[*](1) default 0 not null, original_file_name varchar(255), oss_id varchar(64), size bigint, suffix varchar(50), upload_id varchar(64), user_id varchar(64), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table disk_file (id varchar(64) not null, create_time timestamp(6) not null, file_md5 varchar(32), file_name varchar(255) not null, file_url varchar(100), folder_id varchar(64), mode tinyint(1) default 0 not null, original_file_name varchar(255), oss_id varchar(64), size bigint, suffix varchar(50), upload_id varchar(64), user_id varchar(64), primary key (id)) [42001-224]
+2024-10-26 20:25:08.774197+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table disk_upload_record (id varchar(64) not null, create_time timestamp(6) not null, file_name varchar(255) not null, finish_time timestamp(6), msg varchar(255), stat tinyint[*](1) default 1, upload_mode tinyint(1) default 1, user_id varchar(64), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table disk_upload_record (id varchar(64) not null, create_time timestamp(6) not null, file_name varchar(255) not null, finish_time timestamp(6), msg varchar(255), stat tinyint(1) default 1, upload_mode tinyint(1) default 1, user_id varchar(64), primary key (id)) [42001-224]
+2024-10-26 20:25:08.781162+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_menu (id varchar(64) not null, auth tinyint[*](1) default 0, description varchar(255), icon varchar(64), idx integer, is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, router_name varchar(64), router_path varchar(64), type tinyint(1) default 0, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_menu (id varchar(64) not null, auth tinyint(1) default 0, description varchar(255), icon varchar(64), idx integer, is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, router_name varchar(64), router_path varchar(64), type tinyint(1) default 0, primary key (id)) [42001-224]
+2024-10-26 20:25:08.785152+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_permission (id varchar(64) not null, application_name varchar(255), context_path varchar(255), description varchar(255), is_embedded tinyint[*](1) default 0, module varchar(255), name varchar(255), url varchar(255), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_permission (id varchar(64) not null, application_name varchar(255), context_path varchar(255), description varchar(255), is_embedded tinyint(1) default 0, module varchar(255), name varchar(255), url varchar(255), primary key (id)) [42001-224]
+2024-10-26 20:25:08.787146+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_role (id varchar(64) not null, create_time timestamp(6) not null, description varchar(255), is_embedded tinyint[*](1) default 0, home_url varchar(255), is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, stat tinyint(1) default 1, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_role (id varchar(64) not null, create_time timestamp(6) not null, description varchar(255), is_embedded tinyint(1) default 0, home_url varchar(255), is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, stat tinyint(1) default 1, primary key (id)) [42001-224]
+2024-10-26 20:25:08.796124+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_user (id varchar(64) not null, cert_no varchar(20), create_time timestamp(6) not null, email varchar(50), is_embedded tinyint[*](1) default 0, is_show tinyint(1) default 1, last_update_time timestamp(6) not null, lock_time timestamp(6), nickname varchar(50), phone varchar(20), pwd varchar(50) not null, salt varchar(16) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_user (id varchar(64) not null, cert_no varchar(20), create_time timestamp(6) not null, email varchar(50), is_embedded tinyint(1) default 0, is_show tinyint(1) default 1, last_update_time timestamp(6) not null, lock_time timestamp(6), nickname varchar(50), phone varchar(20), pwd varchar(50) not null, salt varchar(16) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id)) [42001-224]
+2024-10-26 20:25:08.799116+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_file_name on disk_file (file_name) [42102-224]
+2024-10-26 20:25:08.801113+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_original_file_name on disk_file (original_file_name) [42102-224]
+2024-10-26 20:25:08.803107+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_upload_id on disk_file (upload_id) [42102-224]
+2024-10-26 20:25:08.811099+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_UPLOAD_RECORD" not found; SQL statement:
+create index idx_file_name on disk_upload_record (file_name) [42102-224]
+2024-10-26 20:25:08.815072+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_MENU" not found; SQL statement:
+create index idx_parent_id on sys_menu (parent_id) [42102-224]
+2024-10-26 20:25:08.819061+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+create index idx_name on sys_permission (name) [42102-224]
+2024-10-26 20:25:08.821056+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+create index idx_url on sys_permission (url) [42102-224]
+2024-10-26 20:25:08.822534+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_ROLE" not found; SQL statement:
+create index idx_parent_id on sys_role (parent_id) [42102-224]
+2024-10-26 20:25:08.827038+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_name on sys_user (username) [42102-214]
-2023-11-07 11:11:38 jdbc[3]: exception
+create index idx_phone on sys_user (phone) [42102-224]
+2024-10-26 20:25:08.829034+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_phone on sys_user (phone) [42102-214]
-2023-11-07 11:11:38 jdbc[3]: exception
+create index idx_cert_no on sys_user (cert_no) [42102-224]
+2024-10-26 20:25:08.831029+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_cert_no on sys_user (cert_no) [42102-214]
-2023-11-07 11:11:38 jdbc[3]: exception
+create index idx_email on sys_user (email) [42102-224]
+2024-10-26 20:25:16.326099+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='/personkit' [42102-224]
+2024-10-26 20:29:27.330587+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table disk_file (id varchar(64) not null, create_time timestamp(6) not null, file_md5 varchar(32), file_name varchar(255) not null, file_url varchar(100), folder_id varchar(64), mode tinyint[*](1) default 0 not null, original_file_name varchar(255), oss_id varchar(64), size bigint, suffix varchar(50), upload_id varchar(64), user_id varchar(64), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table disk_file (id varchar(64) not null, create_time timestamp(6) not null, file_md5 varchar(32), file_name varchar(255) not null, file_url varchar(100), folder_id varchar(64), mode tinyint(1) default 0 not null, original_file_name varchar(255), oss_id varchar(64), size bigint, suffix varchar(50), upload_id varchar(64), user_id varchar(64), primary key (id)) [42001-224]
+2024-10-26 20:29:27.341183+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table disk_upload_record (id varchar(64) not null, create_time timestamp(6) not null, file_name varchar(255) not null, finish_time timestamp(6), msg varchar(255), stat tinyint[*](1) default 1, upload_mode tinyint(1) default 1, user_id varchar(64), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table disk_upload_record (id varchar(64) not null, create_time timestamp(6) not null, file_name varchar(255) not null, finish_time timestamp(6), msg varchar(255), stat tinyint(1) default 1, upload_mode tinyint(1) default 1, user_id varchar(64), primary key (id)) [42001-224]
+2024-10-26 20:29:27.345203+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_menu (id varchar(64) not null, auth tinyint[*](1) default 0, description varchar(255), icon varchar(64), idx integer, is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, router_name varchar(64), router_path varchar(64), type tinyint(1) default 0, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_menu (id varchar(64) not null, auth tinyint(1) default 0, description varchar(255), icon varchar(64), idx integer, is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, router_name varchar(64), router_path varchar(64), type tinyint(1) default 0, primary key (id)) [42001-224]
+2024-10-26 20:29:27.349164+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_permission (id varchar(64) not null, application_name varchar(255), context_path varchar(255), description varchar(255), is_embedded tinyint[*](1) default 0, module varchar(255), name varchar(255), url varchar(255), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_permission (id varchar(64) not null, application_name varchar(255), context_path varchar(255), description varchar(255), is_embedded tinyint(1) default 0, module varchar(255), name varchar(255), url varchar(255), primary key (id)) [42001-224]
+2024-10-26 20:29:27.353154+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_role (id varchar(64) not null, create_time timestamp(6) not null, description varchar(255), is_embedded tinyint[*](1) default 0, home_url varchar(255), is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, stat tinyint(1) default 1, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_role (id varchar(64) not null, create_time timestamp(6) not null, description varchar(255), is_embedded tinyint(1) default 0, home_url varchar(255), is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, stat tinyint(1) default 1, primary key (id)) [42001-224]
+2024-10-26 20:29:27.362127+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_user (id varchar(64) not null, cert_no varchar(20), create_time timestamp(6) not null, email varchar(50), is_embedded tinyint[*](1) default 0, is_show tinyint(1) default 1, last_update_time timestamp(6) not null, lock_time timestamp(6), nickname varchar(50), phone varchar(20), pwd varchar(50) not null, salt varchar(16) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_user (id varchar(64) not null, cert_no varchar(20), create_time timestamp(6) not null, email varchar(50), is_embedded tinyint(1) default 0, is_show tinyint(1) default 1, last_update_time timestamp(6) not null, lock_time timestamp(6), nickname varchar(50), phone varchar(20), pwd varchar(50) not null, salt varchar(16) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id)) [42001-224]
+2024-10-26 20:29:27.365121+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_file_name on disk_file (file_name) [42102-224]
+2024-10-26 20:29:27.367113+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_original_file_name on disk_file (original_file_name) [42102-224]
+2024-10-26 20:29:27.368110+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_upload_id on disk_file (upload_id) [42102-224]
+2024-10-26 20:29:27.388056+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_UPLOAD_RECORD" not found; SQL statement:
+create index idx_file_name on disk_upload_record (file_name) [42102-224]
+2024-10-26 20:29:27.391048+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_MENU" not found; SQL statement:
+create index idx_parent_id on sys_menu (parent_id) [42102-224]
+2024-10-26 20:29:27.396035+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+create index idx_name on sys_permission (name) [42102-224]
+2024-10-26 20:29:27.397033+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+create index idx_url on sys_permission (url) [42102-224]
+2024-10-26 20:29:27.399059+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_ROLE" not found; SQL statement:
+create index idx_parent_id on sys_role (parent_id) [42102-224]
+2024-10-26 20:29:27.403098+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_email on sys_user (email) [42102-214]
-2023-11-07 11:11:38 jdbc[3]: exception
+create index idx_phone on sys_user (phone) [42102-224]
+2024-10-26 20:29:27.405012+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-alter table sys_user drop constraint if exists uk_username_ver [42102-214]
-2023-11-07 11:11:38 jdbc[3]: exception
+create index idx_cert_no on sys_user (cert_no) [42102-224]
+2024-10-26 20:29:27.406008+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-alter table sys_user add constraint uk_username_ver unique (username, ver) [42102-214]
-2023-11-07 11:17:16 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_user (id varchar(64) not null, cert_no varchar(18), create_time timestamp not null, email varchar(255), last_update_time timestamp not null, nickname varchar(255), phone varchar(255), pwd varchar(20) not null, stat tinyint[*](1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, NULL, AS, DEFAULT, GENERATED, ON UPDATE, NOT NULL, NULL, AUTO_INCREMENT, DEFAULT ON NULL, NULL_TO_DEFAULT, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, NULL, CHECK, REFERENCES, AUTO_INCREMENT, ,, )"; SQL statement:
-create table sys_user (id varchar(64) not null, cert_no varchar(18), create_time timestamp not null, email varchar(255), last_update_time timestamp not null, nickname varchar(255), phone varchar(255), pwd varchar(20) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id)) [42001-214]
-2023-11-07 11:17:16 jdbc[3]: exception
+create index idx_email on sys_user (email) [42102-224]
+2024-10-26 20:29:34.934053+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='/personkit' [42102-224]
+2024-10-26 21:39:18.656023+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table disk_file (id varchar(64) not null, create_time timestamp(6) not null, file_md5 varchar(32), file_name varchar(255) not null, file_url varchar(100), folder_id varchar(64), mode tinyint[*](1) default 0 not null, original_file_name varchar(255), oss_id varchar(64), size bigint, suffix varchar(50), upload_id varchar(64), user_id varchar(64), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table disk_file (id varchar(64) not null, create_time timestamp(6) not null, file_md5 varchar(32), file_name varchar(255) not null, file_url varchar(100), folder_id varchar(64), mode tinyint(1) default 0 not null, original_file_name varchar(255), oss_id varchar(64), size bigint, suffix varchar(50), upload_id varchar(64), user_id varchar(64), primary key (id)) [42001-224]
+2024-10-26 21:39:18.701328+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table disk_upload_record (id varchar(64) not null, create_time timestamp(6) not null, file_name varchar(255) not null, finish_time timestamp(6), msg varchar(255), stat tinyint[*](1) default 1, upload_mode tinyint(1) default 1, user_id varchar(64), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table disk_upload_record (id varchar(64) not null, create_time timestamp(6) not null, file_name varchar(255) not null, finish_time timestamp(6), msg varchar(255), stat tinyint(1) default 1, upload_mode tinyint(1) default 1, user_id varchar(64), primary key (id)) [42001-224]
+2024-10-26 21:39:18.711982+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_menu (id varchar(64) not null, auth tinyint[*](1) default 0, description varchar(255), icon varchar(64), idx integer, is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, router_name varchar(64), router_path varchar(64), type tinyint(1) default 0, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_menu (id varchar(64) not null, auth tinyint(1) default 0, description varchar(255), icon varchar(64), idx integer, is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, router_name varchar(64), router_path varchar(64), type tinyint(1) default 0, primary key (id)) [42001-224]
+2024-10-26 21:39:18.717284+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_permission (id varchar(64) not null, application_name varchar(255), context_path varchar(255), description varchar(255), is_embedded tinyint[*](1) default 0, module varchar(255), name varchar(255), url varchar(255), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_permission (id varchar(64) not null, application_name varchar(255), context_path varchar(255), description varchar(255), is_embedded tinyint(1) default 0, module varchar(255), name varchar(255), url varchar(255), primary key (id)) [42001-224]
+2024-10-26 21:39:18.722271+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_role (id varchar(64) not null, create_time timestamp(6) not null, description varchar(255), is_embedded tinyint[*](1) default 0, home_url varchar(255), is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, stat tinyint(1) default 1, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_role (id varchar(64) not null, create_time timestamp(6) not null, description varchar(255), is_embedded tinyint(1) default 0, home_url varchar(255), is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, stat tinyint(1) default 1, primary key (id)) [42001-224]
+2024-10-26 21:39:18.732245+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_user (id varchar(64) not null, cert_no varchar(20), create_time timestamp(6) not null, email varchar(50), is_embedded tinyint[*](1) default 0, is_show tinyint(1) default 1, last_update_time timestamp(6) not null, lock_time timestamp(6), nickname varchar(50), phone varchar(20), pwd varchar(50) not null, salt varchar(16) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_user (id varchar(64) not null, cert_no varchar(20), create_time timestamp(6) not null, email varchar(50), is_embedded tinyint(1) default 0, is_show tinyint(1) default 1, last_update_time timestamp(6) not null, lock_time timestamp(6), nickname varchar(50), phone varchar(20), pwd varchar(50) not null, salt varchar(16) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id)) [42001-224]
+2024-10-26 21:39:18.736234+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_file_name on disk_file (file_name) [42102-224]
+2024-10-26 21:39:18.739226+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_original_file_name on disk_file (original_file_name) [42102-224]
+2024-10-26 21:39:18.742297+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_upload_id on disk_file (upload_id) [42102-224]
+2024-10-26 21:39:18.752209+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_UPLOAD_RECORD" not found; SQL statement:
+create index idx_file_name on disk_upload_record (file_name) [42102-224]
+2024-10-26 21:39:18.758176+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_MENU" not found; SQL statement:
+create index idx_parent_id on sys_menu (parent_id) [42102-224]
+2024-10-26 21:39:18.765155+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+create index idx_name on sys_permission (name) [42102-224]
+2024-10-26 21:39:18.768149+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+create index idx_url on sys_permission (url) [42102-224]
+2024-10-26 21:39:18.771142+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_ROLE" not found; SQL statement:
+create index idx_parent_id on sys_role (parent_id) [42102-224]
+2024-10-26 21:39:18.778124+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_name on sys_user (username) [42102-214]
-2023-11-07 11:17:16 jdbc[3]: exception
+create index idx_phone on sys_user (phone) [42102-224]
+2024-10-26 21:39:18.780115+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_phone on sys_user (phone) [42102-214]
-2023-11-07 11:17:16 jdbc[3]: exception
+create index idx_cert_no on sys_user (cert_no) [42102-224]
+2024-10-26 21:39:18.783109+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_cert_no on sys_user (cert_no) [42102-214]
-2023-11-07 11:17:16 jdbc[3]: exception
+create index idx_email on sys_user (email) [42102-224]
+2024-10-26 21:39:29.998014+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='/personkit' [42102-224]
+2024-10-26 21:44:50.112039+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table disk_file (id varchar(64) not null, create_time timestamp(6) not null, file_md5 varchar(32), file_name varchar(255) not null, file_url varchar(100), folder_id varchar(64), mode tinyint[*](1) default 0 not null, original_file_name varchar(255), oss_id varchar(64), size bigint, suffix varchar(50), upload_id varchar(64), user_id varchar(64), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table disk_file (id varchar(64) not null, create_time timestamp(6) not null, file_md5 varchar(32), file_name varchar(255) not null, file_url varchar(100), folder_id varchar(64), mode tinyint(1) default 0 not null, original_file_name varchar(255), oss_id varchar(64), size bigint, suffix varchar(50), upload_id varchar(64), user_id varchar(64), primary key (id)) [42001-224]
+2024-10-26 21:44:50.124026+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table disk_upload_record (id varchar(64) not null, create_time timestamp(6) not null, file_name varchar(255) not null, finish_time timestamp(6), msg varchar(255), stat tinyint[*](1) default 1, upload_mode tinyint(1) default 1, user_id varchar(64), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table disk_upload_record (id varchar(64) not null, create_time timestamp(6) not null, file_name varchar(255) not null, finish_time timestamp(6), msg varchar(255), stat tinyint(1) default 1, upload_mode tinyint(1) default 1, user_id varchar(64), primary key (id)) [42001-224]
+2024-10-26 21:44:50.128994+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_menu (id varchar(64) not null, auth tinyint[*](1) default 0, description varchar(255), icon varchar(64), idx integer, is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, router_name varchar(64), router_path varchar(64), type tinyint(1) default 0, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_menu (id varchar(64) not null, auth tinyint(1) default 0, description varchar(255), icon varchar(64), idx integer, is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, router_name varchar(64), router_path varchar(64), type tinyint(1) default 0, primary key (id)) [42001-224]
+2024-10-26 21:44:50.131003+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_permission (id varchar(64) not null, application_name varchar(255), context_path varchar(255), description varchar(255), is_embedded tinyint[*](1) default 0, module varchar(255), name varchar(255), url varchar(255), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_permission (id varchar(64) not null, application_name varchar(255), context_path varchar(255), description varchar(255), is_embedded tinyint(1) default 0, module varchar(255), name varchar(255), url varchar(255), primary key (id)) [42001-224]
+2024-10-26 21:44:50.133980+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_role (id varchar(64) not null, create_time timestamp(6) not null, description varchar(255), is_embedded tinyint[*](1) default 0, home_url varchar(255), is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, stat tinyint(1) default 1, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_role (id varchar(64) not null, create_time timestamp(6) not null, description varchar(255), is_embedded tinyint(1) default 0, home_url varchar(255), is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, stat tinyint(1) default 1, primary key (id)) [42001-224]
+2024-10-26 21:44:50.140977+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_user (id varchar(64) not null, cert_no varchar(20), create_time timestamp(6) not null, email varchar(50), is_embedded tinyint[*](1) default 0, is_show tinyint(1) default 1, last_update_time timestamp(6) not null, lock_time timestamp(6), nickname varchar(50), phone varchar(20), pwd varchar(50) not null, salt varchar(16) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_user (id varchar(64) not null, cert_no varchar(20), create_time timestamp(6) not null, email varchar(50), is_embedded tinyint(1) default 0, is_show tinyint(1) default 1, last_update_time timestamp(6) not null, lock_time timestamp(6), nickname varchar(50), phone varchar(20), pwd varchar(50) not null, salt varchar(16) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id)) [42001-224]
+2024-10-26 21:44:50.142518+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_file_name on disk_file (file_name) [42102-224]
+2024-10-26 21:44:50.143542+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_original_file_name on disk_file (original_file_name) [42102-224]
+2024-10-26 21:44:50.145512+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_upload_id on disk_file (upload_id) [42102-224]
+2024-10-26 21:44:50.152521+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_UPLOAD_RECORD" not found; SQL statement:
+create index idx_file_name on disk_upload_record (file_name) [42102-224]
+2024-10-26 21:44:50.156504+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_MENU" not found; SQL statement:
+create index idx_parent_id on sys_menu (parent_id) [42102-224]
+2024-10-26 21:44:50.161475+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+create index idx_name on sys_permission (name) [42102-224]
+2024-10-26 21:44:50.163466+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+create index idx_url on sys_permission (url) [42102-224]
+2024-10-26 21:44:50.164463+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_ROLE" not found; SQL statement:
+create index idx_parent_id on sys_role (parent_id) [42102-224]
+2024-10-26 21:44:50.169452+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_email on sys_user (email) [42102-214]
-2023-11-07 11:17:16 jdbc[3]: exception
+create index idx_phone on sys_user (phone) [42102-224]
+2024-10-26 21:44:50.170447+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-alter table sys_user drop constraint if exists uk_username_ver [42102-214]
-2023-11-07 11:17:16 jdbc[3]: exception
+create index idx_cert_no on sys_user (cert_no) [42102-224]
+2024-10-26 21:44:50.172492+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-alter table sys_user add constraint uk_username_ver unique (username, ver) [42102-214]
-2023-11-07 11:24:08 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_user (id varchar(64) not null, cert_no varchar(18), create_time timestamp not null, email varchar(255), last_update_time timestamp not null, nickname varchar(255), phone varchar(255), pwd varchar(20) not null, stat tinyint[*](1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, NULL, AS, DEFAULT, GENERATED, ON UPDATE, NOT NULL, NULL, AUTO_INCREMENT, DEFAULT ON NULL, NULL_TO_DEFAULT, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, NULL, CHECK, REFERENCES, AUTO_INCREMENT, ,, )"; SQL statement:
-create table sys_user (id varchar(64) not null, cert_no varchar(18), create_time timestamp not null, email varchar(255), last_update_time timestamp not null, nickname varchar(255), phone varchar(255), pwd varchar(20) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id)) [42001-214]
-2023-11-07 11:24:08 jdbc[3]: exception
+create index idx_email on sys_user (email) [42102-224]
+2024-10-26 21:44:56.303641+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='/personkit' [42102-224]
+2024-10-26 21:47:16.883504+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table disk_file (id varchar(64) not null, create_time timestamp(6) not null, file_md5 varchar(32), file_name varchar(255) not null, file_url varchar(100), folder_id varchar(64), mode tinyint[*](1) default 0 not null, original_file_name varchar(255), oss_id varchar(64), size bigint, suffix varchar(50), upload_id varchar(64), user_id varchar(64), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table disk_file (id varchar(64) not null, create_time timestamp(6) not null, file_md5 varchar(32), file_name varchar(255) not null, file_url varchar(100), folder_id varchar(64), mode tinyint(1) default 0 not null, original_file_name varchar(255), oss_id varchar(64), size bigint, suffix varchar(50), upload_id varchar(64), user_id varchar(64), primary key (id)) [42001-224]
+2024-10-26 21:47:16.895489+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table disk_upload_record (id varchar(64) not null, create_time timestamp(6) not null, file_name varchar(255) not null, finish_time timestamp(6), msg varchar(255), stat tinyint[*](1) default 1, upload_mode tinyint(1) default 1, user_id varchar(64), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table disk_upload_record (id varchar(64) not null, create_time timestamp(6) not null, file_name varchar(255) not null, finish_time timestamp(6), msg varchar(255), stat tinyint(1) default 1, upload_mode tinyint(1) default 1, user_id varchar(64), primary key (id)) [42001-224]
+2024-10-26 21:47:16.901456+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_menu (id varchar(64) not null, auth tinyint[*](1) default 0, description varchar(255), icon varchar(64), idx integer, is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, router_name varchar(64), router_path varchar(64), type tinyint(1) default 0, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_menu (id varchar(64) not null, auth tinyint(1) default 0, description varchar(255), icon varchar(64), idx integer, is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, router_name varchar(64), router_path varchar(64), type tinyint(1) default 0, primary key (id)) [42001-224]
+2024-10-26 21:47:16.905446+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_permission (id varchar(64) not null, application_name varchar(255), context_path varchar(255), description varchar(255), is_embedded tinyint[*](1) default 0, module varchar(255), name varchar(255), url varchar(255), primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_permission (id varchar(64) not null, application_name varchar(255), context_path varchar(255), description varchar(255), is_embedded tinyint(1) default 0, module varchar(255), name varchar(255), url varchar(255), primary key (id)) [42001-224]
+2024-10-26 21:47:16.909435+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_role (id varchar(64) not null, create_time timestamp(6) not null, description varchar(255), is_embedded tinyint[*](1) default 0, home_url varchar(255), is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, stat tinyint(1) default 1, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_role (id varchar(64) not null, create_time timestamp(6) not null, description varchar(255), is_embedded tinyint(1) default 0, home_url varchar(255), is_show tinyint(1) default 1, name varchar(50), parent_id varchar(64) not null, stat tinyint(1) default 1, primary key (id)) [42001-224]
+2024-10-26 21:47:16.919408+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_user (id varchar(64) not null, cert_no varchar(20), create_time timestamp(6) not null, email varchar(50), is_embedded tinyint[*](1) default 0, is_show tinyint(1) default 1, last_update_time timestamp(6) not null, lock_time timestamp(6), nickname varchar(50), phone varchar(20), pwd varchar(50) not null, salt varchar(16) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, DEFAULT, GENERATED, ON UPDATE, NOT NULL, DEFAULT ON NULL, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, CHECK, REFERENCES, ,, )"; SQL statement:
+create table sys_user (id varchar(64) not null, cert_no varchar(20), create_time timestamp(6) not null, email varchar(50), is_embedded tinyint(1) default 0, is_show tinyint(1) default 1, last_update_time timestamp(6) not null, lock_time timestamp(6), nickname varchar(50), phone varchar(20), pwd varchar(50) not null, salt varchar(16) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id)) [42001-224]
+2024-10-26 21:47:16.922400+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_file_name on disk_file (file_name) [42102-224]
+2024-10-26 21:47:16.924395+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_original_file_name on disk_file (original_file_name) [42102-224]
+2024-10-26 21:47:16.926391+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_FILE" not found; SQL statement:
+create index idx_upload_id on disk_file (upload_id) [42102-224]
+2024-10-26 21:47:16.935916+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "DISK_UPLOAD_RECORD" not found; SQL statement:
+create index idx_file_name on disk_upload_record (file_name) [42102-224]
+2024-10-26 21:47:16.938908+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_MENU" not found; SQL statement:
+create index idx_parent_id on sys_menu (parent_id) [42102-224]
+2024-10-26 21:47:16.944008+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+create index idx_name on sys_permission (name) [42102-224]
+2024-10-26 21:47:16.946988+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+create index idx_url on sys_permission (url) [42102-224]
+2024-10-26 21:47:16.947993+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_ROLE" not found; SQL statement:
+create index idx_parent_id on sys_role (parent_id) [42102-224]
+2024-10-26 21:47:16.952972+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-alter table sys_user drop constraint if exists uk_username_ver [42102-214]
-2023-11-07 11:24:08 jdbc[3]: exception
+create index idx_phone on sys_user (phone) [42102-224]
+2024-10-26 21:47:16.955965+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-alter table sys_user add constraint uk_username_ver unique (username, ver) [42102-214]
-2023-11-07 11:28:43 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_user (id varchar(64) not null, cert_no varchar(18), create_time timestamp not null, email varchar(50), last_update_time timestamp not null, nickname varchar(50), phone varchar(20), pwd varchar(20) not null, stat tinyint[*](1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, NULL, AS, DEFAULT, GENERATED, ON UPDATE, NOT NULL, NULL, AUTO_INCREMENT, DEFAULT ON NULL, NULL_TO_DEFAULT, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, NULL, CHECK, REFERENCES, AUTO_INCREMENT, ,, )"; SQL statement:
-create table sys_user (id varchar(64) not null, cert_no varchar(18), create_time timestamp not null, email varchar(50), last_update_time timestamp not null, nickname varchar(50), phone varchar(20), pwd varchar(20) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id)) [42001-214]
-2023-11-07 11:28:43 jdbc[3]: exception
+create index idx_cert_no on sys_user (cert_no) [42102-224]
+2024-10-26 21:47:16.957974+08:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_name on sys_user (username) [42102-214]
-2023-11-07 11:28:43 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_phone on sys_user (phone) [42102-214]
-2023-11-07 11:28:43 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_cert_no on sys_user (cert_no) [42102-214]
-2023-11-07 11:28:43 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_email on sys_user (email) [42102-214]
-2023-11-07 11:28:43 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-alter table sys_user drop constraint if exists uk_username_ver [42102-214]
-2023-11-07 11:28:43 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-alter table sys_user add constraint uk_username_ver unique (username, ver) [42102-214]
-2023-11-07 11:32:42 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "create table sys_user (id varchar(64) not null, cert_no varchar(18), create_time timestamp not null, email varchar(50), last_update_time timestamp not null, nickname varchar(50), phone varchar(20), pwd varchar(20) not null, stat tinyint[*](1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id))"; expected "ARRAY, INVISIBLE, VISIBLE, NOT NULL, NULL, AS, DEFAULT, GENERATED, ON UPDATE, NOT NULL, NULL, AUTO_INCREMENT, DEFAULT ON NULL, NULL_TO_DEFAULT, SEQUENCE, SELECTIVITY, COMMENT, CONSTRAINT, COMMENT, PRIMARY KEY, UNIQUE, NOT NULL, NULL, CHECK, REFERENCES, AUTO_INCREMENT, ,, )"; SQL statement:
-create table sys_user (id varchar(64) not null, cert_no varchar(18), create_time timestamp not null, email varchar(50), last_update_time timestamp not null, nickname varchar(50), phone varchar(20), pwd varchar(20) not null, stat tinyint(1) default 0 not null, username varchar(30) not null, ver int(11) default 0 not null, primary key (id)) [42001-214]
-2023-11-07 11:32:42 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_name on sys_user (username) [42102-214]
-2023-11-07 11:32:42 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_phone on sys_user (phone) [42102-214]
-2023-11-07 11:32:42 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_cert_no on sys_user (cert_no) [42102-214]
-2023-11-07 11:32:42 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-create index idx_email on sys_user (email) [42102-214]
-2023-11-07 11:32:42 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-alter table sys_user drop constraint if exists uk_username_ver [42102-214]
-2023-11-07 11:32:42 jdbc[3]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_USER" not found; SQL statement:
-alter table sys_user add constraint uk_username_ver unique (username, ver) [42102-214]
+create index idx_email on sys_user (email) [42102-224]
+2024-10-26 21:47:24.877094+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='/personkit' [42102-224]
+2024-10-26 21:48:53.318333+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='/personkit' [42102-224]
+2024-10-26 21:50:55.259179+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='/personkit' [42102-224]
+2024-10-26 21:50:55.278871+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='/personkit' [42102-224]
+2024-10-26 21:50:55.283909+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "SYS_PERMISSION" not found; SQL statement:
+SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='/personkit' [42102-224]

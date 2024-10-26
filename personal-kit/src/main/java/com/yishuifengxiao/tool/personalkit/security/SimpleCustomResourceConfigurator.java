@@ -81,13 +81,18 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
 
     @Override
     public RequestMatcher requestMatcher() {
-        String sql = StringUtils.isBlank(contextPath) ?
-                "SELECT DISTINCT sp.url FROM sys_permission sp WHERE ISNULL" + "(sp.context_path)" : String.format(
-                "SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='%s'", contextPath);
-        List<String> list = JdbcUtil.jdbcTemplate().queryForList(sql, String.class);
-        if (CollUtil.isEmpty(list)) {
-            return null;
+        try {
+            String sql = StringUtils.isBlank(contextPath) ?
+                    "SELECT DISTINCT sp.url FROM sys_permission sp WHERE ISNULL" + "(sp.context_path)" : String.format(
+                    "SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='%s'", contextPath);
+            List<String> list = JdbcUtil.jdbcTemplate().queryForList(sql, String.class);
+            if (CollUtil.isEmpty(list)) {
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
 //        return new NegatedRequestMatcher(new OrRequestMatcher(propertyResource.permitAll(), propertyResource
 //        .anonymous()));
 
