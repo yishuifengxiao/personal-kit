@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -46,7 +47,7 @@ public class CacheRateLimiterFilter extends OncePerRequestFilter {
                 //
             ) {
                 //开启了限流功能WE
-                String visitorIp = HttpUtils.getVisitorIp(request);
+                String visitorIp = Optional.ofNullable(HttpUtils.getVisitorIp(request)).orElse("localhost");
                 RateLimiter rateLimiter = GuavaCache.get(visitorIp,
                         () -> RateLimiter.create(coreproperties.getIpMaxVisitPerSecond()));
                 if (!rateLimiter.tryAcquire()) {

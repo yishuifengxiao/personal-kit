@@ -2,9 +2,9 @@ package com.yishuifengxiao.tool.personalkit.tool;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.yishuifengxiao.common.tool.codec.Md5;
 import com.yishuifengxiao.common.tool.collections.DataUtil;
 import com.yishuifengxiao.common.tool.collections.JsonUtil;
-import com.yishuifengxiao.common.tool.encoder.Md5;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.Ontology;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.RandomUtils;

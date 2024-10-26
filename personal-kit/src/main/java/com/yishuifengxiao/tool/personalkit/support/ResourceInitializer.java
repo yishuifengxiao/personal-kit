@@ -33,7 +33,7 @@ import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.DEFAU
  * @date 2023/11/7-19:37
  * @since 1.0.0
  */
-//@Component("resourceInitializer")
+@Component("resourceInitializer")
 public class ResourceInitializer implements CommandLineRunner {
     private boolean hasInit = false;
     private final static List<String> sets = Arrays.asList("springfox.documentation", "org.springframework");
