@@ -6,9 +6,11 @@ import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.holder.TokenHolder;
 import com.yishuifengxiao.common.support.SpringContext;
 import com.yishuifengxiao.common.tool.exception.CustomException;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.vo.LoginVo;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
+import com.yishuifengxiao.tool.personalkit.support.ContextUser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -38,10 +40,16 @@ public class IndexController {
 
     @GetMapping("/currentUser")
     @ResponseBody
-    public Authentication user(Authentication authentication) {
+    public Authentication currentUser(Authentication authentication) {
         return authentication;
     }
 
+
+    @GetMapping("/user")
+    @ResponseBody
+    public SysUser user() {
+        return ContextUser.currentUser();
+    }
 
     @GetMapping("/tokens")
     @ResponseBody

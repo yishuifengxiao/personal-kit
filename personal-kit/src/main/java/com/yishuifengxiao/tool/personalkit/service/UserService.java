@@ -1,5 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
+import com.yishuifengxiao.common.guava.GuavaCache;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.security.SecurityPropertyResource;
 import com.yishuifengxiao.common.security.constant.TokenConstant;
@@ -89,6 +90,7 @@ public class UserService {
                 sysUser.getPwd()));
         sysUser.setPwd(DES.encrypt(sysUser.getSalt(), req.getNewPwd().trim()));
         sysUserRepository.saveAndFlush(sysUser);
+        GuavaCache.remove(sysUser.getUsername());
     }
 
     public void updateUser(SysUser sysUser) {
@@ -111,6 +113,7 @@ public class UserService {
         }
         user.setLastUpdateTime(LocalDateTime.now());
         sysUserRepository.saveAndFlush(sysUser);
+        GuavaCache.remove(sysUser.getUsername());
     }
 
     public void updateResetPwd(ResetPwdReq req) {
@@ -118,6 +121,7 @@ public class UserService {
         Assert.isTrue("邮箱不匹配", StringUtils.equalsIgnoreCase(sysUser.getEmail(), req.getEmail()));
         sysUser.setPwd(DES.encrypt(sysUser.getSalt(), Constant.DEFAULT_PWD));
         sysUserRepository.saveAndFlush(sysUser);
+        GuavaCache.remove(sysUser.getUsername());
     }
 
 

@@ -1,0 +1,167 @@
+{
+  "rootId": "2",
+  "graphName": "名字",
+  "description": "miaoshu ",
+  "nodes": [
+    {
+      "id": "root",
+      "opacity": 0,
+      "text": "",
+      "isHide": true
+    },
+    {
+      "id": "26872",
+      "text": "节点-26872",
+      "isHide": false,
+      "color": "#3aca08",
+      "data": {
+        "myicon": "el-icon-star-on",
+        "nodeProperties": []
+      }
+    },
+    {
+      "id": "29652",
+      "text": "节点-29652",
+      "type": "node",
+      "isShow": true,
+      "isHide": false,
+      "expanded": true,
+      "selected": false,
+      "dragging": false,
+      "styleClass": "",
+      "className": "",
+      "targetNodes": [
+        {
+          "id": "26872",
+          "text": "节点-26872",
+          "type": "node",
+          "isShow": true,
+          "isHide": false,
+          "expanded": true,
+          "selected": false,
+          "dragging": false,
+          "styleClass": "",
+          "className": "",
+          "targetNodes": [
+            null
+          ],
+          "targetFrom": [
+            null
+          ],
+          "targetTo": [],
+          "color": "#3aca08",
+          "opacity": 1,
+          "fixed": false,
+          "x": 600,
+          "y": 0,
+          "Fx": 0,
+          "Fy": 0,
+          "offset_x": 0,
+          "offset_y": 0,
+          "disableDrag": false,
+          "singleNode": false,
+          "data": {
+            "myicon": "el-icon-star-on",
+            "nodeProperties": []
+          },
+          "lot": {
+            "childs": [
+              null
+            ],
+            "eached": true,
+            "strength": 1,
+            "notLeafNode": false,
+            "index_of_parent": 0,
+            "placed": true,
+            "subling": {
+              "level": 0,
+              "all_size": 1,
+              "all_strength": 1
+            },
+            "level": 0,
+            "strength_plus": 1,
+            "index_of_level": 0,
+            "childs_size": 1,
+            "strengthWithChilds": 1,
+            "strengthWithChilds_from": 0,
+            "x": 648,
+            "y": 48
+          },
+          "el": {
+            "offsetWidth": 96,
+            "offsetHeight": 96
+          },
+          "seeks_id": 6
+        }
+      ],
+      "targetFrom": [],
+      "targetTo": [
+        null
+      ],
+      "color": "#51d047",
+      "opacity": 1,
+      "fixed": false,
+      "x": 682,
+      "y": 178.35625,
+      "Fx": 0,
+      "Fy": 0,
+      "offset_x": 0,
+      "offset_y": 0,
+      "disableDrag": false,
+      "singleNode": false,
+      "data": {
+        "myicon": "el-icon-star-on",
+        "nodeProperties": []
+      },
+      "lot": {
+        "childs": [],
+        "eached": true,
+        "strength": 1,
+        "notLeafNode": false,
+        "index_of_parent": 0,
+        "placed": true,
+        "subling": {
+          "level": 1,
+          "all_size": 1,
+          "all_strength": 1
+        },
+        "level": 1,
+        "strength_plus": 1,
+        "index_of_level": 0,
+        "childs_size": 0,
+        "strengthWithChilds": 1,
+        "x": 648,
+        "y": 347.35625
+      },
+      "el": {
+        "offsetWidth": 96,
+        "offsetHeight": 96
+      },
+      "seeks_id": 7,
+      "nodeProperties": [
+        {
+          "nodePropertyName": "属性1706498405299",
+          "dataType": "TEXT",
+          "id": 1706498405299
+        },
+        {
+          "nodePropertyName": "属性1706498407675",
+          "dataType": "TEXT",
+          "id": 1706498407675
+        },
+        {
+          "nodePropertyName": "属性1706498408475",
+          "dataType": "TEXT",
+          "id": 1706498408475
+        }
+      ]
+    }
+  ],
+  "lines": [
+    {
+      "from": "29652",
+      "to": "26872",
+      "text": "关系1706498376953"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.security;
 
+import com.yishuifengxiao.common.guava.GuavaCache;
 import com.yishuifengxiao.common.security.user.CurrentUserDetails;
 import com.yishuifengxiao.common.tool.codec.DES;
 import com.yishuifengxiao.common.tool.collections.DataUtil;
@@ -39,8 +40,8 @@ public class SimpleUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // @formatter:off
-        SysUser sysUser = sysUserDao.findActiveSysUser(username)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format("用户名%s不存在", username)));
+        SysUser sysUser = GuavaCache.get(username, ()-> sysUserDao.findActiveSysUser(username)
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("用户名%s不存在", username))));
 
         Assert.isFalse("账户已禁用，请稍候一段时候再重试",null!=sysUser.getLockTime()&&sysUser.getLockTime().isAfter(LocalDateTime.now()));
 

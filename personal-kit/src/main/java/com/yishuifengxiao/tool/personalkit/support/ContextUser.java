@@ -1,6 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.support;
 
 
+import com.yishuifengxiao.common.guava.GuavaCache;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
@@ -23,9 +24,9 @@ public class ContextUser {
     public static SysUser currentUser() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Assert.isNotNull("当前用户还未登录或登录状态已过期", authentication);
-        SysUser sysUser = ContextUser.sysUserDao.findActiveSysUser(authentication.getName()).orElse(null);
-//        SysUser sysUser = GuavaCache.get(authentication.getName(), () -> ContextUser.sysUserDao.findActiveSysUser
-//        (authentication.getName()).orElse(null));
+//        SysUser sysUser = ContextUser.sysUserDao.findActiveSysUser(authentication.getName()).orElse(null);
+        SysUser sysUser = GuavaCache.get(authentication.getName(), () -> ContextUser.sysUserDao.findActiveSysUser
+                (authentication.getName()).orElse(null));
         Assert.isNotNull("当前用户还未登录或登录状态已过期", sysUser);
         return sysUser;
     }
