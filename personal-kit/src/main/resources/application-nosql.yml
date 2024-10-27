@@ -1,9 +1,9 @@
 spring:
   data:
     redis:
-      host: 10.168.1.115
-      port: 6380
-      password: Yishuifengxiao@36
+      host: 47.97.30.247
+      port: 6379
+      password: 12345678s
       database: 2
       connect-timeout: 1000
       jedis:
