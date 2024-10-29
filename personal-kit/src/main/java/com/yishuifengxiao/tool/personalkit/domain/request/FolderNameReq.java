@@ -23,14 +23,14 @@ public class FolderNameReq implements Serializable {
     /**
      * 数据唯一标识符
      */
-    @Schema(name ="数据唯一标识符,不能为空")
+    @Schema(title ="数据唯一标识符,不能为空")
     @NotBlank(message = "待操作的数据不能为空", groups = {Group.Update.class})
     private String id;
 
     /**
      * 文件夹的名字
      */
-    @Schema(name ="文件夹的名字,不能为空")
+    @Schema(title ="文件夹的名字,不能为空")
     @NotBlank(message = "文件夹的名字不能为空", groups = {Group.Create.class, Group.Update.class})
     private String name;
 
