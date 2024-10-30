@@ -70,7 +70,7 @@ public class RoleController {
         roleService.updateRoleUser(param);
     }
 
-    @PostMapping("/UserRoleReq")
+    @PostMapping("/updateUserRole")
     public void updateUserRole(@Validated(Group.Update.class) @RequestBody UserRoleReq param, BindingResult errors) {
         roleService.updateUserRole(param);
     }

@@ -2,13 +2,16 @@ package com.yishuifengxiao.tool.personalkit.support;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.tool.codec.Md5;
+import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.collections.DataUtil;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.*;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,7 +40,7 @@ import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.DEFAU
 @Component("resourceInitializer")
 public class ResourceInitializer implements CommandLineRunner {
     private boolean hasInit = false;
-    private final static List<String> sets = Arrays.asList("springfox.documentation", "org.springframework");
+    private final static List<String> sets = Arrays.asList("springfox.documentation", "org.springframework", "org.springdoc", "org.springframework.boot");
 
 
     @Autowired
@@ -51,58 +55,87 @@ public class ResourceInitializer implements CommandLineRunner {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    public void doInit() {
+        if (this.hasInit) {
+            return;
+        }
+        Long userNum = JdbcUtil.jdbcHelper().countAll(new SysUser().setUsername(Constant.DEFAULT_USER));
+        if (null != userNum && userNum > 0) {
+            return;
+        }
+        // 初始化用户
+        SysUser sysUser = JdbcUtil.jdbcHelper().saveOrUpdate(SysUser.ofEmbedded(Constant.DEFAULT_ROOT_ID, Constant.DEFAULT_USER, "系统超级管理员", Constant.DEFAULT_PWD));
+        //初始化角色
+        SysRole sysRole = JdbcUtil.jdbcHelper().saveOrUpdate(new SysRole(Constant.DEFAULT_ROOT_ID, "系统角色", "系统初始化数据," + "内置超级管理员，具有系统全部权限", Constant.DEFAULT_ROOT_ID, DEFAULT_HOME_URL, RoleStat.ROLE_ENABLE.getCode(), BoolStat.True.code(), LocalDateTime.now(), 1));
+
+        //初始化 用户-角色 关联关系
+        SysUserRole userRole = new SysUserRole(Md5.md5Short(sysUser.getId() + sysRole.getId()), sysUser.getId(), sysRole.getId());
+        JdbcUtil.jdbcHelper().saveOrUpdate(userRole);
+
+        //初始化权限
+        List<SysPermission> permissions = this.scanSysPermissions();
+        permissions.stream().forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
+        // 初始化 角色-权限 关联
+        permissions.stream().map(v -> new SysMenuPermission(Md5.md5Short(sysRole.getId() + v.getId()), sysRole.getId(), v.getId())).forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
+        this.hasInit = true;
+    }
 
     public List<SysPermission> scanSysPermissions() {
-        List<SysPermission> list = new ArrayList<>();
         Map<String, Object> map = new HashMap();
         map.putAll(context.getBeansWithAnnotation(RestController.class));
         map.putAll(context.getBeansWithAnnotation(Controller.class));
-        map.values().stream().filter(Objects::nonNull).filter(v -> !sets.stream().anyMatch(s -> StringUtils.containsIgnoreCase(v.getClass().getPackageName(), s))).forEach(c -> {
+
+        List<SysPermission> list = map.values().stream().filter(Objects::nonNull).filter(v -> !sets.stream().anyMatch(s -> StringUtils.containsIgnoreCase(v.getClass().getPackageName(), s))).map(controller -> {
             // 得到的是controller
-            Schema api = c.getClass().getAnnotation(Schema.class);
-            RequestMapping requestMapping = c.getClass().getAnnotation(RequestMapping.class);
-            String[] classUrls = null != requestMapping ? requestMapping.value() : null;
-            String moduleName = null;
-            if (null != api) {
-                moduleName = api.name();
-                if (StringUtils.isBlank(moduleName)) {
-                    moduleName = DataUtil.stream(api.types()).collect(Collectors.joining(","));
+            String moduleName = extractModuleName(controller);
+            List<String> classUrls = extractClassUrls(controller);
+            classUrls = CollUtil.isEmpty(classUrls) ? Arrays.asList("") : classUrls;
+            //方法
+            return classUrls.stream().map(classUrl -> Arrays.stream(controller.getClass().getMethods()).filter(m -> Modifier.isPublic(m.getModifiers())).map(declaredMethod -> {
+                String[] methodPaths = methodPath(declaredMethod);
+                if (CollUtil.isEmpty(methodPaths)) {
+                    return null;
                 }
-            }
+                Operation apiOperation = AnnotationUtils.findAnnotation(declaredMethod, Operation.class);
+                String summary = null != apiOperation ? apiOperation.summary() : "";
+                String description = null != apiOperation ? apiOperation.description() : "";
 
-            Method[] declaredMethods = c.getClass().getMethods();
-
-            assemble(moduleName, classUrls, declaredMethods, list);
-
-        });
+                return Arrays.asList(methodPaths).stream().map(methodUrl -> {
+                    String url = StringUtils.trim(classUrl + methodUrl);
+                    SysPermission permission = new SysPermission(IdWorker.snowflakeStringId(), moduleName, summary, description, url, contextPath, applicationName, BoolStat.True.code());
+                    permission.setId(Md5.md5Short(permission.getApplicationName() + permission.getContextPath() + permission.getUrl()));
+                    return permission;
+                }).collect(Collectors.toList());
+            }).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList())).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList());
+        }).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList());
         return list;
-
     }
 
-    private void assemble(String moduleName, String[] classUrls, Method[] declaredMethods, List<SysPermission> list) {
-        Arrays.stream(declaredMethods).forEach(m -> {
-            String[] methodPaths = methodPath(m);
-            if (null != methodPaths) {
-                Schema apiOperation = AnnotationUtils.findAnnotation(m, Schema.class);
-                String name = null != apiOperation ? apiOperation.name() : "";
-                String note = null != apiOperation ? apiOperation.description() : "";
-
-                if (null != classUrls && classUrls.length > 0) {
-                    DataUtil.stream(classUrls).forEach(classUrl -> DataUtil.stream(methodPaths).forEach(methodPath -> this.assemble(list, moduleName, name, note, new StringBuilder(null == classUrl ? "" : classUrl.trim()).append(null == methodPath ? "" : methodPath.trim()).toString())));
-                } else {
-                    DataUtil.stream(methodPaths).forEach(methodPath -> this.assemble(list, moduleName, name, note, null == methodPath ? "" : methodPath.trim()));
-                }
-
-
+    private List<String> extractClassUrls(Object controller) {
+        RequestMapping requestMapping = AnnotationUtils.findAnnotation(controller.getClass(), RequestMapping.class);
+        if (null != requestMapping) {
+            String[] value = requestMapping.value();
+            if (CollUtil.isNotEmpty(value)) {
+                return Arrays.asList(value);
             }
-
-        });
+        }
+        return Collections.EMPTY_LIST;
     }
 
-    private void assemble(List<SysPermission> list, String moduleName, String name, String note, String url) {
-        SysPermission permission = new SysPermission(IdWorker.snowflakeStringId(), moduleName, name, note, url, contextPath, applicationName, BoolStat.True.code());
-        permission.setId(Md5.md5Short(permission.getApplicationName() + permission.getContextPath() + permission.getUrl()));
-        list.add(permission);
+    private String extractModuleName(Object controller) {
+        Tag tag = controller.getClass().getAnnotation(Tag.class);
+        if (null != tag) {
+            return tag.name();
+        }
+        Schema api = controller.getClass().getAnnotation(Schema.class);
+        String moduleName = null;
+        if (null != api) {
+            moduleName = api.name();
+            if (StringUtils.isBlank(moduleName)) {
+                moduleName = DataUtil.stream(api.types()).collect(Collectors.joining(","));
+            }
+        }
+        return moduleName;
     }
 
     private String[] methodPath(Method method) {
@@ -128,34 +161,6 @@ public class ResourceInitializer implements CommandLineRunner {
             return methodRequestMapping.value();
         }
         return null;
-    }
-
-    public void doInit() {
-        if (this.hasInit) {
-            return;
-        }
-        Long userNum = JdbcUtil.jdbcHelper().countAll(new SysUser().setUsername(Constant.DEFAULT_USER));
-        if (null != userNum && userNum > 0) {
-            return;
-        }
-        //初始化权限
-        List<SysPermission> permissions = this.scanSysPermissions();
-        permissions.stream().forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
-        //初始化角色
-        SysRole sysRole = JdbcUtil.jdbcHelper().saveOrUpdate(new SysRole(Constant.DEFAULT_ROOT_ID, "系统角色", "系统初始化数据," +
-                "内置超级管理员，具有系统全部权限", Constant.DEFAULT_ROOT_ID, DEFAULT_HOME_URL, RoleStat.ROLE_ENABLE.getCode(),
-                BoolStat.True.code(), LocalDateTime.now(), 1));
-        // 初始化用户
-        SysUser sysUser = JdbcUtil.jdbcHelper().saveOrUpdate(SysUser.ofEmbedded(Constant.DEFAULT_ROOT_ID,
-                Constant.DEFAULT_USER, "系统超级管理员", Constant.DEFAULT_PWD));
-
-        // 初始化 角色-权限 关联
-        permissions.stream().map(v -> new SysMenuPermission(Md5.md5Short(sysRole.getId() + v.getId()), sysRole.getId(), v.getId())).forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
-
-        //初始化
-        SysUserRole userRole = new SysUserRole(Md5.md5Short(sysUser.getId() + sysRole.getId()), sysUser.getId(), sysRole.getId());
-        JdbcUtil.jdbcHelper().saveOrUpdate(userRole);
-        this.hasInit = true;
     }
 
 
