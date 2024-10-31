@@ -14,19 +14,25 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.context.request.ServletRequestAttributes;import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Objects;
+import java.util.List;import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Aspect
 @Component
 public class MappingAspect {
-    private EventBus asyncEventBus
+    @Autowired
+    private EventBus asyncEventBus;
 
-    // 定义切点，匹配所有 @RestController 或 @Controller 注解的类中带有 @GetMapping 或 @PostMapping 注解的方法  
+
+    /**
+     * 定义切点，匹配所有 @RestController 或 @Controller 注解的类中带有 @GetMapping 或 @PostMapping 注解的方法
+     */
     @Pointcut("within(@org.springframework.web.bind.annotation.RestController *) || "//
             + " within(@org" + ".springframework.stereotype.Controller *)") //
     public void controllerMethods() {
@@ -58,8 +64,8 @@ public class MappingAspect {
         HttpServletResponse response = null == attributes ? null : attributes.getResponse();
         String uri = null == request ? null : request.getRequestURI();
 
-        Object requestParam =
-                DataUtil.stream(joinPoint.getArgs()).filter(Objects::nonNull).filter(this::isNonSystemParams).findFirst().orElse(null);
+        List<Object> params =
+                DataUtil.stream(joinPoint.getArgs()).filter(Objects::nonNull).filter(this::isNotSystemParams).collect(Collectors.toList());
         Throwable ex = null;
         Object result = null;
         try {
@@ -71,7 +77,7 @@ public class MappingAspect {
             throw e;
         } finally {
             SysUser sysUser = ContextCache.currentUser().orElse(null);
-            asyncEventBus.post(new RequestLogEvent(request, response, sysUser, requestParam,
+            asyncEventBus.post(new RequestLogEvent(request, response, sysUser, params,
                     result, ex));
         }
         return result;
@@ -82,7 +88,7 @@ public class MappingAspect {
         asyncEventBus.register(this);
     }
 
-    private boolean isNonSystemParams(Object arg) {
+    private boolean isNotSystemParams(Object arg) {
 
         if (null == arg) {
             return true;
@@ -94,6 +100,12 @@ public class MappingAspect {
             return false;
         }
         if (arg instanceof BindingResult) {
+            return false;
+        }
+        if(arg instanceof MultipartFile){
+            return false;
+        }
+        if(arg instanceof MultipartFile[]){
             return false;
         }
         return true;

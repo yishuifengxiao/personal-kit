@@ -5,6 +5,7 @@ import com.yishuifengxiao.common.guava.GuavaCache;
 import com.yishuifengxiao.common.tool.utils.ExceptionUtil;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -33,8 +34,12 @@ public class ContextCache {
         if (null == authentication) {
             return Optional.empty();
         }
+        String name = authentication.getName();
+        if (StringUtils.isBlank(name)) {
+            return Optional.empty();
+        }
         SysUser contextUser = GuavaCache.get(authentication.getName(),
-                () -> ContextCache.sysUserDao.findActiveSysUser(authentication.getName()).orElse(null));
+                () -> ContextCache.sysUserDao.findActiveSysUser(name).orElse(null));
         return Optional.ofNullable(contextUser);
     }
 

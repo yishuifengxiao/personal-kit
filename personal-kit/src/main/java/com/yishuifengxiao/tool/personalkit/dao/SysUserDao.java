@@ -1,14 +1,11 @@
 package com.yishuifengxiao.tool.personalkit.dao;
 
 import com.yishuifengxiao.common.jdbc.JdbcHelper;
-import com.yishuifengxiao.common.tool.bean.ClassUtil;
 import com.yishuifengxiao.tool.personalkit.dao.repository.SysUserRepository;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.stereotype.Repository;
 
@@ -37,7 +34,10 @@ public class SysUserDao {
         if (StringUtils.isBlank(username)) {
             return Optional.empty();
         }
-        return sysUserRepository.findAll(Example.of(new SysUser().setUsername(username.trim())), Sort.by(ClassUtil.pojoFieldName(SysUser::getCreateTime)).descending()).stream().findFirst();
+//        return sysUserRepository.findAll(Example.of(new SysUser().setUsername(username.trim())), Sort.by(ClassUtil.pojoFieldName(SysUser::getCreateTime)).descending()).stream().findFirst();
+        Optional<SysUser> optional = Optional.ofNullable(jdbcHelper.findOne(new SysUser().setUsername(username)));
+
+        return optional;
     }
 
     public List<SysRole> findAllRoleByUserId(String userId) {
@@ -55,8 +55,8 @@ public class SysUserDao {
         });
     }
 
-    public String findUserNameById(String id){
-        if(StringUtils.isBlank(id)){
+    public String findUserNameById(String id) {
+        if (StringUtils.isBlank(id)) {
             return null;
         }
         return sysUserRepository.findById(id.trim()).map(SysUser::getNickname).orElse(null);

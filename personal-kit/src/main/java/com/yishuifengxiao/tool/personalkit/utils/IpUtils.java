@@ -7,10 +7,7 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class IpUtils {
@@ -33,8 +30,8 @@ public class IpUtils {
             e.printStackTrace();
         }
 
-        return ips.stream().filter(s -> !StringUtils.containsAnyIgnoreCase(s, "127.0.0.1", "172"
-                + ".17.0.1", "%")).collect(Collectors.toList());
+        return ips.stream().filter(s -> !Arrays.asList("127", "172", "0").stream().anyMatch(v -> StringUtils.startsWithIgnoreCase(s,
+                v))).filter(s -> !StringUtils.containsAnyIgnoreCase(s, "%")).collect(Collectors.toList());
     }
 
     public static String getOutIp() {

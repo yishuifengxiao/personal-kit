@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,7 +19,7 @@ public class RequestLogEvent implements Serializable {
     private HttpServletRequest request;
     private HttpServletResponse response;
     private SysUser sysUser;
-    private Object requestParam;
+    private List<Object> params;
     private Object result;
     private Throwable e;
 }
