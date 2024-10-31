@@ -5,6 +5,7 @@ import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
 import com.yishuifengxiao.tool.personalkit.domain.vo.PermissionVo;
 import com.yishuifengxiao.tool.personalkit.service.PermissionService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2023/11/17 16:32
  * @since 1.0.0
  */
+@Tag(name = "权限管理")
 @Valid
 @RestController
 @RequestMapping("/sys/permission")

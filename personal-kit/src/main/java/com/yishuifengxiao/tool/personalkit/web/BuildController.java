@@ -6,6 +6,7 @@ import com.yishuifengxiao.tool.personalkit.domain.mongo.GraphBuildRecord;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.service.GraphBuildRecordService;
 import com.yishuifengxiao.tool.personalkit.service.GraphBuildService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2024/1/18 14:44
  * @since 1.0.0
  */
+@Tag(name = "图谱流水线管理")
 @Valid
 @RestController
 @RequestMapping("/graph/build")

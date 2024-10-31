@@ -6,6 +6,7 @@ import com.yishuifengxiao.tool.personalkit.domain.mongo.GraphDefine;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.GraphDefineVo;
 import com.yishuifengxiao.tool.personalkit.service.GraphService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import java.util.List;
  * @date 2024/1/2 19:02
  * @since 1.0.0
  */
+@Tag(name = "图谱管理")
 @Valid
 @RestController
 @RequestMapping("/graph/define")

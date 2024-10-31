@@ -10,6 +10,7 @@ import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.DiskUploadRecordVo;
 import com.yishuifengxiao.tool.personalkit.domain.vo.VirtuallyFileVo;
 import com.yishuifengxiao.tool.personalkit.service.DataCenterService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import java.util.List;
  * @date 2023/12/2 13:01
  * @since 1.0.0
  */
+@Tag(name = "数据管理")
 @Valid
 @Validated
 @Slf4j

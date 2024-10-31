@@ -1,5 +1,6 @@
 package com.yishuifengxiao.tool.personalkit;
 
+import com.yishuifengxiao.tool.personalkit.utils.IpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.SpringApplication;
@@ -25,7 +26,6 @@ public class App extends SpringBootServletInitializer {
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
 
-        
 
         return builder.sources(App.class);
 
@@ -44,8 +44,13 @@ public class App extends SpringBootServletInitializer {
         ConfigurableEnvironment env = context.getEnvironment();
         String serverPort = env.getProperty("server.port");
         String contextPath = env.getProperty("server.servlet.context-path");
-        StringBuilder url = new StringBuilder("http://localhost:").append(serverPort).append(StringUtils.isBlank(contextPath) ? "" : contextPath.trim()).append("/doc.html");
+        StringBuilder url =
+                new StringBuilder("http://localhost:").append(serverPort).append(StringUtils.isBlank(contextPath) ? "" : contextPath.trim()).append("/doc.html");
         log.info("=============》 在线文档地址 {}", url.toString());
+        IpUtils.localIps().forEach(ip -> {
+            log.info("=============》 在线文档地址 {}",
+                    new StringBuilder("http://" + ip + ":").append(serverPort).append(StringUtils.isBlank(contextPath) ? "" : contextPath.trim()).append("/doc.html").toString());
+        });
     }
 
 }

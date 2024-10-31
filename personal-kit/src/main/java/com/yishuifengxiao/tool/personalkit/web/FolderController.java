@@ -6,6 +6,7 @@ import com.yishuifengxiao.tool.personalkit.domain.request.FolderParentReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdListReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.ResourceVo;
 import com.yishuifengxiao.tool.personalkit.service.FolderService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
  * @version 1.0.0
  * @since 1.0.0
  */
+@Tag(name = "文件夹管理")
 @RestController
 @Valid
 @Validated

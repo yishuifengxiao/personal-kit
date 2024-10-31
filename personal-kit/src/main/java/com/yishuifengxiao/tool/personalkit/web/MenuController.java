@@ -9,6 +9,7 @@ import com.yishuifengxiao.tool.personalkit.domain.vo.MenuTree;
 import com.yishuifengxiao.tool.personalkit.domain.vo.MenuVo;
 import com.yishuifengxiao.tool.personalkit.domain.vo.RoleMenuVo;
 import com.yishuifengxiao.tool.personalkit.service.MenuService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +25,7 @@ import java.util.List;
  * @date 2023/12/9 22:49
  * @since 1.0.0
  */
+@Tag(name = "菜单管理")
 @Valid
 @RestController
 @RequestMapping("/sys/menu")

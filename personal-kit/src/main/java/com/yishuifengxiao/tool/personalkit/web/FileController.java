@@ -8,6 +8,7 @@ import com.yishuifengxiao.tool.personalkit.domain.request.FileMoveReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdListReq;
 import com.yishuifengxiao.tool.personalkit.service.FileService;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ import java.io.IOException;
  * @version 1.0.0
  * @since 1.0.0
  */
+@Tag(name = "文件管理")
 @Controller
 @Valid
 @Validated
@@ -36,7 +38,6 @@ public class FileController {
     private FileService fileService;
 
 
-
     @PostMapping("/imports")
     @ResponseBody
     public void importFiles(HttpServletRequest request,
@@ -45,7 +46,7 @@ public class FileController {
                             @RequestParam(value = "folder", required = false) String folder,
                             //
                             @RequestParam(value = "mode", required = false) UploadMode uploadMode) throws IOException {
-        final SysUser sysUser = ContextCache.currentUser();
+        final SysUser sysUser = ContextCache.currentLoginUser();
         fileService.uploads(request, sysUser, folder, uploadMode, files);
     }
 
@@ -60,15 +61,17 @@ public class FileController {
                                @RequestParam(value = "traceId", required = false) String traceId,
                                //
                                @RequestParam(value = "mode", required = false) UploadMode uploadMode) throws IOException {
-        final SysUser sysUser = ContextCache.currentUser();
-        final String upload = fileService.upload(request, sysUser, folder, uploadMode, file, traceId);
+        final SysUser sysUser = ContextCache.currentLoginUser();
+        final String upload = fileService.upload(request, sysUser, folder, uploadMode, file,
+                traceId);
         return Response.sucData(upload);
     }
 
 
     @PostMapping("/deletes")
     @ResponseBody
-    public void deletes(HttpServletRequest request, @RequestBody IdListReq req, BindingResult errors) {
+    public void deletes(HttpServletRequest request, @RequestBody IdListReq req,
+                        BindingResult errors) {
         fileService.delete(req);
     }
 
@@ -83,7 +86,8 @@ public class FileController {
 
     @PostMapping("/move")
     @ResponseBody
-    public void move(HttpServletRequest request, @RequestBody FileMoveReq req, BindingResult errors) {
+    public void move(HttpServletRequest request, @RequestBody FileMoveReq req,
+                     BindingResult errors) {
         fileService.move(req);
     }
 }

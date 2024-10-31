@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2024/1/2 18:43
  * @since 1.0.0
  */
-@Tag(name = "数据集")
+@Tag(name = "数据集管理")
 @Valid
 @Validated
 @Slf4j

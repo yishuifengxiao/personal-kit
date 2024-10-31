@@ -11,6 +11,8 @@ import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.vo.LoginVo;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
  * @date 2023/10/31-14:29
  * @since 1.0.0
  */
+@Tag(name = "首页")
 @Valid
 @Controller
 public class IndexController {
@@ -44,13 +47,14 @@ public class IndexController {
         return authentication;
     }
 
-
+    @Operation(summary = "当前登录用户信息", description = "获取当前登录用户信息")
     @GetMapping("/user")
     @ResponseBody
     public SysUser user() {
-        return ContextCache.currentUser();
+        return ContextCache.currentUser().orElse(null);
     }
 
+    @Operation(summary = "获取token", description = "获取当前用户所有的token信息")
     @GetMapping("/tokens")
     @ResponseBody
     public List<SecurityToken> tokens(Authentication authentication) {
@@ -73,9 +77,11 @@ public class IndexController {
         return tokens;
     }
 
+    @Operation(summary = "默认接口", description = "获取请求信息")
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     @ResponseBody
-    public Object index(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+    public Object index(HttpServletRequest request, HttpServletResponse response,
+                        Authentication authentication) {
 
         StringBuffer requestURL = request.getRequestURL();
         String requestURI = request.getRequestURI();
@@ -91,13 +97,13 @@ public class IndexController {
         }
 
         Map map = Map.of("requestURL", requestURL, "requestURI", requestURI, "contextPath",
-                contextPath, "servletPath", servletPath, "parameterMap", parameterMap, "headerMap",
-                headerMap);
+                contextPath, "servletPath", servletPath, "parameterMap", parameterMap, "headerMap"
+                , headerMap);
         return map;
     }
 
 
-
+    @Operation(summary = "登录", description = "使用用户名和密码进行登录")
     @PostMapping("/login")
     @org.springframework.web.bind.annotation.ResponseBody
     public LoginVo login(HttpServletRequest request, HttpServletResponse response,
@@ -106,8 +112,7 @@ public class IndexController {
         try {
             LoginVo loginVo = userService.login(request, response, query);
             SpringContext.publishEvent(new SecurityEvent(this, request, response,
-                    Strategy.AUTHENTICATION_SUCCESS,
-                    loginVo.getSecurityToken(), null));
+                    Strategy.AUTHENTICATION_SUCCESS, loginVo.getSecurityToken(), null));
 
             return loginVo;
         } catch (Exception e) {

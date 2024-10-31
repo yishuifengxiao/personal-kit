@@ -11,6 +11,7 @@ import com.yishuifengxiao.tool.personalkit.domain.request.UserRoleReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.RoleVo;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserVo;
 import com.yishuifengxiao.tool.personalkit.service.RoleService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2023/12/9 20:08
  * @since 1.0.0
  */
+@Tag(name = "角色管理")
 @Valid
 @RestController
 @RequestMapping("/sys/role")

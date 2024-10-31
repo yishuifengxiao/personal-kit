@@ -8,6 +8,7 @@ import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
  * @date 2023/11/10-17:00
  * @since 1.0.0
  */
+@Tag(name = "用户管理")
 @Valid
 @RestController
 @RequestMapping("/sys/user")
@@ -32,7 +34,7 @@ public class UserController {
 
     @GetMapping("/info/{id}")
     public UserInfo info(@PathVariable String id, @CurrentUser UserDetails user) {
-        SysUser sysUser = ContextCache.currentUser();
+        SysUser sysUser = ContextCache.currentLoginUser();
         return userService.userInfo(id);
     }
 

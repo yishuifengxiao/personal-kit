@@ -7,9 +7,11 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.SysSecurityRecord;
 import com.yishuifengxiao.tool.personalkit.domain.request.RecordReq;
 import com.yishuifengxiao.tool.personalkit.service.RecordService;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,6 +23,7 @@ import java.util.Arrays;
  * @date 2023/12/3 18:35
  * @since 1.0.0
  */
+@Tag(name = "记录管理")
 @Valid
 @RestController
 @RequestMapping("/record")
@@ -31,10 +34,10 @@ public class RecordController {
 
 
     @PostMapping("/personal/login/page")
-    public Page<SysSecurityRecord> loginRecord(PageQuery<RecordReq> param) {
+    public Page<SysSecurityRecord> loginRecord(@RequestBody PageQuery<RecordReq> param) {
 
         RecordReq recordReq = param.query().orElse(new RecordReq());
-        recordReq.setUsername(ContextCache.currentUser().getUsername());
+        recordReq.setUsername(ContextCache.currentUser().get().getUsername());
         recordReq.setStrategys(Arrays.asList(Strategy.AUTHENTICATION_SUCCESS.getCode(),
                 Strategy.AUTHENTICATION_FAILURE.getCode()));
 
