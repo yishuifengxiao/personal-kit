@@ -71,7 +71,7 @@ export default defineComponent({
   },
 
   methods: {
-    ...mapActions(useUserStore, ['setToken', 'setUserId']),
+    ...mapActions(useUserStore, ['setToken', 'setUser']),
     onFinish(values) {
       this.$http
         .request({
@@ -81,7 +81,7 @@ export default defineComponent({
         })
         .then((res) => {
           this.setToken(res.token)
-          this.setUserId(res.userId)
+          this.setUser(res)
           this.doAction()
         })
         .catch((err) => console.log(err))
