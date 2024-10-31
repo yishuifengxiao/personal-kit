@@ -7,7 +7,7 @@ import com.yishuifengxiao.tool.personalkit.dao.mongo.repository.GraphBuildRecord
 import com.yishuifengxiao.tool.personalkit.dao.mongo.repository.GraphDefineRepository;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.GraphBuildRecord;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.GraphDefine;
-import com.yishuifengxiao.tool.personalkit.support.ContextUser;
+import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +39,7 @@ public class GraphBuildService {
         eventPublisher.post(define);
 
         GraphBuildRecord buildRecord =
-                new GraphBuildRecord().setGraphId(define.getId()).setBuildstat(GraphBuildRecord.BuildStat.BUILDING).setCreateTime(LocalDateTime.now()).setCreateUserId(ContextUser.currentUserId());
+                new GraphBuildRecord().setGraphId(define.getId()).setBuildstat(GraphBuildRecord.BuildStat.BUILDING).setCreateTime(LocalDateTime.now()).setCreateUserId(ContextCache.currentUserId());
         graphBuildRecordRepository.save(buildRecord);
     }
 

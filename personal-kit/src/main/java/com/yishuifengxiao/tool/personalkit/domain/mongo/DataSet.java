@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,7 @@ import java.util.List;
  * @date 2024/1/2 18:07
  * @since 1.0.0
  */
+@Schema(title = "数据集")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,8 +38,10 @@ public class DataSet implements Serializable {
     @Id
     private String id;
 
+    @Schema(title = "数据集名称")
     private String name;
 
+    @Schema(title = "数据集描述")
     private String description;
 
     private String createUserId;

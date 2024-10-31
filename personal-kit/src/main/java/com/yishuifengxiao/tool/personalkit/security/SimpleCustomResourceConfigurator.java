@@ -9,7 +9,7 @@ import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
-import com.yishuifengxiao.tool.personalkit.support.ContextUser;
+import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +58,7 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
             return new AuthorizationDecision(true);
         }
         //当前角色
-        String currentRole = ContextUser.getRole();
+        String currentRole = ContextCache.getRole();
 
         String sql = "SELECT DISTINCT sp.* FROM sys_permission sp, sys_menu_permission smp, sys_menu sm, " +
                 "sys_role_menu srm WHERE smp.permission_id = sp.id AND smp.menu_id = sm.id AND sm.id = srm.menu_id ";

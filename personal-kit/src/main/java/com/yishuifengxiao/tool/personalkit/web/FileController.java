@@ -7,7 +7,7 @@ import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
 import com.yishuifengxiao.tool.personalkit.domain.request.FileMoveReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdListReq;
 import com.yishuifengxiao.tool.personalkit.service.FileService;
-import com.yishuifengxiao.tool.personalkit.support.ContextUser;
+import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +45,7 @@ public class FileController {
                             @RequestParam(value = "folder", required = false) String folder,
                             //
                             @RequestParam(value = "mode", required = false) UploadMode uploadMode) throws IOException {
-        final SysUser sysUser = ContextUser.currentUser();
+        final SysUser sysUser = ContextCache.currentUser();
         fileService.uploads(request, sysUser, folder, uploadMode, files);
     }
 
@@ -60,7 +60,7 @@ public class FileController {
                                @RequestParam(value = "traceId", required = false) String traceId,
                                //
                                @RequestParam(value = "mode", required = false) UploadMode uploadMode) throws IOException {
-        final SysUser sysUser = ContextUser.currentUser();
+        final SysUser sysUser = ContextCache.currentUser();
         final String upload = fileService.upload(request, sysUser, folder, uploadMode, file, traceId);
         return Response.sucData(upload);
     }

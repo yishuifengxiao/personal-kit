@@ -38,7 +38,7 @@ public class CacheRateLimiterFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            ContextUser.setRole(currentRole(request));
+            ContextCache.setRole(currentRole(request));
             if (coreproperties.getIpMaxVisitPerSecond() > 0 &&
                     //
                     !request.getRequestURI().contains(".") &&
@@ -47,7 +47,7 @@ public class CacheRateLimiterFilter extends OncePerRequestFilter {
                 //
             ) {
                 //开启了限流功能WE
-                String visitorIp = Optional.ofNullable(HttpUtils.getVisitorIp(request)).orElse("localhost");
+                String visitorIp = Optional.ofNullable(HttpUtils.getRequestIp(request)).orElse("localhost");
                 RateLimiter rateLimiter = GuavaCache.get(visitorIp,
                         () -> RateLimiter.create(coreproperties.getIpMaxVisitPerSecond()));
                 if (!rateLimiter.tryAcquire()) {
@@ -59,7 +59,7 @@ public class CacheRateLimiterFilter extends OncePerRequestFilter {
 
             filterChain.doFilter(request, response);
         } finally {
-            ContextUser.clearRole();
+            ContextCache.clearRole();
         }
 
     }

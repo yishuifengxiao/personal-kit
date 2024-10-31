@@ -16,7 +16,7 @@ import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadStat;
 import com.yishuifengxiao.tool.personalkit.domain.request.FileMoveReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdListReq;
-import com.yishuifengxiao.tool.personalkit.support.ContextUser;
+import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import com.yishuifengxiao.tool.personalkit.support.UploadClient;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -83,7 +83,7 @@ public class FileService {
         if (StringUtils.isBlank(folder)) {
             DiskFolder diskFolder = new DiskFolder().setId(IdWorker.snowflakeStringId()).setFolderName(DEFAULT_FOLDER_NAME)
                     //
-                    .setParentId(DEFAULT_PARENT_ROOT_ID).setUserId(ContextUser.currentUserId()).setCreateTime(LocalDateTime.now());
+                    .setParentId(DEFAULT_PARENT_ROOT_ID).setUserId(ContextCache.currentUserId()).setCreateTime(LocalDateTime.now());
             if (JdbcUtil.jdbcHelper().countAll(new DiskFolder().setFolderName(diskFolder.getFolderName()).setUserId(diskFolder.getUserId())) == 0) {
                 //不存在则新增
                 JdbcUtil.jdbcHelper().insertSelective(diskFolder);

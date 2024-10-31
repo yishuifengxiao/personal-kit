@@ -17,7 +17,7 @@ import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyRow;
 import com.yishuifengxiao.tool.personalkit.domain.vo.DiskUploadRecordVo;
 import com.yishuifengxiao.tool.personalkit.domain.vo.VirtuallyFileVo;
-import com.yishuifengxiao.tool.personalkit.support.ContextUser;
+import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -119,7 +119,7 @@ public class DataCenterService {
 
     public Page<DiskFile> findPageDiskFile(PageQuery<DiskFile> pageQuery) {
         DiskFile diskFile = pageQuery.query().orElse(new DiskFile());
-        diskFile.setUserId(ContextUser.currentUserId());
+        diskFile.setUserId(ContextCache.currentUserId());
         return JdbcUtil.jdbcHelper().findPage(diskFile, pageQuery.size().intValue(), pageQuery.num().intValue());
     }
 }

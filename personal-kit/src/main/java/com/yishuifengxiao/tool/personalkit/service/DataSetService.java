@@ -15,7 +15,7 @@ import com.yishuifengxiao.tool.personalkit.domain.mongo.DataSet;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.DataSetDetail;
 import com.yishuifengxiao.tool.personalkit.domain.vo.DataSetVo;
-import com.yishuifengxiao.tool.personalkit.support.ContextUser;
+import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class DataSetService {
 
     public Page<DataSetVo> findPageDataSet(PageQuery<DataSet> param) {
         DataSet dataSet = param.query().orElse(new DataSet());
-        dataSet.setCreateUserId(ContextUser.currentUserId());
+        dataSet.setCreateUserId(ContextCache.currentUserId());
         param.setQuery(dataSet);
         return dataSetDao.findPage(param).map(v -> {
 
@@ -57,10 +57,10 @@ public class DataSetService {
     }
 
     public void save(DataSet param) {
-        Assert.lteZero("已经存在相同名称的数据集", dataSetDao.countByNameAndUser(param.getName(), ContextUser.currentUserId()));
+        Assert.lteZero("已经存在相同名称的数据集", dataSetDao.countByNameAndUser(param.getName(), ContextCache.currentUserId()));
         param.setId(IdWorker.snowflakeStringId())
                 .setCreateTime(LocalDateTime.now())
-                .setCreateUserId(ContextUser.currentUserId());
+                .setCreateUserId(ContextCache.currentUserId());
         dataSetRepository.save(param);
     }
 

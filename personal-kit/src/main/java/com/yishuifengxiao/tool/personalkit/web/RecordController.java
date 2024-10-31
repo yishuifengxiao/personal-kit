@@ -6,7 +6,7 @@ import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysSecurityRecord;
 import com.yishuifengxiao.tool.personalkit.domain.request.RecordReq;
 import com.yishuifengxiao.tool.personalkit.service.RecordService;
-import com.yishuifengxiao.tool.personalkit.support.ContextUser;
+import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +34,7 @@ public class RecordController {
     public Page<SysSecurityRecord> loginRecord(PageQuery<RecordReq> param) {
 
         RecordReq recordReq = param.query().orElse(new RecordReq());
-        recordReq.setUsername(ContextUser.currentUser().getUsername());
+        recordReq.setUsername(ContextCache.currentUser().getUsername());
         recordReq.setStrategys(Arrays.asList(Strategy.AUTHENTICATION_SUCCESS.getCode(),
                 Strategy.AUTHENTICATION_FAILURE.getCode()));
 

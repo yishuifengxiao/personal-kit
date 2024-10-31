@@ -2,12 +2,14 @@ package com.yishuifengxiao.tool.personalkit.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yishuifengxiao.common.security.token.SecurityToken;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author yishui
@@ -28,6 +30,8 @@ public class LoginVo implements Serializable {
     private String nickName;
 
     private String token;
+
+    private List<SysRole> roles;
 
     @JsonIgnore
     private transient SecurityToken securityToken;

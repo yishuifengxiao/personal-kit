@@ -36,35 +36,35 @@ public class DataSetController {
     @Autowired
     private DataSetService dataSetService;
 
-    @Operation(summary = "分页查询数据集", description = "分页查询数据集")
+    @Operation(summary = "分页查询数据集", description = "分页查询数据集描述")
     @PostMapping("/page")
     public Page<DataSetVo> reacordPage(@RequestBody PageQuery<DataSet> pageQuery) {
 
         return dataSetService.findPageDataSet(pageQuery);
     }
 
-    @Operation(summary = "增加数据集", description = "增加数据集")
+    @Operation(summary = "增加数据集", description = "增加数据集描述")
     @PostMapping("/save")
     public void add(@RequestBody DataSet param) {
 
         dataSetService.save(param);
     }
 
-    @Operation(summary = "更新数据集", description = "更新数据集")
+    @Operation(summary = "更新数据集", description = "更新数据集描述")
     @PostMapping("/update")
     public void update(@RequestBody DataSet param) {
 
         dataSetService.update(param);
     }
 
-    @Operation(summary = "删除数据集", description = "删除数据集")
+    @Operation(summary = "删除数据集", description = "删除数据集描述")
     @PostMapping("/delete")
     public void delete(@Valid @RequestBody IdReq param) {
 
         dataSetService.delete(param);
     }
 
-    @Operation(summary = "数据集详情", description = "数据集详情")
+    @Operation(summary = "数据集详情", description = "数据集详情描述")
     @PostMapping("/detail")
     public DataSetDetail detail(@Valid @RequestBody IdReq param) {
 

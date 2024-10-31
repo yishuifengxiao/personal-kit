@@ -10,7 +10,7 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.vo.LoginVo;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
-import com.yishuifengxiao.tool.personalkit.support.ContextUser;
+import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -48,7 +48,7 @@ public class IndexController {
     @GetMapping("/user")
     @ResponseBody
     public SysUser user() {
-        return ContextUser.currentUser();
+        return ContextCache.currentUser();
     }
 
     @GetMapping("/tokens")

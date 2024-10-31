@@ -11,7 +11,7 @@ import com.yishuifengxiao.tool.personalkit.dao.mongo.repository.GraphDefineRepos
 import com.yishuifengxiao.tool.personalkit.dao.mongo.repository.OntologyRepository;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.Ontology;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
-import com.yishuifengxiao.tool.personalkit.support.ContextUser;
+import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import com.yishuifengxiao.tool.personalkit.tool.OntHelper;
 import jakarta.transaction.Transactional;
 import org.apache.commons.collections4.MapUtils;
@@ -41,7 +41,7 @@ public class OntologyService {
 
     public Page<Ontology> findPage(PageQuery<Ontology> param) {
         Ontology dataSet = param.query().orElse(new Ontology());
-        dataSet.setCreateUserId(ContextUser.currentUserId());
+        dataSet.setCreateUserId(ContextCache.currentUserId());
         param.setQuery(dataSet);
         return ontologyDao.findPage(param);
     }
@@ -50,10 +50,10 @@ public class OntologyService {
         String graphName = MapUtils.getString(param, "graphName");
         Assert.lteZero("已经存在相同名称的本体",
                 ontologyRepository.countAllByOntologyNameAndCreateUserId(graphName,
-                        ContextUser.currentUserId()));
+                        ContextCache.currentUserId()));
 
 
-        Ontology ontology = OntHelper.convert(param).setCreateUserId(ContextUser.currentUserId())
+        Ontology ontology = OntHelper.convert(param).setCreateUserId(ContextCache.currentUserId())
                 .setCreateTime(LocalDateTime.now())
                 .setVersion(NumberUtil.ZERO.intValue())
                 .setMaster(true).setText(JsonUtil.toJSONString(param));

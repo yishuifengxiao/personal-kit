@@ -15,28 +15,25 @@ import org.springframework.stereotype.Component;
  * @since 1.0.0
  */
 @Component
-public class ContextUser {
+public class ContextCache {
 
     private final static ThreadLocal<String> currentRole = new ThreadLocal<>();
     private static SysUserDao sysUserDao;
 
-
     public static SysUser currentUser() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Assert.isNotNull("当前用户还未登录或登录状态已过期", authentication);
-//        SysUser sysUser = ContextUser.sysUserDao.findActiveSysUser(authentication.getName()).orElse(null);
-        SysUser sysUser = GuavaCache.get(authentication.getName(), () -> ContextUser.sysUserDao.findActiveSysUser
-                (authentication.getName()).orElse(null));
-        Assert.isNotNull("当前用户还未登录或登录状态已过期", sysUser);
-        return sysUser;
+        SysUser contextUser = GuavaCache.get(authentication.getName(), () -> ContextCache.sysUserDao.findActiveSysUser(authentication.getName()).orElse(null));
+        Assert.isNotNull("当前用户还未登录或登录状态已过期", contextUser);
+        return contextUser;
     }
 
     public static String currentUserId() {
         return currentUser().getId();
     }
 
-    public ContextUser(SysUserDao sysUserDao) {
-        ContextUser.sysUserDao = sysUserDao;
+    public ContextCache(SysUserDao sysUserDao) {
+        ContextCache.sysUserDao = sysUserDao;
     }
 
     public static void setRole(String role) {

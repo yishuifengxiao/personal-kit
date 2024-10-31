@@ -11,7 +11,7 @@ import com.yishuifengxiao.tool.personalkit.domain.request.FolderNameReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.FolderParentReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdListReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.ResourceVo;
-import com.yishuifengxiao.tool.personalkit.support.ContextUser;
+import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -36,10 +36,10 @@ public class FolderService {
     public void createFolder(FolderCreateReq req) {
 
 
-        Long counted = JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextUser.currentUserId()).setFolderName(req.getName().trim()).setParentId(req.getParent()));
+        Long counted = JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextCache.currentUserId()).setFolderName(req.getName().trim()).setParentId(req.getParent()));
         Assert.lteZeroN("已经存在相同名称的文件夹", counted);
 
-        DiskFolder diskFolder = new DiskFolder().setUserId(ContextUser.currentUserId()).setFolderName(req.getName().trim()).setParentId(req.getParent()).setId(IdWorker.snowflakeStringId()).setCreateTime(LocalDateTime.now());
+        DiskFolder diskFolder = new DiskFolder().setUserId(ContextCache.currentUserId()).setFolderName(req.getName().trim()).setParentId(req.getParent()).setId(IdWorker.snowflakeStringId()).setCreateTime(LocalDateTime.now());
         JdbcUtil.jdbcHelper().insertSelective(diskFolder);
     }
 
@@ -49,7 +49,7 @@ public class FolderService {
         Assert.isNotNull("记录不存在", folder);
         Assert.isFalse("顶级文件夹不允许操作", StringUtils.equals(DEFAULT_PARENT_ROOT_ID, folder.getParentId()));
         if (!StringUtils.equals(req.getName().trim(), folder.getFolderName())) {
-            Long counted = JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextUser.currentUserId()).setFolderName(req.getName().trim()).setParentId(folder.getParentId()));
+            Long counted = JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextCache.currentUserId()).setFolderName(req.getName().trim()).setParentId(folder.getParentId()));
             Assert.lteZeroN("已经存在相同名称的文件夹", counted);
         }
         folder.setFolderName(req.getName().trim());
@@ -62,7 +62,7 @@ public class FolderService {
         Assert.isNotNull("记录不存在", folder);
         Assert.isFalse("顶级文件夹不允许操作", StringUtils.equals(DEFAULT_PARENT_ROOT_ID, folder.getParentId()));
         if (!StringUtils.equals(req.getParent().trim(), folder.getParentId())) {
-            Long counted = JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextUser.currentUserId()).setParentId(req.getParent()));
+            Long counted = JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextCache.currentUserId()).setParentId(req.getParent()));
             Assert.lteZeroN("已经存在相同名称的文件夹", counted);
         }
         DiskFolder parentFolder = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFolder.class, req.getParent());
@@ -89,9 +89,9 @@ public class FolderService {
     public ResourceVo list(String folderId) {
         DiskFolder folder = null;
         if (StringUtils.isBlank(folderId)) {
-            folder = JdbcUtil.jdbcHelper().findOne(new DiskFolder().setId(ContextUser.currentUserId()).setParentId(DEFAULT_PARENT_ROOT_ID));
+            folder = JdbcUtil.jdbcHelper().findOne(new DiskFolder().setId(ContextCache.currentUserId()).setParentId(DEFAULT_PARENT_ROOT_ID));
             if (null == folder) {
-                folder = new DiskFolder().setId(IdWorker.snowflakeStringId()).setFolderName(DEFAULT_FOLDER_NAME).setParentId(DEFAULT_PARENT_ROOT_ID).setUserId(ContextUser.currentUserId()).setCreateTime(LocalDateTime.now());
+                folder = new DiskFolder().setId(IdWorker.snowflakeStringId()).setFolderName(DEFAULT_FOLDER_NAME).setParentId(DEFAULT_PARENT_ROOT_ID).setUserId(ContextCache.currentUserId()).setCreateTime(LocalDateTime.now());
 
                 JdbcUtil.jdbcHelper().insertSelective(folder);
             }

@@ -5,7 +5,7 @@ import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.security.SecurityPropertyResource;
 import com.yishuifengxiao.common.security.constant.TokenConstant;
 import com.yishuifengxiao.common.security.token.SecurityToken;
-import com.yishuifengxiao.common.security.token.TokenUtil;
+import com.yishuifengxiao.common.security.utils.TokenUtil;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.codec.DES;
 import com.yishuifengxiao.common.tool.exception.CustomException;
@@ -73,7 +73,7 @@ public class UserService {
         request.getSession().setAttribute(requestParameter, token.getValue());
 
 
-        return new LoginVo(sysUser.getId(), sysUser.getUsername(), sysUser.getNickname(), token.getValue(), token);
+        return new LoginVo(sysUser.getId(), sysUser.getUsername(), sysUser.getNickname(), token.getValue(), roles, token);
 
     }
 

@@ -17,7 +17,7 @@ import com.yishuifengxiao.tool.personalkit.domain.mongo.GraphDefine;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.GraphDefineVo;
-import com.yishuifengxiao.tool.personalkit.support.ContextUser;
+import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +56,7 @@ public class GraphService {
 
     public Page<GraphDefineVo> findPage(PageQuery<GraphDefine> param) {
         GraphDefine dataSet = param.query().orElse(new GraphDefine());
-        dataSet.setCreateUserId(ContextUser.currentUserId());
+        dataSet.setCreateUserId(ContextCache.currentUserId());
         param.setQuery(dataSet);
         return graphDefineDao.findPage(param).map(v -> {
             GraphBuildRecord.BuildStat buildStat =
@@ -68,8 +68,8 @@ public class GraphService {
 
     public String save(GraphDefine param) {
         Assert.lteZero("已经存在相同名称的图谱", graphDefineRepository.countAllByGraphNameAndCreateUserId(param.getGraphName(),
-                ContextUser.currentUserId()));
-        param.setCreateUserId(ContextUser.currentUserId()).setCreateTime(LocalDateTime.now()).setVersion(NumberUtil.ZERO.intValue()).setMaster(true);
+                ContextCache.currentUserId()));
+        param.setCreateUserId(ContextCache.currentUserId()).setCreateTime(LocalDateTime.now()).setVersion(NumberUtil.ZERO.intValue()).setMaster(true);
         param.setId(IdWorker.snowflakeStringId());
         graphDefineRepository.save(param);
         return param.getId();
