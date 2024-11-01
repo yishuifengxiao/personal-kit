@@ -72,7 +72,8 @@ public class MappingAspect {
             return joinPoint.proceed();
         }
 
-        RequestLogEvent event = createEvent(request, response, joinPoint, uri);
+        RequestLogEvent event = createEvent(Optional.ofNullable(request),
+                Optional.ofNullable(response), joinPoint, uri);
         Object result = null;
         try {
             // 执行目标方法
@@ -87,14 +88,13 @@ public class MappingAspect {
         return result;
     }
 
-    private RequestLogEvent createEvent(HttpServletRequest request, HttpServletResponse response,
+    private RequestLogEvent createEvent(Optional<HttpServletRequest> request,
+                                        Optional<HttpServletResponse> response,
                                         ProceedingJoinPoint joinPoint, String uri) {
-        String method =
-                Optional.ofNullable(request).filter(Objects::nonNull).map(s -> s.getMethod()).orElse(null);
+        String method = request.filter(Objects::nonNull).map(s -> s.getMethod()).orElse(null);
         Map<String, String[]> parameterMap =
-                Optional.ofNullable(request).filter(Objects::nonNull).map(s -> s.getParameterMap()).orElse(null);
-        Map<String, String> headerMap =
-                Optional.ofNullable(request).filter(Objects::nonNull).map(s -> {
+                request.filter(Objects::nonNull).map(s -> s.getParameterMap()).orElse(null);
+        Map<String, String> headerMap = request.filter(Objects::nonNull).map(s -> {
             Map<String, String> map = new HashMap<>();
             s.getHeaderNames().asIterator().forEachRemaining(headerName -> {
                 String header = s.getHeader(headerName);
@@ -105,16 +105,15 @@ public class MappingAspect {
                 }
 
             });
-
             return map;
         }).orElse(null);
         // 获取请求的 Content-Type
-        String contentType = Optional.ofNullable(request).map(s -> s.getContentType()).orElse(null);
+        String contentType = request.map(s -> s.getContentType()).orElse(null);
         // 判断是否为文件上传
         boolean isFileUpload = contentType != null && contentType.startsWith("multipart/form-data");
         // 检查 Content-Disposition 头部
         String contentDisposition =
-                Optional.ofNullable(response).map(s -> s.getHeader("Content" + "-Disposition")).orElse(null);
+                response.map(s -> s.getHeader("Content" + "-Disposition")).orElse(null);
         boolean isFileDownload = contentDisposition != null && contentDisposition.startsWith(
                 "attachment");
         List<Object> params =
