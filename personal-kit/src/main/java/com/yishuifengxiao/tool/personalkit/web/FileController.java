@@ -6,7 +6,6 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
 import com.yishuifengxiao.tool.personalkit.domain.request.FileMoveReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdListReq;
-import com.yishuifengxiao.tool.personalkit.domain.request.UploadFileReq;
 import com.yishuifengxiao.tool.personalkit.service.FileService;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -55,10 +54,16 @@ public class FileController {
     @PostMapping("/import")
     @ResponseBody
     public Response importFile(HttpServletRequest request,
-                               UploadFileReq req) throws IOException {
+                               @RequestParam(value = "file", required = true) MultipartFile file,
+                               //
+                               @RequestParam(value = "folder", required = false) String folder,
+                               //
+                               @RequestParam(value = "traceId", required = false) String traceId,
+                               //
+                               @RequestParam(value = "mode", required = false) UploadMode uploadMode) throws IOException {
         final SysUser sysUser = ContextCache.currentLoginUser();
-        final String upload = fileService.upload(request, sysUser, req.getFolder(), req.getUploadMode(), req.getFile(),
-                req.getTraceId());
+        final String upload = fileService.upload(request, sysUser, folder, uploadMode, file,
+                traceId);
         return Response.sucData(upload);
     }
 

@@ -16,8 +16,11 @@ spring:
 
 
     mongodb:
-      #      uri: mongodb://localhost/personkit
-      uri: mongodb://admin:123456@10.168.1.115/admin
+      host: localhost
+      port: 27017
+      database: personkit
+  #      uri: mongodb://localhost/personkit
+  #      uri: mongodb://admin:123456@10.168.1.115/admin
   mongodb:
     embedded:
       storage:

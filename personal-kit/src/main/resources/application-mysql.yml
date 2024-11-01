@@ -42,3 +42,14 @@ spring:
       login-timeout: 5
       # 池中维护的最小空闲连接数
       minimum-idle: 10
+
+  sql:
+    init:
+      schema-locations: classpath*:db/dml.sql
+      mode: always
+      continue-on-error: true
+      encoding: UTF-8
+      order: ascending
+
+
+

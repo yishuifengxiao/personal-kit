@@ -86,7 +86,7 @@ export default defineComponent({
       return { Authorization: 'xtoken ' + this.tokenVal }
     },
     uploadUrl: function () {
-      return this.$cfg.rootUrl() + '/personkit/file/import'
+      return this.$cfg.rootUrl() + '/personkit/disk/file/import'
     }
   },
   methods: {

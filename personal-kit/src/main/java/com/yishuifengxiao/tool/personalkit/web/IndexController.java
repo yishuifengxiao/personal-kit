@@ -64,7 +64,6 @@ public class IndexController {
             String username = token.getName();
             LocalDateTime issueAt = token.getIssueAt();
             LocalDateTime expireAt = token.getExpireAt();
-            Integer validSeconds = token.getValidSeconds();
             String tokenValue = token.getValue();
             boolean tokenActive = token.isActive();
             boolean tokenExpired = token.isExpired();
