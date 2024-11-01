@@ -22,10 +22,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Aspect
@@ -75,24 +72,59 @@ public class MappingAspect {
             return joinPoint.proceed();
         }
 
-        List<Object> params =
-                DataUtil.stream(joinPoint.getArgs()).filter(Objects::nonNull).filter(this::isNotSystemParams).collect(Collectors.toList());
-        Throwable ex = null;
+        RequestLogEvent event = createEvent(request, response, joinPoint, uri);
         Object result = null;
         try {
             // 执行目标方法
             result = joinPoint.proceed();
+            event.setResult(result);
         } catch (Throwable e) {
-            // 打印返回结果
-            ex = e;
+            event.setThrowable(e);
             throw e;
         } finally {
-            SysUser sysUser = ContextCache.currentUser().orElse(null);
-            asyncEventBus.post(new RequestLogEvent(request, response, sysUser, params,
-                    result, ex));
+            asyncEventBus.post(event);
         }
         return result;
     }
+
+    private RequestLogEvent createEvent(HttpServletRequest request, HttpServletResponse response,
+                                        ProceedingJoinPoint joinPoint, String uri) {
+        String method =
+                Optional.ofNullable(request).filter(Objects::nonNull).map(s -> s.getMethod()).orElse(null);
+        Map<String, String[]> parameterMap =
+                Optional.ofNullable(request).filter(Objects::nonNull).map(s -> s.getParameterMap()).orElse(null);
+        Map<String, String> headerMap =
+                Optional.ofNullable(request).filter(Objects::nonNull).map(s -> {
+            Map<String, String> map = new HashMap<>();
+            s.getHeaderNames().asIterator().forEachRemaining(headerName -> {
+                String header = s.getHeader(headerName);
+                if (!StringUtils.equalsAnyIgnoreCase(headerName, "cookie", "accept" + "-encoding"
+                        , "connection", "accept-language", "user" + "-agent", "accept" +
+                                "-language", "content-length", "host", "origin") && StringUtils.isNotBlank(header)) {
+                    map.put(headerName, header);
+                }
+
+            });
+
+            return map;
+        }).orElse(null);
+        // 获取请求的 Content-Type
+        String contentType = Optional.ofNullable(request).map(s -> s.getContentType()).orElse(null);
+        // 判断是否为文件上传
+        boolean isFileUpload = contentType != null && contentType.startsWith("multipart/form-data");
+        // 检查 Content-Disposition 头部
+        String contentDisposition =
+                Optional.ofNullable(response).map(s -> s.getHeader("Content" + "-Disposition")).orElse(null);
+        boolean isFileDownload = contentDisposition != null && contentDisposition.startsWith(
+                "attachment");
+        List<Object> params =
+                DataUtil.stream(joinPoint.getArgs()).filter(Objects::nonNull).filter(this::isNotSystemParams).collect(Collectors.toList());
+        SysUser sysUser = ContextCache.currentUser().orElse(null);
+        RequestLogEvent event = new RequestLogEvent(uri, method, headerMap, parameterMap, params,
+                sysUser, isFileUpload, isFileDownload, null, null);
+        return event;
+    }
+
 
     @PostConstruct
     public void init() {

@@ -9,6 +9,7 @@ import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.utils.TokenUtil;
 import com.yishuifengxiao.common.support.SpringContext;
+import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.codec.DES;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
@@ -79,7 +80,7 @@ public class UserService {
             request.getSession().setAttribute(requestParameter, token.getValue());
             SpringContext.publishEvent(new SecurityEvent(this, request, response,
                     Strategy.AUTHENTICATION_SUCCESS, token, null));
-            UserInfo userInfo = com.yishuifengxiao.tool.personalkit.utils.BeanUtil.copy(sysUser,
+            UserInfo userInfo = BeanUtil.copy(sysUser,
                     new UserInfo());
             userInfo.setRoles(roles);
             userInfo.setToken(token.getValue());
@@ -101,7 +102,7 @@ public class UserService {
     public UserInfo userInfo(String id) {
         SysUser sysUser = sysUserRepository.findById(id).orElseThrow(() -> UncheckedException.of(
                 "记录不存在"));
-        UserInfo userInfo = com.yishuifengxiao.tool.personalkit.utils.BeanUtil.copy(sysUser,
+        UserInfo userInfo = BeanUtil.copy(sysUser,
                 new UserInfo());
         String sql = String.format("SELECT r.* from sys_user_role ur,sys_role r where ur"
                 + ".role_id=r.id and ur.user_id='%s'", id);
