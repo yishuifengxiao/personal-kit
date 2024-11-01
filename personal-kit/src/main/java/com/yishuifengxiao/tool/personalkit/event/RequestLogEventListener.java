@@ -34,14 +34,11 @@ public class RequestLogEventListener {
                 Optional.ofNullable(event.getSysUser()).map(SysUser::getUsername).orElse(null);
         String requestBody = event.isFileUpload() ? "文件上传" : this.convert(event.getParams());
         String responseBody = event.isFileDownload() ? "文件下载" : this.convert(event.getResult());
+        String paramMap = null == event.getParameterMap() || event.getParameterMap().isEmpty() ?
+                null : convert(event.getParameterMap());
         HttpLog httpLog = new HttpLog(IdWorker.snowflakeStringId(), event.getUri(),
-                event.getMethod(),
-                userId,
-                username
-                , convert(event.getHeaderMap()), convert(event.getParameterMap()), requestBody,
-                responseBody,
-                null,
-                LocalDateTime.now());
+                event.getMethod(), userId, username, convert(event.getHeaderMap()), paramMap,
+                requestBody, responseBody, null, LocalDateTime.now());
         jdbcHelper.insert(httpLog);
     }
 
@@ -56,6 +53,9 @@ public class RequestLogEventListener {
                 Collection array = (Collection) obj;
                 if (null != array && array.size() != 0) {
                     Object val = array.stream().findFirst().get();
+                    if (null == val) {
+                        return null;
+                    }
                     return mapper.writeValueAsString(val);
                 }
             }
