@@ -44,12 +44,10 @@ public class App extends SpringBootServletInitializer {
         ConfigurableEnvironment env = context.getEnvironment();
         String serverPort = env.getProperty("server.port");
         String contextPath = env.getProperty("server.servlet.context-path");
-        StringBuilder url =
-                new StringBuilder("http://localhost:").append(serverPort).append(StringUtils.isBlank(contextPath) ? "" : contextPath.trim()).append("/doc.html");
-        log.info("=============》 在线文档地址 {}", url.toString());
+        String prefix = StringUtils.isBlank(contextPath) ? "" : contextPath.trim();
         IpUtils.localIps().forEach(ip -> {
-            log.info("=============》 在线文档地址 {}",
-                    new StringBuilder("http://" + ip + ":").append(serverPort).append(StringUtils.isBlank(contextPath) ? "" : contextPath.trim()).append("/doc.html").toString());
+            log.info("=============》 在线文档地址 {}", new StringBuilder("http://").append(ip).append(
+                    ":").append(serverPort).append(prefix).append("/doc.html"));
         });
     }
 

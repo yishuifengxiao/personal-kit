@@ -4,9 +4,11 @@ import com.yishuifengxiao.common.guava.GuavaCache;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.security.SecurityPropertyResource;
 import com.yishuifengxiao.common.security.constant.TokenConstant;
+import com.yishuifengxiao.common.security.support.SecurityEvent;
+import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.utils.TokenUtil;
-import com.yishuifengxiao.common.tool.bean.BeanUtil;
+import com.yishuifengxiao.common.support.SpringContext;
 import com.yishuifengxiao.common.tool.codec.DES;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
@@ -20,7 +22,6 @@ import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
-import com.yishuifengxiao.tool.personalkit.domain.vo.LoginVo;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -49,44 +50,69 @@ public class UserService {
 
     private final SecurityPropertyResource securityPropertyResource;
 
-    public LoginVo login(HttpServletRequest request, HttpServletResponse response, LoginQuery query) throws CustomException {
+    public UserInfo login(HttpServletRequest request, HttpServletResponse response,
+                          LoginQuery query) throws CustomException {
 
-        SysUser sysUser = sysUserDao.findActiveSysUser(query.getUsername().trim()).orElseThrow(() -> new UncheckedException("账号不存在"));
-        Assert.isTrue("账号已过期", UserStat.ACCOUNT_EXPIRED.getCode() != sysUser.getStat());
-        Assert.isTrue("密码已过期", UserStat.CREDENTIALS_EXPIRED.getCode() != sysUser.getStat());
-        Assert.isTrue("账号已锁定", UserStat.ACCOUNT_LOCKED.getCode() != sysUser.getStat());
-        Assert.isTrue("账号未启用", UserStat.ACCOUNT_ENABLE.getCode() == sysUser.getStat());
+        try {
+            SysUser sysUser =
+                    sysUserDao.findActiveSysUser(query.getUsername().trim()).orElseThrow(() -> new UncheckedException("账号不存在"));
+            Assert.isTrue("账号已过期", UserStat.ACCOUNT_EXPIRED.getCode() != sysUser.getStat());
+            Assert.isTrue("密码已过期", UserStat.CREDENTIALS_EXPIRED.getCode() != sysUser.getStat());
+            Assert.isTrue("账号已锁定", UserStat.ACCOUNT_LOCKED.getCode() != sysUser.getStat());
+            Assert.isTrue("账号未启用", UserStat.ACCOUNT_ENABLE.getCode() == sysUser.getStat());
 
-        Assert.isTrue("密码错误", StringUtils.equals(DES.encrypt(sysUser.getSalt(), query.getPassword()),
-                sysUser.getPwd()));
+            Assert.isTrue("密码错误", StringUtils.equals(DES.encrypt(sysUser.getSalt(),
+                            query.getPassword()),
+                    sysUser.getPwd()));
 
-        List<SysRole> roles = sysUserDao.findAllRoleByUserId(sysUser.getId());
-        //判断权限
-        Assert.isNotEmpty("暂无此权限", roles);
-        //获取token
-        SecurityToken token = TokenUtil.createUnsafe(request, query.getUsername().trim());
+            List<SysRole> roles = sysUserDao.findAllRoleByUserId(sysUser.getId());
+            //判断权限
+            Assert.isNotEmpty("暂无此权限", roles);
+            //获取token
+            SecurityToken token = TokenUtil.createUnsafe(request, query.getUsername().trim());
 
-        String requestParameter = securityPropertyResource.security().getToken().getRequestParameter();
-        if (StringUtils.isBlank(requestParameter)) {
-            requestParameter = TokenConstant.TOKEN_REQUEST_PARAM;
+            String requestParameter =
+                    securityPropertyResource.security().getToken().getRequestParameter();
+            if (StringUtils.isBlank(requestParameter)) {
+                requestParameter = TokenConstant.TOKEN_REQUEST_PARAM;
+            }
+            request.getSession().setAttribute(requestParameter, token.getValue());
+            SpringContext.publishEvent(new SecurityEvent(this, request, response,
+                    Strategy.AUTHENTICATION_SUCCESS, token, null));
+            UserInfo userInfo = com.yishuifengxiao.tool.personalkit.utils.BeanUtil.copy(sysUser,
+                    new UserInfo());
+            userInfo.setRoles(roles);
+            userInfo.setToken(token.getValue());
+            return userInfo;
+        } catch (Exception e) {
+            SpringContext.publishEvent(new SecurityEvent(this, request, response,
+                    Strategy.AUTHENTICATION_SUCCESS, new SecurityToken(Collections.EMPTY_LIST) {
+                @Override
+                public String getName() {
+                    return query.getUsername();
+                }
+            }, e));
+            throw e;
         }
-        request.getSession().setAttribute(requestParameter, token.getValue());
 
-
-        return new LoginVo(sysUser.getId(), sysUser.getUsername(), sysUser.getNickname(), token.getValue(), roles, token);
 
     }
 
     public UserInfo userInfo(String id) {
-        SysUser sysUser = sysUserRepository.findById(id).orElseThrow(() -> UncheckedException.of("记录不存在"));
-        UserInfo userInfo = BeanUtil.copy(sysUser, new UserInfo());
-        String sql = String.format("SELECT r.* from sys_user_role ur,sys_role r where ur.role_id=r.id and ur.user_id='%s'", id);
+        SysUser sysUser = sysUserRepository.findById(id).orElseThrow(() -> UncheckedException.of(
+                "记录不存在"));
+        UserInfo userInfo = com.yishuifengxiao.tool.personalkit.utils.BeanUtil.copy(sysUser,
+                new UserInfo());
+        String sql = String.format("SELECT r.* from sys_user_role ur,sys_role r where ur"
+                + ".role_id=r.id and ur.user_id='%s'", id);
         return userInfo.setRoles(JdbcUtil.jdbcHelper().query(SysRole.class, sql).orElse(Collections.EMPTY_LIST));
     }
 
     public void updatePwd(UpdatePwdReq req) {
-        SysUser sysUser = sysUserRepository.findById(req.getId().trim()).orElseThrow(() -> UncheckedException.of("记录不存在"));
-        Assert.isTrue("旧密码不正确", StringUtils.equals(DES.encrypt(sysUser.getSalt(), req.getOldPwd().trim()),
+        SysUser sysUser =
+                sysUserRepository.findById(req.getId().trim()).orElseThrow(() -> UncheckedException.of("记录不存在"));
+        Assert.isTrue("旧密码不正确", StringUtils.equals(DES.encrypt(sysUser.getSalt(),
+                        req.getOldPwd().trim()),
                 sysUser.getPwd()));
         sysUser.setPwd(DES.encrypt(sysUser.getSalt(), req.getNewPwd().trim()));
         sysUserRepository.saveAndFlush(sysUser);
@@ -94,7 +120,8 @@ public class UserService {
     }
 
     public void updateUser(SysUser sysUser) {
-        SysUser user = sysUserRepository.findById(sysUser.getId().trim()).orElseThrow(() -> UncheckedException.of("记录不存在"));
+        SysUser user =
+                sysUserRepository.findById(sysUser.getId().trim()).orElseThrow(() -> UncheckedException.of("记录不存在"));
         if (StringUtils.isNotBlank(sysUser.getNickname())) {
             user.setNickname(sysUser.getNickname().trim());
         }
@@ -108,7 +135,8 @@ public class UserService {
             user.setCertNo(sysUser.getCertNo().trim());
         }
         if (null != sysUser.getStat()) {
-            UserStat.code(sysUser.getStat()).orElseThrow(() -> new UncheckedException("请选择一个正确的状态"));
+            UserStat.code(sysUser.getStat()).orElseThrow(() -> new UncheckedException(
+                    "请选择一个正确的状态"));
             user.setStat(sysUser.getStat());
         }
         user.setLastUpdateTime(LocalDateTime.now());
@@ -117,7 +145,8 @@ public class UserService {
     }
 
     public void updateResetPwd(ResetPwdReq req) {
-        SysUser sysUser = sysUserDao.findActiveSysUser(req.getUsername().trim()).orElseThrow(() -> new UsernameNotFoundException(String.format("用户名%s不存在", req.getUsername().trim())));
+        SysUser sysUser =
+                sysUserDao.findActiveSysUser(req.getUsername().trim()).orElseThrow(() -> new UsernameNotFoundException(String.format("用户名%s不存在", req.getUsername().trim())));
         Assert.isTrue("邮箱不匹配", StringUtils.equalsIgnoreCase(sysUser.getEmail(), req.getEmail()));
         sysUser.setPwd(DES.encrypt(sysUser.getSalt(), Constant.DEFAULT_PWD));
         sysUserRepository.saveAndFlush(sysUser);

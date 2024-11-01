@@ -1,14 +1,11 @@
 package com.yishuifengxiao.tool.personalkit.web;
 
-import com.yishuifengxiao.common.security.support.SecurityEvent;
-import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.holder.TokenHolder;
-import com.yishuifengxiao.common.support.SpringContext;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
-import com.yishuifengxiao.tool.personalkit.domain.vo.LoginVo;
+import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,7 +20,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -106,25 +106,13 @@ public class IndexController {
     @Operation(summary = "登录", description = "使用用户名和密码进行登录")
     @PostMapping("/login")
     @org.springframework.web.bind.annotation.ResponseBody
-    public LoginVo login(HttpServletRequest request, HttpServletResponse response,
-                         @Valid @RequestBody LoginQuery query, BindingResult error) throws CustomException {
+    public UserInfo login(HttpServletRequest request, HttpServletResponse response,
+                          @Valid @RequestBody LoginQuery query, BindingResult error) throws CustomException {
 
-        try {
-            LoginVo loginVo = userService.login(request, response, query);
-            SpringContext.publishEvent(new SecurityEvent(this, request, response,
-                    Strategy.AUTHENTICATION_SUCCESS, loginVo.getSecurityToken(), null));
+        UserInfo userInfo = userService.login(request, response, query);
 
-            return loginVo;
-        } catch (Exception e) {
-            SpringContext.publishEvent(new SecurityEvent(this, request, response,
-                    Strategy.AUTHENTICATION_SUCCESS, new SecurityToken(Collections.EMPTY_LIST) {
-                @Override
-                public String getName() {
-                    return query.getUsername();
-                }
-            }, e));
-            throw e;
-        }
+
+        return userInfo;
     }
 
 

@@ -10,17 +10,22 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.beans.factory.annotation.Autowired;import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;import java.util.Objects;
-import java.util.Optional;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Aspect
@@ -28,6 +33,9 @@ import java.util.stream.Collectors;
 public class MappingAspect {
     @Autowired
     private EventBus asyncEventBus;
+
+    private final static Set<String> urls =
+            Arrays.asList("/v3/api-docs").stream().collect(Collectors.toSet());
 
 
     /**
@@ -63,6 +71,9 @@ public class MappingAspect {
         HttpServletRequest request = null == attributes ? null : attributes.getRequest();
         HttpServletResponse response = null == attributes ? null : attributes.getResponse();
         String uri = null == request ? null : request.getRequestURI();
+        if (urls.stream().anyMatch(s -> StringUtils.containsAnyIgnoreCase(uri, s))) {
+            return joinPoint.proceed();
+        }
 
         List<Object> params =
                 DataUtil.stream(joinPoint.getArgs()).filter(Objects::nonNull).filter(this::isNotSystemParams).collect(Collectors.toList());
@@ -102,10 +113,10 @@ public class MappingAspect {
         if (arg instanceof BindingResult) {
             return false;
         }
-        if(arg instanceof MultipartFile){
+        if (arg instanceof MultipartFile) {
             return false;
         }
-        if(arg instanceof MultipartFile[]){
+        if (arg instanceof MultipartFile[]) {
             return false;
         }
         return true;

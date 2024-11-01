@@ -1,5 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.domain.query;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class LoginQuery implements Serializable {
     @NotBlank(message = "账号不能为空")
     private String username;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotBlank(message = "密码不能为空")
     private String password;
 

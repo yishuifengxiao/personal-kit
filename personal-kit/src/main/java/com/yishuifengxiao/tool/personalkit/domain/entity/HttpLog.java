@@ -23,7 +23,8 @@ import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.GENER
  * @date 2024/10/31 21:18
  * @since 1.0.0
  */
-@Table(name = "http_log", indexes = {@Index(name = "idx_user_id", columnList = "user_id"), @Index(name = "idx_uri", columnList = "uri")})
+@Table(name = "http_log", indexes = {@Index(name = "idx_user_id", columnList = "user_id"),
+        @Index(name = "idx_uri", columnList = "uri")})
 @Entity(name = "http_log")
 @Data
 @AllArgsConstructor
@@ -43,6 +44,9 @@ public class HttpLog implements Serializable {
 
     @Column(name = "user_id", length = 64, columnDefinition = "varchar(64)")
     private String userId;
+    
+    @Column(name = "user_name")
+    private String userName;
 
     @Column(name = "header_param", columnDefinition = "longtext")
     private String headerParam;
