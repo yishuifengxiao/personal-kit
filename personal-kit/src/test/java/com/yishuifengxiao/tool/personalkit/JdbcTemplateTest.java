@@ -1,5 +1,6 @@
 package com.yishuifengxiao.tool.personalkit;
 
+import com.yishuifengxiao.common.jdbc.mapper.ColumnNameRowMapper;
 import com.yishuifengxiao.common.tool.collections.JsonUtil;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import org.junit.Test;
@@ -7,9 +8,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;

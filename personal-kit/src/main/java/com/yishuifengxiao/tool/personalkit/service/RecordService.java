@@ -47,6 +47,6 @@ public class RecordService {
             }
         }
         sql += "  ORDER BY create_time DESC ";
-        return JdbcUtil.jdbcHelper().query(SysSecurityRecord.class, param, sql, params.toArray());
+        return JdbcUtil.jdbcHelper().findPage(SysSecurityRecord.class, param, sql, params.toArray());
     }
 }

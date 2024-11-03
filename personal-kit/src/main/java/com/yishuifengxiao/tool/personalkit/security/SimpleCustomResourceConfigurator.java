@@ -24,7 +24,6 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -67,7 +66,7 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
             sql += " AND srm.menu_id = " + currentRole;
         }
 
-        List<SysPermission> list = JdbcUtil.jdbcHelper().query(SysPermission.class, sql).orElse(Collections.EMPTY_LIST);
+        List<SysPermission> list = JdbcUtil.jdbcHelper().findAll(SysPermission.class, sql);
 
 
         OrRequestMatcher orRequestMatcher =
@@ -85,7 +84,7 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
             String sql = StringUtils.isBlank(contextPath) ?
                     "SELECT DISTINCT sp.url FROM sys_permission sp WHERE ISNULL" + "(sp.context_path)" : String.format(
                     "SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='%s'", contextPath);
-            List<String> list = JdbcUtil.jdbcTemplate().queryForList(sql, String.class);
+            List<String> list = JdbcUtil.jdbcHelper().findAll(String.class, sql);
             if (CollUtil.isEmpty(list)) {
                 return null;
             }

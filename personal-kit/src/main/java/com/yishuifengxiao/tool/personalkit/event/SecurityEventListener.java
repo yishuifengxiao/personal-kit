@@ -8,7 +8,7 @@ import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.tool.collections.DataUtil;
 import com.yishuifengxiao.common.tool.random.IdWorker;
-import com.yishuifengxiao.common.tool.utils.ExceptionUtil;
+import com.yishuifengxiao.common.tool.utils.ValidateUtils;
 import com.yishuifengxiao.tool.personalkit.config.CoreProperties;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysSecurityRecord;
@@ -74,9 +74,9 @@ public class SecurityEventListener {
                 .setCookie(request.getHeader("cookie"))
                 .setStrategy(event.getStrategy().getCode())
                 .setMsg(Optional.ofNullable(event.getException()).map(Throwable::getMessage).orElse(null))
-                .setException(ExceptionUtil.extractError( event.getException()))
+                .setException(ValidateUtils.extractError( event.getException()))
                 .setCreateTime(LocalDateTime.ofInstant(Instant.ofEpochMilli( event.getTimestamp()),ZoneId.of("+8")));
-        JdbcUtil.jdbcHelper().insertSelective(sysSecurityRecord);
+        JdbcUtil.jdbcHelper().saveOrUpdate(sysSecurityRecord);
     }
     private void requestRateLimiter(String name, Strategy strategy, HttpServletRequest request) {
         if (STRATEGYS.contains(strategy)&&StringUtils.isNotBlank(name)) {

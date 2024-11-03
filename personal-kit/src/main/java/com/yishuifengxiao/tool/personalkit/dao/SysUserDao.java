@@ -10,7 +10,6 @@ import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,15 +33,18 @@ public class SysUserDao {
         if (StringUtils.isBlank(username)) {
             return Optional.empty();
         }
-//        return sysUserRepository.findAll(Example.of(new SysUser().setUsername(username.trim())), Sort.by(ClassUtil.pojoFieldName(SysUser::getCreateTime)).descending()).stream().findFirst();
-        Optional<SysUser> optional = Optional.ofNullable(jdbcHelper.findOne(new SysUser().setUsername(username)));
+//        return sysUserRepository.findAll(Example.of(new SysUser().setUsername(username.trim())), Sort.by(ClassUtil
+//        .pojoFieldName(SysUser::getCreateTime)).descending()).stream().findFirst();
+        Optional<SysUser> optional = Optional.ofNullable(jdbcHelper.findOne(new SysUser().setUsername(username),
+                false));
 
         return optional;
     }
 
     public List<SysRole> findAllRoleByUserId(String userId) {
-        String sql = String.format("SELECT r.* from sys_user_role ur ,sys_role r where r.id=ur.role_id and r.stat=1 and ur.user_id=%s", userId);
-        return jdbcHelper.query(SysRole.class, sql).orElse(Collections.EMPTY_LIST);
+        String sql = String.format("SELECT r.* from sys_user_role ur ,sys_role r where r.id=ur.role_id and r.stat=1 " +
+                "and ur.user_id=%s", userId);
+        return jdbcHelper.findAll(SysRole.class, sql);
 
     }
 

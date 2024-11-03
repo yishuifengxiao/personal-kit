@@ -106,7 +106,7 @@ public class UserService {
                 new UserInfo());
         String sql = String.format("SELECT r.* from sys_user_role ur,sys_role r where ur"
                 + ".role_id=r.id and ur.user_id='%s'", id);
-        return userInfo.setRoles(JdbcUtil.jdbcHelper().query(SysRole.class, sql).orElse(Collections.EMPTY_LIST));
+        return userInfo.setRoles(JdbcUtil.jdbcHelper().findAll(SysRole.class, sql));
     }
 
     public void updatePwd(UpdatePwdReq req) {

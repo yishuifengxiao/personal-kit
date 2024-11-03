@@ -65,7 +65,7 @@ public class FileService {
             uploadRecord = new DiskUploadRecord(IdWorker.snowflakeStringId(), multipartFile.getOriginalFilename(), sysUser.getId(), UploadStat.UPLOAD_HANDING.getCode(),
                     uploadMode.getCode(),
                     null, LocalDateTime.now(), null);
-            JdbcUtil.jdbcHelper().insertSelective(uploadRecord);
+            JdbcUtil.jdbcHelper().saveOrUpdate(uploadRecord);
 
             eventPublisher.post(new FileAnalysisEvent(diskFolder, sysUser, file.getAbsolutePath(), uploadMode, uploadRecord));
         } catch (IOException e) {
@@ -84,10 +84,8 @@ public class FileService {
             DiskFolder diskFolder = new DiskFolder().setId(IdWorker.snowflakeStringId()).setFolderName(DEFAULT_FOLDER_NAME)
                     //
                     .setParentId(DEFAULT_PARENT_ROOT_ID).setUserId(ContextCache.currentUserId()).setCreateTime(LocalDateTime.now());
-            if (JdbcUtil.jdbcHelper().countAll(new DiskFolder().setFolderName(diskFolder.getFolderName()).setUserId(diskFolder.getUserId())) == 0) {
-                //不存在则新增
-                JdbcUtil.jdbcHelper().insertSelective(diskFolder);
-            }
+            //不存在则新增
+            JdbcUtil.jdbcHelper().saveOrUpdate(diskFolder);
 
 
             return diskFolder;

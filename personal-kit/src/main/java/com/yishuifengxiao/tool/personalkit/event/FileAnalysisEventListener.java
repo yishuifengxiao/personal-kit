@@ -97,7 +97,7 @@ public class FileAnalysisEventListener {
         CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
         DiskFile diskFile = reference.get();
         if (null != diskFile) {
-            JdbcUtil.jdbcHelper().insertSelective(diskFile);
+            JdbcUtil.jdbcHelper().saveOrUpdate(diskFile);
         }
         if (null != file) {
             file.delete();

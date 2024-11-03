@@ -10,8 +10,6 @@ import com.yishuifengxiao.tool.personalkit.domain.vo.PermissionVo;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-
 /**
  * @author qingteng
  * @version 1.0.0
@@ -22,10 +20,12 @@ import java.util.Collections;
 @Transactional(rollbackOn = {Exception.class})
 public class PermissionService {
     public Page<PermissionVo> findPagePermission(PageQuery<SysPermission> pageQuery) {
-        return JdbcUtil.jdbcHelper().findPage(pageQuery.query().orElse(new SysPermission()), pageQuery.size().intValue(), pageQuery.num().intValue()).map(v -> {
+        return JdbcUtil.jdbcHelper().findPage(pageQuery.query().orElse(new SysPermission()),
+                false, pageQuery.size().intValue(), pageQuery.num().intValue()).map(v -> {
             PermissionVo permissionVo = BeanUtil.copy(v, new PermissionVo());
-            String sql = "SELECT DISTINCT sm.* from sys_permission sp,sys_menu_permission smp,sys_menu sm where smp.menu_id=sm.id and smp.permission_id =sp.id and sp.id=?";
-            permissionVo.setMenus(JdbcUtil.jdbcHelper().query(SysMenu.class, sql, v.getId()).orElse(Collections.EMPTY_LIST));
+            String sql = "SELECT DISTINCT sm.* from sys_permission sp,sys_menu_permission smp,sys_menu sm where smp" +
+                    ".menu_id=sm.id and smp.permission_id =sp.id and sp.id=?";
+            permissionVo.setMenus(JdbcUtil.jdbcHelper().findAll(SysMenu.class, sql, v.getId()));
             return permissionVo;
         });
     }

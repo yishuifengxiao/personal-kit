@@ -37,7 +37,7 @@ public class MenuService {
 
     public List<MenuTree> findMenuTree() {
         // 顶部菜单
-        List<SysMenu> menus = JdbcUtil.jdbcHelper().findAll(new SysMenu());
+        List<SysMenu> menus = JdbcUtil.jdbcHelper().findAll(new SysMenu(), false);
 
         return menus.stream().filter(v -> BoolStat.isFalse(v.getType())).map(v -> {
                     MenuTree menuTree = BeanUtil.copy(v, new MenuTree());
@@ -62,10 +62,14 @@ public class MenuService {
     }
 
     public Page<MenuVo> findPage(PageQuery<SysMenu> pageQuery) {
-        return JdbcUtil.jdbcHelper().findPage(pageQuery.query().orElse(new SysMenu()), pageQuery.size().intValue(), pageQuery.num().intValue()).map(v -> {
+        return JdbcUtil.jdbcHelper().findPage(pageQuery.query().orElse(new SysMenu()), false,
+                pageQuery.size().intValue(),
+                pageQuery.num().intValue()).map(v -> {
             MenuVo vo = BeanUtil.copy(v, new MenuVo());
-            String sql = "SELECT DISTINCT sp.* from sys_permission sp,sys_menu_permission smp where  smp.permission_id " + "=sp.id and smp.menu_id=?";
-            List<SysPermission> list = JdbcUtil.jdbcHelper().query(SysPermission.class, sql, v.getId()).orElse(Collections.EMPTY_LIST);
+            String sql = "SELECT DISTINCT sp.* from sys_permission sp,sys_menu_permission smp where  smp" +
+                    ".permission_id " + "=sp.id and smp.menu_id=?";
+            List<SysPermission> list =
+                    JdbcUtil.jdbcHelper().findAll(SysPermission.class, sql, v.getId());
             vo.setPermissions(list);
             return vo;
         });
@@ -79,9 +83,9 @@ public class MenuService {
         JdbcUtil.jdbcHelper().delete(new SysMenuPermission().setMenuId(menu.getId()));
         DataUtil.stream(req.getPermissionIds())
                 .filter(StringUtils::isNotBlank)
-                .filter(v -> JdbcUtil.jdbcHelper().countAll(new SysPermission().setId(v)) > 0)
+                .filter(v -> JdbcUtil.jdbcHelper().countAll(new SysPermission().setId(v),false) > 0)
                 .map(v -> new SysMenuPermission(menu.getId(), v))
-                .forEach(JdbcUtil.jdbcHelper()::insertSelective);
+                .forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
         //@formatter:on
     }
 
@@ -92,13 +96,14 @@ public class MenuService {
         List<SysMenu> menus = null;
         if (BoolStat.isTrue(sysRole.getEmbedded())) {
             //内置且隐藏的角色
-            menus = JdbcUtil.jdbcHelper().findAll(new SysMenu());
+            menus = JdbcUtil.jdbcHelper().findAll(new SysMenu(),false);
         } else {
             String sql = "select sm.* from sys_menu sm ,sys_role_menu srm where sm.id = srm.menu_id and srm.role_id=?";
-            menus = JdbcUtil.jdbcHelper().query(SysMenu.class, sql, sysRole.getId()).orElse(Collections.EMPTY_LIST);
+            menus = JdbcUtil.jdbcHelper().findAll(SysMenu.class, sql, sysRole.getId());
         }
         // 上部的菜单
-        List<SysMenu> topMenus = menus.stream().filter(v -> BoolStat.isFalse(v.getType())).filter(v -> BoolStat.isTrue(v.getIsShow())).sorted(Comparator.comparing(SysMenu::getIdx)).collect(Collectors.toList());
+        List<SysMenu> topMenus =
+                menus.stream().filter(v -> BoolStat.isFalse(v.getType())).filter(v -> BoolStat.isTrue(v.getIsShow())).sorted(Comparator.comparing(SysMenu::getIdx)).collect(Collectors.toList());
         if (CollUtil.isEmpty(topMenus)) {
             return new RoleMenuVo(Collections.EMPTY_LIST, Collections.EMPTY_LIST);
         }

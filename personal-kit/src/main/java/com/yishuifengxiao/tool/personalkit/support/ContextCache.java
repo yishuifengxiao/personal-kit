@@ -2,7 +2,7 @@ package com.yishuifengxiao.tool.personalkit.support;
 
 
 import com.yishuifengxiao.common.guava.GuavaCache;
-import com.yishuifengxiao.common.tool.utils.ExceptionUtil;
+import com.yishuifengxiao.common.tool.utils.ValidateUtils;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +25,7 @@ public class ContextCache {
 
     public static SysUser currentLoginUser() {
 
-        return currentUser().orElseThrow(ExceptionUtil.orElseThrow("当前用户还未登录或已过期"));
+        return currentUser().orElseThrow(ValidateUtils.orElseThrow("当前用户还未登录或已过期"));
     }
 
     public static Optional<SysUser> currentUser() {

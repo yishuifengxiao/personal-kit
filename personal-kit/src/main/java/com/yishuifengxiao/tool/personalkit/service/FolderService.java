@@ -37,12 +37,12 @@ public class FolderService {
 
 
         Long counted =
-                JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextCache.currentUserId()).setFolderName(req.getName().trim()).setParentId(req.getParent()));
+                JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextCache.currentUserId()).setFolderName(req.getName().trim()).setParentId(req.getParent()),false);
         Assert.lteZeroN("已经存在相同名称的文件夹", counted);
 
         DiskFolder diskFolder =
                 new DiskFolder().setUserId(ContextCache.currentUserId()).setFolderName(req.getName().trim()).setParentId(req.getParent()).setId(IdWorker.snowflakeStringId()).setCreateTime(LocalDateTime.now());
-        JdbcUtil.jdbcHelper().insertSelective(diskFolder);
+        JdbcUtil.jdbcHelper().saveOrUpdate(diskFolder);
     }
 
     public void updateFolderName(FolderNameReq req) {
@@ -53,7 +53,7 @@ public class FolderService {
                 folder.getParentId()));
         if (!StringUtils.equals(req.getName().trim(), folder.getFolderName())) {
             Long counted =
-                    JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextCache.currentUserId()).setFolderName(req.getName().trim()).setParentId(folder.getParentId()));
+                    JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextCache.currentUserId()).setFolderName(req.getName().trim()).setParentId(folder.getParentId()),false);
             Assert.lteZeroN("已经存在相同名称的文件夹", counted);
         }
         folder.setFolderName(req.getName().trim());
@@ -68,7 +68,7 @@ public class FolderService {
                 folder.getParentId()));
         if (!StringUtils.equals(req.getParent().trim(), folder.getParentId())) {
             Long counted =
-                    JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextCache.currentUserId()).setParentId(req.getParent()));
+                    JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextCache.currentUserId()).setParentId(req.getParent()),false);
             Assert.lteZeroN("已经存在相同名称的文件夹", counted);
         }
         DiskFolder parentFolder = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFolder.class,
@@ -98,12 +98,12 @@ public class FolderService {
         DiskFolder folder = null;
         if (StringUtils.isBlank(folderId)) {
             folder =
-                    JdbcUtil.jdbcHelper().findOne(new DiskFolder().setId(ContextCache.currentUserId()).setParentId(DEFAULT_PARENT_ROOT_ID));
+                    JdbcUtil.jdbcHelper().findOne(new DiskFolder().setId(ContextCache.currentUserId()).setParentId(DEFAULT_PARENT_ROOT_ID),false);
             if (null == folder) {
                 folder =
                         new DiskFolder().setId(IdWorker.snowflakeStringId()).setFolderName(DEFAULT_FOLDER_NAME).setParentId(DEFAULT_PARENT_ROOT_ID).setUserId(ContextCache.currentUserId()).setCreateTime(LocalDateTime.now());
 
-                JdbcUtil.jdbcHelper().insertSelective(folder);
+                JdbcUtil.jdbcHelper().saveOrUpdate(folder);
             }
         } else {
             folder = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFolder.class, folderId.trim());
@@ -113,9 +113,9 @@ public class FolderService {
         findParent(list, folder);
 
         List<ResourceVo.Item> folders =
-                DataUtil.stream(JdbcUtil.jdbcHelper().findAll(new DiskFolder().setParentId(folder.getId()))).map(v -> new ResourceVo.Item(v.getId(), v.getFolderName())).collect(Collectors.toList());
+                DataUtil.stream(JdbcUtil.jdbcHelper().findAll(new DiskFolder().setParentId(folder.getId()),false)).map(v -> new ResourceVo.Item(v.getId(), v.getFolderName())).collect(Collectors.toList());
         List<ResourceVo.Item> files =
-                DataUtil.stream(JdbcUtil.jdbcHelper().findAll(new DiskFile().setFolderId(folder.getId()))).map(v -> new ResourceVo.Item(v.getId(), v.getFileName())).collect(Collectors.toList());
+                DataUtil.stream(JdbcUtil.jdbcHelper().findAll(new DiskFile().setFolderId(folder.getId()),false)).map(v -> new ResourceVo.Item(v.getId(), v.getFileName())).collect(Collectors.toList());
 
 
         return new ResourceVo(folder.getId(), folder.getParentId(),
