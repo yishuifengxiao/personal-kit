@@ -1,9 +1,8 @@
 package com.yishuifengxiao.tool.personalkit.support;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
-import com.yishuifengxiao.common.tool.codec.Md5;
+import com.yishuifengxiao.common.tool.codec.MD5;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
-import com.yishuifengxiao.common.tool.collections.DataUtil;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
@@ -75,7 +74,7 @@ public class ResourceInitializer implements CommandLineRunner {
         JdbcUtil.jdbcHelper().saveOrUpdate(sysRole);
 
         //初始化 用户-角色 关联关系
-        SysUserRole userRole = new SysUserRole(Md5.md5Short(sysUser.getId() + sysRole.getId()), sysUser.getId(),
+        SysUserRole userRole = new SysUserRole(MD5.md5Short(sysUser.getId() + sysRole.getId()), sysUser.getId(),
                 sysRole.getId());
         JdbcUtil.jdbcHelper().saveOrUpdate(userRole);
 
@@ -83,7 +82,7 @@ public class ResourceInitializer implements CommandLineRunner {
         List<SysPermission> permissions = this.scanSysPermissions();
         permissions.stream().forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
         // 初始化 角色-权限 关联
-        permissions.stream().map(v -> new SysMenuPermission(Md5.md5Short(sysRole.getId() + v.getId()),
+        permissions.stream().map(v -> new SysMenuPermission(MD5.md5Short(sysRole.getId() + v.getId()),
                 sysRole.getId(), v.getId())).forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
         this.hasInit = true;
     }
@@ -114,7 +113,7 @@ public class ResourceInitializer implements CommandLineRunner {
                             SysPermission permission = new SysPermission(IdWorker.snowflakeStringId(), moduleName,
                                     summary,
                                     description, url, contextPath, applicationName, BoolStat.True.code());
-                            permission.setId(Md5.md5Short(permission.getApplicationName() + permission.getContextPath() + permission.getUrl()));
+                            permission.setId(MD5.md5Short(permission.getApplicationName() + permission.getContextPath() + permission.getUrl()));
                             return permission;
                         }).collect(Collectors.toList());
                     }).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList())).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList());
@@ -143,7 +142,7 @@ public class ResourceInitializer implements CommandLineRunner {
         if (null != api) {
             moduleName = api.name();
             if (StringUtils.isBlank(moduleName)) {
-                moduleName = DataUtil.stream(api.types()).collect(Collectors.joining(","));
+                moduleName = CollUtil.stream(api.types()).collect(Collectors.joining(","));
             }
         }
         return moduleName;

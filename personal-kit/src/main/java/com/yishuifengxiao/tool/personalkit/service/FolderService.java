@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
-import com.yishuifengxiao.common.tool.collections.DataUtil;
+import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
@@ -113,9 +113,9 @@ public class FolderService {
         findParent(list, folder);
 
         List<ResourceVo.Item> folders =
-                DataUtil.stream(JdbcUtil.jdbcHelper().findAll(new DiskFolder().setParentId(folder.getId()),false)).map(v -> new ResourceVo.Item(v.getId(), v.getFolderName())).collect(Collectors.toList());
+                CollUtil.stream(JdbcUtil.jdbcHelper().findAll(new DiskFolder().setParentId(folder.getId()),false)).map(v -> new ResourceVo.Item(v.getId(), v.getFolderName())).collect(Collectors.toList());
         List<ResourceVo.Item> files =
-                DataUtil.stream(JdbcUtil.jdbcHelper().findAll(new DiskFile().setFolderId(folder.getId()),false)).map(v -> new ResourceVo.Item(v.getId(), v.getFileName())).collect(Collectors.toList());
+                CollUtil.stream(JdbcUtil.jdbcHelper().findAll(new DiskFile().setFolderId(folder.getId()),false)).map(v -> new ResourceVo.Item(v.getId(), v.getFileName())).collect(Collectors.toList());
 
 
         return new ResourceVo(folder.getId(), folder.getParentId(),

@@ -2,7 +2,7 @@ package com.yishuifengxiao.tool.personalkit.support;
 
 import com.google.common.util.concurrent.RateLimiter;
 import com.yishuifengxiao.common.guava.GuavaCache;
-import com.yishuifengxiao.common.tool.collections.DataUtil;
+import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.entity.Response;
 import com.yishuifengxiao.common.utils.HttpUtils;
 import com.yishuifengxiao.tool.personalkit.config.CoreProperties;
@@ -31,7 +31,7 @@ public class CacheRateLimiterFilter extends OncePerRequestFilter {
     @Autowired
     private CoreProperties coreproperties;
 
-    private final Set<String> excludes = DataUtil.asSet("api-docs", "swagger", ".css", ".js", ".html");
+    private final Set<String> excludes = CollUtil.asSet("api-docs", "swagger", ".css", ".js", ".html");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,

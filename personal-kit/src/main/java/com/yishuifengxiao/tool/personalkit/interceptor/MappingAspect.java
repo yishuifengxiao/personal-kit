@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.interceptor;
 
 import com.google.common.eventbus.EventBus;
-import com.yishuifengxiao.common.tool.collections.DataUtil;
+import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.tool.personalkit.domain.bo.RequestLogEvent;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
@@ -117,7 +117,7 @@ public class MappingAspect {
         boolean isFileDownload = contentDisposition != null && contentDisposition.startsWith(
                 "attachment");
         List<Object> params =
-                DataUtil.stream(joinPoint.getArgs()).filter(Objects::nonNull).filter(this::isNotSystemParams).collect(Collectors.toList());
+                CollUtil.stream(joinPoint.getArgs()).filter(Objects::nonNull).filter(this::isNotSystemParams).collect(Collectors.toList());
         SysUser sysUser = ContextCache.currentUser().orElse(null);
         RequestLogEvent event = new RequestLogEvent(uri, method, headerMap, parameterMap, params,
                 sysUser, isFileUpload, isFileDownload, null, null);

@@ -3,7 +3,7 @@ package com.yishuifengxiao.tool.personalkit.service;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.jdbc.entity.Order;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
-import com.yishuifengxiao.common.tool.collections.DataUtil;
+import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
@@ -57,7 +57,7 @@ public class DataCenterService {
             //上传记录关联的全部文件
             List<DiskFile> files = JdbcUtil.jdbcHelper().findAll(new DiskFile().setUploadId(v.getId()), false);
             List<VirtuallyFile> virtuallyFiles =
-                    DataUtil.stream(files).map(diskFile -> dataSourceDao.findVirtuallyFileByFileId(diskFile.getId())).filter(Objects::nonNull)
+                    CollUtil.stream(files).map(diskFile -> dataSourceDao.findVirtuallyFileByFileId(diskFile.getId())).filter(Objects::nonNull)
                             //
                             .flatMap(Collection::stream).filter(Objects::nonNull).distinct().collect(Collectors.toList());
 

@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
-import com.yishuifengxiao.common.tool.collections.DataUtil;
+import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
@@ -101,7 +101,7 @@ public class GraphService {
                     dataSetRepository.findById(dataSource.getDataSetId()).orElseThrow(() -> UncheckedException.of(
                             "数据集不存在"));
             if (null != dataSource.getSourceItems()) {
-                DataUtil.stream(dataSource.getSourceItems()).map(v -> {
+                CollUtil.stream(dataSource.getSourceItems()).map(v -> {
                     DiskFile diskFile = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFile.class, v.getDiskFileId());
                     Assert.isNotNull("记录文件不存在", diskFile);
                     VirtuallyFile virtuallyFile =
@@ -147,7 +147,7 @@ public class GraphService {
     public void updateNodeMapping(GraphDefine.NodeMapping nodeMapping) {
         GraphDefine graphDefine = validate(nodeMapping.getId());
         List<GraphDefine.NodeMapping> mappings =
-                DataUtil.stream(graphDefine.getNodeMappings()).filter(Objects::nonNull).filter(v -> StringUtils.equals(v.getEdgeName(), nodeMapping.getEdgeName())).collect(Collectors.toList());
+                CollUtil.stream(graphDefine.getNodeMappings()).filter(Objects::nonNull).filter(v -> StringUtils.equals(v.getEdgeName(), nodeMapping.getEdgeName())).collect(Collectors.toList());
         mappings.add(nodeMapping);
         graphDefine.setNodeMappings(mappings);
         graphDefineRepository.save(graphDefine);

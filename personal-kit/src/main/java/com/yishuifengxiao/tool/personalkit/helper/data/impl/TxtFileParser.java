@@ -1,6 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.helper.data.impl;
 
-import com.yishuifengxiao.common.tool.collections.DataUtil;
+import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.io.IoUtil;
 import com.yishuifengxiao.tool.personalkit.domain.bo.ExcelRow;
 import com.yishuifengxiao.tool.personalkit.domain.enums.DataType;
@@ -33,13 +33,14 @@ public class TxtFileParser extends BaseFileParser {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line = null;
             AtomicLong atomic = new AtomicLong(0L);
-            List<VirtuallyFile.VirtuallyHeader> headers = DataUtil.asList(new VirtuallyFile.VirtuallyHeader(0, SupportedSuffix.TXT.getSuffix(), DataType.ANY));
+            List<VirtuallyFile.VirtuallyHeader> headers = CollUtil.asList(new VirtuallyFile.VirtuallyHeader(0,
+                    SupportedSuffix.TXT.getSuffix(), DataType.ANY));
             while ((line = br.readLine()) != null) {
                 long rowIndex = atomic.incrementAndGet();
                 if (StringUtils.isBlank(line)) {
                     continue;
                 }
-                ExcelRow parserRow = new ExcelRow(rowIndex, DataUtil.asList(excelCell(0, headers, line)));
+                ExcelRow parserRow = new ExcelRow(rowIndex, CollUtil.asList(excelCell(0, headers, line)));
                 rows.add(parserRow);
             }
             return Arrays.asList(new ParserResult(file.getName(), headers, rows));

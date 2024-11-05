@@ -1,6 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.helper.data;
 
-import com.yishuifengxiao.common.tool.collections.DataUtil;
+import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyRow;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +23,7 @@ public abstract class BaseFileParser implements FileParser {
     protected VirtuallyRow.ExcelCell excelCell(Integer columnIndex, List<VirtuallyFile.VirtuallyHeader> headers, String text) {
         headers = null == headers ? Collections.emptyList() : headers;
         List<String> list = headers.stream().filter(v -> v.getColumnIndex().equals(columnIndex)).filter(Objects::nonNull).map(VirtuallyFile.VirtuallyHeader::getName).filter(StringUtils::isNotBlank).collect(Collectors.toList());
-        String columnName = DataUtil.first(list);
+        String columnName = CollUtil.first(list).orElse(null);
         return cellHelper.excelCell(columnIndex, columnName, text);
     }
 }

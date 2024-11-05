@@ -2,9 +2,9 @@ package com.yishuifengxiao.tool.personalkit.tool;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.yishuifengxiao.common.tool.codec.Md5;
-import com.yishuifengxiao.common.tool.collections.DataUtil;
-import com.yishuifengxiao.common.tool.collections.JsonUtil;
+import com.yishuifengxiao.common.tool.bean.JsonUtil;
+import com.yishuifengxiao.common.tool.codec.MD5;
+import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.Ontology;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -45,7 +45,7 @@ public class OntHelper {
                         return null;
                     }
                     if (StringUtils.isBlank(nodeId)) {
-                        nodeId = Md5.md5Short(nodeName);
+                        nodeId = MD5.md5Short(nodeName);
                     }
 
 
@@ -64,9 +64,9 @@ public class OntHelper {
                 JSONArray.parseArray(JSONArray.toJSONString(graphData.get("lines"))).stream().map(v -> {
                     JSONObject jsonObject = JSONObject.from(v);
                     String edgeName = jsonObject.getString("text");
-                    String fromNodeName = DataUtil.stream(nodes).filter(s -> StringUtils.equals(s.getNodeId(),
+                    String fromNodeName = CollUtil.stream(nodes).filter(s -> StringUtils.equals(s.getNodeId(),
                             jsonObject.getString("from"))).findFirst().map(Ontology.Node::getNodeName).orElse(null);
-                    String toNodeName = DataUtil.stream(nodes).filter(s -> StringUtils.equals(s.getNodeId(),
+                    String toNodeName = CollUtil.stream(nodes).filter(s -> StringUtils.equals(s.getNodeId(),
                             jsonObject.getString("to"))).findFirst().map(Ontology.Node::getNodeName).orElse(null);
                     if (StringUtils.isNoneBlank(edgeName, fromNodeName, toNodeName)) {
                         return null;

@@ -3,7 +3,7 @@ package com.yishuifengxiao.tool.personalkit.event;
 import com.google.common.eventbus.Subscribe;
 import com.yishuifengxiao.common.guava.EventPublisher;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
-import com.yishuifengxiao.common.tool.codec.Md5;
+import com.yishuifengxiao.common.tool.codec.MD5;
 import com.yishuifengxiao.common.tool.io.IoUtil;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.tool.personalkit.domain.bo.FileAnalysisEvent;
@@ -61,7 +61,7 @@ public class FileAnalysisEventListener {
                 String objectName = uploadClient.upload(fileAnalysisEvent.getSysUser(), file);
                 DiskFile diskFile = new DiskFile(
                         fileId, file.getName(), fileAnalysisEvent.getDiskFolder().getId(),
-                        fileAnalysisEvent.getSysUser().getId(), objectName, Md5.md5Short(file),
+                        fileAnalysisEvent.getSysUser().getId(), objectName, MD5.md5Short(file),
                         IoUtil.suffix(file), null, file.getName(), fileAnalysisEvent.getUploadRecord().getId(),
                         file.length(), fileAnalysisEvent.getUploadMode().getCode(), LocalDateTime.now());
                 reference.set(diskFile);

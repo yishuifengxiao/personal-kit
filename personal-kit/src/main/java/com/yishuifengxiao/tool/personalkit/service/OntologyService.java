@@ -1,6 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
-import com.yishuifengxiao.common.tool.collections.JsonUtil;
+import com.yishuifengxiao.common.tool.bean.JsonUtil;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;

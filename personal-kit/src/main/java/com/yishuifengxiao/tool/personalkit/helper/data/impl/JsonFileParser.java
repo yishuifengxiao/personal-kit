@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.helper.data.impl;
 
 import com.alibaba.fastjson2.JSONArray;
-import com.yishuifengxiao.common.tool.collections.JsonUtil;
+import com.yishuifengxiao.common.tool.bean.JsonUtil;
 import com.yishuifengxiao.common.tool.io.IoUtil;
 import com.yishuifengxiao.tool.personalkit.domain.bo.ExcelRow;
 import com.yishuifengxiao.tool.personalkit.domain.enums.DataType;

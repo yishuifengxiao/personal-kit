@@ -2,7 +2,7 @@ package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
-import com.yishuifengxiao.common.tool.collections.DataUtil;
+import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
@@ -112,7 +112,7 @@ public class RoleService {
         //删除旧的关联关系
         JdbcUtil.jdbcHelper().delete(new SysRoleMenu().setRoleId(roleId));
 
-        Set<String> menuIds = DataUtil.stream(menus)
+        Set<String> menuIds = CollUtil.stream(menus)
                 .filter(Objects::nonNull)
                 .filter(v -> StringUtils.isNotBlank(v.getId()))
                 .filter(v -> JdbcUtil.jdbcHelper().countAll(new SysMenu().setId(v.getId().trim()),false) > 0)
@@ -167,7 +167,7 @@ public class RoleService {
         SysRole sysRole = JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, roleUserReq.getId().trim());
         Assert.isNotNull("角色不存在", sysRole);
         Assert.isFalse("角色已禁用", RoleStat.ROLE_DISABLE.getCode() == sysRole.getStat());
-          DataUtil.stream(roleUserReq.getUserIds())
+        CollUtil.stream(roleUserReq.getUserIds())
                 .filter(StringUtils::isNotBlank)
                 .map(String::trim)
                 .distinct()
@@ -188,7 +188,7 @@ public class RoleService {
         //删除旧的关联关系
         JdbcUtil.jdbcHelper().delete(new SysUserRole().setUserId(user.getId()));
         for (String roleId :
-                DataUtil.stream(userRoleReq.getRoleIds()).distinct().filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList())) {
+                CollUtil.stream(userRoleReq.getRoleIds()).distinct().filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList())) {
             SysRole sysRole = JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, roleId.trim());
             Assert.isNotNull(String.format("角色%s不存在", roleId), sysRole);
             Assert.isFalse(String.format("角色%s已禁用", sysRole.getName()),

@@ -2,7 +2,7 @@ package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.guava.EventPublisher;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
-import com.yishuifengxiao.common.tool.collections.DataUtil;
+import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.io.IoUtil;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.common.tool.utils.Assert;
@@ -48,7 +48,7 @@ public class FileService {
     private UploadClient uploadClient;
 
     public void uploads(HttpServletRequest request, SysUser sysUser, String folder, UploadMode uploadMode, MultipartFile[] files) {
-        DataUtil.parallelStream(files).forEach(v -> upload(request, sysUser, folder, uploadMode, v, v.getName()));
+        CollUtil.stream(files).forEach(v -> upload(request, sysUser, folder, uploadMode, v, v.getName()));
     }
 
     public String upload(HttpServletRequest request, SysUser sysUser, String folder, UploadMode uploadMode, MultipartFile multipartFile, String traceId) {

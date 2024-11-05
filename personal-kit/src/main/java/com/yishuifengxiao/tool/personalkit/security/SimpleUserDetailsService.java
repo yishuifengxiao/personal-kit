@@ -3,7 +3,7 @@ package com.yishuifengxiao.tool.personalkit.security;
 import com.yishuifengxiao.common.guava.GuavaCache;
 import com.yishuifengxiao.common.security.user.CurrentUserDetails;
 import com.yishuifengxiao.common.tool.codec.DES;
-import com.yishuifengxiao.common.tool.collections.DataUtil;
+import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
@@ -55,7 +55,7 @@ public class SimpleUserDetailsService implements UserDetailsService {
                 UserStat.CREDENTIALS_EXPIRED.getCode()!=sysUser.getStat(),
                 UserStat.ACCOUNT_LOCKED.getCode()!=sysUser.getStat(),
                 AuthorityUtils.commaSeparatedStringToAuthorityList(
-                        DataUtil.stream(roles).map(SysRole::getName)
+                        CollUtil.stream(roles).map(SysRole::getName)
                                 .filter(StringUtils::isNotBlank)
                                 .distinct().collect(Collectors.joining(","))))
                 .setCurrentUser(sysUser);

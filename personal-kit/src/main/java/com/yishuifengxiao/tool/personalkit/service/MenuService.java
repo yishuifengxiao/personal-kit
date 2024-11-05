@@ -3,7 +3,6 @@ package com.yishuifengxiao.tool.personalkit.service;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
-import com.yishuifengxiao.common.tool.collections.DataUtil;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
@@ -81,7 +80,7 @@ public class MenuService {
         SysMenu menu = JdbcUtil.jdbcHelper().findByPrimaryKey(SysMenu.class, req.getId().trim());
         Assert.isNotNull("记录不存在", menu);
         JdbcUtil.jdbcHelper().delete(new SysMenuPermission().setMenuId(menu.getId()));
-        DataUtil.stream(req.getPermissionIds())
+        CollUtil.stream(req.getPermissionIds())
                 .filter(StringUtils::isNotBlank)
                 .filter(v -> JdbcUtil.jdbcHelper().countAll(new SysPermission().setId(v),false) > 0)
                 .map(v -> new SysMenuPermission(menu.getId(), v))
@@ -109,7 +108,7 @@ public class MenuService {
         }
         //选中的上部菜单
         SysMenu selectTopMenu =
-                topMenus.stream().filter(v -> StringUtils.equalsIgnoreCase(v.getRouterName(), topMenuId)).findFirst().orElse(DataUtil.first(topMenus));
+                topMenus.stream().filter(v -> StringUtils.equalsIgnoreCase(v.getRouterName(), topMenuId)).findFirst().orElse(CollUtil.first(topMenus).orElse(null));
         // 左侧的一级菜单
         List<SysMenu> leftFirsts =
                 menus.stream().filter(v -> BoolStat.isTrue(v.getType())).filter(v -> StringUtils.equalsIgnoreCase(v.getParentId(), selectTopMenu.getId())).collect(Collectors.toList());

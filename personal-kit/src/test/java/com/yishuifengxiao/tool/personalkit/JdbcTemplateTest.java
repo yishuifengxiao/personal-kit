@@ -2,7 +2,7 @@ package com.yishuifengxiao.tool.personalkit;
 
 import com.yishuifengxiao.common.jdbc.JdbcHelper;
 import com.yishuifengxiao.common.jdbc.mapper.ColumnNameRowMapper;
-import com.yishuifengxiao.common.tool.collections.JsonUtil;
+import com.yishuifengxiao.common.tool.bean.JsonUtil;
 import com.yishuifengxiao.tool.personalkit.domain.entity.AutoTable;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUserRole;
@@ -81,5 +81,13 @@ public class JdbcTemplateTest {
         Map<String, Object> keys = keyHolder.getKeys();
         System.out.println(keys);
         System.out.println("-------");
+    }
+
+    @Test
+    public void test_findAll() {
+        List<SysRole> sysRoles = jdbcHelper.findAll(new SysRole().setName("aaaaaaaaaaaaa"), false);
+        System.out.println(sysRoles);
+        SysRole one = jdbcHelper.findOne(new SysRole().setName("aaaaaaaaaaaaa"), false);
+        System.out.println(one);
     }
 }

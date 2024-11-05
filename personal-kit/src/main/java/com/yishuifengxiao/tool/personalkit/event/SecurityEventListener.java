@@ -6,7 +6,7 @@ import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.security.support.SecurityEvent;
 import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.security.token.SecurityToken;
-import com.yishuifengxiao.common.tool.collections.DataUtil;
+import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.common.tool.utils.ValidateUtils;
 import com.yishuifengxiao.tool.personalkit.config.CoreProperties;
@@ -36,7 +36,7 @@ import java.util.Set;
 @Component
 public class SecurityEventListener {
 
-    private final static Set<Strategy> STRATEGYS = DataUtil.asSet(Strategy.AUTHENTICATION_FAILURE, Strategy.ACCESS_DENIED, Strategy.ON_EXCEPTION);
+    private final static Set<Strategy> STRATEGYS = CollUtil.asSet(Strategy.AUTHENTICATION_FAILURE, Strategy.ACCESS_DENIED, Strategy.ON_EXCEPTION);
 
 
     @Autowired
