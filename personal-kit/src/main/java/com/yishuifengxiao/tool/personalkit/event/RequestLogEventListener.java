@@ -1,5 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.event;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.eventbus.Subscribe;
@@ -47,6 +48,8 @@ public class RequestLogEventListener {
         if (null == obj) {
             return null;
         }
+        // 配置 ObjectMapper，忽略 null 值
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
         try {
             if (Collection.class.isAssignableFrom(obj.getClass())) {
