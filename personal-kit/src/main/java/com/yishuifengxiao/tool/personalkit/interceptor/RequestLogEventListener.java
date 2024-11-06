@@ -1,8 +1,12 @@
-package com.yishuifengxiao.tool.personalkit.event;
+package com.yishuifengxiao.tool.personalkit.interceptor;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.eventbus.Subscribe;
 import com.yishuifengxiao.common.guava.EventPublisher;
 import com.yishuifengxiao.common.jdbc.JdbcHelper;
@@ -13,7 +17,9 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Optional;
@@ -33,8 +39,13 @@ public class RequestLogEventListener {
         String userId = Optional.ofNullable(event.getSysUser()).map(SysUser::getId).orElse(null);
         String username =
                 Optional.ofNullable(event.getSysUser()).map(SysUser::getUsername).orElse(null);
-        String requestBody = event.isFileUpload() ? "文件上传" : this.convert(event.getParams());
-        String responseBody = event.isFileDownload() ? "文件下载" : this.convert(event.getResult());
+        String requestBody = this.convert(event.getParams());
+        String responseBody = null;
+        if (null != event.getThrowable()) {
+            responseBody = event.getThrowable().getMessage();
+        } else {
+            responseBody = event.isFileDownload() ? "文件下载" : this.convert(event.getResult());
+        }
         String paramMap = null == event.getParameterMap() || event.getParameterMap().isEmpty() ?
                 null : convert(event.getParameterMap());
         HttpLog httpLog = new HttpLog(IdWorker.snowflakeStringId(), event.getUri(),
@@ -51,6 +62,11 @@ public class RequestLogEventListener {
         // 配置 ObjectMapper，忽略 null 值
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
+        // 序列化时忽略MultipartFile
+        // 创建模块并注册自定义序列化器
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(MultipartFile.class, new MultipartFileSerializer());
+        mapper.registerModule(module);
         try {
             if (Collection.class.isAssignableFrom(obj.getClass())) {
                 Collection array = (Collection) obj;
@@ -71,5 +87,14 @@ public class RequestLogEventListener {
     @PostConstruct
     public void init() {
         eventPublisher.eventBus().register(this);
+    }
+
+
+    public static class MultipartFileSerializer extends JsonSerializer<MultipartFile> {
+
+        @Override
+        public void serialize(MultipartFile file, JsonGenerator jsonGenerator, SerializerProvider serializers) throws IOException {
+            // 不执行任何操作，直接忽略该字段
+        }
     }
 }
