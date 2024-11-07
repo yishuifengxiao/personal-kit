@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.eventbus.Subscribe;
 import com.yishuifengxiao.common.guava.EventPublisher;
 import com.yishuifengxiao.common.jdbc.JdbcHelper;
+import com.yishuifengxiao.common.tool.bean.JsonUtil;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.tool.personalkit.domain.bo.RequestLogEvent;
 import com.yishuifengxiao.tool.personalkit.domain.entity.HttpLog;
@@ -28,10 +29,10 @@ import java.util.Optional;
 public class RequestLogEventListener {
     @Autowired
     private EventPublisher eventPublisher;
-    @Autowired
-    private ObjectMapper mapper;
+
     @Autowired
     private JdbcHelper jdbcHelper;
+
 
     @Subscribe
     public void onRequestLogEvent(RequestLogEvent event) {
@@ -59,23 +60,37 @@ public class RequestLogEventListener {
         if (null == obj) {
             return null;
         }
-        // 配置 ObjectMapper，忽略 null 值
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        mapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
-        // 忽略 MultipartFile
-        SimpleModule module = new SimpleModule();
-        // 注册 MultipartFile 的自定义序列化器
-        module.addSerializer(MultipartFile.class, new MultipartFileSerializer());
-        mapper.registerModule(module);
-        return null;
+        String jsonString = JsonUtil.toJSONString(obj);
+
+        return jsonString;
+
     }
 
-    public class MultipartFileSerializer extends JsonSerializer<MultipartFile> {
+    public static class MultipartFileSerializer extends JsonSerializer<MultipartFile> {
         @Override
         public void serialize(MultipartFile value, JsonGenerator gen,
                               SerializerProvider serializers) throws IOException {
             // 什么也不做，直接忽略这个字段
         }
+    }
+
+    static {
+        try {
+            ObjectMapper mapper = JsonUtil.mapper;
+            // 配置ObjectMapper不要在多态类型处添加@class
+            // 配置 ObjectMapper
+            mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false); // 如果需要
+            // 配置 ObjectMapper，忽略 null 值
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            mapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
+            // 忽略 MultipartFile
+            SimpleModule module = new SimpleModule();
+            // 注册 MultipartFile 的自定义序列化器
+            module.addSerializer(MultipartFile.class, new MultipartFileSerializer());
+            mapper.registerModule(module);
+        } catch (Exception e) {
+        }
+
     }
 
     @PostConstruct

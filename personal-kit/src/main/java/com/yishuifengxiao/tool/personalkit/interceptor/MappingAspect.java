@@ -4,19 +4,18 @@ import com.google.common.eventbus.EventBus;
 import com.yishuifengxiao.tool.personalkit.domain.bo.RequestLogEvent;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.Filter;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.support.ServletRequestHandledEvent;
@@ -64,10 +63,17 @@ public class MappingAspect {
         @Before("controllerMethods() && mappingMethods()")
         public void beforeRequest(JoinPoint joinPoint) {
             Object[] args = joinPoint.getArgs();
-            Object result = null == args ? null :
-                    Arrays.stream(args).filter(MappingAspect.this::isNeedCache).collect(Collectors.toList());
+            Object result = null;
+            if (null != args && args.length > 0) {
+                List<Object> list =
+                        Arrays.stream(args).filter(MappingAspect.this::isNeedCache).collect(Collectors.toList());
+                if (list.size() == 1) {
+                    result = list.get(0);
+                } else {
+                    result = list;
+                }
+            }
             CacheUtils.setRequestCache(result);
-            System.err.println("-------------- 输入参数为 " + args);
         }
     }
 
@@ -75,14 +81,12 @@ public class MappingAspect {
     @Component
     public class ResponseAdviceAspect {
 
-        @After("execution(* org.springframework.web.servlet.mvc.method.annotation" +
-                ".ResponseBodyAdvice+.beforeBodyWrite(..))")
-        public void interceptBeforeBodyWrite(JoinPoint joinPoint) throws Throwable {
-            Object[] args = joinPoint.getArgs();
-            Object result = null == args ? null :
-                    Arrays.stream(args).filter(MappingAspect.this::isNeedCache).collect(Collectors.toList());
+        @AfterReturning(pointcut = "execution(* org.springframework.web.servlet.mvc.method"
+                + ".annotation" +
+                ".ResponseBodyAdvice+.beforeBodyWrite(..))", returning = "result")
+        public void interceptBeforeBodyWrite(Object result) throws Throwable {
+            Object args = result;
             CacheUtils.setResponseCache(result);
-            System.err.println("-------------- 输出参数为 " + args);
 
         }
     }
@@ -140,20 +144,27 @@ public class MappingAspect {
         if (null == object) {
             return false;
         }
-        System.out.println(" 当前参数为  class = " + object.getClass() + " object value " + object);
+
+        boolean flag = true;
         if (Void.class.isAssignableFrom(object.getClass())) {
-            return false;
+            flag = false;
+        } else if (StringUtils.startsWithIgnoreCase(object.getClass().getName(), "org"
+                + ".springframework")) {
+            flag = false;
+        } else if (MultipartFile.class.isAssignableFrom(object.getClass())) {
+            flag = false;
+        } else if (ServletRequest.class.isAssignableFrom(object.getClass())) {
+            flag = false;
+        } else if (ServletResponse.class.isAssignableFrom(object.getClass())) {
+            flag = false;
+        } else if (Filter.class.isAssignableFrom(object.getClass())) {
+            flag = false;
+        } else if (BeanPropertyBindingResult.class.isAssignableFrom(object.getClass())) {
+            flag = false;
+        } else if (org.springframework.http.MediaType.class.isAssignableFrom(object.getClass())) {
+            flag = false;
         }
-        if (MultipartFile.class.isAssignableFrom(object.getClass())) {
-            return false;
-        }
-        if (ServletRequest.class.isAssignableFrom(object.getClass())) {
-            return false;
-        }
-        if (ServletResponse.class.isAssignableFrom(object.getClass())) {
-            return false;
-        }
-        return true;
+        return flag;
     }
 
     @PostConstruct
