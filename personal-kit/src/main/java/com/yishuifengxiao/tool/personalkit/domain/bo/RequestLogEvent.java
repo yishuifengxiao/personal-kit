@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 @Data
@@ -15,14 +14,14 @@ import java.util.Map;
 @NoArgsConstructor
 @Accessors(chain = true)
 public class RequestLogEvent implements Serializable {
+    private long key;
     private String uri;
     private String method;
-    private Map<String, String> headerMap;
+    private String queryString;
+    private Map<String, String> requestHeaderMap;
     private Map<String, String[]> parameterMap;
-    private List<Object> params;
+    private Map<String, String> responseHeaderMap;
     private SysUser sysUser;
-    private boolean isFileUpload;
-    private boolean isFileDownload;
-    private Object result;
-    private Throwable throwable;
+
+
 }

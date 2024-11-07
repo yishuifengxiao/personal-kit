@@ -64,7 +64,7 @@ public class FileController {
         final SysUser sysUser = ContextCache.currentLoginUser();
         final String upload = fileService.upload(request, sysUser, folder, uploadMode, file,
                 traceId);
-        return Response.sucData(upload);
+        return Response.suc(upload);
     }
 
 

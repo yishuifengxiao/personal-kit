@@ -3,6 +3,7 @@ package com.yishuifengxiao.tool.personalkit.web;
 import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.holder.TokenHolder;
 import com.yishuifengxiao.common.tool.exception.CustomException;
+import com.yishuifengxiao.tool.personalkit.demo.DemoData;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
@@ -114,5 +115,17 @@ public class IndexController {
         return userInfo;
     }
 
+
+    @PostMapping("/demoData")
+    @ResponseBody
+    public DemoData demoData() {
+        return new DemoData("测试ID", 1);
+    }
+
+
+    @GetMapping("/aa")
+    public void aa() {
+        System.out.println("-----------1");
+    }
 
 }
