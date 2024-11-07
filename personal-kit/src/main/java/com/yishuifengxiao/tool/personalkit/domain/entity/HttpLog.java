@@ -44,7 +44,7 @@ public class HttpLog implements Serializable {
 
     @Column(name = "user_id", length = 64, columnDefinition = "varchar(64)")
     private String userId;
-    
+
     @Column(name = "user_name")
     private String userName;
 
@@ -59,6 +59,9 @@ public class HttpLog implements Serializable {
 
     @Column(name = "response_body", columnDefinition = "longtext")
     private String responseBody;
+
+    @Column(name = "use_millis", columnDefinition = "bigint")
+    private Long useMillis;
 
     private String mark;
 

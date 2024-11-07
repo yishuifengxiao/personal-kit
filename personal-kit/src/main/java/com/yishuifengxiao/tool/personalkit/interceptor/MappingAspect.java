@@ -21,6 +21,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.support.ServletRequestHandledEvent;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -87,7 +89,8 @@ public class MappingAspect {
         public void interceptBeforeBodyWrite(Object result) throws Throwable {
             Object args = result;
             CacheUtils.setResponseCache(result);
-
+            //保存请求时间
+            CacheUtils.setRequestTime();
         }
     }
 
@@ -133,7 +136,11 @@ public class MappingAspect {
                     }
                 });
             });
-            RequestLogEvent logEvent = new RequestLogEvent(id, requestUrl, method, queryString,
+            //耗时的毫秒数
+            long untiled = CacheUtils.getRequestTime().until(LocalDateTime.now(),
+                    ChronoUnit.MILLIS);
+            RequestLogEvent logEvent = new RequestLogEvent(id, untiled, requestUrl, method,
+                    queryString,
                     requestHeaderMap, parameterMap
                     , responseHeaderMap, ContextCache.currentUser().orElse(null));
             asyncEventBus.post(logEvent);

@@ -15,6 +15,7 @@ import java.util.Map;
 @Accessors(chain = true)
 public class RequestLogEvent implements Serializable {
     private long key;
+    private Long useMillis;
     private String uri;
     private String method;
     private String queryString;

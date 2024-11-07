@@ -42,7 +42,7 @@ public class RequestLogEventListener {
                 Optional.ofNullable(event.getSysUser()).map(SysUser::getUsername).orElse(null);
         Object requestCache = CacheUtils.getRequestCache(event.getKey());
         Object responseCache = CacheUtils.getResponseCache(event.getKey());
-
+        LocalDateTime requestTime = CacheUtils.getRequestTime(event.getKey());
         String requestBody = this.convert(requestCache);
         String responseBody = this.convert(responseCache);
         String parameterMap = this.convert(event.getParameterMap());
@@ -51,7 +51,7 @@ public class RequestLogEventListener {
         CacheUtils.clear(event.getKey());
         HttpLog httpLog = new HttpLog(IdWorker.snowflakeStringId(), event.getUri(),
                 event.getMethod(), userId, username, requestHeaderMap, parameterMap,
-                requestBody, responseBody, null, LocalDateTime.now());
+                requestBody, responseBody, event.getUseMillis(), null, requestTime);
         jdbcHelper.insert(httpLog);
     }
 
