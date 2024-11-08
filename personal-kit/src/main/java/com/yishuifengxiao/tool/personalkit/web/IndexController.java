@@ -1,7 +1,11 @@
 package com.yishuifengxiao.tool.personalkit.web;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.holder.TokenHolder;
+import com.yishuifengxiao.common.tool.bean.JsonUtil;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.tool.personalkit.demo.DemoData;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
@@ -16,6 +20,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.jackson2.CoreJackson2Module;
+import org.springframework.security.web.jackson2.WebJackson2Module;
+import org.springframework.security.web.jackson2.WebServletJackson2Module;
+import org.springframework.security.web.server.jackson2.WebServerJackson2Module;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +66,7 @@ public class IndexController {
     @Operation(summary = "获取token", description = "获取当前用户所有的token信息")
     @GetMapping("/tokens")
     @ResponseBody
-    public List<SecurityToken> tokens(Authentication authentication) {
+    public List<SecurityToken> tokens(Authentication authentication) throws JsonProcessingException {
         List<SecurityToken> tokens = tokenHolder.getAll(authentication.getName());
 
         tokens.stream().map(token -> {
@@ -72,7 +80,16 @@ public class IndexController {
 
             return null;
         }).collect(Collectors.toList());
+        ObjectMapper mapper = JsonUtil.mapper();
 
+        mapper.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY);
+        mapper.registerModule(new CoreJackson2Module());
+        mapper.registerModule(new WebJackson2Module());
+        mapper.registerModule(new WebServletJackson2Module());
+        mapper.registerModule(new WebServerJackson2Module());
+
+        String json = mapper.writeValueAsString(tokens);
 
         return tokens;
     }
