@@ -1,4 +1,4 @@
-package com.yishuifengxiao.tool.personalkit.event;
+package com.yishuifengxiao.tool.personalkit.interceptor;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -15,7 +15,6 @@ import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.tool.personalkit.domain.bo.RequestLogEvent;
 import com.yishuifengxiao.tool.personalkit.domain.entity.HttpLog;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
-import com.yishuifengxiao.tool.personalkit.interceptor.CacheUtils;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,6 +26,8 @@ import java.util.Optional;
 
 @Component
 public class RequestLogEventListener {
+
+    private final static ObjectMapper mapper = JsonUtil.mapper();
     @Autowired
     private EventPublisher eventPublisher;
 
@@ -60,10 +61,13 @@ public class RequestLogEventListener {
         if (null == obj) {
             return null;
         }
-        String jsonString = JsonUtil.toJSONString(obj);
-
+        String jsonString = null;
+        try {
+            jsonString = mapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return jsonString;
-
     }
 
     public static class MultipartFileSerializer extends JsonSerializer<MultipartFile> {
@@ -75,12 +79,8 @@ public class RequestLogEventListener {
     }
 
     static {
+        // 禁用写入类信息
         try {
-            ObjectMapper mapper = JsonUtil.mapper;
-            // 配置ObjectMapper不要在多态类型处添加@class
-            // 配置 ObjectMapper
-            mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false); // 如果需要
-            // 配置 ObjectMapper，忽略 null 值
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             mapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
             // 忽略 MultipartFile

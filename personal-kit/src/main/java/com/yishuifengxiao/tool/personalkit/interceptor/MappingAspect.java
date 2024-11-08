@@ -1,6 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.interceptor;
 
 import com.google.common.eventbus.EventBus;
+import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.tool.personalkit.domain.bo.RequestLogEvent;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.annotation.PostConstruct;
@@ -11,7 +12,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -34,8 +38,10 @@ public class MappingAspect {
     private EventBus asyncEventBus;
 
 
-    private final static Set<String> urls =
-            Arrays.asList("/v3/api-docs").stream().collect(Collectors.toSet());
+    private final static String[] urls = new String[]{".", "/v3/api-docs"};
+
+    private final static String[] keywords = CollUtil.asArray("cookie", "content-length", "sec-",
+            ":", "accept", "host", "connection");
 
     @Aspect
     @Component
@@ -83,9 +89,8 @@ public class MappingAspect {
     @Component
     public class ResponseAdviceAspect {
 
-        @AfterReturning(pointcut = "execution(* org.springframework.web.servlet.mvc.method"
-                + ".annotation" +
-                ".ResponseBodyAdvice+.beforeBodyWrite(..))", returning = "result")
+        @AfterReturning(pointcut = "execution(* org.springframework.web.servlet.mvc.method" +
+                ".annotation" + ".ResponseBodyAdvice+.beforeBodyWrite(..))", returning = "result")
         public void interceptBeforeBodyWrite(Object result) throws Throwable {
             Object args = result;
             CacheUtils.setResponseCache(result);
@@ -103,9 +108,12 @@ public class MappingAspect {
                     (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             Optional<HttpServletRequest> request = Optional.ofNullable(null == attributes ? null
                     : attributes.getRequest());
-            Optional<HttpServletResponse> response = Optional.ofNullable(null == attributes ? null :
-                    attributes.getResponse());
+            Optional<HttpServletResponse> response = Optional.ofNullable(null == attributes ?
+                    null : attributes.getResponse());
             String requestUrl = event.getRequestUrl();
+            if (StringUtils.containsAnyIgnoreCase(requestUrl, urls)) {
+                return;
+            }
             String method = event.getMethod();
             long id = Thread.currentThread().getId();
             String queryString =
@@ -114,35 +122,44 @@ public class MappingAspect {
                     request.filter(Objects::nonNull).map(ServletRequest::getParameterMap).orElse(null);
             Map<String, String> requestHeaderMap = new HashMap<>();
             request.filter(Objects::nonNull).ifPresent(s -> {
-                s.getHeaderNames().asIterator().forEachRemaining(key -> {
-                    if (StringUtils.isNotBlank(key)) {
-                        String headerVal = request.map(v -> v.getHeader(key)).orElse(null);
-                        if (StringUtils.isNotBlank(headerVal)) {
-                            requestHeaderMap.put(key, headerVal);
-                        }
+                Collections.list(s.getHeaderNames()).parallelStream().filter(v -> !StringUtils.containsAnyIgnoreCase(v, keywords))
+                        .forEach(key -> {
+                            if (StringUtils.isNotBlank(key)) {
+                                if (!StringUtils.containsAnyIgnoreCase(key, keywords)) {
+                                    String headerVal =
+                                            request.map(v -> v.getHeader(key)).orElse(null);
+                                    if (StringUtils.isNotBlank(headerVal)) {
+                                        requestHeaderMap.put(key, headerVal);
+                                    }
+                                }
 
-                    }
-                });
+
+                            }
+                        });
             });
             Map<String, String> responseHeaderMap = new HashMap<>();
             response.filter(Objects::nonNull).ifPresent(s -> {
-                s.getHeaderNames().stream().forEach(key -> {
-                    if (StringUtils.isNotBlank(key)) {
-                        String headerVal = request.map(v -> v.getHeader(key)).orElse(null);
-                        if (StringUtils.isNotBlank(headerVal)) {
-                            responseHeaderMap.put(key, headerVal);
-                        }
+                s.getHeaderNames().parallelStream().filter(v -> !StringUtils.containsAnyIgnoreCase(v, keywords))
+                        .forEach(key -> {
+                            if (StringUtils.isNotBlank(key)) {
+                                if (!StringUtils.containsAnyIgnoreCase(key, keywords)) {
+                                    String headerVal =
+                                            request.map(v -> v.getHeader(key)).orElse(null);
+                                    if (StringUtils.isNotBlank(headerVal)) {
+                                        requestHeaderMap.put(key, headerVal);
+                                    }
+                                }
 
-                    }
-                });
+
+                            }
+                        });
             });
             //耗时的毫秒数
             long untiled = CacheUtils.getRequestTime().until(LocalDateTime.now(),
                     ChronoUnit.MILLIS);
             RequestLogEvent logEvent = new RequestLogEvent(id, untiled, requestUrl, method,
-                    queryString,
-                    requestHeaderMap, parameterMap
-                    , responseHeaderMap, ContextCache.currentUser().orElse(null));
+                    queryString, requestHeaderMap, parameterMap, responseHeaderMap,
+                    ContextCache.currentUser().orElse(null));
             asyncEventBus.post(logEvent);
         }
     }
@@ -155,8 +172,8 @@ public class MappingAspect {
         boolean flag = true;
         if (Void.class.isAssignableFrom(object.getClass())) {
             flag = false;
-        } else if (StringUtils.startsWithIgnoreCase(object.getClass().getName(), "org"
-                + ".springframework")) {
+        } else if (StringUtils.startsWithIgnoreCase(object.getClass().getName(), "org" +
+                ".springframework")) {
             flag = false;
         } else if (MultipartFile.class.isAssignableFrom(object.getClass())) {
             flag = false;
