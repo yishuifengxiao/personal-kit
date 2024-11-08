@@ -16,10 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.access.expression.DefaultHttpSecurityExpressionHandler;
 import org.springframework.security.web.access.expression.WebSecurityExpressionRoot;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -55,13 +59,13 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
 
     @Override
     public AuthorizationDecision check(Supplier<Authentication> supplier, RequestAuthorizationContext object) {
-        WebSecurityExpressionRoot webSecurityExpressionRoot = new WebSecurityExpressionRoot(supplier,
-                object.getRequest());
+
+
         //包含context-path
         HttpServletRequest request = object.getRequest();
 
         Authentication authentication = supplier.get();
-        AuthorizationDecision decision = authorizationDecision(request);
+        AuthorizationDecision decision = authorizationDecision(supplier, object);
         if (null != decision) {
             return decision;
         }
@@ -95,7 +99,20 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
     }
 
 
-    private AuthorizationDecision authorizationDecision(HttpServletRequest request) {
+    private AuthorizationDecision authorizationDecision(Supplier<Authentication> supplier,
+                                                        RequestAuthorizationContext object) {
+
+        DefaultHttpSecurityExpressionHandler defaultHttpSecurityExpressionHandler =
+                new DefaultHttpSecurityExpressionHandler();
+        WebSecurityExpressionRoot webSecurityExpressionRoot = new WebSecurityExpressionRoot(supplier,
+                object.getRequest());
+        EvaluationContext evaluationContext = defaultHttpSecurityExpressionHandler.createEvaluationContext(supplier,
+                object);
+        // 使用 SpEL 解析表达式
+        ExpressionParser parser = new SpelExpressionParser();
+
+
+        HttpServletRequest request = object.getRequest();
         String uri = request.getRequestURI();
         uri = StringUtils.substringAfter(uri, this.contextPath);
         SysPermission permission = JdbcUtil.jdbcHelper(context).findOne(new SysPermission().setUrl(uri),
@@ -104,14 +121,17 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
             return null;
         }
         try {
+
             String[] tokens = StringUtils.splitByWholeSeparatorPreserveAllTokens(permission.getPath(), "::");
             String preAuthorize =
                     Arrays.stream(Class.forName(tokens[0]).getMethods()).filter(v -> StringUtils.equals(v.getName(),
                             tokens[1])).findFirst().map(method -> AnnotationUtils.findAnnotation(method,
                             PreAuthorize.class)).map(PreAuthorize::value).orElse(null);
             if (StringUtils.isNotBlank(preAuthorize)) {
-                if (StringUtils.equalsAnyIgnoreCase(preAuthorize, "permitAll", "permitAll()")) {
-                    return new AuthorizationDecision(true);
+
+                Boolean value = parser.parseExpression(preAuthorize).getValue(evaluationContext, Boolean.class);
+                if (null != value) {
+                    return new AuthorizationDecision(value);
                 }
             }
 
