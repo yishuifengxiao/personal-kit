@@ -7,7 +7,6 @@ import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.holder.TokenHolder;
 import com.yishuifengxiao.common.tool.bean.JsonUtil;
 import com.yishuifengxiao.common.tool.exception.CustomException;
-import com.yishuifengxiao.tool.personalkit.demo.DemoData;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
@@ -19,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.jackson2.CoreJackson2Module;
 import org.springframework.security.web.jackson2.WebJackson2Module;
@@ -75,8 +75,6 @@ public class IndexController {
             LocalDateTime expireAt = token.getExpireAt();
             String tokenValue = token.getValue();
             boolean tokenActive = token.isActive();
-            boolean tokenExpired = token.isExpired();
-            boolean tokenAvailable = token.isAvailable();
 
             return null;
         }).collect(Collectors.toList());
@@ -97,9 +95,8 @@ public class IndexController {
     @Operation(summary = "默认接口", description = "获取请求信息")
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     @ResponseBody
-    public Object index(HttpServletRequest request, HttpServletResponse response,
-                        Authentication authentication) {
-
+    @PreAuthorize("permitAll")
+    public Object index(HttpServletRequest request, HttpServletResponse response) {
         StringBuffer requestURL = request.getRequestURL();
         String requestURI = request.getRequestURI();
         String contextPath = request.getContextPath();
@@ -112,7 +109,6 @@ public class IndexController {
             String header = request.getHeader(element);
             headerMap.put(element, header);
         }
-
         Map map = Map.of("requestURL", requestURL, "requestURI", requestURI, "contextPath",
                 contextPath, "servletPath", servletPath, "parameterMap", parameterMap, "headerMap"
                 , headerMap);
@@ -133,16 +129,5 @@ public class IndexController {
     }
 
 
-    @PostMapping("/demoData")
-    @ResponseBody
-    public DemoData demoData() {
-        return new DemoData("测试ID", 1);
-    }
-
-
-    @GetMapping("/aa")
-    public void aa() {
-        System.out.println("-----------1");
-    }
 
 }

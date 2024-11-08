@@ -59,6 +59,9 @@ public class ResourceInitializer implements CommandLineRunner {
         if (this.hasInit) {
             return;
         }
+        //初始化权限
+        List<SysPermission> permissions = this.scanSysPermissions();
+        permissions.stream().forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
         Long userNum = JdbcUtil.jdbcHelper().countAll(new SysUser().setUsername(Constant.DEFAULT_USER), false);
         if (null != userNum && userNum > 0) {
             return;
@@ -68,9 +71,9 @@ public class ResourceInitializer implements CommandLineRunner {
                 Constant.DEFAULT_PWD);
         JdbcUtil.jdbcHelper().saveOrUpdate(sysUser);
         //初始化角色
-        SysRole sysRole = new SysRole(Constant.DEFAULT_ROOT_ID, "系统角色",
-                "系统初始化数据," + "内置超级管理员，具有系统全部权限", Constant.DEFAULT_ROOT_ID, DEFAULT_HOME_URL,
-                RoleStat.ROLE_ENABLE.getCode(), BoolStat.True.code(), LocalDateTime.now(), 1);
+        SysRole sysRole = new SysRole(Constant.DEFAULT_ROOT_ID, "系统角色", "系统初始化数据," + "内置超级管理员，具有系统全部权限",
+                Constant.DEFAULT_ROOT_ID, DEFAULT_HOME_URL, RoleStat.ROLE_ENABLE.getCode(), BoolStat.True.code(),
+                LocalDateTime.now(), 1);
         JdbcUtil.jdbcHelper().saveOrUpdate(sysRole);
 
         //初始化 用户-角色 关联关系
@@ -78,9 +81,7 @@ public class ResourceInitializer implements CommandLineRunner {
                 sysRole.getId());
         JdbcUtil.jdbcHelper().saveOrUpdate(userRole);
 
-        //初始化权限
-        List<SysPermission> permissions = this.scanSysPermissions();
-        permissions.stream().forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
+
         // 初始化 角色-权限 关联
         permissions.stream().map(v -> new SysMenuPermission(MD5.md5Short(sysRole.getId() + v.getId()),
                 sysRole.getId(), v.getId())).forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
@@ -98,12 +99,17 @@ public class ResourceInitializer implements CommandLineRunner {
                     String moduleName = extractModuleName(controller);
                     List<String> classUrls = extractClassUrls(controller);
                     classUrls = CollUtil.isEmpty(classUrls) ? Arrays.asList("") : classUrls;
+                    String className =StringUtils.substringBefore( controller.getClass().getName(),"$");
+
                     //方法
                     return classUrls.stream().map(classUrl -> Arrays.stream(controller.getClass().getMethods()).filter(m -> Modifier.isPublic(m.getModifiers())).map(declaredMethod -> {
                         String[] methodPaths = methodPath(declaredMethod);
                         if (CollUtil.isEmpty(methodPaths)) {
                             return null;
                         }
+
+                        String path = className + "::" + declaredMethod.getName();
+
                         Operation apiOperation = AnnotationUtils.findAnnotation(declaredMethod, Operation.class);
                         String summary = null != apiOperation ? apiOperation.summary() : "";
                         String description = null != apiOperation ? apiOperation.description() : "";
@@ -112,7 +118,7 @@ public class ResourceInitializer implements CommandLineRunner {
                             String url = StringUtils.trim(classUrl + methodUrl);
                             SysPermission permission = new SysPermission(IdWorker.snowflakeStringId(), moduleName,
                                     summary,
-                                    description, url, contextPath, applicationName, BoolStat.True.code());
+                                    description, url, contextPath, applicationName, path, BoolStat.True.code());
                             permission.setId(MD5.md5Short(permission.getApplicationName() + permission.getContextPath() + permission.getUrl()));
                             return permission;
                         }).collect(Collectors.toList());

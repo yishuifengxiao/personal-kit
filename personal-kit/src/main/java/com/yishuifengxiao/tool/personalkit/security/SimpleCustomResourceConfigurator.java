@@ -14,9 +14,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.access.expression.WebSecurityExpressionRoot;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.AnyRequestMatcher;
@@ -24,6 +28,7 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -44,14 +49,25 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
 
     @Value("${server.servlet.context-path:''}")
     private String contextPath;
+    @Autowired
+    private ApplicationContext context;
 
 
     @Override
-    public AuthorizationDecision check(Supplier<Authentication> authentication, RequestAuthorizationContext object) {
+    public AuthorizationDecision check(Supplier<Authentication> supplier, RequestAuthorizationContext object) {
+        WebSecurityExpressionRoot webSecurityExpressionRoot = new WebSecurityExpressionRoot(supplier,
+                object.getRequest());
         //包含context-path
         HttpServletRequest request = object.getRequest();
+
+        Authentication authentication = supplier.get();
+        AuthorizationDecision decision = authorizationDecision(request);
+        if (null != decision) {
+            return decision;
+        }
+
         SysUser sysUser =
-                sysUserDao.findActiveSysUser(authentication.get().getName()).orElseThrow(() -> new UsernameNotFoundException(String.format("账号%s不存在", authentication.get().getName())));
+                sysUserDao.findActiveSysUser(authentication.getName()).orElseThrow(() -> new UsernameNotFoundException(String.format("账号%s不存在", authentication.getName())));
         // 内置账号默认通过校验
         if (StringUtils.equalsIgnoreCase(sysUser.getId(), Constant.DEFAULT_ROOT_ID) || BoolStat.isTrue(sysUser.getEmbedded())) {
             return new AuthorizationDecision(true);
@@ -66,7 +82,7 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
             sql += " AND srm.menu_id = " + currentRole;
         }
 
-        List<SysPermission> list = JdbcUtil.jdbcHelper().findAll(SysPermission.class, sql);
+        List<SysPermission> list = JdbcUtil.jdbcHelper(context).findAll(SysPermission.class, sql);
 
 
         OrRequestMatcher orRequestMatcher =
@@ -78,13 +94,39 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
         return new AuthorizationDecision(anyMatch);
     }
 
+
+    private AuthorizationDecision authorizationDecision(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        uri = StringUtils.substringAfter(uri, this.contextPath);
+        SysPermission permission = JdbcUtil.jdbcHelper(context).findOne(new SysPermission().setUrl(uri),
+                false);
+        if (null == permission) {
+            return null;
+        }
+        try {
+            String[] tokens = StringUtils.splitByWholeSeparatorPreserveAllTokens(permission.getPath(), "::");
+            String preAuthorize =
+                    Arrays.stream(Class.forName(tokens[0]).getMethods()).filter(v -> StringUtils.equals(v.getName(),
+                            tokens[1])).findFirst().map(method -> AnnotationUtils.findAnnotation(method,
+                            PreAuthorize.class)).map(PreAuthorize::value).orElse(null);
+            if (StringUtils.isNotBlank(preAuthorize)) {
+                if (StringUtils.equalsAnyIgnoreCase(preAuthorize, "permitAll", "permitAll()")) {
+                    return new AuthorizationDecision(true);
+                }
+            }
+
+        } catch (Exception e) {
+        }
+        return null;
+    }
+
     @Override
     public RequestMatcher requestMatcher() {
         try {
             String sql = StringUtils.isBlank(contextPath) ?
                     "SELECT DISTINCT sp.url FROM sys_permission sp WHERE ISNULL" + "(sp.context_path)" : String.format(
                     "SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='%s'", contextPath);
-            List<String> list = JdbcUtil.jdbcHelper().findAll(String.class, sql);
+            List<String> list = JdbcUtil.jdbcHelper(context).findAll(String.class, sql);
             if (CollUtil.isEmpty(list)) {
                 return null;
             }

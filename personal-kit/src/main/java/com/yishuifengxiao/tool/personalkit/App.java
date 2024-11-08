@@ -8,7 +8,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 import java.util.Date;
 
@@ -20,6 +23,9 @@ import java.util.Date;
  */
 @Slf4j
 @SpringBootApplication
+@EnableMethodSecurity
+@EnableWebSecurity
+@EnableAspectJAutoProxy
 public class App extends SpringBootServletInitializer {
 
 
@@ -32,6 +38,7 @@ public class App extends SpringBootServletInitializer {
     }
 
     public static void main(String[] args) {
+//        AbstractPreAuthenticatedProcessingFilter.class
 
         ConfigurableApplicationContext context = SpringApplication.run(App.class, args);
 

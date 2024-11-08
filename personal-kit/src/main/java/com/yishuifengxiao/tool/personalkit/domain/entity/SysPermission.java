@@ -45,6 +45,8 @@ public class SysPermission implements Serializable {
     @Column(name = "application_name")
     private String applicationName;
 
+    private String path;
+
 
     @JsonIgnore
     @Column(name = "is_embedded", length = 1, columnDefinition = "tinyint(1) default 0")
