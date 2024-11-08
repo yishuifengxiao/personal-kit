@@ -16,6 +16,7 @@ import com.yishuifengxiao.tool.personalkit.domain.bo.RequestLogEvent;
 import com.yishuifengxiao.tool.personalkit.domain.entity.HttpLog;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import jakarta.annotation.PostConstruct;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,9 +46,13 @@ public class RequestLogEventListener {
         Object responseCache = CacheUtils.getResponseCache(event.getKey());
         LocalDateTime requestTime = CacheUtils.getRequestTime(event.getKey());
         String requestBody = this.convert(requestCache);
-        String responseBody = this.convert(responseCache);
-        String parameterMap = this.convert(event.getParameterMap());
         String responseHeaderMap = this.convert(event.getResponseHeaderMap());
+        String contentDisposition = event.getResponseHeaderMap().getOrDefault("Content"
+                + "-Disposition", "");
+        String responseBody = StringUtils.isNotBlank(contentDisposition) ? "文件下载" :
+                this.convert(responseCache);
+        String parameterMap = this.convert(event.getParameterMap());
+
         String requestHeaderMap = this.convert(event.getRequestHeaderMap());
         CacheUtils.clear(event.getKey());
         HttpLog httpLog = new HttpLog(IdWorker.snowflakeStringId(), event.getUri(),
