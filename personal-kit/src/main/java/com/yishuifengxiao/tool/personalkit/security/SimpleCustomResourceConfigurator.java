@@ -30,7 +30,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.AnyRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
-import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +42,7 @@ import java.util.stream.Collectors;
  * @date 2023/11/14-19:20
  * @since 1.0.0
  */
-@Component
+//@Component
 public class SimpleCustomResourceConfigurator implements CustomResourceConfigurator {
     @Autowired
     private SysUserDao sysUserDao;
@@ -101,6 +100,7 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
 
     private AuthorizationDecision authorizationDecision(Supplier<Authentication> supplier,
                                                         RequestAuthorizationContext object) {
+        Authentication authentication = supplier.get();
 
         DefaultHttpSecurityExpressionHandler defaultHttpSecurityExpressionHandler =
                 new DefaultHttpSecurityExpressionHandler();
