@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -43,6 +44,7 @@ import java.util.stream.Collectors;
  * @since 1.0.0
  */
 @Component
+@Order()
 public class SimpleCustomResourceConfigurator implements CustomResourceConfigurator {
     @Autowired
     private SysUserDao sysUserDao;
@@ -62,6 +64,11 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
         HttpServletRequest request = object.getRequest();
 
         Authentication authentication = supplier.get();
+//        if (null != authentication && AnonymousAuthenticationToken.class.isAssignableFrom(authentication.getClass())) {
+//            return new AuthorizationDecision(true);
+//        }
+
+
         AuthorizationDecision decision = authorizationDecision(supplier, object);
         if (null != decision) {
             return decision;

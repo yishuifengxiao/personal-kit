@@ -42,6 +42,11 @@ public class App extends SpringBootServletInitializer {
 
 //        AbstractPreAuthenticatedProcessingFilter.class
 //        AuthorizationManagerBeforeMethodInterceptor.class
+//        PreAuthenticatedAuthenticationToken.class;
+//        AbstractPreAuthenticatedProcessingFilter.class; //
+//        PreAuthenticatedAuthenticationProvider.class
+//        org.springframework.security.web.access.intercept.AuthorizationFilter.class
+//        AbstractSecurityInterceptor
         ConfigurableApplicationContext context = SpringApplication.run(App.class, args);
 
         runAfterStart(context);
