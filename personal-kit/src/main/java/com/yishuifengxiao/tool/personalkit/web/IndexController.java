@@ -114,6 +114,7 @@ public class IndexController {
         Map map = Map.of("requestURL", requestURL, "requestURI", requestURI, "contextPath",
                 contextPath, "servletPath", servletPath, "parameterMap", parameterMap, "headerMap"
                 , headerMap);
+
         return map;
     }
 
