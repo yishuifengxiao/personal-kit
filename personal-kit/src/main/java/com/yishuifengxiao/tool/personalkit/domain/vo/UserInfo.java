@@ -35,4 +35,6 @@ public class UserInfo extends SysUser {
     private LocalDateTime lockTime;
     @JsonIgnore
     private LocalDateTime lastUpdateTime;
+    @JsonIgnore
+    private Integer stat;
 }

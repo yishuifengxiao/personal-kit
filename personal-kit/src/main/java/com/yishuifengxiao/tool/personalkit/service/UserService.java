@@ -64,8 +64,6 @@ public class UserService {
             SysUser sysUser = GuavaCache.get(query.getUsername().trim(), SysUser.class);
             Assert.isTrue("密码错误", passwordEncoder.matches(query.getPassword(),
                     details.getPassword()));
-            List<StringKeyValue> roles =
-                    sysUserDao.findAllRoleByUserId(sysUser.getId()).stream().map(s -> new StringKeyValue<>(String.valueOf(s.getId()), s.getName())).collect(Collectors.toList());
             //获取token
             SecurityToken token = TokenUtil.createUnsafe(request, query.getUsername().trim());
 
@@ -78,7 +76,6 @@ public class UserService {
             SpringContext.publishEvent(new SecurityEvent(this, request, response,
                     Strategy.AUTHENTICATION_SUCCESS, token, null));
             UserInfo userInfo = BeanUtil.copy(sysUser, new UserInfo());
-            userInfo.setRoles(roles);
             userInfo.setToken(token.getValue());
             return userInfo;
         } catch (Exception e) {
