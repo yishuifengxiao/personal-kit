@@ -1,8 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.guava.GuavaCache;
-import com.yishuifengxiao.common.security.SecurityPropertyResource;
-import com.yishuifengxiao.common.security.constant.TokenConstant;
 import com.yishuifengxiao.common.security.support.SecurityEvent;
 import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.security.token.SecurityToken;
@@ -54,7 +52,6 @@ public class UserService {
     private final SimpleUserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
-    private final SecurityPropertyResource securityPropertyResource;
 
     public UserInfo login(HttpServletRequest request, HttpServletResponse response,
                           LoginQuery query) throws CustomException {
@@ -66,15 +63,7 @@ public class UserService {
                     details.getPassword()));
             //获取token
             SecurityToken token = TokenUtil.createUnsafe(request, query.getUsername().trim());
-
-            String requestParameter =
-                    securityPropertyResource.security().getToken().getRequestParameter();
-            if (StringUtils.isBlank(requestParameter)) {
-                requestParameter = TokenConstant.TOKEN_REQUEST_PARAM;
-            }
-            request.getSession().setAttribute(requestParameter, token.getValue());
-            SpringContext.publishEvent(new SecurityEvent(this, request, response,
-                    Strategy.AUTHENTICATION_SUCCESS, token, null));
+            TokenUtil.setToken(token);
             UserInfo userInfo = BeanUtil.copy(sysUser, new UserInfo());
             userInfo.setToken(token.getValue());
             return userInfo;
