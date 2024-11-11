@@ -57,10 +57,10 @@ public class UserService {
         try {
             SysUser sysUser =
                     sysUserDao.findActiveSysUser(query.getUsername().trim()).orElseThrow(() -> new UncheckedException("账号不存在"));
-            Assert.isTrue("账号已过期", UserStat.ACCOUNT_EXPIRED.getCode() != sysUser.getStat());
-            Assert.isTrue("密码已过期", UserStat.CREDENTIALS_EXPIRED.getCode() != sysUser.getStat());
-            Assert.isTrue("账号已锁定", UserStat.ACCOUNT_LOCKED.getCode() != sysUser.getStat());
-            Assert.isTrue("账号未启用", UserStat.ACCOUNT_ENABLE.getCode() == sysUser.getStat());
+            Assert.isTrue("账号已过期", UserStat.ACCOUNT_EXPIRED.code() != sysUser.getStat());
+            Assert.isTrue("密码已过期", UserStat.CREDENTIALS_EXPIRED.code() != sysUser.getStat());
+            Assert.isTrue("账号已锁定", UserStat.ACCOUNT_LOCKED.code() != sysUser.getStat());
+            Assert.isTrue("账号未启用", UserStat.ACCOUNT_ENABLE.code() == sysUser.getStat());
 
             Assert.isTrue("密码错误", StringUtils.equals(DES.encrypt(sysUser.getSalt(),
                             query.getPassword()),

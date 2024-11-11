@@ -50,10 +50,10 @@ public class SimpleUserDetailsService implements UserDetailsService {
         String password=passwordEncoder.encode(DES.decrypt(sysUser.getSalt(),sysUser.getPwd()));
 
         return new CurrentUserDetails(username, password,
-                UserStat.ACCOUNT_ENABLE.getCode()==sysUser.getStat(),
-                UserStat.ACCOUNT_EXPIRED.getCode()!=sysUser.getStat(),
-                UserStat.CREDENTIALS_EXPIRED.getCode()!=sysUser.getStat(),
-                UserStat.ACCOUNT_LOCKED.getCode()!=sysUser.getStat(),
+                UserStat.ACCOUNT_ENABLE.code()==sysUser.getStat(),
+                UserStat.ACCOUNT_EXPIRED.code()!=sysUser.getStat(),
+                UserStat.CREDENTIALS_EXPIRED.code()!=sysUser.getStat(),
+                UserStat.ACCOUNT_LOCKED.code()!=sysUser.getStat(),
                 AuthorityUtils.commaSeparatedStringToAuthorityList(
                         CollUtil.stream(roles).map(SysRole::getName)
                                 .filter(StringUtils::isNotBlank)

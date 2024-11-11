@@ -1,5 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.domain.enums;
 
+import com.yishuifengxiao.common.tool.entity.RootEnum;
+
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -9,7 +11,11 @@ import java.util.Optional;
  * @date 2023/11/6-16:46
  * @since 1.0.0
  */
-public enum UserStat {
+public enum UserStat implements RootEnum {
+    /**
+     * 系统数据
+     */
+    SYSTEM_INIT("系统数据", -1),
     /**
      * 启用
      */
@@ -37,20 +43,23 @@ public enum UserStat {
 
     private int code;
 
-    private UserStat(String name, int code) {
+    UserStat(String name, int code) {
         this.name = name;
         this.code = code;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public int getCode() {
-        return code;
-    }
 
     public static Optional<UserStat> code(int code) {
         return Arrays.stream(values()).filter(v -> v.code == code).findFirst();
+    }
+
+    @Override
+    public Integer code() {
+        return this.code;
+    }
+
+    @Override
+    public String enumName() {
+        return this.name;
     }
 }

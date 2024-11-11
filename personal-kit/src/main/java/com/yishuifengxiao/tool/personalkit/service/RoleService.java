@@ -11,6 +11,7 @@ import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.*;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
+import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
 import com.yishuifengxiao.tool.personalkit.domain.query.RoleQuery;
 import com.yishuifengxiao.tool.personalkit.domain.query.UserQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.RoleUserReq;
@@ -227,7 +228,7 @@ public class RoleService {
         SysUser user = JdbcUtil.jdbcHelper().findByPrimaryKey(SysUser.class,
                 userRoleReq.getId().trim());
         Assert.isNotNull("用户不存在", user);
-        Assert.isFalse("内置用户禁止编辑", BoolStat.True.code() == user.getEmbedded());
+        Assert.isFalse("内置用户禁止编辑", UserStat.SYSTEM_INIT.equalCode(user.getStat()));
         //删除旧的关联关系
         JdbcUtil.jdbcHelper().delete(new SysUserRole().setUserId(user.getId()));
         for (String roleId :

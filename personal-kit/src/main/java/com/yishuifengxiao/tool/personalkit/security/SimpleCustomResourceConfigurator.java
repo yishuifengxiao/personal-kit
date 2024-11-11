@@ -3,11 +3,11 @@ package com.yishuifengxiao.tool.personalkit.security;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.security.httpsecurity.authorize.custom.CustomResourceConfigurator;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
-import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -61,7 +61,7 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
         SysUser sysUser =
                 sysUserDao.findActiveSysUser(authentication.getName()).orElseThrow(() -> new UsernameNotFoundException(String.format("账号%s不存在", authentication.getName())));
         // 内置账号默认通过校验
-        if (StringUtils.equalsIgnoreCase(sysUser.getId(), Constant.DEFAULT_ROOT_ID) || BoolStat.isTrue(sysUser.getEmbedded())) {
+        if (StringUtils.equalsIgnoreCase(sysUser.getId(), Constant.DEFAULT_ROOT_ID) || UserStat.SYSTEM_INIT.equalCode(sysUser.getStat())) {
             return new AuthorizationDecision(true);
         }
         //当前角色

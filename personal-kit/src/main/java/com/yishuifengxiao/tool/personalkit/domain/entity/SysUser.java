@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.common.tool.validate.Group;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
@@ -121,22 +120,13 @@ public class SysUser implements Serializable {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime lastUpdateTime;
 
-
-    @Column(name = "is_embedded", length = 1, columnDefinition = "tinyint(1) default 0")
-    @JsonIgnore
-    private Integer embedded;
-
-    @JsonIgnore
-    @Column(name = "is_show", length = 1, columnDefinition = "tinyint(1) default 1")
-    private Integer isShow;
-
-
-    public static SysUser ofEmbedded(String id, String username, String nickname, String originalPassword) {
+    public static SysUser ofEmbedded(String id, String username, String nickname,
+                                     String originalPassword) {
         String salt = SecurityUtil.createSalt();
         String password = SecurityUtil.encryptPassword(salt, originalPassword);
         //@formatter:on
         return new SysUser().setId(id).setUsername(username).setNickname(nickname).setSalt(salt).setPwd(password)
-                .setEmbedded(BoolStat.True.code()).setVer(Constant.ACTIVE_DATA_VER).setStat(UserStat.ACCOUNT_ENABLE.getCode())
+                .setVer(Constant.ACTIVE_DATA_VER).setStat(UserStat.SYSTEM_INIT.code())
                 .setCreateTime(LocalDateTime.now()).setLastUpdateTime(LocalDateTime.now())
                 ;
 
