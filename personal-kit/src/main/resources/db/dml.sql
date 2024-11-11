@@ -1,10 +1,8 @@
 /*
  Navicat Premium Dump SQL
 
- Source Server         : 47.97.30.247
  Source Server Type    : MySQL
  Source Server Version : 80040 (8.0.40)
- Source Host           : 47.97.30.247:3306
  Source Schema         : personkit
 
  Target Server Type    : MySQL

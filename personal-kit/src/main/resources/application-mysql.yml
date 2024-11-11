@@ -49,7 +49,6 @@ spring:
       mode: always
       continue-on-error: true
       encoding: UTF-8
-      order: ascending
 
 
 

@@ -6,7 +6,10 @@ import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
-import com.yishuifengxiao.tool.personalkit.domain.entity.*;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysUserRole;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,11 +20,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.time.LocalDateTime;
@@ -39,9 +48,8 @@ import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.DEFAU
 @Component("resourceInitializer")
 public class ResourceInitializer implements CommandLineRunner {
     private boolean hasInit = false;
-    private final static List<String> sets = Arrays.asList("springfox.documentation", "org"
-            + ".springframework", "org" +
-            ".springdoc", "org.springframework.boot");
+    private final static List<String> sets = Arrays.asList("springfox.documentation", "org" +
+            ".springframework", "org" + ".springdoc", "org.springframework.boot");
 
 
     @Autowired
@@ -55,8 +63,10 @@ public class ResourceInitializer implements CommandLineRunner {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ResourceLoader resourceLoader;
 
-    public void doInit() {
+    public void doInit() throws IOException {
         if (this.hasInit) {
             return;
         }
@@ -65,28 +75,39 @@ public class ResourceInitializer implements CommandLineRunner {
         permissions.stream().forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
         // 初始化用户
         SysUser sysUser = SysUser.ofEmbedded(Constant.DEFAULT_ROOT_ID, Constant.DEFAULT_USER,
-                "系统超级管理员",
-                Constant.DEFAULT_PWD);
+                "系统超级管理员", Constant.DEFAULT_PWD);
         JdbcUtil.jdbcHelper().saveOrUpdate(sysUser);
         //初始化角色
         SysRole sysRole = new SysRole(Constant.DEFAULT_ROOT_ID, "系统角色", "系统初始化数据," +
-                "内置超级管理员，具有系统全部权限",
-                Constant.DEFAULT_ROOT_ID, DEFAULT_HOME_URL, RoleStat.ROLE_ENABLE.getCode(),
-                BoolStat.True.code(),
-                LocalDateTime.now(), 1);
+                "内置超级管理员，具有系统全部权限", Constant.DEFAULT_ROOT_ID, DEFAULT_HOME_URL,
+                RoleStat.ROLE_ENABLE.getCode(), BoolStat.True.code(), LocalDateTime.now(), 1);
         JdbcUtil.jdbcHelper().saveOrUpdate(sysRole);
 
         //初始化 用户-角色 关联关系
         SysUserRole userRole = new SysUserRole(MD5.md5Short(sysUser.getId() + sysRole.getId()),
-                sysUser.getId(),
-                sysRole.getId());
+                sysUser.getId(), sysRole.getId());
         JdbcUtil.jdbcHelper().saveOrUpdate(userRole);
 
-
-        // 初始化 角色-权限 关联
-        permissions.stream().map(v -> new SysMenuPermission(MD5.md5Short(sysRole.getId() + v.getId()),
-                sysRole.getId(), v.getId())).forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
+        // 初始化角色-菜单关系
+        JdbcUtil.jdbcHelper().jdbcTemplate().execute("INSERT IGNORE INTO sys_menu_permission( id,"
+                + " menu_id, permission_id) SELECT md5( CONCAT( p.id )), 1, p.id FROM " +
+                "sys_permission p ; ");
         this.hasInit = true;
+    }
+
+    private String initSql() {
+        Resource resource = resourceLoader.getResource("classpath:db/dml.sql");
+        String result = "";
+        try (InputStream inputStream = resource.getInputStream(); BufferedReader reader =
+                new BufferedReader(new InputStreamReader(inputStream))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                result = result + line;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result.trim();
     }
 
     public List<SysPermission> scanSysPermissions() {
@@ -120,10 +141,10 @@ public class ResourceInitializer implements CommandLineRunner {
                         return Arrays.asList(methodPaths).stream().map(methodUrl -> {
                             String url = StringUtils.trim(classUrl + methodUrl);
                             SysPermission permission =
-                                    new SysPermission(IdWorker.snowflakeStringId(), moduleName,
-                                            summary,
-                                            description, url, contextPath, applicationName, path,
-                                            BoolStat.True.code());
+                                    new SysPermission(IdWorker.snowflakeStringId(),
+                                            moduleName, summary, description, url, contextPath,
+                                            applicationName,
+                                            path, BoolStat.True.code());
                             permission.setId(MD5.md5Short(permission.getApplicationName() + permission.getContextPath() + permission.getUrl()));
                             return permission;
                         }).collect(Collectors.toList());
