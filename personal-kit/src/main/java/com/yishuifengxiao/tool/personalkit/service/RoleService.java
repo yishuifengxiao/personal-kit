@@ -44,15 +44,61 @@ public class RoleService {
      * @return
      */
     public Page<RoleVo> findPageRole(PageQuery<RoleQuery> pageQuery) {
-        String sql = "SELECT DISTINCT sr.* from sys_role sr ,sys_role_menu srm ,sys_menu sm WHERE sr.id=srm.role_id " +
-                "and srm.menu_id=sm.id ";
-        sql += QueryUtil.createAndSql(pageQuery.getQuery(), false, "sm");
-        sql += QueryUtil.createAndSql(pageQuery.getQuery(), true, "sr");
+        RoleQuery roleQuery = pageQuery.query().orElse(new RoleQuery());
+        String sql = """
+                SELECT DISTINCTROW
+                	sr.*   
+                FROM
+                	sys_role sr   
+                WHERE
+                	1 = 1   
+                AND
+                IF
+                	( ? IS NULL, TRUE, sr.`id` = ? )   
+                AND
+                IF
+                	( ? IS NULL, TRUE, sr.`name` LIKE CONCAT( '%',?, '%' ) )   
+                AND
+                IF
+                	( ? IS NULL, TRUE, sr.`description` LIKE CONCAT( '%',?, '%' ) )   
+                AND
+                IF
+                	( ? IS NULL, TRUE, sr.`home_url` LIKE CONCAT( '%',?, '%' ) )   
+                AND
+                IF
+                	( ? IS NULL, TRUE, sr.`parent_id` = ? )   
+                AND
+                IF
+                	( ? IS NULL, TRUE, sr.`is_show` = ? )   
+                AND
+                IF
+                	( ? IS NULL, TRUE, sr.`stat` = ? )   
+                AND
+                IF
+                	( ? IS NULL, TRUE, sr.`is_embedded` = ? )   
+                AND
+                IF
+                	(
+                		? IS NULL,
+                		TRUE,
+                	(
+                	sr.id IN ( SELECT srm.role_id FROM sys_menu m, sys_role_menu srm WHERE m.id = srm.role_id AND m.`name` LIKE CONCAT( '%',?, '%' ) )))
+                """;
 
-        Page<SysRole> page = JdbcUtil.jdbcHelper().findPage(SysRole.class, pageQuery, sql);
+
+        Page<SysRole> page = JdbcUtil.jdbcHelper().findPage(SysRole.class, pageQuery, sql,
+                roleQuery.getId(), roleQuery.getId(), roleQuery.getName(), roleQuery.getName(),
+                roleQuery.getDescription(), roleQuery.getDescription(), roleQuery.getHomeUrl(),
+                roleQuery.getHomeUrl(),
+                roleQuery.getParentId(), roleQuery.getParentId(), roleQuery.getIsShow(),
+                roleQuery.getIsShow(),
+                roleQuery.getStat(), roleQuery.getStat(), roleQuery.getEmbedded(),
+                roleQuery.getEmbedded(),
+                roleQuery.getMenuName(), roleQuery.getMenuName());
         return page.map(v -> {
             RoleVo roleVo = BeanUtil.copy(v, new RoleVo());
-            String psql = "SELECT DISTINCT sm.* from sys_role sr ,sys_role_menu srm ,sys_menu sm WHERE sr.id=srm" +
+            String psql = "SELECT DISTINCTROW sm.* from sys_role sr ,sys_role_menu srm ,sys_menu sm "
+                    + "WHERE sr.id=srm" +
                     ".role_id and srm.menu_id=sm.id AND sr.id= ？";
             roleVo.setMenus(JdbcUtil.jdbcHelper().findAll(SysMenu.class, psql, v.getId()));
             return roleVo;
@@ -147,14 +193,16 @@ public class RoleService {
 
 
     public Page<UserVo> findPageUser(PageQuery<UserQuery> pageQuery) {
-        String sql = "SELECT  DISTINCT su.* from sys_user su,sys_user_role sur,sys_role sr where su.id=sur" +
+        String sql = "SELECT  DISTINCT su.* from sys_user su,sys_user_role sur,sys_role sr where "
+                + "su.id=sur" +
                 ".user_id  and sur.role_id=sr.id ";
         sql += QueryUtil.createAndSql(pageQuery.getQuery(), false, "sr");
         sql += QueryUtil.createAndSql(pageQuery.getQuery(), true, "su");
         Page<SysUser> page = JdbcUtil.jdbcHelper().findPage(SysUser.class, pageQuery, sql);
         return page.map(v -> {
             UserVo userVo = BeanUtil.copy(v, new UserVo());
-            String psql = "SELECT  DISTINCT sr.* from sys_user_role sur,sys_role sr where sur.role_id=sr.id " + "and " +
+            String psql = "SELECT  DISTINCT sr.* from sys_user_role sur,sys_role sr where sur"
+                    + ".role_id=sr.id " + "and " +
                     "sur.user_id=?";
             List<SysRole> roles = JdbcUtil.jdbcHelper().findAll(SysRole.class, psql, v.getId());
             userVo.setRoles(roles);
@@ -182,7 +230,8 @@ public class RoleService {
     }
 
     public void updateUserRole(UserRoleReq userRoleReq) {
-        SysUser user = JdbcUtil.jdbcHelper().findByPrimaryKey(SysUser.class, userRoleReq.getId().trim());
+        SysUser user = JdbcUtil.jdbcHelper().findByPrimaryKey(SysUser.class,
+                userRoleReq.getId().trim());
         Assert.isNotNull("用户不存在", user);
         Assert.isFalse("内置用户禁止编辑", BoolStat.True.code() == user.getEmbedded());
         //删除旧的关联关系
@@ -194,7 +243,8 @@ public class RoleService {
             Assert.isFalse(String.format("角色%s已禁用", sysRole.getName()),
                     RoleStat.ROLE_DISABLE.getCode() == sysRole.getStat());
 
-            JdbcUtil.jdbcHelper().saveOrUpdate(new SysUserRole(IdWorker.snowflakeStringId(), user.getId(),
+            JdbcUtil.jdbcHelper().saveOrUpdate(new SysUserRole(IdWorker.snowflakeStringId(),
+                    user.getId(),
                     sysRole.getId()));
         }
 
