@@ -39,7 +39,8 @@ import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.DEFAU
 @Component("resourceInitializer")
 public class ResourceInitializer implements CommandLineRunner {
     private boolean hasInit = false;
-    private final static List<String> sets = Arrays.asList("springfox.documentation", "org.springframework", "org" +
+    private final static List<String> sets = Arrays.asList("springfox.documentation", "org"
+            + ".springframework", "org" +
             ".springdoc", "org.springframework.boot");
 
 
@@ -62,22 +63,22 @@ public class ResourceInitializer implements CommandLineRunner {
         //初始化权限
         List<SysPermission> permissions = this.scanSysPermissions();
         permissions.stream().forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
-        Long userNum = JdbcUtil.jdbcHelper().countAll(new SysUser().setUsername(Constant.DEFAULT_USER), false);
-        if (null != userNum && userNum > 0) {
-            return;
-        }
         // 初始化用户
-        SysUser sysUser = SysUser.ofEmbedded(Constant.DEFAULT_ROOT_ID, Constant.DEFAULT_USER, "系统超级管理员",
+        SysUser sysUser = SysUser.ofEmbedded(Constant.DEFAULT_ROOT_ID, Constant.DEFAULT_USER,
+                "系统超级管理员",
                 Constant.DEFAULT_PWD);
         JdbcUtil.jdbcHelper().saveOrUpdate(sysUser);
         //初始化角色
-        SysRole sysRole = new SysRole(Constant.DEFAULT_ROOT_ID, "系统角色", "系统初始化数据," + "内置超级管理员，具有系统全部权限",
-                Constant.DEFAULT_ROOT_ID, DEFAULT_HOME_URL, RoleStat.ROLE_ENABLE.getCode(), BoolStat.True.code(),
+        SysRole sysRole = new SysRole(Constant.DEFAULT_ROOT_ID, "系统角色", "系统初始化数据," +
+                "内置超级管理员，具有系统全部权限",
+                Constant.DEFAULT_ROOT_ID, DEFAULT_HOME_URL, RoleStat.ROLE_ENABLE.getCode(),
+                BoolStat.True.code(),
                 LocalDateTime.now(), 1);
         JdbcUtil.jdbcHelper().saveOrUpdate(sysRole);
 
         //初始化 用户-角色 关联关系
-        SysUserRole userRole = new SysUserRole(MD5.md5Short(sysUser.getId() + sysRole.getId()), sysUser.getId(),
+        SysUserRole userRole = new SysUserRole(MD5.md5Short(sysUser.getId() + sysRole.getId()),
+                sysUser.getId(),
                 sysRole.getId());
         JdbcUtil.jdbcHelper().saveOrUpdate(userRole);
 
@@ -99,7 +100,8 @@ public class ResourceInitializer implements CommandLineRunner {
                     String moduleName = extractModuleName(controller);
                     List<String> classUrls = extractClassUrls(controller);
                     classUrls = CollUtil.isEmpty(classUrls) ? Arrays.asList("") : classUrls;
-                    String className =StringUtils.substringBefore( controller.getClass().getName(),"$");
+                    String className =
+                            StringUtils.substringBefore(controller.getClass().getName(), "$");
 
                     //方法
                     return classUrls.stream().map(classUrl -> Arrays.stream(controller.getClass().getMethods()).filter(m -> Modifier.isPublic(m.getModifiers())).map(declaredMethod -> {
@@ -110,15 +112,18 @@ public class ResourceInitializer implements CommandLineRunner {
 
                         String path = className + "::" + declaredMethod.getName();
 
-                        Operation apiOperation = AnnotationUtils.findAnnotation(declaredMethod, Operation.class);
+                        Operation apiOperation = AnnotationUtils.findAnnotation(declaredMethod,
+                                Operation.class);
                         String summary = null != apiOperation ? apiOperation.summary() : "";
                         String description = null != apiOperation ? apiOperation.description() : "";
 
                         return Arrays.asList(methodPaths).stream().map(methodUrl -> {
                             String url = StringUtils.trim(classUrl + methodUrl);
-                            SysPermission permission = new SysPermission(IdWorker.snowflakeStringId(), moduleName,
-                                    summary,
-                                    description, url, contextPath, applicationName, path, BoolStat.True.code());
+                            SysPermission permission =
+                                    new SysPermission(IdWorker.snowflakeStringId(), moduleName,
+                                            summary,
+                                            description, url, contextPath, applicationName, path,
+                                            BoolStat.True.code());
                             permission.setId(MD5.md5Short(permission.getApplicationName() + permission.getContextPath() + permission.getUrl()));
                             return permission;
                         }).collect(Collectors.toList());
@@ -128,7 +133,8 @@ public class ResourceInitializer implements CommandLineRunner {
     }
 
     private List<String> extractClassUrls(Object controller) {
-        RequestMapping requestMapping = AnnotationUtils.findAnnotation(controller.getClass(), RequestMapping.class);
+        RequestMapping requestMapping = AnnotationUtils.findAnnotation(controller.getClass(),
+                RequestMapping.class);
         if (null != requestMapping) {
             String[] value = requestMapping.value();
             if (CollUtil.isNotEmpty(value)) {
@@ -164,7 +170,8 @@ public class ResourceInitializer implements CommandLineRunner {
         if (null != methodPostMapping) {
             return methodPostMapping.value();
         }
-        DeleteMapping methodDeleteMapping = AnnotationUtils.findAnnotation(method, DeleteMapping.class);
+        DeleteMapping methodDeleteMapping = AnnotationUtils.findAnnotation(method,
+                DeleteMapping.class);
         if (null != methodDeleteMapping) {
             return methodDeleteMapping.value();
         }
@@ -172,7 +179,8 @@ public class ResourceInitializer implements CommandLineRunner {
         if (null != methodPutMapping) {
             return methodPutMapping.value();
         }
-        RequestMapping methodRequestMapping = AnnotationUtils.findAnnotation(method, RequestMapping.class);
+        RequestMapping methodRequestMapping = AnnotationUtils.findAnnotation(method,
+                RequestMapping.class);
         if (null != methodRequestMapping) {
             return methodRequestMapping.value();
         }
