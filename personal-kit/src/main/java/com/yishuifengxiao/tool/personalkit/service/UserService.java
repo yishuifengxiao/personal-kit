@@ -24,11 +24,14 @@ import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
+import com.yishuifengxiao.tool.personalkit.security.SimpleUserDetailsService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -48,6 +51,8 @@ public class UserService {
 
     private final SysUserRepository sysUserRepository;
 
+    private final SimpleUserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
 
     private final SecurityPropertyResource securityPropertyResource;
 
@@ -55,20 +60,11 @@ public class UserService {
                           LoginQuery query) throws CustomException {
 
         try {
-            SysUser sysUser =
-                    sysUserDao.findActiveSysUser(query.getUsername().trim()).orElseThrow(() -> new UncheckedException("账号不存在"));
-            Assert.isTrue("账号已过期", UserStat.ACCOUNT_EXPIRED.code() != sysUser.getStat());
-            Assert.isTrue("密码已过期", UserStat.CREDENTIALS_EXPIRED.code() != sysUser.getStat());
-            Assert.isTrue("账号已锁定", UserStat.ACCOUNT_LOCKED.code() != sysUser.getStat());
-            Assert.isTrue("账号未启用", UserStat.ACCOUNT_ENABLE.code() == sysUser.getStat());
-
-            Assert.isTrue("密码错误", StringUtils.equals(DES.encrypt(sysUser.getSalt(),
-                            query.getPassword()),
-                    sysUser.getPwd()));
-
+            UserDetails details = userDetailsService.loadUserByUsername(query.getUsername().trim());
+            SysUser sysUser = GuavaCache.get(query.getUsername().trim(), SysUser.class);
+            Assert.isTrue("密码错误",
+                    passwordEncoder.matches(query.getPassword(), details.getPassword()));
             List<SysRole> roles = sysUserDao.findAllRoleByUserId(sysUser.getId());
-            //判断权限
-            Assert.isNotEmpty("暂无此权限", roles);
             //获取token
             SecurityToken token = TokenUtil.createUnsafe(request, query.getUsername().trim());
 
