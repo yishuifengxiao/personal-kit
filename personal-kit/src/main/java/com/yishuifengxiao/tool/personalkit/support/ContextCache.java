@@ -3,7 +3,6 @@ package com.yishuifengxiao.tool.personalkit.support;
 
 import com.yishuifengxiao.common.guava.GuavaCache;
 import com.yishuifengxiao.common.tool.utils.ValidateUtils;
-import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
@@ -20,8 +19,9 @@ import java.util.Optional;
 @Component
 public class ContextCache {
 
-    private final static ThreadLocal<String> currentRole = new ThreadLocal<>();
-    private static SysUserDao sysUserDao;
+    private final static String USER_PREFIX = "CURRENT_USER_PREFIX::";
+    private final static String USER_ROLE_PREFIX = "USER_ROLE_PREFIX::";
+
 
     public static SysUser currentLoginUser() {
 
@@ -38,28 +38,34 @@ public class ContextCache {
         if (StringUtils.isBlank(name)) {
             return Optional.empty();
         }
-        SysUser contextUser = GuavaCache.get(authentication.getName(),
-                () -> ContextCache.sysUserDao.findActiveSysUser(name).orElse(null));
-        return Optional.ofNullable(contextUser);
+        SysUser sysUser =
+                (SysUser) GuavaCache.get(USER_PREFIX + Thread.currentThread().getId() + name);
+        return Optional.ofNullable(sysUser);
     }
+
 
     public static String currentUserId() {
         return currentLoginUser().getId();
     }
 
-    public ContextCache(SysUserDao sysUserDao) {
-        ContextCache.sysUserDao = sysUserDao;
+    public static void setCurrentUser(SysUser sysUser) {
+        if (null == sysUser) {
+            return;
+        }
+        GuavaCache.put(USER_PREFIX + Thread.currentThread().getId() + sysUser.getUsername(),
+                sysUser);
     }
 
+
     public static void setRole(String role) {
-        currentRole.set(role);
+        GuavaCache.put(USER_ROLE_PREFIX + Thread.currentThread().getId(), role);
     }
 
     public static String getRole() {
-        return currentRole.get();
+        return (String) GuavaCache.get(USER_ROLE_PREFIX + Thread.currentThread().getId());
     }
 
     public static void clearRole() {
-        currentRole.remove();
+        GuavaCache.remove(USER_ROLE_PREFIX + Thread.currentThread().getId());
     }
 }

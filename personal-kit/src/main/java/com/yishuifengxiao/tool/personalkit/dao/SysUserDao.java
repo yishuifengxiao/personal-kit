@@ -33,18 +33,29 @@ public class SysUserDao {
         if (StringUtils.isBlank(username)) {
             return Optional.empty();
         }
-//        return sysUserRepository.findAll(Example.of(new SysUser().setUsername(username.trim())), Sort.by(ClassUtil
+//        return sysUserRepository.findAll(Example.of(new SysUser().setUsername(username.trim()))
+//        , Sort.by(ClassUtil
 //        .pojoFieldName(SysUser::getCreateTime)).descending()).stream().findFirst();
-        Optional<SysUser> optional = Optional.ofNullable(jdbcHelper.findOne(new SysUser().setUsername(username),
-                false));
+        Optional<SysUser> optional =
+                Optional.ofNullable(jdbcHelper.findOne(new SysUser().setUsername(username),
+                        false));
 
         return optional;
     }
 
     public List<SysRole> findAllRoleByUserId(String userId) {
-        String sql = String.format("SELECT r.* from sys_user_role ur ,sys_role r where r.id=ur.role_id and r.stat=1 " +
-                "and ur.user_id=%s", userId);
-        return jdbcHelper.findAll(SysRole.class, sql);
+        String sql = """
+                SELECT
+                	r.*  
+                FROM
+                	sys_user_role ur,
+                	sys_role r  
+                WHERE
+                	r.id = ur.role_id  
+                	AND r.stat IN (- 1, 1 )  
+                	AND ur.user_id = ?
+                """;
+        return jdbcHelper.findAll(SysRole.class, sql, userId);
 
     }
 

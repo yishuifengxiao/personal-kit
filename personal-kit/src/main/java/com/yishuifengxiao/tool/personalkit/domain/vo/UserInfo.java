@@ -2,7 +2,7 @@ package com.yishuifengxiao.tool.personalkit.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
+import com.yishuifengxiao.common.tool.entity.StringKeyValue;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,7 +25,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserInfo extends SysUser {
 
-    private List<SysRole> roles;
+    private List<StringKeyValue> roles;
 
     private String token;
 

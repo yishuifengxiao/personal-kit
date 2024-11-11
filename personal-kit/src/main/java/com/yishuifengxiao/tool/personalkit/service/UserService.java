@@ -1,7 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.guava.GuavaCache;
-import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.security.SecurityPropertyResource;
 import com.yishuifengxiao.common.security.constant.TokenConstant;
 import com.yishuifengxiao.common.security.support.SecurityEvent;
@@ -11,13 +10,13 @@ import com.yishuifengxiao.common.security.utils.TokenUtil;
 import com.yishuifengxiao.common.support.SpringContext;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.codec.DES;
+import com.yishuifengxiao.common.tool.entity.StringKeyValue;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.dao.repository.SysUserRepository;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
@@ -37,6 +36,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author yishui
@@ -62,9 +62,10 @@ public class UserService {
         try {
             UserDetails details = userDetailsService.loadUserByUsername(query.getUsername().trim());
             SysUser sysUser = GuavaCache.get(query.getUsername().trim(), SysUser.class);
-            Assert.isTrue("密码错误",
-                    passwordEncoder.matches(query.getPassword(), details.getPassword()));
-            List<SysRole> roles = sysUserDao.findAllRoleByUserId(sysUser.getId());
+            Assert.isTrue("密码错误", passwordEncoder.matches(query.getPassword(),
+                    details.getPassword()));
+            List<StringKeyValue> roles =
+                    sysUserDao.findAllRoleByUserId(sysUser.getId()).stream().map(s -> new StringKeyValue<>(String.valueOf(s.getId()), s.getName())).collect(Collectors.toList());
             //获取token
             SecurityToken token = TokenUtil.createUnsafe(request, query.getUsername().trim());
 
@@ -76,8 +77,7 @@ public class UserService {
             request.getSession().setAttribute(requestParameter, token.getValue());
             SpringContext.publishEvent(new SecurityEvent(this, request, response,
                     Strategy.AUTHENTICATION_SUCCESS, token, null));
-            UserInfo userInfo = BeanUtil.copy(sysUser,
-                    new UserInfo());
+            UserInfo userInfo = BeanUtil.copy(sysUser, new UserInfo());
             userInfo.setRoles(roles);
             userInfo.setToken(token.getValue());
             return userInfo;
@@ -98,19 +98,17 @@ public class UserService {
     public UserInfo userInfo(String id) {
         SysUser sysUser = sysUserRepository.findById(id).orElseThrow(() -> UncheckedException.of(
                 "记录不存在"));
-        UserInfo userInfo = BeanUtil.copy(sysUser,
-                new UserInfo());
-        String sql = String.format("SELECT r.* from sys_user_role ur,sys_role r where ur"
-                + ".role_id=r.id and ur.user_id='%s'", id);
-        return userInfo.setRoles(JdbcUtil.jdbcHelper().findAll(SysRole.class, sql));
+        UserInfo userInfo = BeanUtil.copy(sysUser, new UserInfo());
+        List<StringKeyValue> roles =
+                sysUserDao.findAllRoleByUserId(sysUser.getId()).stream().map(s -> new StringKeyValue<>(String.valueOf(s.getId()), s.getName())).collect(Collectors.toList());
+        return userInfo.setRoles(roles);
     }
 
     public void updatePwd(UpdatePwdReq req) {
         SysUser sysUser =
                 sysUserRepository.findById(req.getId().trim()).orElseThrow(() -> UncheckedException.of("记录不存在"));
         Assert.isTrue("旧密码不正确", StringUtils.equals(DES.encrypt(sysUser.getSalt(),
-                        req.getOldPwd().trim()),
-                sysUser.getPwd()));
+                req.getOldPwd().trim()), sysUser.getPwd()));
         sysUser.setPwd(DES.encrypt(sysUser.getSalt(), req.getNewPwd().trim()));
         sysUserRepository.saveAndFlush(sysUser);
         GuavaCache.remove(sysUser.getUsername());

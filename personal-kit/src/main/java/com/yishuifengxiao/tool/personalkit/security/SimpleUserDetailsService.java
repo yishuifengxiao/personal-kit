@@ -5,10 +5,12 @@ import com.yishuifengxiao.common.security.user.CurrentUserDetails;
 import com.yishuifengxiao.common.tool.codec.DES;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.utils.Assert;
+import com.yishuifengxiao.common.tool.utils.ValidateUtils;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
+import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -46,8 +48,10 @@ public class SimpleUserDetailsService implements UserDetailsService {
         Assert.isFalse("账户已禁用，请稍候一段时候再重试",null!=sysUser.getLockTime()&&sysUser.getLockTime().isAfter(LocalDateTime.now()));
 
         List<SysRole> roles = sysUserDao.findAllRoleByUserId(sysUser.getId());
+        ValidateUtils.isTrue(CollUtil.isNotEmpty(roles),"当前用户还未配置角色");
 
         String password=passwordEncoder.encode(DES.decrypt(sysUser.getSalt(),sysUser.getPwd()));
+        ContextCache.setCurrentUser(sysUser);
 
         return new CurrentUserDetails(username, password,
                ! UserStat.ACCOUNT_DISABLE.equalCode( sysUser.getStat()),
