@@ -38,7 +38,7 @@ public class RecordService {
 
             if (null != param.getQuery().getStrategys()) {
                 sql += " and strategy in ? ";
-                params.add(param.getQuery().getStrategys());
+                params.add(param.getQuery().getStrategys().toArray(Integer[]::new));
             }
 
             if (StringUtils.isNotBlank(param.getQuery().getUsername())) {
