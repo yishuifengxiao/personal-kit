@@ -57,14 +57,16 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
 
 
     @Override
-    public AuthorizationDecision check(Supplier<Authentication> supplier, RequestAuthorizationContext object) {
+    public AuthorizationDecision check(Supplier<Authentication> supplier,
+                                       RequestAuthorizationContext object) {
 
 
         //包含context-path
         HttpServletRequest request = object.getRequest();
 
         Authentication authentication = supplier.get();
-//        if (null != authentication && AnonymousAuthenticationToken.class.isAssignableFrom(authentication.getClass())) {
+//        if (null != authentication && AnonymousAuthenticationToken.class.isAssignableFrom
+//        (authentication.getClass())) {
 //            return new AuthorizationDecision(true);
 //        }
 
@@ -83,8 +85,10 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
         //当前角色
         String currentRole = ContextCache.getRole();
 
-        String sql = "SELECT DISTINCT sp.* FROM sys_permission sp, sys_menu_permission smp, sys_menu sm, " +
-                "sys_role_menu srm WHERE smp.permission_id = sp.id AND smp.menu_id = sm.id AND sm.id = srm.menu_id ";
+        String sql = "SELECT DISTINCT sp.* FROM sys_permission sp, sys_menu_permission smp, "
+                + "sys_menu sm, " +
+                "sys_role_menu srm WHERE smp.permission_id = sp.id AND smp.menu_id = sm.id AND sm"
+                + ".id = srm.menu_id ";
 
         if (StringUtils.isNotBlank(currentRole)) {
             sql += " AND srm.menu_id = " + currentRole;
@@ -109,9 +113,11 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
 
         DefaultHttpSecurityExpressionHandler defaultHttpSecurityExpressionHandler =
                 new DefaultHttpSecurityExpressionHandler();
-        WebSecurityExpressionRoot webSecurityExpressionRoot = new WebSecurityExpressionRoot(supplier,
+        WebSecurityExpressionRoot webSecurityExpressionRoot =
+                new WebSecurityExpressionRoot(supplier,
                 object.getRequest());
-        EvaluationContext evaluationContext = defaultHttpSecurityExpressionHandler.createEvaluationContext(supplier,
+        EvaluationContext evaluationContext =
+                defaultHttpSecurityExpressionHandler.createEvaluationContext(supplier,
                 object);
         // 使用 SpEL 解析表达式
         ExpressionParser parser = new SpelExpressionParser();
@@ -120,21 +126,24 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
         HttpServletRequest request = object.getRequest();
         String uri = request.getRequestURI();
         uri = StringUtils.substringAfter(uri, this.contextPath);
-        SysPermission permission = JdbcUtil.jdbcHelper(context).findOne(new SysPermission().setUrl(uri),
+        SysPermission permission =
+                JdbcUtil.jdbcHelper(context).findOne(new SysPermission().setUrl(uri),
                 false);
         if (null == permission) {
             return null;
         }
         try {
 
-            String[] tokens = StringUtils.splitByWholeSeparatorPreserveAllTokens(permission.getPath(), "::");
+            String[] tokens =
+                    StringUtils.splitByWholeSeparatorPreserveAllTokens(permission.getPath(), "::");
             String preAuthorize =
                     Arrays.stream(Class.forName(tokens[0]).getMethods()).filter(v -> StringUtils.equals(v.getName(),
                             tokens[1])).findFirst().map(method -> AnnotationUtils.findAnnotation(method,
                             PreAuthorize.class)).map(PreAuthorize::value).orElse(null);
             if (StringUtils.isNotBlank(preAuthorize)) {
 
-                Boolean value = parser.parseExpression(preAuthorize).getValue(evaluationContext, Boolean.class);
+                Boolean value = parser.parseExpression(preAuthorize).getValue(evaluationContext,
+                        Boolean.class);
                 if (null != value) {
                     return new AuthorizationDecision(value);
                 }
@@ -149,8 +158,10 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
     public RequestMatcher requestMatcher() {
         try {
             String sql = StringUtils.isBlank(contextPath) ?
-                    "SELECT DISTINCT sp.url FROM sys_permission sp WHERE ISNULL" + "(sp.context_path)" : String.format(
-                    "SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='%s'", contextPath);
+                    "SELECT DISTINCT sp.url FROM sys_permission sp WHERE ISNULL" + "(sp"
+                            + ".context_path)" : String.format(
+                    "SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='%s'",
+                    contextPath);
             List<String> list = JdbcUtil.jdbcHelper(context).findAll(String.class, sql);
             if (CollUtil.isEmpty(list)) {
                 return null;
@@ -160,7 +171,8 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
             e.printStackTrace();
         }
 
-//        return new NegatedRequestMatcher(new OrRequestMatcher(propertyResource.permitAll(), propertyResource
+//        return new NegatedRequestMatcher(new OrRequestMatcher(propertyResource.permitAll(),
+//        propertyResource
 //        .anonymous()));
 
         return AnyRequestMatcher.INSTANCE;

@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.jackson2.CoreJackson2Module;
 import org.springframework.security.web.jackson2.WebJackson2Module;
@@ -95,9 +95,9 @@ public class IndexController {
     @Operation(summary = "默认接口", description = "获取请求信息")
     @RequestMapping(value = "/index", method = RequestMethod.GET)
     @ResponseBody
-//    @PreAuthorize("permitAll()")
+    @PreAuthorize("permitAll()")
 //    @PreAuthorize
-    @PostAuthorize("permitAll")
+//    @PostAuthorize("permitAll")
     public Object index(HttpServletRequest request, HttpServletResponse response) {
         StringBuffer requestURL = request.getRequestURL();
         String requestURI = request.getRequestURI();
