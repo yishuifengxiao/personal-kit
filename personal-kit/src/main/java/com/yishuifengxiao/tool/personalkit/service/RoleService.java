@@ -99,7 +99,7 @@ public class RoleService {
             RoleVo roleVo = BeanUtil.copy(v, new RoleVo());
             String psql = "SELECT DISTINCTROW sm.* from sys_role sr ,sys_role_menu srm ,sys_menu sm "
                     + "WHERE sr.id=srm" +
-                    ".role_id and srm.menu_id=sm.id AND sr.id= ？";
+                    ".role_id and srm.menu_id=sm.id AND sr.id= ? ";
             roleVo.setMenus(JdbcUtil.jdbcHelper().findAll(SysMenu.class, psql, v.getId()));
             return roleVo;
         });
