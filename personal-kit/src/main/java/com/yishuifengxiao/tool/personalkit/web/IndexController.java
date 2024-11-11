@@ -7,6 +7,7 @@ import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.holder.TokenHolder;
 import com.yishuifengxiao.common.tool.bean.JsonUtil;
 import com.yishuifengxiao.common.tool.exception.CustomException;
+import com.yishuifengxiao.common.tool.utils.ValidateUtils;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
@@ -60,7 +61,7 @@ public class IndexController {
     @GetMapping("/user")
     @ResponseBody
     public SysUser user() {
-        return ContextCache.currentUser().orElse(null);
+        return ContextCache.currentUser().orElseThrow(ValidateUtils.orElseThrow("当前用户还未登录"));
     }
 
     @Operation(summary = "获取token", description = "获取当前用户所有的token信息")

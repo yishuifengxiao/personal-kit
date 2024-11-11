@@ -40,7 +40,10 @@ public class ContextCache {
             return Optional.empty();
         }
         SysUser sysUser =
-                (SysUser) GuavaCache.get(USER_PREFIX + Thread.currentThread().getId() + name);
+                (SysUser) GuavaCache.get(USER_PREFIX + name);
+        if (null == sysUser) {
+            return Optional.empty();
+        }
         return Optional.ofNullable(sysUser);
     }
 
@@ -53,21 +56,27 @@ public class ContextCache {
         if (null == sysUser) {
             return;
         }
-        GuavaCache.put(USER_PREFIX + Thread.currentThread().getId() + sysUser.getUsername(),
+        GuavaCache.put(USER_PREFIX + sysUser.getUsername(),
                 sysUser);
     }
 
 
     public static void setRole(SysRole role) {
-        GuavaCache.put(USER_ROLE_PREFIX + Thread.currentThread().getId(), role);
+        final Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+        GuavaCache.put(USER_ROLE_PREFIX + authentication.getName(), role);
     }
 
     public static Optional<SysRole> getRole() {
-        SysRole role = (SysRole) GuavaCache.get(USER_ROLE_PREFIX + Thread.currentThread().getId());
+        final Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+        SysRole role = (SysRole) GuavaCache.get(USER_ROLE_PREFIX + authentication.getName());
         return Optional.ofNullable(role);
     }
 
     public static void clearRole() {
-        GuavaCache.remove(USER_ROLE_PREFIX + Thread.currentThread().getId());
+        final Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+        GuavaCache.remove(USER_ROLE_PREFIX + authentication.getName());
     }
 }
