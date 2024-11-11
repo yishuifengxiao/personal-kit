@@ -49,7 +49,6 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
     @Autowired
     private ApplicationContext context;
 
-
     @Override
     public AuthorizationDecision check(Supplier<Authentication> supplier,
                                        RequestAuthorizationContext object) {

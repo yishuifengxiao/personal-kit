@@ -15,7 +15,6 @@ import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -44,7 +43,6 @@ public class SimpleUserDetailsService implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
 
-    private final ApplicationContext context;
 
 
     @Override
