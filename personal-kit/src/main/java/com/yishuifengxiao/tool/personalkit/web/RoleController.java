@@ -4,12 +4,8 @@ import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.validate.Group;
 import com.yishuifengxiao.tool.personalkit.domain.query.RoleQuery;
-import com.yishuifengxiao.tool.personalkit.domain.query.UserQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdListReq;
-import com.yishuifengxiao.tool.personalkit.domain.request.RoleUserReq;
-import com.yishuifengxiao.tool.personalkit.domain.request.UserRoleReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.RoleVo;
-import com.yishuifengxiao.tool.personalkit.domain.vo.UserVo;
 import com.yishuifengxiao.tool.personalkit.service.RoleService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -45,12 +41,6 @@ public class RoleController {
 
     }
 
-    @PostMapping("/user/page")
-    public Page<UserVo> findPageUser(@RequestBody PageQuery<UserQuery> pageQuery) {
-        Page<UserVo> page = roleService.findPageUser(pageQuery);
-        return page;
-    }
-
 
     @PostMapping("/add")
     public void addRole(@Validated(Group.Create.class) @RequestBody RoleVo param, BindingResult errors) {
@@ -67,13 +57,5 @@ public class RoleController {
         roleService.deleteRoles(param.getIds());
     }
 
-    @PostMapping("/updateRoleUser")
-    public void updateRole(@Validated(Group.Update.class) @RequestBody RoleUserReq param, BindingResult errors) {
-        roleService.updateRoleUser(param);
-    }
 
-    @PostMapping("/updateUserRole")
-    public void updateUserRole(@Validated(Group.Update.class) @RequestBody UserRoleReq param, BindingResult errors) {
-        roleService.updateUserRole(param);
-    }
 }

@@ -9,22 +9,21 @@ import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
-import com.yishuifengxiao.tool.personalkit.domain.entity.*;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysRoleMenu;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysUserRole;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
-import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
 import com.yishuifengxiao.tool.personalkit.domain.query.RoleQuery;
-import com.yishuifengxiao.tool.personalkit.domain.query.UserQuery;
-import com.yishuifengxiao.tool.personalkit.domain.request.RoleUserReq;
-import com.yishuifengxiao.tool.personalkit.domain.request.UserRoleReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.RoleVo;
-import com.yishuifengxiao.tool.personalkit.domain.vo.UserVo;
-import com.yishuifengxiao.tool.personalkit.utils.QueryUtil;
 import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -187,61 +186,4 @@ public class RoleService {
     }
 
 
-    public Page<UserVo> findPageUser(PageQuery<UserQuery> pageQuery) {
-        String sql = "SELECT  DISTINCT su.* from sys_user su,sys_user_role sur,sys_role sr where "
-                + "su.id=sur" +
-                ".user_id  and sur.role_id=sr.id ";
-        sql += QueryUtil.createAndSql(pageQuery.getQuery(), false, "sr");
-        sql += QueryUtil.createAndSql(pageQuery.getQuery(), true, "su");
-        Page<SysUser> page = JdbcUtil.jdbcHelper().findPage(SysUser.class, pageQuery, sql);
-        return page.map(v -> {
-            UserVo userVo = BeanUtil.copy(v, new UserVo());
-            String psql = "SELECT  DISTINCT sr.* from sys_user_role sur,sys_role sr where sur"
-                    + ".role_id=sr.id " + "and " +
-                    "sur.user_id=?";
-            List<SysRole> roles = JdbcUtil.jdbcHelper().findAll(SysRole.class, psql, v.getId());
-            userVo.setRoles(roles);
-            return userVo;
-        });
-    }
-
-    public void updateRoleUser(RoleUserReq roleUserReq) {
-        //@formatter:off
-        SysRole sysRole = JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, roleUserReq.getId().trim());
-        Assert.isNotNull("角色不存在", sysRole);
-        Assert.isFalse("角色已禁用", RoleStat.ROLE_DISABLE.equalCode( sysRole.getStat()));
-        CollUtil.stream(roleUserReq.getUserIds())
-                .filter(StringUtils::isNotBlank)
-                .map(String::trim)
-                .distinct()
-                  // 排除超级管理员
-                .filter(v -> !StringUtils.equalsIgnoreCase(v, Constant.DEFAULT_ROOT_ID))
-                .filter(v->null!= JdbcUtil.jdbcHelper().findByPrimaryKey(SysUser.class,v))
-                  //删除旧的关联关系
-               .filter(v-> JdbcUtil.jdbcHelper().delete(new SysUserRole(v,roleUserReq.getId().trim()))>0)
-                .map(v -> new SysUserRole(IdWorker.snowflakeStringId(), v.trim(), roleUserReq.getId().trim()))
-                .forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
-        //@formatter:on
-    }
-
-    public void updateUserRole(UserRoleReq userRoleReq) {
-        SysUser user = JdbcUtil.jdbcHelper().findByPrimaryKey(SysUser.class,
-                userRoleReq.getId().trim());
-        Assert.isNotNull("用户不存在", user);
-        Assert.isFalse("内置用户禁止编辑", UserStat.SYSTEM_INIT.equalCode(user.getStat()));
-        //删除旧的关联关系
-        JdbcUtil.jdbcHelper().delete(new SysUserRole().setUserId(user.getId()));
-        for (String roleId :
-                CollUtil.stream(userRoleReq.getRoleIds()).distinct().filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toList())) {
-            SysRole sysRole = JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, roleId.trim());
-            Assert.isNotNull(String.format("角色%s不存在", roleId), sysRole);
-            Assert.isFalse(String.format("角色%s已禁用", sysRole.getName()),
-                    RoleStat.ROLE_DISABLE.equalCode(sysRole.getStat()));
-
-            JdbcUtil.jdbcHelper().saveOrUpdate(new SysUserRole(IdWorker.snowflakeStringId(),
-                    user.getId(),
-                    sysRole.getId()));
-        }
-
-    }
 }
