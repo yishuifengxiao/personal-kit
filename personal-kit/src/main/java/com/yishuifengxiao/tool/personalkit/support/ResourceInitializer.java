@@ -80,7 +80,7 @@ public class ResourceInitializer implements CommandLineRunner {
         //初始化角色
         SysRole sysRole = new SysRole(Constant.DEFAULT_ROOT_ID, "系统角色", "系统初始化数据," +
                 "内置超级管理员，具有系统全部权限", Constant.DEFAULT_ROOT_ID, DEFAULT_HOME_URL,
-                RoleStat.ROLE_ENABLE.getCode(), BoolStat.True.code(), LocalDateTime.now(), 1);
+                RoleStat.ROLE_INIT.code(), LocalDateTime.now());
         JdbcUtil.jdbcHelper().saveOrUpdate(sysRole);
 
         //初始化 用户-角色 关联关系
@@ -89,9 +89,8 @@ public class ResourceInitializer implements CommandLineRunner {
         JdbcUtil.jdbcHelper().saveOrUpdate(userRole);
 
         // 初始化角色-菜单关系
-        JdbcUtil.jdbcHelper().jdbcTemplate().execute("INSERT IGNORE INTO sys_menu_permission( id,"
-                + " menu_id, permission_id) SELECT md5( CONCAT( p.id )), 1, p.id FROM " +
-                "sys_permission p ; ");
+        JdbcUtil.jdbcHelper().jdbcTemplate().execute("INSERT IGNORE INTO sys_role_menu( id, " +
+                "role_id, menu_id) SELECT md5( CONCAT( m.id )), 1, m.id FROM sys_menu m ;");
         this.hasInit = true;
     }
 
@@ -117,39 +116,36 @@ public class ResourceInitializer implements CommandLineRunner {
 
         List<SysPermission> list =
                 map.values().stream().filter(Objects::nonNull).filter(v -> !sets.stream().anyMatch(s -> StringUtils.containsIgnoreCase(v.getClass().getPackageName(), s))).map(controller -> {
-                    // 得到的是controller
-                    String moduleName = extractModuleName(controller);
-                    List<String> classUrls = extractClassUrls(controller);
-                    classUrls = CollUtil.isEmpty(classUrls) ? Arrays.asList("") : classUrls;
-                    String className =
-                            StringUtils.substringBefore(controller.getClass().getName(), "$");
+            // 得到的是controller
+            String moduleName = extractModuleName(controller);
+            List<String> classUrls = extractClassUrls(controller);
+            classUrls = CollUtil.isEmpty(classUrls) ? Arrays.asList("") : classUrls;
+            String className = StringUtils.substringBefore(controller.getClass().getName(), "$");
 
-                    //方法
-                    return classUrls.stream().map(classUrl -> Arrays.stream(controller.getClass().getMethods()).filter(m -> Modifier.isPublic(m.getModifiers())).map(declaredMethod -> {
-                        String[] methodPaths = methodPath(declaredMethod);
-                        if (CollUtil.isEmpty(methodPaths)) {
-                            return null;
-                        }
+            //方法
+            return classUrls.stream().map(classUrl -> Arrays.stream(controller.getClass().getMethods()).filter(m -> Modifier.isPublic(m.getModifiers())).map(declaredMethod -> {
+                String[] methodPaths = methodPath(declaredMethod);
+                if (CollUtil.isEmpty(methodPaths)) {
+                    return null;
+                }
 
-                        String path = className + "::" + declaredMethod.getName();
+                String path = className + "::" + declaredMethod.getName();
 
-                        Operation apiOperation = AnnotationUtils.findAnnotation(declaredMethod,
-                                Operation.class);
-                        String summary = null != apiOperation ? apiOperation.summary() : "";
-                        String description = null != apiOperation ? apiOperation.description() : "";
+                Operation apiOperation = AnnotationUtils.findAnnotation(declaredMethod,
+                        Operation.class);
+                String summary = null != apiOperation ? apiOperation.summary() : "";
+                String description = null != apiOperation ? apiOperation.description() : "";
 
-                        return Arrays.asList(methodPaths).stream().map(methodUrl -> {
-                            String url = StringUtils.trim(classUrl + methodUrl);
-                            SysPermission permission =
-                                    new SysPermission(IdWorker.snowflakeStringId(),
-                                            moduleName, summary, description, url, contextPath,
-                                            applicationName,
-                                            path, BoolStat.True.code());
-                            permission.setId(MD5.md5Short(permission.getApplicationName() + permission.getContextPath() + permission.getUrl()));
-                            return permission;
-                        }).collect(Collectors.toList());
-                    }).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList())).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList());
-                }).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList());
+                return Arrays.asList(methodPaths).stream().map(methodUrl -> {
+                    String url = StringUtils.trim(classUrl + methodUrl);
+                    SysPermission permission = new SysPermission(IdWorker.snowflakeStringId(),
+                            moduleName, summary, description, url, contextPath, applicationName,
+                            path, BoolStat.True.code());
+                    permission.setId(MD5.md5Short(permission.getApplicationName() + permission.getContextPath() + permission.getUrl()));
+                    return permission;
+                }).collect(Collectors.toList());
+            }).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList())).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList());
+        }).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList());
         return list;
     }
 

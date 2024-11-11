@@ -1,7 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -30,7 +29,8 @@ import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.GENER
  * @since 1.0.0
  */
 @Validated
-@Table(name = "sys_role", indexes = {@Index(name = "idx_parent_id", columnList = "parent_id")}, uniqueConstraints = {@UniqueConstraint(name = "uk_name", columnNames = {"name"})})
+@Table(name = "sys_role", indexes = {@Index(name = "idx_parent_id", columnList = "parent_id")},
+        uniqueConstraints = {@UniqueConstraint(name = "uk_name", columnNames = {"name"})})
 @Entity(name = "sys_role")
 @Data
 @AllArgsConstructor
@@ -66,18 +66,11 @@ public class SysRole implements Serializable {
     @Column(name = "stat", length = 1, columnDefinition = "tinyint(1) default 1")
     private Integer stat;
 
-    @JsonIgnore
-    @Column(name = "is_embedded", length = 1, columnDefinition = "tinyint(1) default 0")
-    private Integer embedded;
-
     @Column(name = "create_time", nullable = false, updatable = false)
     @JsonFormat(locale = "zh", timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime createTime;
 
-    @JsonIgnore
-    @Column(name = "is_show", length = 1, columnDefinition = "tinyint(1) default 1")
-    private Integer isShow;
 
 }

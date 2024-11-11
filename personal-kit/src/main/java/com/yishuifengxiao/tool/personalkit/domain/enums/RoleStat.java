@@ -1,5 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.domain.enums;
 
+import com.yishuifengxiao.common.tool.entity.RootEnum;
+
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -9,8 +11,11 @@ import java.util.Optional;
  * @date 2023/11/16-19:31
  * @since 1.0.0
  */
-public enum RoleStat {
-
+public enum RoleStat implements RootEnum {
+    /**
+     * 系统
+     */
+    ROLE_INIT("系统", -1),
     /**
      * 启用
      */
@@ -30,15 +35,23 @@ public enum RoleStat {
         this.code = code;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public int getCode() {
-        return code;
-    }
 
     public static Optional<RoleStat> code(int code) {
         return Arrays.stream(values()).filter(v -> v.code == code).findFirst();
+    }
+
+    @Override
+    public Integer code() {
+        return this.code;
+    }
+
+    @Override
+    public String description() {
+        return this.name;
+    }
+
+    @Override
+    public String enumName() {
+        return this.name;
     }
 }

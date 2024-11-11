@@ -11,6 +11,7 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenuPermission;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
+import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
 import com.yishuifengxiao.tool.personalkit.domain.request.MenuPermissionReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.MenuTree;
 import com.yishuifengxiao.tool.personalkit.domain.vo.MenuVo;
@@ -65,7 +66,8 @@ public class MenuService {
                 pageQuery.size().intValue(),
                 pageQuery.num().intValue()).map(v -> {
             MenuVo vo = BeanUtil.copy(v, new MenuVo());
-            String sql = "SELECT DISTINCT sp.* from sys_permission sp,sys_menu_permission smp where  smp" +
+            String sql = "SELECT DISTINCT sp.* from sys_permission sp,sys_menu_permission smp "
+                    + "where  smp" +
                     ".permission_id " + "=sp.id and smp.menu_id=?";
             List<SysPermission> list =
                     JdbcUtil.jdbcHelper().findAll(SysPermission.class, sql, v.getId());
@@ -93,11 +95,12 @@ public class MenuService {
         SysRole sysRole = JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, roleId.trim());
         Assert.isNotNull("请选择一个正确的角色", sysRole);
         List<SysMenu> menus = null;
-        if (BoolStat.isTrue(sysRole.getEmbedded())) {
+        if (RoleStat.ROLE_INIT.equalCode(sysRole.getStat())) {
             //内置且隐藏的角色
-            menus = JdbcUtil.jdbcHelper().findAll(new SysMenu(),false);
+            menus = JdbcUtil.jdbcHelper().findAll(new SysMenu(), false);
         } else {
-            String sql = "select sm.* from sys_menu sm ,sys_role_menu srm where sm.id = srm.menu_id and srm.role_id=?";
+            String sql = "select sm.* from sys_menu sm ,sys_role_menu srm where sm.id = srm"
+                    + ".menu_id and srm.role_id=?";
             menus = JdbcUtil.jdbcHelper().findAll(SysMenu.class, sql, sysRole.getId());
         }
         // 上部的菜单
@@ -108,7 +111,8 @@ public class MenuService {
         }
         //选中的上部菜单
         SysMenu selectTopMenu =
-                topMenus.stream().filter(v -> StringUtils.equalsIgnoreCase(v.getRouterName(), topMenuId)).findFirst().orElse(CollUtil.first(topMenus).orElse(null));
+                topMenus.stream().filter(v -> StringUtils.equalsIgnoreCase(v.getRouterName(),
+                        topMenuId)).findFirst().orElse(CollUtil.first(topMenus).orElse(null));
         // 左侧的一级菜单
         List<SysMenu> leftFirsts =
                 menus.stream().filter(v -> BoolStat.isTrue(v.getType())).filter(v -> StringUtils.equalsIgnoreCase(v.getParentId(), selectTopMenu.getId())).collect(Collectors.toList());
