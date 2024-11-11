@@ -3,6 +3,7 @@ package com.yishuifengxiao.tool.personalkit.support;
 
 import com.yishuifengxiao.common.guava.GuavaCache;
 import com.yishuifengxiao.common.tool.utils.ValidateUtils;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
@@ -57,12 +58,13 @@ public class ContextCache {
     }
 
 
-    public static void setRole(String role) {
+    public static void setRole(SysRole role) {
         GuavaCache.put(USER_ROLE_PREFIX + Thread.currentThread().getId(), role);
     }
 
-    public static String getRole() {
-        return (String) GuavaCache.get(USER_ROLE_PREFIX + Thread.currentThread().getId());
+    public static Optional<SysRole> getRole() {
+        SysRole role = (SysRole) GuavaCache.get(USER_ROLE_PREFIX + Thread.currentThread().getId());
+        return Optional.ofNullable(role);
     }
 
     public static void clearRole() {

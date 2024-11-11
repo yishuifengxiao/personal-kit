@@ -7,21 +7,27 @@ import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.common.tool.utils.ValidateUtils;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
+import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -38,9 +44,12 @@ public class SimpleUserDetailsService implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final ApplicationContext context;
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
         // @formatter:off
         SysUser sysUser = GuavaCache.get(username, ()-> sysUserDao.findActiveSysUser(username)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("用户名%s不存在", username))));
@@ -49,6 +58,8 @@ public class SimpleUserDetailsService implements UserDetailsService {
 
         List<SysRole> roles = sysUserDao.findAllRoleByUserId(sysUser.getId());
         ValidateUtils.isTrue(CollUtil.isNotEmpty(roles),"当前用户还未配置角色");
+
+        currentRole(roles);
 
         String password=passwordEncoder.encode(DES.decrypt(sysUser.getSalt(),sysUser.getPwd()));
         ContextCache.setCurrentUser(sysUser);
@@ -63,5 +74,36 @@ public class SimpleUserDetailsService implements UserDetailsService {
                                 .filter(StringUtils::isNotBlank)
                                 .distinct().collect(Collectors.joining(","))))
                 .setCurrentUser(sysUser);
+    }
+
+    private void currentRole(List<SysRole> roles) {
+        if(null==roles||roles.isEmpty()){
+            return ;
+        }
+        try{
+            ServletRequestAttributes attributes =
+                    (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            HttpServletRequest request = attributes.getRequest();
+            String currentRole = request.getHeader(Constant.CURRENT_ROLE);
+            if (StringUtils.isBlank(currentRole)) {
+                currentRole = request.getParameter(Constant.CURRENT_ROLE);
+            }
+            String loginRole=currentRole;
+            SysRole role =null;
+            if(StringUtils.isNotBlank(loginRole)){
+                 role =roles.stream().filter(Objects::nonNull).filter(v->StringUtils.equals(v.getName(),
+                        loginRole)).findFirst().orElse(roles.stream().filter(Objects::nonNull).filter(v->StringUtils.equals(String.valueOf(v.getId()),
+                        loginRole)).findFirst().orElse(null));
+
+            }else {
+                role= roles.get(0);
+            }
+
+            if(null!=role){
+                ContextCache.setRole(role);
+            }
+        }catch (Exception e){}
+
+
     }
 }

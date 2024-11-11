@@ -6,7 +6,6 @@ import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.entity.Response;
 import com.yishuifengxiao.common.utils.HttpUtils;
 import com.yishuifengxiao.tool.personalkit.config.CoreProperties;
-import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,14 +30,14 @@ public class CacheRateLimiterFilter extends OncePerRequestFilter {
     @Autowired
     private CoreProperties coreproperties;
 
-    private final Set<String> excludes = CollUtil.asSet("api-docs", "swagger", ".css", ".js", ".html");
+    private final Set<String> excludes = CollUtil.asSet("api-docs", "swagger", ".css", ".js",
+            ".html");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            ContextCache.setRole(currentRole(request));
             if (coreproperties.getIpMaxVisitPerSecond() > 0 &&
                     //
                     !request.getRequestURI().contains(".") &&
@@ -47,7 +46,8 @@ public class CacheRateLimiterFilter extends OncePerRequestFilter {
                 //
             ) {
                 //开启了限流功能WE
-                String visitorIp = Optional.ofNullable(HttpUtils.getRequestIp(request)).orElse("localhost");
+                String visitorIp = Optional.ofNullable(HttpUtils.getRequestIp(request)).orElse(
+                        "localhost");
                 RateLimiter rateLimiter = GuavaCache.get(visitorIp,
                         () -> RateLimiter.create(coreproperties.getIpMaxVisitPerSecond()));
                 if (!rateLimiter.tryAcquire()) {
@@ -65,11 +65,4 @@ public class CacheRateLimiterFilter extends OncePerRequestFilter {
     }
 
 
-    private String currentRole(HttpServletRequest request) {
-        String currentRole = request.getHeader(Constant.CURRENT_ROLE);
-        if (StringUtils.isNotBlank(currentRole)) {
-            return currentRole.trim();
-        }
-        return request.getParameter(Constant.CURRENT_ROLE);
-    }
 }

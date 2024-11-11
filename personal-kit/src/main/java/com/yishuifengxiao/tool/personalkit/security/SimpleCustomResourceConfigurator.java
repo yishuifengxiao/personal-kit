@@ -3,9 +3,11 @@ package com.yishuifengxiao.tool.personalkit.security;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.security.httpsecurity.authorize.custom.CustomResourceConfigurator;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
+import com.yishuifengxiao.common.tool.utils.ValidateUtils;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
@@ -65,7 +67,9 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
             return new AuthorizationDecision(true);
         }
         //当前角色
-        String currentRole = ContextCache.getRole();
+        String currentRole =
+                ContextCache.getRole().map(SysRole::getId).orElseThrow(ValidateUtils.orElseThrow(
+                        "当前用户还未登录"));
 
         String sql = "SELECT DISTINCT sp.* FROM sys_permission sp, sys_menu_permission smp, "
                 + "sys_menu sm, " +
