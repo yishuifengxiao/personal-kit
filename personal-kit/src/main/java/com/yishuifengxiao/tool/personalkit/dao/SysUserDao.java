@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,9 +37,8 @@ public class SysUserDao {
 //        return sysUserRepository.findAll(Example.of(new SysUser().setUsername(username.trim()))
 //        , Sort.by(ClassUtil
 //        .pojoFieldName(SysUser::getCreateTime)).descending()).stream().findFirst();
-        Optional<SysUser> optional =
-                Optional.ofNullable(jdbcHelper.findOne(new SysUser().setUsername(username),
-                        false));
+        Optional<SysUser> optional = jdbcHelper.findAll(new SysUser().setUsername(username.trim()).setVer(0), false)
+                .stream().max(Comparator.comparing(SysUser::getCreateTime));
 
         return optional;
     }

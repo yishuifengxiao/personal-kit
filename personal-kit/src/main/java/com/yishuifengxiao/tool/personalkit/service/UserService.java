@@ -1,6 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.guava.GuavaCache;
+import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.security.support.SecurityEvent;
 import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.security.token.SecurityToken;
@@ -8,6 +9,8 @@ import com.yishuifengxiao.common.security.utils.TokenUtil;
 import com.yishuifengxiao.common.support.SpringContext;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.codec.DES;
+import com.yishuifengxiao.common.tool.entity.Page;
+import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.entity.StringKeyValue;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
@@ -18,6 +21,7 @@ import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
+import com.yishuifengxiao.tool.personalkit.domain.query.UserQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
@@ -135,4 +139,53 @@ public class UserService {
     }
 
 
+    public Page<SysUser> findPage(PageQuery<UserQuery> query) {
+        UserQuery userQuery = query.query().orElse(new UserQuery());
+        UserStat userStat = UserStat.code(userQuery.getStat()).orElse(UserStat.SYSTEM_INIT);
+        String sql = """
+                SELECT
+                  u.*          
+                FROM
+                  sys_user u
+                  LEFT JOIN sys_user_role sur ON u.id = sur.user_id
+                  LEFT JOIN sys_role r ON r.id = sur.role_id          
+                WHERE
+                  u.ver = 0 
+                """;
+        if (StringUtils.isNotBlank(userQuery.getUsername())) {
+            sql += " AND u.username LIKE '%" + userQuery.getUsername() + "%'";
+        }
+        if (StringUtils.isNotBlank(userQuery.getNickname())) {
+            sql += " AND u.nickname LIKE '%" + userQuery.getNickname() + "%'";
+        }
+        if (StringUtils.isNotBlank(userQuery.getPhone())) {
+            sql += " AND u.phone LIKE '%" + userQuery.getPhone() + "%'";
+        }
+        if (StringUtils.isNotBlank(userQuery.getEmail())) {
+            sql += " AND u.email LIKE '%" + userQuery.getEmail() + "%'";
+        }
+        if (UserStat.SYSTEM_INIT.equals(userStat)) {
+            sql += " AND u.stat != " + userStat.code();
+        } else {
+            sql += " AND u.stat = " + userStat.code();
+        }
+        if (StringUtils.isNotBlank(userQuery.getRoleName())) {
+            sql += " AND r.name LIKE '%" + userQuery.getRoleName() + "%'";
+        }
+        if (null != userQuery.getStartCreateTime()) {
+            sql += " AND u.create_time >= '" + userQuery.getCreateTime() + "'";
+        }
+        if (null != userQuery.getEndCreateTime()) {
+            sql += " AND u.create_time <= '" + userQuery.getEndCreateTime() + "'";
+        }
+        if (null != userQuery.getStartLockTime()) {
+            sql += " AND u.lock_time >= '" + userQuery.getLockTime() + "'";
+        }
+        if (null != userQuery.getEndLockTime()) {
+            sql += " AND u.lock_time <= '" + userQuery.getLockTime() + "'";
+        }
+        Page<SysUser> page = JdbcUtil.jdbcHelper().findPage(SysUser.class, query, sql);
+        return page;
+
+    }
 }

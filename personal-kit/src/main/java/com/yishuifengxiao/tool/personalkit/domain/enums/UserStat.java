@@ -49,7 +49,10 @@ public enum UserStat implements RootEnum {
     }
 
 
-    public static Optional<UserStat> code(int code) {
+    public static Optional<UserStat> code(Integer code) {
+        if (null == code) {
+            return Optional.empty();
+        }
         return Arrays.stream(values()).filter(v -> v.code == code).findFirst();
     }
 

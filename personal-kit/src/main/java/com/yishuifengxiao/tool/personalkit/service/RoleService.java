@@ -8,6 +8,7 @@ import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.common.tool.utils.Assert;
+import com.yishuifengxiao.common.tool.utils.ValidateUtils;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -118,8 +120,8 @@ public class RoleService {
 
     public void updateRole(RoleVo param) {
         //@formatter:off
-        SysRole role = JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, param.getId());
-        Assert.isNotNull("记录不存在", role);
+        SysRole role =
+                Optional.ofNullable( JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, param.getId())).filter(r->!RoleStat.ROLE_INIT.equalCode(r.getStat())).orElseThrow(ValidateUtils.orElseThrow("记录不存在"));
         if (StringUtils.isNotBlank(param.getName()) && !StringUtils.equalsIgnoreCase(param.getName().trim(), role.getName())) {
 
             Assert.isNull("角色已存在", JdbcUtil.jdbcHelper().findOne(new SysRole().setName(param.getName().trim()),false));
@@ -144,6 +146,7 @@ public class RoleService {
     }
 
     public void updateRoleMenu(String roleId, List<SysMenu> menus) {
+        Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, roleId)).filter(r -> !RoleStat.ROLE_INIT.equalCode(r.getStat())).orElseThrow(ValidateUtils.orElseThrow("记录不存在"));
         //@formatter:off
         //删除旧的关联关系
         JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysRoleMenu.class,
@@ -172,11 +175,11 @@ public class RoleService {
     public void deleteRoles(List<String> ids) {
         for (String id : ids) {
             Assert.isNotBlank("记录主键不能为空", id);
-            SysRole sysRole = JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, id.trim());
-            Assert.isNotNull("记录不存在", sysRole);
-            Assert.isFalse("内置角色不允许删除", RoleStat.ROLE_INIT.equalCode(sysRole.getStat()));
+            SysRole sysRole =
+                    Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, id)).filter(r -> !RoleStat.ROLE_INIT.equalCode(r.getStat())).orElseThrow(ValidateUtils.orElseThrow("记录不存在"));
             Assert.isFalse("未禁用的角色不允许删除", RoleStat.ROLE_DISABLE.equalCode(sysRole.getStat()));
             JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysRole.class, id.trim());
+
             // 删除关联关系
             JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysRoleMenu.class,
                     JdbcUtil.jdbcHelper().findAll(new SysRoleMenu().setRoleId(id.trim()), false).stream().map(SysRoleMenu::getId).toArray(Object[]::new));

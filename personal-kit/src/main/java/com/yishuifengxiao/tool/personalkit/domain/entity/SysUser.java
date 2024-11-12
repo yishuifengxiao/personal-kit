@@ -132,4 +132,5 @@ public class SysUser implements Serializable {
 
         //@formatter:off
     }
+
 }
