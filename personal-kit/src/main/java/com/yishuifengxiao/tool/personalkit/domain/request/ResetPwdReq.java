@@ -2,7 +2,9 @@ package com.yishuifengxiao.tool.personalkit.domain.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
@@ -14,6 +16,8 @@ import java.io.Serializable;
  */
 @Valid
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ResetPwdReq implements Serializable {
 
     @NotBlank(message = "账号不能为空")

@@ -18,7 +18,7 @@ import java.io.Serializable;
 @Data
 public class UpdatePwdReq implements Serializable {
 
-    @NotBlank(message = "用户id", groups = {Group.Update.class})
+    @NotBlank(message = "用户id不能为空", groups = {Group.Update.class})
     private String id;
 
     @NotBlank(message = "旧密码不能为空", groups = {Group.Update.class})

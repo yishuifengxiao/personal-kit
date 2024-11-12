@@ -97,11 +97,10 @@ public class UserService {
                 sysUser.getPwd()));
         sysUser.setPwd(DES.encrypt(sysUser.getSalt(), req.getNewPwd().trim()));
         sysUserRepository.saveAndFlush(sysUser);
-        GuavaCache.remove(sysUser.getUsername());
     }
 
     public void updateUser(SysUser sysUser) {
-        SysUser user = sysUserRepository.findById(sysUser.getId().trim()).orElseThrow(() -> UncheckedException.of(
+        SysUser user = sysUserRepository.findById(sysUser.getId().trim()).orElseThrow(ValidateUtils.orElseThrow(
                 "记录不存在"));
         if (StringUtils.isNotBlank(sysUser.getNickname())) {
             user.setNickname(sysUser.getNickname().trim());
@@ -120,8 +119,7 @@ public class UserService {
             user.setStat(sysUser.getStat());
         }
         user.setLastUpdateTime(LocalDateTime.now());
-        sysUserRepository.saveAndFlush(sysUser);
-        GuavaCache.remove(sysUser.getUsername());
+        JdbcUtil.jdbcHelper().saveOrUpdate(user);
     }
 
     public void updateResetPwd(ResetPwdReq req) {

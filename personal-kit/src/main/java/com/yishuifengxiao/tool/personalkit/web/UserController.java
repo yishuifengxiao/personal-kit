@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Tag(name = "用户管理")
 @Valid
+@Validated
 @RestController
 @RequestMapping("/sys/user")
 @RequiredArgsConstructor
@@ -48,8 +49,7 @@ public class UserController {
     }
 
     @PostMapping("/pwd/update")
-    public void updatePwd(@Validated(Group.Update.class) @RequestBody UpdatePwdReq req,
-                          BindingResult errors) {
+    public void updatePwd(@Validated(Group.Update.class) @RequestBody UpdatePwdReq req) {
         userService.updatePwd(req);
     }
 
