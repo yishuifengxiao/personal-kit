@@ -47,6 +47,9 @@ public class RoleService {
      */
     public Page<RoleVo> findPageRole(PageQuery<RoleQuery> pageQuery) {
         RoleQuery roleQuery = pageQuery.query().orElse(new RoleQuery());
+        if (RoleStat.ROLE_INIT.equalCode(roleQuery.getStat())) {
+            roleQuery.setStat(null);
+        }
         String sql = """
                 SELECT DISTINCTROW
                 	sr.*   
@@ -71,7 +74,7 @@ public class RoleService {
                 	( ? IS NULL, TRUE, sr.`parent_id` = ? )   
                 AND
                 IF
-                	( ? IS NULL, TRUE, sr.`stat` = ? )   
+                	( ? IS NULL, sr.`stat` != -1 , sr.`stat` = ? )   
                 AND
                 IF
                 	(

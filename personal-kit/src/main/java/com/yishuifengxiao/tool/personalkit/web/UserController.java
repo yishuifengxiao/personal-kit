@@ -66,7 +66,7 @@ public class UserController {
     }
 
     @PostMapping("/findPage")
-    public Page<SysUser> findPage(@RequestBody PageQuery<UserQuery> query) {
+    public Page<UserInfo> findPage(@RequestBody PageQuery<UserQuery> query) {
         return userService.findPage(query);
     }
 

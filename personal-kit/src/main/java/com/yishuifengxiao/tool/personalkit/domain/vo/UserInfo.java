@@ -1,6 +1,5 @@
 package com.yishuifengxiao.tool.personalkit.domain.vo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.yishuifengxiao.common.tool.entity.StringKeyValue;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
@@ -9,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -29,12 +27,5 @@ public class UserInfo extends SysUser {
 
     private String token;
 
-    @JsonIgnore
-    private LocalDateTime createTime;
-    @JsonIgnore
-    private LocalDateTime lockTime;
-    @JsonIgnore
-    private LocalDateTime lastUpdateTime;
-    @JsonIgnore
-    private Integer stat;
+
 }

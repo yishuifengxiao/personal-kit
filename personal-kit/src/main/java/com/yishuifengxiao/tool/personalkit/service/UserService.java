@@ -139,7 +139,7 @@ public class UserService {
     }
 
 
-    public Page<SysUser> findPage(PageQuery<UserQuery> query) {
+    public Page<UserInfo> findPage(PageQuery<UserQuery> query) {
         UserQuery userQuery = query.query().orElse(new UserQuery());
         UserStat userStat = UserStat.code(userQuery.getStat()).orElse(UserStat.SYSTEM_INIT);
         String sql = """
@@ -185,7 +185,13 @@ public class UserService {
             sql += " AND u.lock_time <= '" + userQuery.getLockTime() + "'";
         }
         Page<SysUser> page = JdbcUtil.jdbcHelper().findPage(SysUser.class, query, sql);
-        return page;
+        return page.map(s -> {
+            UserInfo userInfo = BeanUtil.copy(s, new UserInfo());
+            List<StringKeyValue> roles =
+                    sysUserDao.findAllRoleByUserId(s.getId()).stream().map(r -> new StringKeyValue<>(String.valueOf(r.getId()), r.getName())).collect(Collectors.toList());
+            userInfo.setRoles(roles);
+            return userInfo;
+        });
 
     }
 }
