@@ -7,12 +7,9 @@ import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.holder.TokenHolder;
 import com.yishuifengxiao.common.tool.bean.JsonUtil;
 import com.yishuifengxiao.common.tool.exception.CustomException;
-import com.yishuifengxiao.common.tool.utils.ValidateUtils;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
-import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
+import com.yishuifengxiao.tool.personalkit.domain.vo.CurrentUser;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
-import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -60,8 +57,8 @@ public class IndexController {
     @Operation(summary = "当前登录用户信息", description = "获取当前登录用户信息")
     @GetMapping("/user")
     @ResponseBody
-    public SysUser user() {
-        return ContextCache.currentUser().orElseThrow(ValidateUtils.orElseThrow("当前用户还未登录"));
+    public CurrentUser user() {
+        return userService.findCurrentUser();
     }
 
     @Operation(summary = "获取token", description = "获取当前用户所有的token信息")
@@ -123,13 +120,13 @@ public class IndexController {
     @Operation(summary = "登录", description = "使用用户名和密码进行登录")
     @PostMapping("/login")
     @org.springframework.web.bind.annotation.ResponseBody
-    public UserInfo login(HttpServletRequest request, HttpServletResponse response,
-                          @Valid @RequestBody LoginQuery query, BindingResult error) throws CustomException {
+    public SecurityToken login(HttpServletRequest request, HttpServletResponse response,
+                               @Valid @RequestBody LoginQuery query, BindingResult error) throws CustomException {
 
-        UserInfo userInfo = userService.login(request, response, query);
+        SecurityToken token = userService.login(request, response, query);
 
 
-        return userInfo;
+        return token;
     }
 
 

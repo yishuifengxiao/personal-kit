@@ -21,11 +21,9 @@ import java.util.List;
 @NoArgsConstructor
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserInfo extends SysUser {
+public class PageUser extends SysUser {
 
     private List<StringKeyValue> roles;
-
-    private String token;
 
 
 }

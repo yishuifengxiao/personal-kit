@@ -15,17 +15,22 @@ import com.yishuifengxiao.common.tool.entity.StringKeyValue;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
 import com.yishuifengxiao.common.tool.utils.Assert;
+import com.yishuifengxiao.common.tool.utils.ValidateUtils;
+import com.yishuifengxiao.tool.personalkit.dao.RoleDao;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.dao.repository.SysUserRepository;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.query.UserQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
-import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
+import com.yishuifengxiao.tool.personalkit.domain.vo.PageUser;
+import com.yishuifengxiao.tool.personalkit.domain.vo.CurrentUser;
 import com.yishuifengxiao.tool.personalkit.security.SimpleUserDetailsService;
+import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -50,63 +55,54 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
     private final SysUserDao sysUserDao;
-
+    private final RoleDao roleDao;
     private final SysUserRepository sysUserRepository;
 
     private final SimpleUserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
 
-    public UserInfo login(HttpServletRequest request, HttpServletResponse response,
-                          LoginQuery query) throws CustomException {
+    public SecurityToken login(HttpServletRequest request, HttpServletResponse response, LoginQuery query) throws CustomException {
 
         try {
             UserDetails details = userDetailsService.loadUserByUsername(query.getUsername().trim());
             SysUser sysUser = GuavaCache.get(query.getUsername().trim(), SysUser.class);
-            Assert.isTrue("密码错误", passwordEncoder.matches(query.getPassword(),
-                    details.getPassword()));
+            Assert.isTrue("密码错误", passwordEncoder.matches(query.getPassword(), details.getPassword()));
             //获取token
             SecurityToken token = TokenUtil.createUnsafe(request, query.getUsername().trim());
-            TokenUtil.setToken(token);
-            UserInfo userInfo = BeanUtil.copy(sysUser, new UserInfo());
-            userInfo.setToken(token.getValue());
-            return userInfo;
+            return token;
         } catch (Exception e) {
-            SpringContext.publishEvent(new SecurityEvent(this, request, response,
-                    Strategy.AUTHENTICATION_SUCCESS, new SecurityToken(Collections.EMPTY_LIST) {
-                @Override
-                public String getName() {
-                    return query.getUsername();
-                }
-            }, e));
+            SpringContext.publishEvent(new SecurityEvent(this, request, response, Strategy.AUTHENTICATION_SUCCESS,
+                    new SecurityToken(Collections.EMPTY_LIST) {
+                        @Override
+                        public String getName() {
+                            return query.getUsername();
+                        }
+                    }, e));
             throw e;
         }
 
 
     }
 
-    public UserInfo userInfo(String id) {
-        SysUser sysUser = sysUserRepository.findById(id).orElseThrow(() -> UncheckedException.of(
-                "记录不存在"));
-        UserInfo userInfo = BeanUtil.copy(sysUser, new UserInfo());
-        List<StringKeyValue> roles =
-                sysUserDao.findAllRoleByUserId(sysUser.getId()).stream().map(s -> new StringKeyValue<>(String.valueOf(s.getId()), s.getName())).collect(Collectors.toList());
-        return userInfo.setRoles(roles);
+    public SysUser userInfo(String id) {
+        SysUser sysUser = sysUserRepository.findById(id).orElseThrow(() -> UncheckedException.of("记录不存在"));
+        return sysUser;
     }
 
     public void updatePwd(UpdatePwdReq req) {
-        SysUser sysUser =
-                sysUserRepository.findById(req.getId().trim()).orElseThrow(() -> UncheckedException.of("记录不存在"));
-        Assert.isTrue("旧密码不正确", StringUtils.equals(DES.encrypt(sysUser.getSalt(),
-                req.getOldPwd().trim()), sysUser.getPwd()));
+        SysUser sysUser = sysUserRepository.findById(req.getId().trim()).orElseThrow(() -> UncheckedException.of(
+                "记录不存在"));
+        Assert.isTrue("旧密码不正确", StringUtils.equals(DES.encrypt(sysUser.getSalt(), req.getOldPwd().trim()),
+                sysUser.getPwd()));
         sysUser.setPwd(DES.encrypt(sysUser.getSalt(), req.getNewPwd().trim()));
         sysUserRepository.saveAndFlush(sysUser);
         GuavaCache.remove(sysUser.getUsername());
     }
 
     public void updateUser(SysUser sysUser) {
-        SysUser user =
-                sysUserRepository.findById(sysUser.getId().trim()).orElseThrow(() -> UncheckedException.of("记录不存在"));
+        SysUser user = sysUserRepository.findById(sysUser.getId().trim()).orElseThrow(() -> UncheckedException.of(
+                "记录不存在"));
         if (StringUtils.isNotBlank(sysUser.getNickname())) {
             user.setNickname(sysUser.getNickname().trim());
         }
@@ -120,8 +116,7 @@ public class UserService {
             user.setCertNo(sysUser.getCertNo().trim());
         }
         if (null != sysUser.getStat()) {
-            UserStat.code(sysUser.getStat()).orElseThrow(() -> new UncheckedException(
-                    "请选择一个正确的状态"));
+            UserStat.code(sysUser.getStat()).orElseThrow(() -> new UncheckedException("请选择一个正确的状态"));
             user.setStat(sysUser.getStat());
         }
         user.setLastUpdateTime(LocalDateTime.now());
@@ -139,7 +134,7 @@ public class UserService {
     }
 
 
-    public Page<UserInfo> findPage(PageQuery<UserQuery> query) {
+    public Page<PageUser> findPage(PageQuery<UserQuery> query) {
         UserQuery userQuery = query.query().orElse(new UserQuery());
         UserStat userStat = UserStat.code(userQuery.getStat()).orElse(UserStat.SYSTEM_INIT);
         String sql = """
@@ -186,12 +181,25 @@ public class UserService {
         }
         Page<SysUser> page = JdbcUtil.jdbcHelper().findPage(SysUser.class, query, sql);
         return page.map(s -> {
-            UserInfo userInfo = BeanUtil.copy(s, new UserInfo());
+            PageUser pageUser = BeanUtil.copy(s, new PageUser());
             List<StringKeyValue> roles =
-                    sysUserDao.findAllRoleByUserId(s.getId()).stream().map(r -> new StringKeyValue<>(String.valueOf(r.getId()), r.getName())).collect(Collectors.toList());
-            userInfo.setRoles(roles);
-            return userInfo;
+                    roleDao.findRoleByUser(s.getId()).stream().map(r -> new StringKeyValue<>(String.valueOf(r.getId()),
+                            r.getName())).collect(Collectors.toList());
+            pageUser.setRoles(roles);
+            return pageUser;
         });
 
+    }
+
+    public CurrentUser findCurrentUser() {
+        SysUser sysUser = ContextCache.currentUser().orElseThrow(ValidateUtils.orElseThrow("当前用户还未登录"));
+
+        CurrentUser currentUser = BeanUtil.copy(sysUser, new CurrentUser());
+
+        List<SysRole> roles = roleDao.findRoleByUser(sysUser.getId());
+
+        SysRole sysRole = ContextCache.getRole().orElse(null);
+
+        return currentUser.setRoles(roles).setRole(sysRole);
     }
 }

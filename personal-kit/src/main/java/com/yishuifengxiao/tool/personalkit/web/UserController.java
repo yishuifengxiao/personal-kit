@@ -1,6 +1,5 @@
 package com.yishuifengxiao.tool.personalkit.web;
 
-import com.yishuifengxiao.common.security.user.CurrentUser;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.validate.Group;
@@ -8,7 +7,7 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.query.UserQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
-import com.yishuifengxiao.tool.personalkit.domain.vo.UserInfo;
+import com.yishuifengxiao.tool.personalkit.domain.vo.PageUser;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -43,7 +42,8 @@ public class UserController {
             @Parameter(name = "id", description = "用户Id", in = ParameterIn.PATH)
     })
     @GetMapping("/info/{id}")
-    public UserInfo info(@PathVariable String id, @CurrentUser UserDetails user) {
+    public SysUser info(@PathVariable String id,
+                        @com.yishuifengxiao.common.security.user.CurrentUser UserDetails user) {
         return userService.userInfo(id);
     }
 
@@ -66,7 +66,7 @@ public class UserController {
     }
 
     @PostMapping("/findPage")
-    public Page<UserInfo> findPage(@RequestBody PageQuery<UserQuery> query) {
+    public Page<PageUser> findPage(@RequestBody PageQuery<UserQuery> query) {
         return userService.findPage(query);
     }
 

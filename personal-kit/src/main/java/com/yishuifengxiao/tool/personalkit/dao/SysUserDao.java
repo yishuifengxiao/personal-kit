@@ -2,7 +2,6 @@ package com.yishuifengxiao.tool.personalkit.dao;
 
 import com.yishuifengxiao.common.jdbc.JdbcHelper;
 import com.yishuifengxiao.tool.personalkit.dao.repository.SysUserRepository;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -43,21 +41,6 @@ public class SysUserDao {
         return optional;
     }
 
-    public List<SysRole> findAllRoleByUserId(String userId) {
-        String sql = """
-                SELECT
-                	r.*  
-                FROM
-                	sys_user_role ur,
-                	sys_role r  
-                WHERE
-                	r.id = ur.role_id  
-                	AND r.stat IN (- 1, 1 )  
-                	AND ur.user_id = ?
-                """;
-        return jdbcHelper.findAll(SysRole.class, sql, userId);
-
-    }
 
     public void updateDisableTime(String id, LocalDateTime time) {
         String sql = "update sys_user set lock_time = ? where id = ?";

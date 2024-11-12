@@ -6,6 +6,7 @@ import com.yishuifengxiao.common.tool.codec.DES;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.common.tool.utils.ValidateUtils;
+import com.yishuifengxiao.tool.personalkit.dao.RoleDao;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
@@ -40,9 +41,9 @@ import java.util.stream.Collectors;
 public class SimpleUserDetailsService implements UserDetailsService {
 
     private final SysUserDao sysUserDao;
+    private final RoleDao roleDao;
 
     private final PasswordEncoder passwordEncoder;
-
 
 
     @Override
@@ -54,7 +55,7 @@ public class SimpleUserDetailsService implements UserDetailsService {
 
         Assert.isFalse("账户已禁用，请稍候一段时候再重试",null!=sysUser.getLockTime()&&sysUser.getLockTime().isAfter(LocalDateTime.now()));
 
-        List<SysRole> roles = sysUserDao.findAllRoleByUserId(sysUser.getId());
+        List<SysRole> roles = roleDao.findRoleByUser(sysUser.getId());
         ValidateUtils.isTrue(CollUtil.isNotEmpty(roles),"当前用户还未配置角色");
 
         currentRole(roles);
