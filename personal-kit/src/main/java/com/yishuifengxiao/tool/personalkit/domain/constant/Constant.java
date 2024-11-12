@@ -35,10 +35,7 @@ public final class Constant {
      */
     public final static int ACTIVE_DATA_VER = 0;
 
-    /**
-     * 默认的id生成器
-     */
-    public final static String GENERIC_GENERATOR = "com.yishuifengxiao.tool.personalkit.utils.CustomIdGenerator";
+
 
     /**
      * 默认的首页路径

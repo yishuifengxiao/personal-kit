@@ -2,6 +2,7 @@ package com.yishuifengxiao.tool.personalkit.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yishuifengxiao.common.tool.validate.Group;
+import com.yishuifengxiao.tool.personalkit.utils.CustomIdGenerator;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -14,7 +15,6 @@ import org.springframework.validation.annotation.Validated;
 
 import java.io.Serializable;
 
-import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.GENERIC_GENERATOR;
 
 /**
  * @author qingteng
@@ -34,7 +34,7 @@ public class SysMenu implements Serializable {
     @NotBlank(message = "待修改的记录主键不能为空", groups = {Group.Update.class})
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "system_uuid")
-    @GenericGenerator(name = "system_uuid", strategy = GENERIC_GENERATOR)
+    @GenericGenerator(name = "system_uuid", strategy = CustomIdGenerator.GENERIC_GENERATOR)
     @Column(name = "id", length = 64, nullable = false, unique = true)
     private String id;
 

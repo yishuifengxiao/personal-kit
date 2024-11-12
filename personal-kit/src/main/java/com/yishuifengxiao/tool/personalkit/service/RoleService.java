@@ -83,16 +83,13 @@ public class RoleService {
         Page<SysRole> page = JdbcUtil.jdbcHelper().findPage(SysRole.class, pageQuery, sql,
                 roleQuery.getId(), roleQuery.getId(), roleQuery.getName(), roleQuery.getName(),
                 roleQuery.getDescription(), roleQuery.getDescription(), roleQuery.getHomeUrl(),
-                roleQuery.getHomeUrl(),
-                roleQuery.getParentId(), roleQuery.getParentId(),
-                roleQuery.getStat(), roleQuery.getStat(),
-                roleQuery.getMenuName(), roleQuery.getMenuName());
+                roleQuery.getHomeUrl(), roleQuery.getParentId(), roleQuery.getParentId(),
+                roleQuery.getStat(), roleQuery.getStat(), roleQuery.getMenuName(),
+                roleQuery.getMenuName());
         return page.map(v -> {
             RoleVo roleVo = BeanUtil.copy(v, new RoleVo());
             String psql = "SELECT DISTINCTROW sm.* from sys_role sr ,sys_role_menu srm ,sys_menu "
-                    + "sm "
-                    + "WHERE sr.id=srm" +
-                    ".role_id and srm.menu_id=sm.id AND sr.id= ? ";
+                    + "sm " + "WHERE sr.id=srm" + ".role_id and srm.menu_id=sm.id AND sr.id= ? ";
             roleVo.setMenus(JdbcUtil.jdbcHelper().findAll(SysMenu.class, psql, v.getId()));
             return roleVo;
         });
@@ -149,7 +146,9 @@ public class RoleService {
     public void updateRoleMenu(String roleId, List<SysMenu> menus) {
         //@formatter:off
         //删除旧的关联关系
-        JdbcUtil.jdbcHelper().delete(new SysRoleMenu().setRoleId(roleId));
+        JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysRoleMenu.class,
+                JdbcUtil.jdbcHelper().findAll(new SysRoleMenu().setRoleId(roleId),false).stream().map(SysRoleMenu::getId).toArray(Object[]::new)
+                );
 
         Set<String> menuIds = CollUtil.stream(menus)
                 .filter(Objects::nonNull)
@@ -175,13 +174,14 @@ public class RoleService {
             Assert.isNotBlank("记录主键不能为空", id);
             SysRole sysRole = JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, id.trim());
             Assert.isNotNull("记录不存在", sysRole);
-            Assert.isFalse("内置角色不允许删除",
-                    RoleStat.ROLE_INIT.equalCode(sysRole.getStat()));
+            Assert.isFalse("内置角色不允许删除", RoleStat.ROLE_INIT.equalCode(sysRole.getStat()));
             Assert.isFalse("未禁用的角色不允许删除", RoleStat.ROLE_DISABLE.equalCode(sysRole.getStat()));
             JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysRole.class, id.trim());
             // 删除关联关系
-            JdbcUtil.jdbcHelper().delete(new SysRoleMenu().setRoleId(id.trim()));
-            JdbcUtil.jdbcHelper().delete(new SysUserRole().setRoleId(id.trim()));
+            JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysRoleMenu.class,
+                    JdbcUtil.jdbcHelper().findAll(new SysRoleMenu().setRoleId(id.trim()), false).stream().map(SysRoleMenu::getId).toArray(Object[]::new));
+            JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysUserRole.class,
+                    JdbcUtil.jdbcHelper().findAll(new SysUserRole().setRoleId(id.trim()), false).stream().map(SysUserRole::getId).toArray(Object[]::new));
         }
     }
 

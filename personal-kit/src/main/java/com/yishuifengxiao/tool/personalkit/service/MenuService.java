@@ -81,7 +81,8 @@ public class MenuService {
         //@formatter:off
         SysMenu menu = JdbcUtil.jdbcHelper().findByPrimaryKey(SysMenu.class, req.getId().trim());
         Assert.isNotNull("记录不存在", menu);
-        JdbcUtil.jdbcHelper().delete(new SysMenuPermission().setMenuId(menu.getId()));
+        JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysMenuPermission.class,
+                JdbcUtil.jdbcHelper().findAll(new SysMenuPermission().setMenuId(menu.getId()),false).stream().map(SysMenuPermission::getId).toArray(Object[]::new) );
         CollUtil.stream(req.getPermissionIds())
                 .filter(StringUtils::isNotBlank)
                 .filter(v -> JdbcUtil.jdbcHelper().countAll(new SysPermission().setId(v),false) > 0)

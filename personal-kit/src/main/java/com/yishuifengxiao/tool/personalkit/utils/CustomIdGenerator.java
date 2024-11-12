@@ -8,6 +8,11 @@ import org.hibernate.id.IdentifierGenerator;
 import java.io.Serializable;
 
 public class CustomIdGenerator implements IdentifierGenerator {
+    /**
+     * 默认的id生成器
+     */
+    public final static String GENERIC_GENERATOR = "com.yishuifengxiao.tool.personalkit.utils"
+            + ".CustomIdGenerator";
 
     @Override
     public Serializable generate(SharedSessionContractImplementor session, Object object) throws HibernateException {

@@ -37,7 +37,7 @@ public class FolderService {
 
 
         Long counted =
-                JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextCache.currentUserId()).setFolderName(req.getName().trim()).setParentId(req.getParent()),false);
+                JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextCache.currentUserId()).setFolderName(req.getName().trim()).setParentId(req.getParent()), false);
         Assert.lteZeroN("已经存在相同名称的文件夹", counted);
 
         DiskFolder diskFolder =
@@ -53,7 +53,7 @@ public class FolderService {
                 folder.getParentId()));
         if (!StringUtils.equals(req.getName().trim(), folder.getFolderName())) {
             Long counted =
-                    JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextCache.currentUserId()).setFolderName(req.getName().trim()).setParentId(folder.getParentId()),false);
+                    JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextCache.currentUserId()).setFolderName(req.getName().trim()).setParentId(folder.getParentId()), false);
             Assert.lteZeroN("已经存在相同名称的文件夹", counted);
         }
         folder.setFolderName(req.getName().trim());
@@ -68,7 +68,7 @@ public class FolderService {
                 folder.getParentId()));
         if (!StringUtils.equals(req.getParent().trim(), folder.getParentId())) {
             Long counted =
-                    JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextCache.currentUserId()).setParentId(req.getParent()),false);
+                    JdbcUtil.jdbcHelper().countAll(new DiskFolder().setUserId(ContextCache.currentUserId()).setParentId(req.getParent()), false);
             Assert.lteZeroN("已经存在相同名称的文件夹", counted);
         }
         DiskFolder parentFolder = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFolder.class,
@@ -89,7 +89,7 @@ public class FolderService {
             DiskFolder folder = JdbcUtil.jdbcHelper().findByPrimaryKey(DiskFolder.class, id.trim());
             Assert.isNotNull("记录不存在", folder);
             JdbcUtil.jdbcHelper().deleteByPrimaryKey(DiskFolder.class, id.trim());
-            JdbcUtil.jdbcHelper().delete(new DiskFile().setFolderId(id.trim()));
+            JdbcUtil.jdbcHelper().deleteByPrimaryKey(DiskFile.class, id.trim());
         }
 
     }
@@ -98,7 +98,7 @@ public class FolderService {
         DiskFolder folder = null;
         if (StringUtils.isBlank(folderId)) {
             folder =
-                    JdbcUtil.jdbcHelper().findOne(new DiskFolder().setId(ContextCache.currentUserId()).setParentId(DEFAULT_PARENT_ROOT_ID),false);
+                    JdbcUtil.jdbcHelper().findOne(new DiskFolder().setId(ContextCache.currentUserId()).setParentId(DEFAULT_PARENT_ROOT_ID), false);
             if (null == folder) {
                 folder =
                         new DiskFolder().setId(IdWorker.snowflakeStringId()).setFolderName(DEFAULT_FOLDER_NAME).setParentId(DEFAULT_PARENT_ROOT_ID).setUserId(ContextCache.currentUserId()).setCreateTime(LocalDateTime.now());
@@ -113,9 +113,9 @@ public class FolderService {
         findParent(list, folder);
 
         List<ResourceVo.Item> folders =
-                CollUtil.stream(JdbcUtil.jdbcHelper().findAll(new DiskFolder().setParentId(folder.getId()),false)).map(v -> new ResourceVo.Item(v.getId(), v.getFolderName())).collect(Collectors.toList());
+                CollUtil.stream(JdbcUtil.jdbcHelper().findAll(new DiskFolder().setParentId(folder.getId()), false)).map(v -> new ResourceVo.Item(v.getId(), v.getFolderName())).collect(Collectors.toList());
         List<ResourceVo.Item> files =
-                CollUtil.stream(JdbcUtil.jdbcHelper().findAll(new DiskFile().setFolderId(folder.getId()),false)).map(v -> new ResourceVo.Item(v.getId(), v.getFileName())).collect(Collectors.toList());
+                CollUtil.stream(JdbcUtil.jdbcHelper().findAll(new DiskFile().setFolderId(folder.getId()), false)).map(v -> new ResourceVo.Item(v.getId(), v.getFileName())).collect(Collectors.toList());
 
 
         return new ResourceVo(folder.getId(), folder.getParentId(),

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.yishuifengxiao.tool.personalkit.utils.CustomIdGenerator;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,7 +16,6 @@ import org.hibernate.annotations.GenericGenerator;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.GENERIC_GENERATOR;
 
 /**
  * @author qingteng
@@ -33,7 +33,7 @@ import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.GENER
 public class HttpLog implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "system_uuid")
-    @GenericGenerator(name = "system_uuid", strategy = GENERIC_GENERATOR)
+    @GenericGenerator(name = "system_uuid", strategy = CustomIdGenerator.GENERIC_GENERATOR)
     @Column(name = "id", length = 64, nullable = false, unique = true)
     private String id;
 

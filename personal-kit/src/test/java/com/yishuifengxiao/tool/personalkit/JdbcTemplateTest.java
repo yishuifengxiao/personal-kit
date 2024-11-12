@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit;
 
 import com.yishuifengxiao.common.jdbc.JdbcHelper;
-import com.yishuifengxiao.common.jdbc.mapper.ColumnNameRowMapper;
+import com.yishuifengxiao.common.jdbc.util.ColumnNameRowMapper;
 import com.yishuifengxiao.common.tool.bean.JsonUtil;
 import com.yishuifengxiao.tool.personalkit.domain.entity.AutoTable;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;

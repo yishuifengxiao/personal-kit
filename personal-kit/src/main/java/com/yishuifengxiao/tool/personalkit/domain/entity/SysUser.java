@@ -9,6 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.yishuifengxiao.common.tool.validate.Group;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
+import com.yishuifengxiao.tool.personalkit.utils.CustomIdGenerator;
 import com.yishuifengxiao.tool.personalkit.utils.SecurityUtil;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -26,7 +27,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.GENERIC_GENERATOR;
 
 /**
  * @author yishui
@@ -55,7 +55,7 @@ public class SysUser implements Serializable {
     @NotBlank(message = "请选择一条记录", groups = {Group.Update.class})
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "system_uuid")
-    @GenericGenerator(name = "system_uuid", strategy = GENERIC_GENERATOR)
+    @GenericGenerator(name = "system_uuid", strategy = CustomIdGenerator.GENERIC_GENERATOR)
     @Column(name = "id", length = 64, nullable = false, unique = true)
     private String id;
 
