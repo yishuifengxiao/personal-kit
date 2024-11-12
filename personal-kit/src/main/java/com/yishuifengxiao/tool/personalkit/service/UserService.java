@@ -5,6 +5,7 @@ import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.security.support.SecurityEvent;
 import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.security.token.SecurityToken;
+import com.yishuifengxiao.common.security.token.holder.TokenHolder;
 import com.yishuifengxiao.common.security.utils.TokenUtil;
 import com.yishuifengxiao.common.support.SpringContext;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
@@ -27,14 +28,15 @@ import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.query.UserQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
-import com.yishuifengxiao.tool.personalkit.domain.vo.PageUser;
 import com.yishuifengxiao.tool.personalkit.domain.vo.CurrentUser;
+import com.yishuifengxiao.tool.personalkit.domain.vo.PageUser;
 import com.yishuifengxiao.tool.personalkit.security.SimpleUserDetailsService;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,6 +45,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -60,6 +63,7 @@ public class UserService {
 
     private final SimpleUserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
+    private final TokenHolder tokenHolder;
 
 
     public SecurityToken login(HttpServletRequest request, HttpServletResponse response, LoginQuery query) throws CustomException {
@@ -70,6 +74,7 @@ public class UserService {
             Assert.isTrue("密码错误", passwordEncoder.matches(query.getPassword(), details.getPassword()));
             //获取token
             SecurityToken token = TokenUtil.createUnsafe(request, query.getUsername().trim());
+            TokenUtil.setToken(token);
             return token;
         } catch (Exception e) {
             SpringContext.publishEvent(new SecurityEvent(this, request, response, Strategy.AUTHENTICATION_SUCCESS,
@@ -95,8 +100,11 @@ public class UserService {
                 "记录不存在"));
         Assert.isTrue("旧密码不正确", StringUtils.equals(DES.encrypt(sysUser.getSalt(), req.getOldPwd().trim()),
                 sysUser.getPwd()));
-        sysUser.setPwd(DES.encrypt(sysUser.getSalt(), req.getNewPwd().trim()));
+        sysUser.setPwd(DES.encrypt(sysUser.getSalt(), req.getNewPwd().trim())).setLastUpdateTime(LocalDateTime.now());
         sysUserRepository.saveAndFlush(sysUser);
+        // 删除所有的token
+        tokenHolder.getAll(sysUser.getUsername()).stream().filter(Objects::nonNull).forEach(tokenHolder::remove);
+        SecurityContextHolder.clearContext();
     }
 
     public void updateUser(SysUser sysUser) {
@@ -126,9 +134,11 @@ public class UserService {
         SysUser sysUser =
                 sysUserDao.findActiveSysUser(req.getUsername().trim()).orElseThrow(() -> new UsernameNotFoundException(String.format("用户名%s不存在", req.getUsername().trim())));
         Assert.isTrue("邮箱不匹配", StringUtils.equalsIgnoreCase(sysUser.getEmail(), req.getEmail()));
-        sysUser.setPwd(DES.encrypt(sysUser.getSalt(), Constant.DEFAULT_PWD));
+        sysUser.setPwd(DES.encrypt(sysUser.getSalt(), Constant.DEFAULT_PWD)).setLastUpdateTime(LocalDateTime.now());
         sysUserRepository.saveAndFlush(sysUser);
-        GuavaCache.remove(sysUser.getUsername());
+        // 删除所有的token
+        tokenHolder.getAll(sysUser.getUsername()).stream().filter(Objects::nonNull).forEach(tokenHolder::remove);
+        SecurityContextHolder.clearContext();
     }
 
 

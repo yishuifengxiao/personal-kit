@@ -37,32 +37,29 @@ public class CacheRateLimiterFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        try {
-            if (coreproperties.getIpMaxVisitPerSecond() > 0 &&
-                    //
-                    !request.getRequestURI().contains(".") &&
-                    //
-                    excludes.stream().noneMatch(v -> StringUtils.containsIgnoreCase(request.getRequestURI(), v))
+        if (coreproperties.getIpMaxVisitPerSecond() > 0 &&
                 //
-            ) {
-                //开启了限流功能WE
-                String visitorIp = Optional.ofNullable(HttpUtils.getRequestIp(request)).orElse(
-                        "localhost");
-                RateLimiter rateLimiter = GuavaCache.get(visitorIp,
-                        () -> RateLimiter.create(coreproperties.getIpMaxVisitPerSecond()));
-                if (!rateLimiter.tryAcquire()) {
-                    // 触发了限流
-                    HttpUtils.write(request, response, Response.error("您的访问较为频繁，请稍后一段时间后再试"));
-                    return;
-                }
+                !request.getRequestURI().contains(".") &&
+                //
+                excludes.stream().noneMatch(v -> StringUtils.containsIgnoreCase(request.getRequestURI(), v))
+            //
+        ) {
+            //开启了限流功能WE
+            String visitorIp = Optional.ofNullable(HttpUtils.getRequestIp(request)).orElse(
+                    "localhost");
+            RateLimiter rateLimiter = GuavaCache.get(visitorIp,
+                    () -> RateLimiter.create(coreproperties.getIpMaxVisitPerSecond()));
+            if (!rateLimiter.tryAcquire()) {
+                // 触发了限流
+                HttpUtils.write(request, response, Response.error("您的访问较为频繁，请稍后一段时间后再试"));
+                return;
             }
-
-            filterChain.doFilter(request, response);
-        } finally {
-            ContextCache.clearRole();
         }
+        filterChain.doFilter(request,response);
 
     }
+
+
 
 
 }
