@@ -5,10 +5,8 @@ import com.yishuifengxiao.common.guava.GuavaCache;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.security.support.SecurityEvent;
 import com.yishuifengxiao.common.security.support.Strategy;
-import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.random.IdWorker;
-import com.yishuifengxiao.common.tool.utils.ValidateUtils;
 import com.yishuifengxiao.tool.personalkit.config.CoreProperties;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysSecurityRecord;
@@ -17,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +35,8 @@ import java.util.Set;
 @Component
 public class SecurityEventListener {
 
-    private final static Set<Strategy> STRATEGYS = CollUtil.asSet(Strategy.AUTHENTICATION_FAILURE, Strategy.ACCESS_DENIED, Strategy.ON_EXCEPTION);
+    private final static Set<Strategy> STRATEGYS = CollUtil.asSet(Strategy.AUTHENTICATION_FAILURE
+            , Strategy.ACCESS_DENIED, Strategy.ON_EXCEPTION);
 
 
     @Autowired
@@ -50,38 +50,27 @@ public class SecurityEventListener {
     public void onEvent(SecurityEvent event) {
         HttpServletRequest request = event.getRequest();
         Authentication authentication = event.getAuthentication();
-        String name = null;
-        String tokenVal = null;
-        if (null != authentication) {
-            name = authentication.getName();
-            if (authentication instanceof SecurityToken) {
-                SecurityToken securityToken = (SecurityToken) authentication;
-                tokenVal = securityToken.getValue();
-            }
-        }
-
+        String name = authentication.getName();
         requestRateLimiter(name, event.getStrategy(), request);
 
         //@formatter:off
         SysSecurityRecord sysSecurityRecord = new SysSecurityRecord().setId(IdWorker.snowflakeStringId())
-                .setUsername(name).setToken(tokenVal)
+                .setUsername(name)
                 .setContentType(request.getContentType())
-                .setUserAgent(request.getHeader("user-agent"))
-                .setReferer(request.getHeader("referer"))
+                .setUserAgent(request.getHeader(HttpHeaders.USER_AGENT))
+                .setReferer(request.getHeader(HttpHeaders.REFERER))
                 .setIp(request.getRemoteAddr())
-                .setAccept(request.getHeader("accept"))
-                .setUrl(request.getRequestURL().toString())
-                .setCookie(request.getHeader("cookie"))
                 .setStrategy(event.getStrategy().getCode())
                 .setMsg(Optional.ofNullable(event.getException()).map(Throwable::getMessage).orElse(null))
-                .setException(ValidateUtils.extractError( event.getException()))
                 .setCreateTime(LocalDateTime.ofInstant(Instant.ofEpochMilli( event.getTimestamp()),ZoneId.of("+8")));
         JdbcUtil.jdbcHelper().saveOrUpdate(sysSecurityRecord);
     }
+
     private void requestRateLimiter(String name, Strategy strategy, HttpServletRequest request) {
         if (STRATEGYS.contains(strategy)&&StringUtils.isNotBlank(name)) {
             //认证失败、无权限、失败 ,防止暴力破解
-            RateLimiter rateLimiter = GuavaCache.get(name, () -> RateLimiter.create(coreproperties.getPermitsPerSecond()));
+            RateLimiter rateLimiter = GuavaCache.get("rateLimiter"+name,
+                    () -> RateLimiter.create(coreproperties.getPermitsPerSecond()));
             if(! rateLimiter.tryAcquire()){
                 //触发限流
                 SysUser activeSysUser = sysUserDao.findActiveSysUser(name).orElse(null);

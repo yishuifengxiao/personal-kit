@@ -43,7 +43,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -75,15 +74,13 @@ public class UserService {
             //获取token
             SecurityToken token = TokenUtil.createUnsafe(request, query.getUsername().trim());
             TokenUtil.setToken(token);
+            SpringContext.publishEvent(new SecurityEvent(this, request, response,
+                    Strategy.AUTHENTICATION_SUCCESS, token, null));
             return token;
         } catch (Exception e) {
             SpringContext.publishEvent(new SecurityEvent(this, request, response,
-                    Strategy.AUTHENTICATION_SUCCESS, new SecurityToken(Collections.EMPTY_LIST) {
-                @Override
-                public String getName() {
-                    return query.getUsername();
-                }
-            }, e));
+                    Strategy.AUTHENTICATION_FAILURE, new SecurityToken(query.getUsername(), null,
+                    null, null), e));
             throw e;
         }
 

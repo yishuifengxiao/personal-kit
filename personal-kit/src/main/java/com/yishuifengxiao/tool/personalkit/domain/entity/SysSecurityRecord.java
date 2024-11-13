@@ -41,8 +41,6 @@ public class SysSecurityRecord implements Serializable {
 
     private String username;
 
-    @Column(length = 50)
-    private String token;
 
     @Column(name = "content_type")
     private String contentType;
@@ -55,28 +53,12 @@ public class SysSecurityRecord implements Serializable {
     @Column(length = 50)
     private String ip;
 
-    private String accept;
-
-    private String url;
-
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(columnDefinition = "longtext ")
-    private String cookie;
-
     /**
      * @see Strategy
      */
     private Integer strategy;
 
-
     private String msg;
-
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    @Column(columnDefinition = "longtext ")
-    private String exception;
-
 
     @Column(name = "create_time", nullable = false, updatable = false)
     @CreatedDate
