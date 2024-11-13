@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,5 +39,9 @@ public class MenuTree implements Serializable {
 
     private String icon;
 
-    private List<MenuTree> childrens;
+    private List<MenuTree> childrens = new ArrayList<>();
+
+    public void addChild(MenuTree child) {
+        childrens.add(child);
+    }
 }

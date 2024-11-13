@@ -7,22 +7,21 @@ import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.utils.Assert;
+import com.yishuifengxiao.tool.personalkit.dao.MenuDao;
+import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenuPermission;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
-import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
 import com.yishuifengxiao.tool.personalkit.domain.request.MenuPermissionReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.MenuTree;
 import com.yishuifengxiao.tool.personalkit.domain.vo.MenuVo;
 import com.yishuifengxiao.tool.personalkit.domain.vo.RoleMenuVo;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -32,7 +31,10 @@ import java.util.stream.Collectors;
  * @since 1.0.0
  */
 @Service
+@RequiredArgsConstructor
 public class MenuService {
+
+    private final MenuDao menuDao;
 
 
     public List<MenuTree> findMenuTree() {
@@ -93,43 +95,45 @@ public class MenuService {
 
 
     public RoleMenuVo findRoleMenu(String roleId, String topMenuId) {
+        roleId = StringUtils.isBlank(roleId) ? Constant.DEFAULT_ROOT_ID : roleId.trim();
         SysRole sysRole = JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, roleId.trim());
         Assert.isNotNull("请选择一个正确的角色", sysRole);
-        List<SysMenu> menus = null;
-        if (RoleStat.ROLE_INIT.equalCode(sysRole.getStat())) {
-            //内置且隐藏的角色
-            menus = JdbcUtil.jdbcHelper().findAll(new SysMenu(), false);
-        } else {
-            String sql = "select sm.* from sys_menu sm ,sys_role_menu srm where sm.id = srm"
-                    + ".menu_id and srm.role_id=?";
-            menus = JdbcUtil.jdbcHelper().findAll(SysMenu.class, sql, sysRole.getId());
+        List<SysMenu> list = menuDao.findAllMenuByRole(roleId);
+        if (CollUtil.isEmpty(list)) {
+            return new RoleMenuVo(Collections.emptyList(), Collections.emptyList());
         }
         // 上部的菜单
         List<SysMenu> topMenus =
-                menus.stream().filter(v -> BoolStat.isFalse(v.getType())).filter(v -> BoolStat.isTrue(v.getIsShow())).sorted(Comparator.comparing(SysMenu::getIdx)).collect(Collectors.toList());
+                list.stream().filter(v -> BoolStat.isFalse(v.getType())).sorted(Comparator.comparing(SysMenu::getIdx
+                )).collect(Collectors.toList());
         if (CollUtil.isEmpty(topMenus)) {
-            return new RoleMenuVo(Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+            return new RoleMenuVo(Collections.emptyList(), Collections.emptyList());
         }
-        //选中的上部菜单
-        SysMenu selectTopMenu =
-                topMenus.stream().filter(v -> StringUtils.equalsIgnoreCase(v.getRouterName(),
-                        topMenuId)).findFirst().orElse(CollUtil.first(topMenus).orElse(null));
-        // 左侧的一级菜单
-        List<SysMenu> leftFirsts =
-                menus.stream().filter(v -> BoolStat.isTrue(v.getType())).filter(v -> StringUtils.equalsIgnoreCase(v.getParentId(), selectTopMenu.getId())).collect(Collectors.toList());
+        SysMenu selectTop =
+                topMenus.stream().filter(v -> StringUtils.equalsIgnoreCase(v.getId(), topMenuId)).findFirst().orElse(topMenus.get(0));
 
-        List<SysMenu> allMenus = menus;
-        List<MenuTree> menuTrees = leftFirsts.stream().map(v -> {
-                    MenuTree menuTree = BeanUtil.copy(v, new MenuTree());
-                    List<MenuTree> children = buildTree(allMenus, v.getId());
-                    menuTree.setChildrens(children);
-                    return menuTree;
-                }
 
-        ).collect(Collectors.toList());
+        List<MenuTree> menuTrees = buildTree(list, selectTop);
+
 
         return new RoleMenuVo(topMenus, menuTrees);
     }
 
+    public static List<MenuTree> buildTree(List<SysMenu> nodes, SysMenu selectTop) {
+        List<MenuTree> trees = nodes.stream().filter(v -> StringUtils.equalsIgnoreCase(v.getParentId(),
+                selectTop.getId())).sorted(Comparator.comparing(SysMenu::getIdx
+        )).map(v -> {
+            MenuTree firstLevel = BeanUtil.copy(v, new MenuTree());
+
+            List<MenuTree> secondLevel = nodes.stream().filter(s -> StringUtils.equalsIgnoreCase(s.getParentId(),
+                    firstLevel.getId())).sorted(Comparator.comparing(SysMenu::getIdx
+            )).map(s -> BeanUtil.copy(s, new MenuTree())).collect(Collectors.toList());
+            firstLevel.setChildrens(secondLevel);
+            return firstLevel;
+        }).collect(Collectors.toList());
+
+
+        return trees;
+    }
 
 }

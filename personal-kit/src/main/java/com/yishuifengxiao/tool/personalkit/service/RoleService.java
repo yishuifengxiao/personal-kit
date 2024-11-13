@@ -105,8 +105,11 @@ public class RoleService {
         //@formatter:off
 
         Assert.isNull("角色已存在", JdbcUtil.jdbcHelper().findOne(new SysRole().setName(param.getName().trim()),false));
+
         SysRole sysRole = BeanUtil.copy(param, new SysRole()).setId(IdWorker.snowflakeStringId()).setCreateTime(LocalDateTime.now()).setName(param.getName().trim());
-        sysRole.setStat((Integer) (null == param.getStat() ? RoleStat.ROLE_ENABLE.code() : RoleStat.code(param.getStat()).orElse(RoleStat.ROLE_DISABLE).code()));
+
+        sysRole.setStat(null == param.getStat() ? RoleStat.ROLE_ENABLE.code() : RoleStat.code(param.getStat()).orElse(RoleStat.ROLE_DISABLE).code());
+
         if (StringUtils.isNotBlank(param.getParentId())) {
             Assert.lteZeroN("父角色不存在", JdbcUtil.jdbcHelper().countAll(new SysRole().setId(param.getParentId().trim()),
                     false));
@@ -125,6 +128,7 @@ public class RoleService {
         //@formatter:off
         SysRole role =
                 Optional.ofNullable( JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, param.getId())).filter(r->!RoleStat.ROLE_INIT.equalCode(r.getStat())).orElseThrow(ValidateUtils.orElseThrow("记录不存在"));
+
         if (StringUtils.isNotBlank(param.getName()) && !StringUtils.equalsIgnoreCase(param.getName().trim(), role.getName())) {
 
             Assert.isNull("角色已存在", JdbcUtil.jdbcHelper().findOne(new SysRole().setName(param.getName().trim()),false));

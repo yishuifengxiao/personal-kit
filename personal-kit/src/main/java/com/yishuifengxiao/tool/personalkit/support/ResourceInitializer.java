@@ -1,18 +1,21 @@
 package com.yishuifengxiao.tool.personalkit.support;
 
-import com.google.common.eventbus.EventBus;
+import com.yishuifengxiao.common.guava.EventPublisher;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
+import com.yishuifengxiao.common.tool.bean.JsonUtil;
 import com.yishuifengxiao.common.tool.codec.MD5;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
-import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
-import com.yishuifengxiao.tool.personalkit.domain.entity.*;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysUserRole;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
+import com.yishuifengxiao.tool.personalkit.listener.event.UserCreateEvent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +24,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -46,11 +48,9 @@ import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.DEFAU
  */
 @Component("resourceInitializer")
 public class ResourceInitializer implements CommandLineRunner {
-    private boolean hasInit = false;
     private final static List<String> sets = Arrays.asList("springfox.documentation", "org" +
             ".springframework", "org" + ".springdoc", "org.springframework.boot");
-    @Autowired
-    private EventBus asyncEventBus;
+
 
     @Autowired
     private ApplicationContext context;
@@ -62,14 +62,13 @@ public class ResourceInitializer implements CommandLineRunner {
     private String applicationName;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private EventPublisher eventPublisher;
     @Autowired
     private ResourceLoader resourceLoader;
 
     public void doInit() throws IOException {
-        if (this.hasInit) {
-            return;
-        }
+        JdbcUtil.jdbcHelper().jdbcTemplate().update("DELETE from sys_permission where application_name=?",
+                this.applicationName);
         //初始化权限
         List<SysPermission> permissions = this.scanSysPermissions();
         permissions.stream().forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
@@ -88,14 +87,16 @@ public class ResourceInitializer implements CommandLineRunner {
                 sysUser.getId(), sysRole.getId());
         JdbcUtil.jdbcHelper().saveOrUpdate(userRole);
 
+        //初始化餐单
+        String sql = initSql();
+
         // 初始化角色-菜单关系
-        JdbcUtil.jdbcHelper().jdbcTemplate().execute("INSERT IGNORE INTO sys_role_menu( id, " +
-                "role_id, menu_id) SELECT md5( CONCAT( m.id )), 1, m.id FROM sys_menu m ;");
-        DiskFolder folder = new DiskFolder(sysUser.getId(), sysUser.getUsername(),
-                Constant.DEFAULT_ROOT_ID,
-                sysUser.getId(), LocalDateTime.now());
-        JdbcUtil.jdbcHelper().saveOrUpdate(folder);
-        this.hasInit = true;
+        JdbcUtil.jdbcHelper().jdbcTemplate().execute("""
+                INSERT IGNORE INTO sys_role_menu( id, role_id, menu_id) SELECT md5( CONCAT( m.id )), 1, m.id FROM sys_menu m
+                """);
+
+        // 创建用户的消息
+        eventPublisher.post(new UserCreateEvent(sysUser));
     }
 
     private String initSql() {
@@ -144,11 +145,11 @@ public class ResourceInitializer implements CommandLineRunner {
                         return Arrays.asList(methodPaths).stream().map(methodUrl -> {
                             String url = StringUtils.trim(classUrl + methodUrl);
                             SysPermission permission =
-                                    new SysPermission(IdWorker.snowflakeStringId(),
+                                    new SysPermission(null,
                                             moduleName, summary, description, url, contextPath,
                                             applicationName,
                                             path, BoolStat.True.code());
-                            permission.setId(MD5.md5Short(permission.getApplicationName() + permission.getContextPath() + permission.getUrl()));
+                            permission.setId(MD5.md5Short(JsonUtil.toJSONString(permission)));
                             return permission;
                         }).collect(Collectors.toList());
                     }).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList())).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList());
@@ -217,8 +218,5 @@ public class ResourceInitializer implements CommandLineRunner {
         this.doInit();
     }
 
-    @PostConstruct
-    public void init() {
-        asyncEventBus.register(this);
-    }
+
 }
