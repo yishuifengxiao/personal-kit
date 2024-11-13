@@ -12,7 +12,7 @@ import com.yishuifengxiao.common.guava.EventPublisher;
 import com.yishuifengxiao.common.jdbc.JdbcHelper;
 import com.yishuifengxiao.common.tool.bean.JsonUtil;
 import com.yishuifengxiao.common.tool.random.IdWorker;
-import com.yishuifengxiao.tool.personalkit.domain.bo.RequestLogEvent;
+import com.yishuifengxiao.tool.personalkit.listener.event.RequestLogEvent;
 import com.yishuifengxiao.tool.personalkit.domain.entity.HttpLog;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import jakarta.annotation.PostConstruct;

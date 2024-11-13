@@ -1,4 +1,4 @@
-package com.yishuifengxiao.tool.personalkit.event;
+package com.yishuifengxiao.tool.personalkit.listener;
 
 import com.google.common.eventbus.Subscribe;
 import com.yishuifengxiao.common.guava.EventPublisher;
@@ -6,7 +6,7 @@ import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.tool.codec.MD5;
 import com.yishuifengxiao.common.tool.io.IoUtil;
 import com.yishuifengxiao.common.tool.random.IdWorker;
-import com.yishuifengxiao.tool.personalkit.domain.bo.FileAnalysisEvent;
+import com.yishuifengxiao.tool.personalkit.listener.event.FileAnalysisEvent;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
 import com.yishuifengxiao.tool.personalkit.domain.enums.SupportedSuffix;

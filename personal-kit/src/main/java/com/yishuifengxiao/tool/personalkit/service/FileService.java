@@ -7,7 +7,7 @@ import com.yishuifengxiao.common.tool.io.IoUtil;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.common.tool.utils.OsUtils;
-import com.yishuifengxiao.tool.personalkit.domain.bo.FileAnalysisEvent;
+import com.yishuifengxiao.tool.personalkit.listener.event.FileAnalysisEvent;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFolder;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;

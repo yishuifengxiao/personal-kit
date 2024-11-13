@@ -1,19 +1,18 @@
 package com.yishuifengxiao.tool.personalkit.support;
 
+import com.google.common.eventbus.EventBus;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.tool.codec.MD5;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysUserRole;
+import com.yishuifengxiao.tool.personalkit.domain.entity.*;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,7 +49,8 @@ public class ResourceInitializer implements CommandLineRunner {
     private boolean hasInit = false;
     private final static List<String> sets = Arrays.asList("springfox.documentation", "org" +
             ".springframework", "org" + ".springdoc", "org.springframework.boot");
-
+    @Autowired
+    private EventBus asyncEventBus;
 
     @Autowired
     private ApplicationContext context;
@@ -91,6 +91,10 @@ public class ResourceInitializer implements CommandLineRunner {
         // 初始化角色-菜单关系
         JdbcUtil.jdbcHelper().jdbcTemplate().execute("INSERT IGNORE INTO sys_role_menu( id, " +
                 "role_id, menu_id) SELECT md5( CONCAT( m.id )), 1, m.id FROM sys_menu m ;");
+        DiskFolder folder = new DiskFolder(sysUser.getId(), sysUser.getUsername(),
+                Constant.DEFAULT_ROOT_ID,
+                sysUser.getId(), LocalDateTime.now());
+        JdbcUtil.jdbcHelper().saveOrUpdate(folder);
         this.hasInit = true;
     }
 
@@ -116,36 +120,39 @@ public class ResourceInitializer implements CommandLineRunner {
 
         List<SysPermission> list =
                 map.values().stream().filter(Objects::nonNull).filter(v -> !sets.stream().anyMatch(s -> StringUtils.containsIgnoreCase(v.getClass().getPackageName(), s))).map(controller -> {
-            // 得到的是controller
-            String moduleName = extractModuleName(controller);
-            List<String> classUrls = extractClassUrls(controller);
-            classUrls = CollUtil.isEmpty(classUrls) ? Arrays.asList("") : classUrls;
-            String className = StringUtils.substringBefore(controller.getClass().getName(), "$");
+                    // 得到的是controller
+                    String moduleName = extractModuleName(controller);
+                    List<String> classUrls = extractClassUrls(controller);
+                    classUrls = CollUtil.isEmpty(classUrls) ? Arrays.asList("") : classUrls;
+                    String className =
+                            StringUtils.substringBefore(controller.getClass().getName(), "$");
 
-            //方法
-            return classUrls.stream().map(classUrl -> Arrays.stream(controller.getClass().getMethods()).filter(m -> Modifier.isPublic(m.getModifiers())).map(declaredMethod -> {
-                String[] methodPaths = methodPath(declaredMethod);
-                if (CollUtil.isEmpty(methodPaths)) {
-                    return null;
-                }
+                    //方法
+                    return classUrls.stream().map(classUrl -> Arrays.stream(controller.getClass().getMethods()).filter(m -> Modifier.isPublic(m.getModifiers())).map(declaredMethod -> {
+                        String[] methodPaths = methodPath(declaredMethod);
+                        if (CollUtil.isEmpty(methodPaths)) {
+                            return null;
+                        }
 
-                String path = className + "::" + declaredMethod.getName();
+                        String path = className + "::" + declaredMethod.getName();
 
-                Operation apiOperation = AnnotationUtils.findAnnotation(declaredMethod,
-                        Operation.class);
-                String summary = null != apiOperation ? apiOperation.summary() : "";
-                String description = null != apiOperation ? apiOperation.description() : "";
+                        Operation apiOperation = AnnotationUtils.findAnnotation(declaredMethod,
+                                Operation.class);
+                        String summary = null != apiOperation ? apiOperation.summary() : "";
+                        String description = null != apiOperation ? apiOperation.description() : "";
 
-                return Arrays.asList(methodPaths).stream().map(methodUrl -> {
-                    String url = StringUtils.trim(classUrl + methodUrl);
-                    SysPermission permission = new SysPermission(IdWorker.snowflakeStringId(),
-                            moduleName, summary, description, url, contextPath, applicationName,
-                            path, BoolStat.True.code());
-                    permission.setId(MD5.md5Short(permission.getApplicationName() + permission.getContextPath() + permission.getUrl()));
-                    return permission;
-                }).collect(Collectors.toList());
-            }).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList())).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList());
-        }).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList());
+                        return Arrays.asList(methodPaths).stream().map(methodUrl -> {
+                            String url = StringUtils.trim(classUrl + methodUrl);
+                            SysPermission permission =
+                                    new SysPermission(IdWorker.snowflakeStringId(),
+                                            moduleName, summary, description, url, contextPath,
+                                            applicationName,
+                                            path, BoolStat.True.code());
+                            permission.setId(MD5.md5Short(permission.getApplicationName() + permission.getContextPath() + permission.getUrl()));
+                            return permission;
+                        }).collect(Collectors.toList());
+                    }).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList())).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList());
+                }).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList());
         return list;
     }
 
@@ -208,6 +215,10 @@ public class ResourceInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         this.doInit();
+    }
 
+    @PostConstruct
+    public void init() {
+        asyncEventBus.register(this);
     }
 }

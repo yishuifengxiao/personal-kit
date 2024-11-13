@@ -1,4 +1,4 @@
-package com.yishuifengxiao.tool.personalkit.domain.bo;
+package com.yishuifengxiao.tool.personalkit.listener.event;
 
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFolder;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;

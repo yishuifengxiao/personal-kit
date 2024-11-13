@@ -41,14 +41,15 @@ public class RoleController {
 
     }
 
-
     @PostMapping("/add")
-    public void addRole(@Validated(Group.Create.class) @RequestBody RoleVo param, BindingResult errors) {
+    public void addRole(@Validated(Group.Create.class) @RequestBody RoleVo param,
+                        BindingResult errors) {
         roleService.addRole(param);
     }
 
     @PostMapping("/update")
-    public void updateRole(@Validated(Group.Create.class) @RequestBody RoleVo param, BindingResult errors) {
+    public void updateRole(@Validated(Group.Create.class) @RequestBody RoleVo param,
+                           BindingResult errors) {
         roleService.updateRole(param);
     }
 

@@ -2,7 +2,7 @@ package com.yishuifengxiao.tool.personalkit.interceptor;
 
 import com.google.common.eventbus.EventBus;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
-import com.yishuifengxiao.tool.personalkit.domain.bo.RequestLogEvent;
+import com.yishuifengxiao.tool.personalkit.listener.event.RequestLogEvent;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.Filter;

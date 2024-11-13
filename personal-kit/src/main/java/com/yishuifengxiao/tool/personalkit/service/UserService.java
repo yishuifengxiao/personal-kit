@@ -1,5 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
+import com.yishuifengxiao.common.guava.EventPublisher;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.security.support.SecurityEvent;
 import com.yishuifengxiao.common.security.support.Strategy;
@@ -8,6 +9,7 @@ import com.yishuifengxiao.common.security.utils.TokenUtil;
 import com.yishuifengxiao.common.support.SpringContext;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.codec.DES;
+import com.yishuifengxiao.common.tool.codec.MD5;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.entity.StringKeyValue;
@@ -28,15 +30,18 @@ import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.query.UserQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
+import com.yishuifengxiao.tool.personalkit.domain.request.UserCreateReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UserRoleReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.CurrentUser;
 import com.yishuifengxiao.tool.personalkit.domain.vo.PageUser;
+import com.yishuifengxiao.tool.personalkit.listener.event.UserCreateEvent;
 import com.yishuifengxiao.tool.personalkit.security.SimpleUserDetailsService;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,6 +50,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -63,6 +69,8 @@ public class UserService {
     private final SimpleUserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private EventPublisher eventPublisher;
 
     public SecurityToken login(HttpServletRequest request, HttpServletResponse response,
                                LoginQuery query) throws CustomException {
@@ -178,4 +186,27 @@ public class UserService {
         req.getRoleIds().stream().map(v -> new SysUserRole(IdWorker.snowflakeStringId(),
                 req.getId(), v)).forEach(JdbcUtil.jdbcHelper()::insert);
     }
+
+    public void create(UserCreateReq user) {
+        Long count =
+                JdbcUtil.jdbcHelper().countAll(new SysUser().setUsername(user.getUsername()).setVer(0), false);
+        ValidateUtils.isTrue(null == count || count == 0, "账号已存在");
+        Set<String> roles =
+                user.getRoleIds().stream().filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toSet());
+        ValidateUtils.isTrue(!roles.isEmpty(), "角色不能为空");
+        for (String roleId : user.getRoleIds()) {
+            Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, roleId)).orElseThrow(ValidateUtils.orElseThrow("角色不存在"));
+        }
+        String salt = MD5.md5Short(IdWorker.snowflakeStringId());
+        String encrypt = DES.encrypt(salt, Constant.DEFAULT_PWD);
+        SysUser sysUser = new SysUser(IdWorker.snowflakeStringId(), user.getUsername(),
+                user.getNickname(), user.getPhone(), user.getEmail(), user.getCertNo(), salt,
+                encrypt, UserStat.ACCOUNT_ENABLE.code(), LocalDateTime.now(), null, 0,
+                LocalDateTime.now());
+        JdbcUtil.jdbcHelper().insert(sysUser);
+
+        eventPublisher.post(new UserCreateEvent(sysUser));
+    }
+
+
 }
