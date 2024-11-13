@@ -36,7 +36,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,7 +44,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -66,18 +64,21 @@ public class UserService {
     private final TokenHolder tokenHolder;
 
 
-    public SecurityToken login(HttpServletRequest request, HttpServletResponse response, LoginQuery query) throws CustomException {
+    public SecurityToken login(HttpServletRequest request, HttpServletResponse response,
+                               LoginQuery query) throws CustomException {
 
         try {
             UserDetails details = userDetailsService.loadUserByUsername(query.getUsername().trim());
             SysUser sysUser = GuavaCache.get(query.getUsername().trim(), SysUser.class);
-            Assert.isTrue("密码错误", passwordEncoder.matches(query.getPassword(), details.getPassword()));
+            Assert.isTrue("密码错误", passwordEncoder.matches(query.getPassword(),
+                    details.getPassword()));
             //获取token
             SecurityToken token = TokenUtil.createUnsafe(request, query.getUsername().trim());
             TokenUtil.setToken(token);
             return token;
         } catch (Exception e) {
-            SpringContext.publishEvent(new SecurityEvent(this, request, response, Strategy.AUTHENTICATION_SUCCESS,
+            SpringContext.publishEvent(new SecurityEvent(this, request, response,
+                    Strategy.AUTHENTICATION_SUCCESS,
                     new SecurityToken(Collections.EMPTY_LIST) {
                         @Override
                         public String getName() {
@@ -91,25 +92,28 @@ public class UserService {
     }
 
     public SysUser userInfo(String id) {
-        SysUser sysUser = sysUserRepository.findById(id).orElseThrow(() -> UncheckedException.of("记录不存在"));
+        SysUser sysUser = sysUserRepository.findById(id).orElseThrow(() -> UncheckedException.of(
+                "记录不存在"));
         return sysUser;
     }
 
-    public void updatePwd(UpdatePwdReq req) {
-        SysUser sysUser = sysUserRepository.findById(req.getId().trim()).orElseThrow(() -> UncheckedException.of(
-                "记录不存在"));
-        Assert.isTrue("旧密码不正确", StringUtils.equals(DES.encrypt(sysUser.getSalt(), req.getOldPwd().trim()),
+    public void updatePwd(HttpServletRequest request, UpdatePwdReq req) {
+        SysUser sysUser =
+                sysUserRepository.findById(req.getId().trim()).orElseThrow(() -> UncheckedException.of(
+                        "记录不存在"));
+        Assert.isTrue("旧密码不正确", StringUtils.equals(DES.encrypt(sysUser.getSalt(),
+                        req.getOldPwd().trim()),
                 sysUser.getPwd()));
         sysUser.setPwd(DES.encrypt(sysUser.getSalt(), req.getNewPwd().trim())).setLastUpdateTime(LocalDateTime.now());
         sysUserRepository.saveAndFlush(sysUser);
         // 删除所有的token
-        tokenHolder.getAll(sysUser.getUsername()).stream().filter(Objects::nonNull).forEach(tokenHolder::remove);
-        SecurityContextHolder.clearContext();
+        TokenUtil.clearAllAuthentication();
     }
 
     public void updateUser(SysUser sysUser) {
-        SysUser user = sysUserRepository.findById(sysUser.getId().trim()).orElseThrow(ValidateUtils.orElseThrow(
-                "记录不存在"));
+        SysUser user =
+                sysUserRepository.findById(sysUser.getId().trim()).orElseThrow(ValidateUtils.orElseThrow(
+                        "记录不存在"));
         if (StringUtils.isNotBlank(sysUser.getNickname())) {
             user.setNickname(sysUser.getNickname().trim());
         }
@@ -123,22 +127,22 @@ public class UserService {
             user.setCertNo(sysUser.getCertNo().trim());
         }
         if (null != sysUser.getStat()) {
-            UserStat.code(sysUser.getStat()).orElseThrow(() -> new UncheckedException("请选择一个正确的状态"));
+            UserStat.code(sysUser.getStat()).orElseThrow(() -> new UncheckedException(
+                    "请选择一个正确的状态"));
             user.setStat(sysUser.getStat());
         }
         user.setLastUpdateTime(LocalDateTime.now());
         JdbcUtil.jdbcHelper().saveOrUpdate(user);
     }
 
-    public void updateResetPwd(ResetPwdReq req) {
+    public void updateResetPwd(HttpServletRequest request, ResetPwdReq req) {
         SysUser sysUser =
                 sysUserDao.findActiveSysUser(req.getUsername().trim()).orElseThrow(() -> new UsernameNotFoundException(String.format("用户名%s不存在", req.getUsername().trim())));
         Assert.isTrue("邮箱不匹配", StringUtils.equalsIgnoreCase(sysUser.getEmail(), req.getEmail()));
         sysUser.setPwd(DES.encrypt(sysUser.getSalt(), Constant.DEFAULT_PWD)).setLastUpdateTime(LocalDateTime.now());
         sysUserRepository.saveAndFlush(sysUser);
         // 删除所有的token
-        tokenHolder.getAll(sysUser.getUsername()).stream().filter(Objects::nonNull).forEach(tokenHolder::remove);
-        SecurityContextHolder.clearContext();
+        TokenUtil.clearAllAuthentication();
     }
 
 
@@ -200,7 +204,8 @@ public class UserService {
     }
 
     public CurrentUser findCurrentUser() {
-        SysUser sysUser = ContextCache.currentUser().orElseThrow(ValidateUtils.orElseThrow("当前用户还未登录"));
+        SysUser sysUser = ContextCache.currentUser().orElseThrow(ValidateUtils.orElseThrow(
+                "当前用户还未登录"));
 
         CurrentUser currentUser = BeanUtil.copy(sysUser, new CurrentUser());
 

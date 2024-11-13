@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -49,13 +50,14 @@ public class UserController {
     }
 
     @PostMapping("/pwd/update")
-    public void updatePwd(@Validated(Group.Update.class) @RequestBody UpdatePwdReq req) {
-        userService.updatePwd(req);
+    public void updatePwd(HttpServletRequest request,
+                          @Validated(Group.Update.class) @RequestBody UpdatePwdReq req) {
+        userService.updatePwd(request,req);
     }
 
     @PostMapping("/pwd/reset")
-    public void resetPwd(@Valid @RequestBody ResetPwdReq req) {
-        userService.updateResetPwd(req);
+    public void resetPwd(HttpServletRequest request, @Valid @RequestBody ResetPwdReq req) {
+        userService.updateResetPwd(request, req);
     }
 
 

@@ -87,7 +87,7 @@
     <logger name="org.springframework.data" level="WARN"></logger>
     <logger name="org.springframework.scheduling" level="WARN"></logger>
     <logger name="org.springframework.integration" level="WARN"></logger>
-    <logger name="org.springframework.security" level="ERROR"/>
+    <logger name="org.springframework.security" level="trace"/>
     <logger name="org.springframework.web" level="WARN"/>
     <logger name="org.springframework.amqp" level="WARN"></logger>
     <logger name="org.springframework.jdbc" level="WARN"></logger>
