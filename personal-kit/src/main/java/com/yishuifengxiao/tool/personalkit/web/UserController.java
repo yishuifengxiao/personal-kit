@@ -7,6 +7,7 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.query.UserQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
+import com.yishuifengxiao.tool.personalkit.domain.vo.CurrentUser;
 import com.yishuifengxiao.tool.personalkit.domain.vo.PageUser;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,7 +53,7 @@ public class UserController {
     @PostMapping("/pwd/update")
     public void updatePwd(HttpServletRequest request,
                           @Validated(Group.Update.class) @RequestBody UpdatePwdReq req) {
-        userService.updatePwd(request,req);
+        userService.updatePwd(request, req);
     }
 
     @PostMapping("/pwd/reset")

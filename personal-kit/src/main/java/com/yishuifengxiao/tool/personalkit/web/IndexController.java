@@ -54,12 +54,6 @@ public class IndexController {
         return authentication;
     }
 
-    @Operation(summary = "当前登录用户信息", description = "获取当前登录用户信息")
-    @GetMapping("/user")
-    @ResponseBody
-    public CurrentUser user() {
-        return userService.findCurrentUser();
-    }
 
     @Operation(summary = "获取token", description = "获取当前用户所有的token信息")
     @GetMapping("/tokens")
@@ -125,8 +119,14 @@ public class IndexController {
 
         SecurityToken token = userService.login(request, response, query);
 
-
         return token;
+    }
+
+    @Operation(summary = "当前登录用户信息", description = "获取当前登录用户信息")
+    @GetMapping("/current")
+    @ResponseBody
+    public CurrentUser current() {
+        return userService.findCurrentUser();
     }
 
 

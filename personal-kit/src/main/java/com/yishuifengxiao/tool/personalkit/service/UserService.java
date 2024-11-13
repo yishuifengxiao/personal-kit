@@ -1,11 +1,9 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
-import com.yishuifengxiao.common.guava.GuavaCache;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.security.support.SecurityEvent;
 import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.security.token.SecurityToken;
-import com.yishuifengxiao.common.security.token.holder.TokenHolder;
 import com.yishuifengxiao.common.security.utils.TokenUtil;
 import com.yishuifengxiao.common.support.SpringContext;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
@@ -15,6 +13,7 @@ import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.entity.StringKeyValue;
 import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.common.tool.exception.UncheckedException;
+import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.common.tool.utils.ValidateUtils;
 import com.yishuifengxiao.tool.personalkit.dao.RoleDao;
@@ -23,11 +22,13 @@ import com.yishuifengxiao.tool.personalkit.dao.repository.SysUserRepository;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysUserRole;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.query.UserQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
+import com.yishuifengxiao.tool.personalkit.domain.request.UserRoleReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.CurrentUser;
 import com.yishuifengxiao.tool.personalkit.domain.vo.PageUser;
 import com.yishuifengxiao.tool.personalkit.security.SimpleUserDetailsService;
@@ -44,6 +45,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -61,7 +63,6 @@ public class UserService {
 
     private final SimpleUserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
-    private final TokenHolder tokenHolder;
 
 
     public SecurityToken login(HttpServletRequest request, HttpServletResponse response,
@@ -69,7 +70,6 @@ public class UserService {
 
         try {
             UserDetails details = userDetailsService.loadUserByUsername(query.getUsername().trim());
-            SysUser sysUser = GuavaCache.get(query.getUsername().trim(), SysUser.class);
             Assert.isTrue("密码错误", passwordEncoder.matches(query.getPassword(),
                     details.getPassword()));
             //获取token
@@ -78,13 +78,12 @@ public class UserService {
             return token;
         } catch (Exception e) {
             SpringContext.publishEvent(new SecurityEvent(this, request, response,
-                    Strategy.AUTHENTICATION_SUCCESS,
-                    new SecurityToken(Collections.EMPTY_LIST) {
-                        @Override
-                        public String getName() {
-                            return query.getUsername();
-                        }
-                    }, e));
+                    Strategy.AUTHENTICATION_SUCCESS, new SecurityToken(Collections.EMPTY_LIST) {
+                @Override
+                public String getName() {
+                    return query.getUsername();
+                }
+            }, e));
             throw e;
         }
 
@@ -99,11 +98,9 @@ public class UserService {
 
     public void updatePwd(HttpServletRequest request, UpdatePwdReq req) {
         SysUser sysUser =
-                sysUserRepository.findById(req.getId().trim()).orElseThrow(() -> UncheckedException.of(
-                        "记录不存在"));
+                sysUserRepository.findById(req.getId().trim()).orElseThrow(() -> UncheckedException.of("记录不存在"));
         Assert.isTrue("旧密码不正确", StringUtils.equals(DES.encrypt(sysUser.getSalt(),
-                        req.getOldPwd().trim()),
-                sysUser.getPwd()));
+                req.getOldPwd().trim()), sysUser.getPwd()));
         sysUser.setPwd(DES.encrypt(sysUser.getSalt(), req.getNewPwd().trim())).setLastUpdateTime(LocalDateTime.now());
         sysUserRepository.saveAndFlush(sysUser);
         // 删除所有的token
@@ -112,8 +109,7 @@ public class UserService {
 
     public void updateUser(SysUser sysUser) {
         SysUser user =
-                sysUserRepository.findById(sysUser.getId().trim()).orElseThrow(ValidateUtils.orElseThrow(
-                        "记录不存在"));
+                sysUserRepository.findById(sysUser.getId().trim()).orElseThrow(ValidateUtils.orElseThrow("记录不存在"));
         if (StringUtils.isNotBlank(sysUser.getNickname())) {
             user.setNickname(sysUser.getNickname().trim());
         }
@@ -126,9 +122,11 @@ public class UserService {
         if (StringUtils.isNotBlank(sysUser.getCertNo())) {
             user.setCertNo(sysUser.getCertNo().trim());
         }
+        if (UserStat.SYSTEM_INIT.equalCode(sysUser.getStat())) {
+            sysUser.setStat(null);
+        }
         if (null != sysUser.getStat()) {
-            UserStat.code(sysUser.getStat()).orElseThrow(() -> new UncheckedException(
-                    "请选择一个正确的状态"));
+            UserStat.code(sysUser.getStat()).orElseThrow(ValidateUtils.orElseThrow("请选择一个正确的状态"));
             user.setStat(sysUser.getStat());
         }
         user.setLastUpdateTime(LocalDateTime.now());
@@ -147,56 +145,13 @@ public class UserService {
 
 
     public Page<PageUser> findPage(PageQuery<UserQuery> query) {
-        UserQuery userQuery = query.query().orElse(new UserQuery());
-        UserStat userStat = UserStat.code(userQuery.getStat()).orElse(UserStat.SYSTEM_INIT);
-        String sql = """
-                SELECT
-                  u.*          
-                FROM
-                  sys_user u
-                  LEFT JOIN sys_user_role sur ON u.id = sur.user_id
-                  LEFT JOIN sys_role r ON r.id = sur.role_id          
-                WHERE
-                  u.ver = 0 
-                """;
-        if (StringUtils.isNotBlank(userQuery.getUsername())) {
-            sql += " AND u.username LIKE '%" + userQuery.getUsername() + "%'";
-        }
-        if (StringUtils.isNotBlank(userQuery.getNickname())) {
-            sql += " AND u.nickname LIKE '%" + userQuery.getNickname() + "%'";
-        }
-        if (StringUtils.isNotBlank(userQuery.getPhone())) {
-            sql += " AND u.phone LIKE '%" + userQuery.getPhone() + "%'";
-        }
-        if (StringUtils.isNotBlank(userQuery.getEmail())) {
-            sql += " AND u.email LIKE '%" + userQuery.getEmail() + "%'";
-        }
-        if (UserStat.SYSTEM_INIT.equals(userStat)) {
-            sql += " AND u.stat != " + userStat.code();
-        } else {
-            sql += " AND u.stat = " + userStat.code();
-        }
-        if (StringUtils.isNotBlank(userQuery.getRoleName())) {
-            sql += " AND r.name LIKE '%" + userQuery.getRoleName() + "%'";
-        }
-        if (null != userQuery.getStartCreateTime()) {
-            sql += " AND u.create_time >= '" + userQuery.getCreateTime() + "'";
-        }
-        if (null != userQuery.getEndCreateTime()) {
-            sql += " AND u.create_time <= '" + userQuery.getEndCreateTime() + "'";
-        }
-        if (null != userQuery.getStartLockTime()) {
-            sql += " AND u.lock_time >= '" + userQuery.getLockTime() + "'";
-        }
-        if (null != userQuery.getEndLockTime()) {
-            sql += " AND u.lock_time <= '" + userQuery.getLockTime() + "'";
-        }
-        Page<SysUser> page = JdbcUtil.jdbcHelper().findPage(SysUser.class, query, sql);
+
+
+        Page<SysUser> page = sysUserDao.findPage(query);
         return page.map(s -> {
             PageUser pageUser = BeanUtil.copy(s, new PageUser());
             List<StringKeyValue> roles =
-                    roleDao.findRoleByUser(s.getId()).stream().map(r -> new StringKeyValue<>(String.valueOf(r.getId()),
-                            r.getName())).collect(Collectors.toList());
+                    roleDao.findRoleByUser(s.getId()).stream().map(r -> new StringKeyValue<>(String.valueOf(r.getId()), r.getName())).collect(Collectors.toList());
             pageUser.setRoles(roles);
             return pageUser;
         });
@@ -214,5 +169,16 @@ public class UserService {
         SysRole sysRole = ContextCache.getRole().orElse(null);
 
         return currentUser.setRoles(roles).setRole(sysRole);
+    }
+
+    public void updateUserRoleReq(UserRoleReq req) {
+        SysUser sysUser =
+                Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysUser.class,
+                        req.getId())).orElseThrow(ValidateUtils.orElseThrow("记录不存在"));
+        ValidateUtils.isFalse(UserStat.SYSTEM_INIT.equalCode(sysUser.getStat()), "记录不存在");
+        JdbcUtil.jdbcHelper().jdbcTemplate().update("DELETE from sys_user_role where user_id=?",
+                req.getId());
+        req.getRoleIds().stream().map(v -> new SysUserRole(IdWorker.snowflakeStringId(),
+                req.getId(), v)).forEach(JdbcUtil.jdbcHelper()::insert);
     }
 }

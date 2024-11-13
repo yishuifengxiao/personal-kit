@@ -1,8 +1,13 @@
 package com.yishuifengxiao.tool.personalkit.dao;
 
 import com.yishuifengxiao.common.jdbc.JdbcHelper;
+import com.yishuifengxiao.common.jdbc.JdbcUtil;
+import com.yishuifengxiao.common.tool.entity.Page;
+import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.dao.repository.SysUserRepository;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
+import com.yishuifengxiao.tool.personalkit.domain.query.UserQuery;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.PreparedStatementCallback;
@@ -56,5 +61,53 @@ public class SysUserDao {
             return null;
         }
         return sysUserRepository.findById(id.trim()).map(SysUser::getNickname).orElse(null);
+    }
+
+    public Page<SysUser> findPage(PageQuery<UserQuery> query){
+        UserQuery userQuery = query.query().orElse(new UserQuery());
+        UserStat userStat = UserStat.code(userQuery.getStat()).orElse(UserStat.SYSTEM_INIT);
+        String sql = """
+                SELECT
+                  u.*          
+                FROM
+                  sys_user u
+                  LEFT JOIN sys_user_role sur ON u.id = sur.user_id
+                  LEFT JOIN sys_role r ON r.id = sur.role_id          
+                WHERE
+                  u.ver = 0 
+                """;
+        if (StringUtils.isNotBlank(userQuery.getUsername())) {
+            sql += " AND u.username LIKE '%" + userQuery.getUsername() + "%'";
+        }
+        if (StringUtils.isNotBlank(userQuery.getNickname())) {
+            sql += " AND u.nickname LIKE '%" + userQuery.getNickname() + "%'";
+        }
+        if (StringUtils.isNotBlank(userQuery.getPhone())) {
+            sql += " AND u.phone LIKE '%" + userQuery.getPhone() + "%'";
+        }
+        if (StringUtils.isNotBlank(userQuery.getEmail())) {
+            sql += " AND u.email LIKE '%" + userQuery.getEmail() + "%'";
+        }
+        if (UserStat.SYSTEM_INIT.equals(userStat)) {
+            sql += " AND u.stat != " + userStat.code();
+        } else {
+            sql += " AND u.stat = " + userStat.code();
+        }
+        if (StringUtils.isNotBlank(userQuery.getRoleName())) {
+            sql += " AND r.name LIKE '%" + userQuery.getRoleName() + "%'";
+        }
+        if (null != userQuery.getStartCreateTime()) {
+            sql += " AND u.create_time >= '" + userQuery.getCreateTime() + "'";
+        }
+        if (null != userQuery.getEndCreateTime()) {
+            sql += " AND u.create_time <= '" + userQuery.getEndCreateTime() + "'";
+        }
+        if (null != userQuery.getStartLockTime()) {
+            sql += " AND u.lock_time >= '" + userQuery.getLockTime() + "'";
+        }
+        if (null != userQuery.getEndLockTime()) {
+            sql += " AND u.lock_time <= '" + userQuery.getLockTime() + "'";
+        }
+       return JdbcUtil.jdbcHelper().findPage(SysUser.class, query, sql);
     }
 }

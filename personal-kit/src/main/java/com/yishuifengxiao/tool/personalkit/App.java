@@ -1,5 +1,6 @@
 package com.yishuifengxiao.tool.personalkit;
 
+import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.tool.personalkit.utils.IpUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -48,7 +49,7 @@ public class App extends SpringBootServletInitializer {
 //        org.springframework.security.web.access.intercept.AuthorizationFilter.class
 //        AbstractSecurityInterceptor
         ConfigurableApplicationContext context = SpringApplication.run(App.class, args);
-
+        JdbcUtil.jdbcHelper(context);
         runAfterStart(context);
         log.info("=============》 启动成功 {}", new Date());
 
