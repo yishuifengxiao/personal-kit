@@ -5,9 +5,10 @@ import com.yishuifengxiao.common.security.httpsecurity.authorize.custom.CustomRe
 import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.utils.ValidateUtils;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
+import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +18,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.AnyRequestMatcher;
@@ -24,7 +26,9 @@ import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -41,8 +45,9 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
     private SysUserDao sysUserDao;
 
 
-    @Value("${server.servlet.context-path:''}")
-    private String contextPath;
+    @Value("${spring.application.name:''}")
+    private String applicationName;
+
     @Autowired
     private ApplicationContext context;
 
@@ -56,26 +61,54 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
 
         Authentication authentication = supplier.get();
 
-        SysUser sysUser = ContextCache.currentUser(authentication).orElse(null);
+        SysUser sysUser =
+                sysUserDao.findActiveSysUser(authentication.getName()).orElseThrow(() -> new UsernameNotFoundException(String.format("账号%s不存在", authentication.getName())));
+        // 内置账号默认通过校验
+        if (StringUtils.equalsIgnoreCase(sysUser.getId(), Constant.DEFAULT_ROOT_ID) || UserStat.SYSTEM_INIT.equalCode(sysUser.getStat())) {
+            return new AuthorizationDecision(true);
+        }
         //当前角色
         String currentRole =
                 ContextCache.getRole().map(SysRole::getId).orElseThrow(ValidateUtils.orElseThrow(
                         "当前用户还未登录"));
 
-        String sql = "SELECT DISTINCT sp.* FROM sys_permission sp, sys_menu_permission smp, "
-                + "sys_menu sm, " +
-                "sys_role_menu srm WHERE smp.permission_id = sp.id AND smp.menu_id = sm.id AND sm"
-                + ".id = srm.menu_id ";
+        String sql = """
+                SELECT DISTINCT
+                  s.url  
+                FROM
+                  sys_permission s  
+                WHERE
+                  s.id IN (
+                    SELECT
+                      smp.permission_id  
+                    FROM
+                      sys_menu_permission smp,
+                      sys_menu sm  
+                    WHERE
+                      sm.is_show = 1  
+                      AND smp.menu_id = sm.id  
+                      AND smp.id IN (
+                        SELECT
+                          srm.role_id  
+                        FROM
+                          sys_role_menu srm,
+                          sys_role sr  
+                        WHERE
+                          sr.stat IN ( - 1, 1 )  
+                          AND srm.role_id = sr.id  
+                          AND srm.role_id IN ( :roleIds )  
+                      )  
+                  )
+                                
+                """;
+        Map map = Map.of("roleIds", Arrays.asList(currentRole));
 
-        if (StringUtils.isNotBlank(currentRole)) {
-            sql += " AND srm.menu_id = " + currentRole;
-        }
 
-        List<SysPermission> list = JdbcUtil.jdbcHelper(context).findAll(SysPermission.class, sql);
+        List<String> urls = JdbcUtil.jdbcHelper(context).findAll(String.class, sql, map);
 
 
         OrRequestMatcher orRequestMatcher =
-                new OrRequestMatcher(list.stream().map(v -> new AntPathRequestMatcher(v.getUrl())).collect(Collectors.toList()));
+                new OrRequestMatcher(urls.stream().map(v -> new AntPathRequestMatcher(v)).collect(Collectors.toList()));
 
 
         boolean anyMatch = orRequestMatcher.matches(request);
@@ -86,12 +119,10 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
     @Override
     public RequestMatcher requestMatcher() {
         try {
-            String sql = StringUtils.isBlank(contextPath) ?
-                    "SELECT DISTINCT sp.url FROM sys_permission sp WHERE ISNULL" + "(sp"
-                            + ".context_path)" : String.format(
-                    "SELECT DISTINCT sp.url FROM sys_permission sp WHERE sp.context_path='%s'",
-                    contextPath);
-            List<String> list = JdbcUtil.jdbcHelper(context).findAll(String.class, sql);
+            String sql = """
+                    SELECT DISTINCT s.url from sys_permission s where s.application_name=?
+                    """;
+            List<String> list = JdbcUtil.jdbcHelper(context).findAll(String.class, sql, applicationName);
             if (CollUtil.isEmpty(list)) {
                 return null;
             }
