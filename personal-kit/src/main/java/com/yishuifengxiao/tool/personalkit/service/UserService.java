@@ -127,9 +127,6 @@ public class UserService {
         if (StringUtils.isNotBlank(sysUser.getCertNo())) {
             user.setCertNo(sysUser.getCertNo().trim());
         }
-        if (UserStat.SYSTEM_INIT.equalCode(sysUser.getStat())) {
-            sysUser.setStat(null);
-        }
         if (null != sysUser.getStat()) {
             UserStat.code(sysUser.getStat()).orElseThrow(ValidateUtils.orElseThrow("请选择一个正确的状态"));
             user.setStat(sysUser.getStat());
@@ -180,7 +177,6 @@ public class UserService {
         SysUser sysUser =
                 Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysUser.class,
                         req.getId())).orElseThrow(ValidateUtils.orElseThrow("记录不存在"));
-        ValidateUtils.isFalse(UserStat.SYSTEM_INIT.equalCode(sysUser.getStat()), "记录不存在");
         JdbcUtil.jdbcHelper().jdbcTemplate().update("DELETE from sys_user_role where user_id=?",
                 req.getId());
         req.getRoleIds().stream().map(v -> new SysUserRole(IdWorker.snowflakeStringId(),

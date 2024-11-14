@@ -126,7 +126,7 @@ public class SysUser implements Serializable {
         String password = SecurityUtil.encryptPassword(salt, originalPassword);
         //@formatter:on
         return new SysUser().setId(id).setUsername(username).setNickname(nickname).setSalt(salt).setPwd(password)
-                .setVer(Constant.ACTIVE_DATA_VER).setStat(UserStat.SYSTEM_INIT.code())
+                .setVer(Constant.ACTIVE_DATA_VER).setStat(UserStat.ACCOUNT_ENABLE.code())
                 .setCreateTime(LocalDateTime.now()).setLastUpdateTime(LocalDateTime.now())
                 ;
 

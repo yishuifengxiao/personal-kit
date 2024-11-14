@@ -6,6 +6,7 @@ import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.dao.repository.SysUserRepository;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
 import com.yishuifengxiao.tool.personalkit.domain.query.UserQuery;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +41,9 @@ public class SysUserDao {
 //        return sysUserRepository.findAll(Example.of(new SysUser().setUsername(username.trim()))
 //        , Sort.by(ClassUtil
 //        .pojoFieldName(SysUser::getCreateTime)).descending()).stream().findFirst();
-        Optional<SysUser> optional = jdbcHelper.findAll(new SysUser().setUsername(username.trim()).setVer(0), false)
-                .stream().max(Comparator.comparing(SysUser::getCreateTime));
+        Optional<SysUser> optional =
+                jdbcHelper.findAll(new SysUser().setUsername(username.trim()).setVer(0), false)
+                        .stream().max(Comparator.comparing(SysUser::getCreateTime));
 
         return optional;
     }
@@ -63,9 +65,9 @@ public class SysUserDao {
         return sysUserRepository.findById(id.trim()).map(SysUser::getNickname).orElse(null);
     }
 
-    public Page<SysUser> findPage(PageQuery<UserQuery> query){
+    public Page<SysUser> findPage(PageQuery<UserQuery> query) {
         UserQuery userQuery = query.query().orElse(new UserQuery());
-        UserStat userStat = UserStat.code(userQuery.getStat()).orElse(UserStat.SYSTEM_INIT);
+        UserStat userStat = UserStat.code(userQuery.getStat()).orElse(null);
         String sql = """
                 SELECT
                   u.*          
@@ -88,9 +90,7 @@ public class SysUserDao {
         if (StringUtils.isNotBlank(userQuery.getEmail())) {
             sql += " AND u.email LIKE '%" + userQuery.getEmail() + "%'";
         }
-        if (UserStat.SYSTEM_INIT.equals(userStat)) {
-            sql += " AND u.stat != " + userStat.code();
-        } else {
+        if (null != userStat) {
             sql += " AND u.stat = " + userStat.code();
         }
         if (StringUtils.isNotBlank(userQuery.getRoleName())) {
@@ -108,6 +108,11 @@ public class SysUserDao {
         if (null != userQuery.getEndLockTime()) {
             sql += " AND u.lock_time <= '" + userQuery.getLockTime() + "'";
         }
-       return JdbcUtil.jdbcHelper().findPage(SysUser.class, query, sql);
+        if (null == userQuery.getRoleId()) {
+            sql += " and r.id != " + RoleStat.ROLE_INIT.code() + "";
+        } else {
+            sql += " and r.id = " + userQuery.getRoleId() + "";
+        }
+        return JdbcUtil.jdbcHelper().findPage(SysUser.class, query, sql);
     }
 }

@@ -58,8 +58,8 @@ public class SimpleUserDetailsService implements UserDetailsService {
         List<SysRole> roles = roleDao.findRoleByUser(sysUser.getId());
         ValidateUtils.isTrue(CollUtil.isNotEmpty(roles),"当前用户还未配置角色");
 
-        currentRole(roles);
-
+        SysRole role = currentRole(roles);
+        ContextCache.setRole(role);
         String password=passwordEncoder.encode(DES.decrypt(sysUser.getSalt(),sysUser.getPwd()));
         ContextCache.setCurrentUser(sysUser);
 
@@ -73,13 +73,15 @@ public class SimpleUserDetailsService implements UserDetailsService {
                                 .filter(StringUtils::isNotBlank)
                                 .distinct().collect(Collectors.joining(","))))
                 .setCurrentUser(sysUser);
+        // @formatter:on
     }
 
-    private void currentRole(List<SysRole> roles) {
-        if(null==roles||roles.isEmpty()){
-            return ;
+    private SysRole currentRole(List<SysRole> roles) {
+        if (null == roles || roles.isEmpty()) {
+            return null;
         }
-        try{
+        SysRole role = null;
+        try {
             ServletRequestAttributes attributes =
                     (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             HttpServletRequest request = attributes.getRequest();
@@ -87,22 +89,17 @@ public class SimpleUserDetailsService implements UserDetailsService {
             if (StringUtils.isBlank(currentRole)) {
                 currentRole = request.getParameter(Constant.CURRENT_ROLE);
             }
-            String loginRole=currentRole;
-            SysRole role =null;
-            if(StringUtils.isNotBlank(loginRole)){
-                 role =roles.stream().filter(Objects::nonNull).filter(v->StringUtils.equals(v.getName(),
-                        loginRole)).findFirst().orElse(roles.stream().filter(Objects::nonNull).filter(v->StringUtils.equals(String.valueOf(v.getId()),
-                        loginRole)).findFirst().orElse(null));
+            String loginRole = currentRole;
 
-            }else {
-                role= roles.get(0);
+            if (StringUtils.isNotBlank(loginRole)) {
+                role = roles.stream().filter(Objects::nonNull).filter(v -> StringUtils.equals(v.getName(), loginRole)).findFirst().orElse(roles.stream().filter(Objects::nonNull).filter(v -> StringUtils.equals(String.valueOf(v.getId()), loginRole)).findFirst().orElse(null));
+
+            } else {
+                role = roles.get(0);
             }
-
-            if(null!=role){
-                ContextCache.setRole(role);
-            }
-        }catch (Exception e){}
-
+        } catch (Exception e) {
+        }
+        return role;
 
     }
 }

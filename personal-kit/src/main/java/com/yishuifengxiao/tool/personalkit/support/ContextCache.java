@@ -29,9 +29,7 @@ public class ContextCache {
         return currentUser().orElseThrow(ValidateUtils.orElseThrow("当前用户还未登录或已过期"));
     }
 
-    public static Optional<SysUser> currentUser() {
-        final Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
+    public static Optional<SysUser> currentUser(Authentication authentication) {
         if (null == authentication) {
             return Optional.empty();
         }
@@ -45,6 +43,12 @@ public class ContextCache {
             return Optional.empty();
         }
         return Optional.ofNullable(sysUser);
+    }
+
+    public static Optional<SysUser> currentUser() {
+        final Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+        return currentUser(authentication);
     }
 
 

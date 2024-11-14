@@ -76,6 +76,8 @@ public class UserController {
         return userService.findPage(query);
     }
 
+    @Operation(summary = "创建用户", description = "创建用户")
+    @PostMapping("/create")
     public void create(@Validated(Group.Create.class) @RequestBody UserCreateReq user) {
         userService.create(user);
     }

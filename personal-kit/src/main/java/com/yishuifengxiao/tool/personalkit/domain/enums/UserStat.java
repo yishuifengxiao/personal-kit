@@ -12,10 +12,7 @@ import java.util.Optional;
  * @since 1.0.0
  */
 public enum UserStat implements RootEnum {
-    /**
-     * 系统数据
-     */
-    SYSTEM_INIT("系统数据", -1),
+
     /**
      * 启用
      */
