@@ -147,9 +147,10 @@ public class UserService {
 
 
     public Page<PageUser> findPage(PageQuery<UserQuery> query) {
-
-
-        Page<SysUser> page = sysUserDao.findPage(query);
+        SysRole role =
+                ContextCache.getRole(ContextCache.currentUser().map(v -> v.getUsername()).orElse(
+                        "")).orElse(null);
+        Page<SysUser> page = sysUserDao.findPage(query, role);
         return page.map(s -> {
             PageUser pageUser = BeanUtil.copy(s, new PageUser());
             List<StringKeyValue> roles =

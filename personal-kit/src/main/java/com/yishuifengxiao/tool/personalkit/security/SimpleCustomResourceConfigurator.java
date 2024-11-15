@@ -7,6 +7,7 @@ import com.yishuifengxiao.common.tool.utils.ValidateUtils;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,12 +59,16 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
         Authentication authentication = supplier.get();
         SysUser sysUser =
                 ContextCache.currentUser(authentication).orElseThrow(ValidateUtils.orElseThrow(
-                "当前用户还未登录"));
+                        "当前用户还未登录"));
 
         //当前角色
-        String currentRole =
-                ContextCache.getRole(sysUser.getUsername()).map(SysRole::getId).orElseThrow(ValidateUtils.orElseThrow(
+        SysRole currentRole =
+                ContextCache.getRole(sysUser.getUsername()).orElseThrow(ValidateUtils.orElseThrow(
                         "当前用户还未登录"));
+        if (RoleStat.ROLE_INIT.equalCode(currentRole.getStat())) {
+            return new AuthorizationDecision(true);
+        }
+
 
         String sql = """
                 SELECT DISTINCT
@@ -94,10 +99,14 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
                   )
                                 
                 """;
-        Map map = Map.of("roleIds", Arrays.asList(currentRole));
+        Map map = Map.of("roleIds", Arrays.asList(currentRole.getId()));
 
 
         List<String> urls = JdbcUtil.jdbcHelper(context).findAll(String.class, sql, map);
+
+        if (CollUtil.isEmpty(urls)) {
+            return new AuthorizationDecision(false);
+        }
 
 
         OrRequestMatcher orRequestMatcher =

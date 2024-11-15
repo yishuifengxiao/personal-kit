@@ -5,6 +5,7 @@ import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.dao.repository.SysUserRepository;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
@@ -65,7 +66,7 @@ public class SysUserDao {
         return sysUserRepository.findById(id.trim()).map(SysUser::getNickname).orElse(null);
     }
 
-    public Page<SysUser> findPage(PageQuery<UserQuery> query) {
+    public Page<SysUser> findPage(PageQuery<UserQuery> query, SysRole role) {
         UserQuery userQuery = query.query().orElse(new UserQuery());
         UserStat userStat = UserStat.code(userQuery.getStat()).orElse(null);
         String sql = """
@@ -108,10 +109,12 @@ public class SysUserDao {
         if (null != userQuery.getEndLockTime()) {
             sql += " AND u.lock_time <= '" + userQuery.getLockTime() + "'";
         }
-        if (null == userQuery.getRoleId()) {
-            sql += " and r.id != " + RoleStat.ROLE_INIT.code() + "";
-        } else {
+        if (StringUtils.isNotBlank(userQuery.getRoleId())) {
             sql += " and r.id = " + userQuery.getRoleId() + "";
+        }
+        if (null == role || !RoleStat.ROLE_INIT.equalCode(role.getStat())) {
+            //
+            sql += " and r.stat != " + RoleStat.ROLE_INIT.code() + "";
         }
         return JdbcUtil.jdbcHelper().findPage(SysUser.class, query, sql);
     }
