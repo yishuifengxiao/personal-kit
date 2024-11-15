@@ -2,6 +2,7 @@ package com.yishuifengxiao.tool.personalkit.support;
 
 
 import com.yishuifengxiao.common.guava.GuavaCache;
+import com.yishuifengxiao.common.security.token.extractor.SecurityValueExtractor;
 import com.yishuifengxiao.common.tool.utils.ValidateUtils;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
@@ -9,6 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Optional;
 
@@ -19,6 +22,11 @@ import java.util.Optional;
  */
 @Component
 public class ContextCache {
+    public ContextCache(SecurityValueExtractor securityValueExtractor) {
+        ContextCache.securityValueExtractor = securityValueExtractor;
+    }
+
+    private static SecurityValueExtractor securityValueExtractor;
 
     private final static String USER_PREFIX = "CURRENT_USER_PREFIX::";
     private final static String USER_ROLE_PREFIX = "USER_ROLE_PREFIX::";
@@ -48,6 +56,7 @@ public class ContextCache {
     public static Optional<SysUser> currentUser() {
         final Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
+
         return currentUser(authentication);
     }
 
@@ -65,22 +74,28 @@ public class ContextCache {
     }
 
 
-    public static void setRole(SysRole role) {
-        final Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
-        GuavaCache.put(USER_ROLE_PREFIX + authentication.getName(), role);
+    public static void setRole(String username, SysRole role) {
+
+
+        GuavaCache.put(USER_ROLE_PREFIX + username + getDeviceId(), role);
     }
 
-    public static Optional<SysRole> getRole() {
-        final Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
-        SysRole role = (SysRole) GuavaCache.get(USER_ROLE_PREFIX + authentication.getName());
+    public static Optional<SysRole> getRole(String username) {
+
+        SysRole role = (SysRole) GuavaCache.get(USER_ROLE_PREFIX + username + getDeviceId());
         return Optional.ofNullable(role);
     }
 
     public static void clearRole() {
-        final Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
-        GuavaCache.remove(USER_ROLE_PREFIX + authentication.getName());
+        GuavaCache.remove(USER_ROLE_PREFIX + getDeviceId());
+    }
+
+    private static String getDeviceId() {
+
+        ServletRequestAttributes attributes =
+                (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        String deviceId = securityValueExtractor.extractDeviceId(attributes.getRequest(),
+                attributes.getResponse());
+        return deviceId;
     }
 }

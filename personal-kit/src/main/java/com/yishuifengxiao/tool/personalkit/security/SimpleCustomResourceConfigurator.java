@@ -56,11 +56,13 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
         HttpServletRequest request = object.getRequest();
 
         Authentication authentication = supplier.get();
-        SysUser sysUser = ContextCache.currentUser(authentication).orElse(null);
+        SysUser sysUser =
+                ContextCache.currentUser(authentication).orElseThrow(ValidateUtils.orElseThrow(
+                "当前用户还未登录"));
 
         //当前角色
         String currentRole =
-                ContextCache.getRole().map(SysRole::getId).orElseThrow(ValidateUtils.orElseThrow(
+                ContextCache.getRole(sysUser.getUsername()).map(SysRole::getId).orElseThrow(ValidateUtils.orElseThrow(
                         "当前用户还未登录"));
 
         String sql = """

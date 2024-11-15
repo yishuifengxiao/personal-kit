@@ -59,7 +59,7 @@ public class SimpleUserDetailsService implements UserDetailsService {
         ValidateUtils.isTrue(CollUtil.isNotEmpty(roles),"当前用户还未配置角色");
 
         SysRole role = currentRole(roles);
-        ContextCache.setRole(role);
+        ContextCache.setRole(sysUser.getUsername(),role);
         String password=passwordEncoder.encode(DES.decrypt(sysUser.getSalt(),sysUser.getPwd()));
         ContextCache.setCurrentUser(sysUser);
 

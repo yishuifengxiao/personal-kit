@@ -168,7 +168,7 @@ public class UserService {
 
         List<SysRole> roles = roleDao.findRoleByUser(sysUser.getId());
 
-        SysRole sysRole = ContextCache.getRole().orElse(null);
+        SysRole sysRole = ContextCache.getRole(sysUser.getUsername()).orElse(null);
 
         return currentUser.setRoles(roles).setRole(sysRole);
     }
