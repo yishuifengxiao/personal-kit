@@ -110,7 +110,7 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
 
 
         OrRequestMatcher orRequestMatcher =
-                new OrRequestMatcher(urls.stream().map(v -> new AntPathRequestMatcher(v)).collect(Collectors.toList()));
+                new OrRequestMatcher(urls.stream().map(AntPathRequestMatcher::new).collect(Collectors.toList()));
 
 
         boolean anyMatch = orRequestMatcher.matches(request);
