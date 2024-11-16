@@ -4,37 +4,14 @@
       <img :src="loginFormImage" class="loginFormImage" />
       <div class="div-form">
         <div class="form_title">欢迎登录系统</div>
-        <a-form
-          class="form"
-          :model="formState"
-          name="basic"
-          :label-col="{ span: 4 }"
-          :wrapper-col="{ span: 16 }"
-          autocomplete="off"
-          @finish="onFinish"
-          @finishFailed="onFinishFailed"
-        >
-          <a-form-item
-            label="账号"
-            name="username"
-            class="username"
-            :rules="[{ required: true, message: '账号不能为空' }]"
-          >
+        <a-form class="form" :model="formState" name="basic" :label-col="{ span: 4 }" :wrapper-col="{ span: 16 }"
+          autocomplete="off" @finish="onFinish" @finishFailed="onFinishFailed">
+          <a-form-item label="账号" name="username" class="username" :rules="[{ required: true, message: '账号不能为空' }]">
             <a-input name="username" v-model:value="formState.username" size="large" allowClear />
           </a-form-item>
 
-          <a-form-item
-            label="密码"
-            name="password"
-            class="password"
-            :rules="[{ required: true, message: '密码不能为空' }]"
-          >
-            <a-input-password
-              name="password"
-              v-model:value="formState.password"
-              size="large"
-              allowClear
-            />
+          <a-form-item label="密码" name="password" class="password" :rules="[{ required: true, message: '密码不能为空' }]">
+            <a-input-password name="password" v-model:value="formState.password" size="large" allowClear />
           </a-form-item>
 
           <a-form-item label="记住账号" name="remember">
@@ -80,8 +57,8 @@ export default defineComponent({
           method: 'post'
         })
         .then((res) => {
-          this.setToken(res.token)
-          this.setUser(res)
+  
+          this.setToken(res.value)
           this.doAction()
         })
         .catch((err) => console.log(err))
