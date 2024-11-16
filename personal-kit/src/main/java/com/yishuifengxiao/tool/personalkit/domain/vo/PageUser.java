@@ -25,5 +25,9 @@ public class PageUser extends SysUser {
 
     private List<StringKeyValue> roles;
 
+    private String statName;
+
+    private String roleName;
+
 
 }

@@ -267,7 +267,7 @@ export default defineComponent({
 		 * @param {*} param0
 		 */
 		onTopMenuSelect({
-			item, key, selectedKeys
+			item, key
 		}) {
 	
 			this.setTopMenuId(item.id)

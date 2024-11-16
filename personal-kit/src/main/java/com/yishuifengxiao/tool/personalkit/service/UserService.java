@@ -155,7 +155,9 @@ public class UserService {
             PageUser pageUser = BeanUtil.copy(s, new PageUser());
             List<StringKeyValue> roles =
                     roleDao.findRoleByUser(s.getId()).stream().map(r -> new StringKeyValue<>(String.valueOf(r.getId()), r.getName())).collect(Collectors.toList());
+            pageUser.setRoleName(roles.stream().map(v->v.getVal().toString()).collect(Collectors.joining(",")));
             pageUser.setRoles(roles);
+            pageUser.setStatName(UserStat.code(s.getStat()).map(UserStat::enumName).orElse(""));
             return pageUser;
         });
 

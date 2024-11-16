@@ -16,11 +16,11 @@ public enum UserStat implements RootEnum {
     /**
      * 启用
      */
-    ACCOUNT_ENABLE("账号启用", 0),
+    ACCOUNT_ENABLE("账号正常", 0),
     /**
      * 启用
      */
-    ACCOUNT_DISABLE("账号未启用", 1),
+    ACCOUNT_DISABLE("账号禁用", 1),
 
     /**
      * 禁用
