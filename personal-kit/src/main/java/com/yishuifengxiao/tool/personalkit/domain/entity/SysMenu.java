@@ -39,11 +39,11 @@ public class SysMenu implements Serializable {
     private String id;
 
 
-    @Size(max = 50, message = "角色名称最大50个字符", groups = {Group.Update.class, Group.Create.class})
+    @Size(max = 50, message = "菜单名称最大50个字符", groups = {Group.Update.class, Group.Create.class})
     @Column(length = 50, unique = true)
     private String name;
 
-    @Size(max = 255, message = "角色描述最大255个字符", groups = {Group.Update.class, Group.Create.class})
+    @Size(max = 255, message = "菜单描述最大255个字符", groups = {Group.Update.class, Group.Create.class})
     private String description;
 
     @Column(name = "parent_id", length = 64, nullable = false)

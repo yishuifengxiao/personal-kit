@@ -8,7 +8,6 @@
       :model="formState"
       @finish="handleFinish"
       :label-col="labelCol"
-      
     >
       <a-row :gutter="24">
         <a-col :span="6">
@@ -163,15 +162,26 @@ export default defineComponent({
   },
   methods: {
     handleFinish() {
-      const tmp = this.formState
+
       this.formState.startCreateTimetmp = this.formState.rangetimepicker[0]
       this.formState.endCreateTime = this.formState.rangetimepicker[0]
-      debugger
       this.query()
     },
     //搜索角色
     handleRoleSearch(val) {
-      debugger
+      this.$http
+        .request({
+          url: '/personkit/sys/role/page',
+          data: {
+            num: 1,
+            query: { name: val },
+            size: 1000
+          }
+        })
+        .then((res) => {
+          this.roleSource=reactive(res.data);
+        })
+        .catch((err) => console.log(err))
     },
     /**
      * 查询数据

@@ -8,79 +8,31 @@
       :model="formState"
       @finish="handleFinish"
       :label-col="labelCol"
-      
     >
       <a-row :gutter="24">
         <a-col :span="6">
-          <a-form-item label="账号" name="username" class="input">
-            <a-input v-model:value="formState.username" placeholder="账号，模糊查询"> </a-input>
+          <a-form-item label="菜单名称" name="name" class="input">
+            <a-input v-model:value="formState.name" placeholder="账号，模糊查询"> </a-input>
           </a-form-item>
         </a-col>
         <a-col :span="6">
-          <a-form-item label="昵称" name="nickname" class="input">
-            <a-input v-model:value="formState.nickname" placeholder="昵称，模糊查询"> </a-input>
+          <a-form-item label="父级菜单" name="父级菜单" class="input">
+            <a-input v-model:value="formState.parentName" placeholder="昵称，模糊查询"> </a-input>
           </a-form-item>
         </a-col>
         <a-col :span="6">
-          <a-form-item label="手机号" name="phone" class="input">
-            <a-input v-model:value="formState.phone" placeholder="手机号，模糊查询"> </a-input>
+          <a-form-item label="路由名称" name="routerName" class="input">
+            <a-input v-model:value="formState.routerName" placeholder="手机号，模糊查询"> </a-input>
           </a-form-item>
         </a-col>
         <a-col :span="6">
-          <a-form-item label="邮箱" name="email" class="input">
-            <a-input v-model:value="formState.email" placeholder="邮箱，模糊查询"> </a-input>
+          <a-form-item label="需要鉴权" name="auth" class="input">
+            <a-input v-model:value="formState.auth" placeholder="邮箱，模糊查询"> </a-input>
           </a-form-item>
         </a-col>
-        <a-col :span="6">
-          <a-form-item label="证件号码" name="certNo" class="input">
-            <a-input v-model:value="formState.certNo" placeholder="证件号码，模糊查询"> </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="5">
-          <a-form-item label="角色" name="roleId" class="input">
-            <a-select
-              v-model:value="formState.roleId"
-              show-search
-              placeholder="input search text"
-              :default-active-first-option="false"
-              :show-arrow="false"
-              :filter-option="false"
-              :not-found-content="null"
-              :options="roleSource"
-              @search="handleRoleSearch"
-            ></a-select>
-          </a-form-item>
-        </a-col>
-        <a-col :span="5">
-          <a-form-item label="状态" name="stat" class="input">
-            <a-select
-              placeholder="状态"
-              v-model:value="formState.stat"
-              :options="userStatusOptions"
-            ></a-select>
-          </a-form-item>
-        </a-col>
-        <a-col :span="8">
-          <a-form-item label="创建时间" name="fileName" class="input">
-            <a-range-picker
-              v-model:value="formState['rangetimepicker']"
-              :placeholder="['开始时间', '结束时间']"
-              show-time
-              format="YYYY-MM-DD HH:mm:ss"
-              value-format="YYYY-MM-DD HH:mm:ss"
-            />
-          </a-form-item>
-        </a-col>
+
         <a-col :span="1" class="input">
           <a-button type="primary" html-type="submit"> 搜索 </a-button>
-        </a-col>
-        <a-col :span="20" class="input" style="float: right">
-          <a-space>
-            <a-button type="primary" html-type="submit"> 创建账号 </a-button>
-            <a-button type="primary" html-type="submit"> 修改角色 </a-button>
-            <a-button type="primary" danger>批量删除</a-button>
-            <a-button type="primary" danger>批量禁用</a-button>
-          </a-space>
         </a-col>
       </a-row>
     </a-form>
@@ -129,21 +81,9 @@ export default defineComponent({
   data() {
     const formState = reactive({
       id: '',
-      username: '',
-      nickname: '',
-      phone: '',
-      email: '',
-      certNo: '',
-      stat: 0,
-      createTime: '',
-      lockTime: '',
-      lastUpdateTime: '',
-      roleName: '',
-      roleId: '',
-      startCreateTime: '',
-      endCreateTime: '',
-      startLockTime: '',
-      endLockTime: ''
+      name: '',
+      parentName: '',
+      stat: 0
     })
     const data = reactive([])
     const roleSource = reactive([])
@@ -163,16 +103,9 @@ export default defineComponent({
   },
   methods: {
     handleFinish() {
-      const tmp = this.formState
-      this.formState.startCreateTimetmp = this.formState.rangetimepicker[0]
-      this.formState.endCreateTime = this.formState.rangetimepicker[0]
-      debugger
       this.query()
     },
-    //搜索角色
-    handleRoleSearch(val) {
-      debugger
-    },
+
     /**
      * 查询数据
      */
@@ -221,85 +154,62 @@ export default defineComponent({
     UserOutlined
   },
   mounted() {
-    console.log('------------------------- data sourc emounte')
     this.query()
   },
   setup() {
     const columns = [
       {
-        title: '账号',
-        dataIndex: 'username',
-        key: 'username',
-        align: 'center',
-        fixed: 'left',
-        width: 150
+        title: '菜单名称',
+        dataIndex: 'name',
+        key: 'name',
+        align: 'center'
       },
       {
-        title: '昵称',
-        dataIndex: 'nickname',
-        key: 'nickname',
-        align: 'center',
-        width: 150,
-        fixed: 'left'
+        title: '父级菜单',
+        dataIndex: 'parentName',
+        key: 'parentName',
+        align: 'center'
       },
       {
         title: '角色',
         dataIndex: 'roleName',
         key: 'roleName',
         ellipsis: true,
-        align: 'center',
-        width: 100,
-        fixed: 'left'
-      },
-      {
-        title: '状态',
-        dataIndex: 'statName',
-        key: 'statName',
-        ellipsis: true,
-        width: 100,
         align: 'center'
       },
       {
-        title: '邮箱',
-        dataIndex: 'email',
-        key: 'email',
+        title: '路由名称',
+        dataIndex: 'routerName',
+        key: 'routerName',
         ellipsis: true,
-        width: 150,
+
         align: 'center'
       },
       {
-        title: '证件号码',
-        dataIndex: 'certNo',
-        key: 'certNo',
+        title: '需要鉴权',
+        dataIndex: 'auth',
+        key: 'auth',
         ellipsis: true,
-        width: 150,
+
         align: 'center'
       },
       {
-        title: '手机号',
-        dataIndex: 'phone',
-        key: 'phone',
-        width: 150,
+        title: '菜单位置',
+        dataIndex: 'type',
+        key: 'type',
+        ellipsis: true,
+
+        align: 'center'
+      },
+      {
+        title: '描述',
+        dataIndex: 'description',
+        key: 'description',
+
         ellipsis: true,
         align: 'center'
       },
 
-      {
-        title: '创建时间',
-        dataIndex: 'createTime',
-        key: 'createTime',
-        width: 150,
-        ellipsis: true,
-        align: 'center'
-      },
-      {
-        title: '最后登录时间',
-        dataIndex: 'userName',
-        key: 'userName',
-        width: 100,
-        ellipsis: true,
-        align: 'center'
-      },
       {
         title: '操作',
         dataIndex: 'action',

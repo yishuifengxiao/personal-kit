@@ -20,8 +20,9 @@ import org.springframework.stereotype.Component;
 @Transactional(rollbackOn = {Exception.class})
 public class PermissionService {
     public Page<PermissionVo> findPagePermission(PageQuery<SysPermission> pageQuery) {
-        return JdbcUtil.jdbcHelper().findPage(pageQuery.query().orElse(new SysPermission()),
-                false, pageQuery.size().intValue(), pageQuery.num().intValue()).map(v -> {
+        Page<SysPermission> page = JdbcUtil.jdbcHelper().findPage(pageQuery.query().orElse(new SysPermission()),
+                true, pageQuery.size().intValue(), pageQuery.num().intValue());
+        return page.map(v -> {
             PermissionVo permissionVo = BeanUtil.copy(v, new PermissionVo());
             String sql = "SELECT DISTINCT sm.* from sys_permission sp,sys_menu_permission smp,sys_menu sm where smp" +
                     ".menu_id=sm.id and smp.permission_id =sp.id and sp.id=?";

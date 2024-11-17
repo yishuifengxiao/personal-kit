@@ -1,7 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.domain.query;
 
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
-import jakarta.persistence.Column;
 import lombok.Data;
 
 
@@ -14,10 +13,8 @@ import lombok.Data;
 @Data
 public class RoleQuery extends SysRole {
 
-    @Column(name = "id")
     private String menuId;
 
-    @Column(name = "name")
     private String menuName;
-    
+
 }
