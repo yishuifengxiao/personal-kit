@@ -10,19 +10,32 @@
       :label-col="labelCol"
     >
       <a-form-item label="菜单名称" name="name" class="input">
-        <a-input v-model:value="formState.name" placeholder="账号，模糊查询"> </a-input>
+        <a-input allowClear v-model:value="formState.name" placeholder="菜单名称，模糊查询">
+        </a-input>
       </a-form-item>
 
       <a-form-item label="父级菜单" name="父级菜单" class="input">
-        <a-input v-model:value="formState.parentName" placeholder="昵称，模糊查询"> </a-input>
+        <a-input
+          allowClear
+          v-model:value="formState.parentName"
+          placeholder="父级菜单名称，模糊查询"
+        >
+        </a-input>
       </a-form-item>
 
       <a-form-item label="路由名称" name="routerName" class="input">
-        <a-input v-model:value="formState.routerName" placeholder="手机号，模糊查询"> </a-input>
+        <a-input allowClear v-model:value="formState.routerName" placeholder="路由名称，模糊查询">
+        </a-input>
       </a-form-item>
 
       <a-form-item label="需要鉴权" name="auth" class="input">
-        <a-input v-model:value="formState.auth" placeholder="邮箱，模糊查询"> </a-input>
+        <a-select
+          allowClear
+          style="width: 180px"
+          placeholder="状态"
+          v-model:value="formState.auth"
+          :options="statusOptions"
+        ></a-select>
       </a-form-item>
       <a-space class="input">
         <a-button type="primary" html-type="submit"> 搜索 </a-button>
@@ -71,12 +84,7 @@ import { mapState } from 'pinia'
 import { useUserStore } from '@/stores/user'
 export default defineComponent({
   data() {
-    const formState = reactive({
-      id: '',
-      name: '',
-      parentName: '',
-      stat: 0
-    })
+    const formState = reactive({})
     const data = reactive([])
     const roleSource = reactive([])
     return { formState, data, roleSource }
@@ -219,14 +227,11 @@ export default defineComponent({
     const fileList = ref([])
     const labelCol = { style: { width: '80px' } }
     const wrapperCol = { span: 14 }
-    const userStatusOptions = reactive([
-      { label: '账号正常', value: 0 },
-      { label: '账号禁用', value: 1 },
-      { label: '账号过期', value: 2 },
-      { label: '密码过期', value: 3 },
-      { label: '账号锁定', value: 4 }
+    const statusOptions = reactive([
+      { label: '需要鉴权', value: 1 },
+      { label: '无需鉴权', value: 0 }
     ])
-    return { columns, pagination, fileList, labelCol, wrapperCol, userStatusOptions }
+    return { columns, pagination, fileList, labelCol, wrapperCol, statusOptions }
   }
 })
 </script>

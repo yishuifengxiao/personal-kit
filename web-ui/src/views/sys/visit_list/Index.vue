@@ -9,15 +9,15 @@
       @finish="handleFinish"
     >
       <a-form-item label="类型" name="username">
-        <a-input v-model:value="formState.username" placeholder="动作类型"> </a-input>
+         <a-input allowClear v-model:value="formState.username" placeholder="动作类型"> </a-input>
       </a-form-item>
 
       <a-form-item label="账号" name="nickname">
-        <a-input v-model:value="formState.nickname" placeholder="昵称，模糊查询"> </a-input>
+         <a-input allowClear v-model:value="formState.nickname" placeholder="昵称，模糊查询"> </a-input>
       </a-form-item>
 
       <a-form-item label="结果" name="phone">
-        <a-input v-model:value="formState.phone" placeholder="手机号，模糊查询"> </a-input>
+         <a-input allowClear v-model:value="formState.phone" placeholder="手机号，模糊查询"> </a-input>
       </a-form-item>
 
       <a-form-item>

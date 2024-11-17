@@ -29,7 +29,8 @@
       </a-form-item>
 
       <a-form-item label="资源路径" name="url" class="input">
-        <a-input allowClear v-model:value="formState.url" placeholder="邮箱，模糊查询"> </a-input>
+        <a-input allowClear v-model:value="formState.url" placeholder="资源路径，模糊查询">
+        </a-input>
       </a-form-item>
       <a-space class="input">
         <a-button type="primary" html-type="submit"> 搜索 </a-button>
@@ -78,13 +79,7 @@ import { mapState } from 'pinia'
 import { useUserStore } from '@/stores/user'
 export default defineComponent({
   data() {
-    const formState = reactive({
-      id: '',
-      name: '',
-      applicationName: '',
-      module: '',
-      url: ''
-    })
+    const formState = reactive({})
     const data = reactive([])
     const roleSource = reactive([])
     return { formState, data, roleSource }

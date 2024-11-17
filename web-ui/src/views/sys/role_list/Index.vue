@@ -10,19 +10,19 @@
       :label-col="labelCol"
     >
       <a-form-item label="角色名称" name="name" class="input">
-        <a-input v-model:value="formState.name" placeholder="角色名称，模糊查询"> </a-input>
+         <a-input allowClear v-model:value="formState.name" placeholder="角色名称，模糊查询"> </a-input>
       </a-form-item>
 
       <a-form-item label="角色状态" name="stat" class="input">
-        <a-input v-model:value="formState.stat" placeholder="角色状态"> </a-input>
+         <a-input allowClear v-model:value="formState.stat" placeholder="角色状态"> </a-input>
       </a-form-item>
 
       <a-form-item label="角色描述" name="description" class="input">
-        <a-input v-model:value="formState.description" placeholder="角色描述，模糊查询"> </a-input>
+         <a-input allowClear v-model:value="formState.description" placeholder="角色描述，模糊查询"> </a-input>
       </a-form-item>
 
       <a-form-item label="包含菜单" name="menuName" class="input">
-        <a-input v-model:value="formState.menuName" placeholder="包含菜单，模糊查询"> </a-input>
+         <a-input allowClear v-model:value="formState.menuName" placeholder="包含菜单，模糊查询"> </a-input>
       </a-form-item>
 
       <a-space class="input">

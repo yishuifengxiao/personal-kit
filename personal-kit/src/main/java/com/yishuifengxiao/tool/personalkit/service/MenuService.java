@@ -65,7 +65,7 @@ public class MenuService {
     }
 
     public Page<MenuVo> findPage(PageQuery<SysMenu> pageQuery) {
-        return JdbcUtil.jdbcHelper().findPage(pageQuery.query().orElse(new SysMenu()), false,
+        return JdbcUtil.jdbcHelper().findPage(pageQuery.query().orElse(new SysMenu()), true,
                 pageQuery, Order.asc("parentId")).map(v -> {
             MenuVo vo = BeanUtil.copy(v, new MenuVo());
             vo.setParentName(Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysMenu.class,

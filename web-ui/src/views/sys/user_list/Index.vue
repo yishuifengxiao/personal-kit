@@ -10,27 +10,27 @@
       :label-col="labelCol"
     >
       <a-form-item label="账号" name="username" class="input">
-        <a-input v-model:value="formState.username" placeholder="账号，模糊查询"> </a-input>
+         <a-input allowClear v-model:value="formState.username" placeholder="账号，模糊查询"> </a-input>
       </a-form-item>
 
       <a-form-item label="昵称" name="nickname" class="input">
-        <a-input v-model:value="formState.nickname" placeholder="昵称，模糊查询"> </a-input>
+         <a-input allowClear v-model:value="formState.nickname" placeholder="昵称，模糊查询"> </a-input>
       </a-form-item>
 
       <a-form-item label="手机号" name="phone" class="input">
-        <a-input v-model:value="formState.phone" placeholder="手机号，模糊查询"> </a-input>
+         <a-input allowClear v-model:value="formState.phone" placeholder="手机号，模糊查询"> </a-input>
       </a-form-item>
 
       <a-form-item label="邮箱" name="email" class="input">
-        <a-input v-model:value="formState.email" placeholder="邮箱，模糊查询"> </a-input>
+         <a-input allowClear v-model:value="formState.email" placeholder="邮箱，模糊查询"> </a-input>
       </a-form-item>
 
       <a-form-item label="证件号码" name="certNo" class="input">
-        <a-input v-model:value="formState.certNo" placeholder="证件号码，模糊查询"> </a-input>
+         <a-input allowClear v-model:value="formState.certNo" placeholder="证件号码，模糊查询"> </a-input>
       </a-form-item>
 
       <a-form-item label="角色" name="roleId" class="input">
-        <a-select
+        <a-select allowClear
           style="width: 180px"
           v-model:value="formState.roleId"
           show-search
@@ -45,7 +45,7 @@
       </a-form-item>
 
       <a-form-item label="状态" name="stat" class="input">
-        <a-select
+        <a-select allowClear
           style="width: 180px"
           placeholder="状态"
           v-model:value="formState.stat"
@@ -54,7 +54,7 @@
       </a-form-item>
 
       <a-form-item label="创建时间" name="fileName" class="input">
-        <a-range-picker
+        <a-range-picker allowClear
           v-model:value="formState['rangetimepicker']"
           :placeholder="['开始时间', '结束时间']"
           show-time
