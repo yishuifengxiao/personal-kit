@@ -6,6 +6,7 @@ import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
+import com.yishuifengxiao.tool.personalkit.domain.entity.HttpLog;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysSecurityRecord;
 import com.yishuifengxiao.tool.personalkit.domain.request.RecordReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.SysSecurityRecordVo;
@@ -32,5 +33,9 @@ public class RecordService {
                             Strategy.AUTHENTICATION_SUCCESS.enumName() : Strategy.AUTHENTICATION_FAILURE.enumName());
                     return vo;
                 });
+    }
+
+    public Page<HttpLog> findPageVisitRecord(PageQuery<HttpLog> param) {
+        return JdbcUtil.jdbcHelper().findPage(param, true, Order.desc("createTime"));
     }
 }

@@ -3,6 +3,7 @@ package com.yishuifengxiao.tool.personalkit.web;
 import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
+import com.yishuifengxiao.tool.personalkit.domain.entity.HttpLog;
 import com.yishuifengxiao.tool.personalkit.domain.request.RecordReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.SysSecurityRecordVo;
 import com.yishuifengxiao.tool.personalkit.service.RecordService;
@@ -42,6 +43,13 @@ public class RecordController {
                 Strategy.AUTHENTICATION_FAILURE.code()));
 
         return recordService.findPageSysSecurityRecord(param);
+    }
+
+    @PostMapping("/personal/visit/page")
+    public Page<HttpLog> visitRecord(@RequestBody PageQuery<HttpLog> param) {
+
+
+        return recordService.findPageVisitRecord(param);
     }
 
 

@@ -9,43 +9,37 @@
       @finish="handleFinish"
       :label-col="labelCol"
     >
-      <a-form-item label="账号" name="username" class="input">
-         <a-input allowClear v-model:value="formState.username" placeholder="账号，模糊查询"> </a-input>
+      <a-form-item label="请求地址" name="uri" class="input">
+        <a-input allowClear v-model:value="formState.uri" placeholder="请求地址，模糊查询">
+        </a-input>
       </a-form-item>
 
-      <a-form-item label="昵称" name="nickname" class="input">
-         <a-input allowClear v-model:value="formState.nickname" placeholder="昵称，模糊查询"> </a-input>
+      <a-form-item label="请求方法" name="method" class="input">
+        <a-input allowClear v-model:value="formState.method" placeholder="请求方法，模糊查询">
+        </a-input>
       </a-form-item>
 
-      <a-form-item label="手机号" name="phone" class="input">
-         <a-input allowClear v-model:value="formState.phone" placeholder="手机号，模糊查询"> </a-input>
+      <a-form-item label="操作用户" name="userName" class="input">
+        <a-input allowClear v-model:value="formState.userName" placeholder="操作用户，模糊查询">
+        </a-input>
       </a-form-item>
 
-      <a-form-item label="邮箱" name="email" class="input">
-         <a-input allowClear v-model:value="formState.email" placeholder="邮箱，模糊查询"> </a-input>
+      <a-form-item label="最小耗时" name="email" class="input">
+        <a-input-number allowClear v-model:value="formState.email" placeholder="最小耗时，单位毫秒">
+        </a-input-number>
       </a-form-item>
-
-      <a-form-item label="证件号码" name="certNo" class="input">
-         <a-input allowClear v-model:value="formState.certNo" placeholder="证件号码，模糊查询"> </a-input>
+      <a-form-item label="最大耗时" name="email" class="input">
+        <a-input-number allowClear v-model:value="formState.email" placeholder="最大耗时，单位毫秒">
+        </a-input-number>
       </a-form-item>
-
 
       <a-form-item label="状态" name="stat" class="input">
-        <a-select allowClear
+        <a-select
+          allowClear
           placeholder="状态"
           v-model:value="formState.stat"
           :options="userStatusOptions"
         ></a-select>
-      </a-form-item>
-
-      <a-form-item label="创建时间" name="fileName" class="input">
-        <a-range-picker allowClear
-          v-model:value="formState['rangetimepicker']"
-          :placeholder="['开始时间', '结束时间']"
-          show-time
-          format="YYYY-MM-DD HH:mm:ss"
-          value-format="YYYY-MM-DD HH:mm:ss"
-        />
       </a-form-item>
 
       <a-space class="input">
@@ -67,7 +61,7 @@
               :disabled="record.stat != 2 || record.actualTotalNum === 0"
               >详情</a-button
             >
-            <a>删除</a> <a>修改角色</a> <a>修改状态</a></a-space
+            <a>删除</a></a-space
           >
         </template>
       </template>
@@ -95,24 +89,7 @@ import { mapState } from 'pinia'
 import { useUserStore } from '@/stores/user'
 export default defineComponent({
   data() {
-    const formState = reactive({
-      id: '',
-      username: '',
-      nickname: '',
-      phone: '',
-      email: '',
-      certNo: '',
-      stat: 0,
-      createTime: '',
-      lockTime: '',
-      lastUpdateTime: '',
-      roleName: '',
-      roleId: '',
-      startCreateTime: '',
-      endCreateTime: '',
-      startLockTime: '',
-      endLockTime: ''
-    })
+    const formState = reactive({})
     const data = reactive([])
     const roleSource = reactive([])
     return { formState, data, roleSource }
@@ -131,23 +108,17 @@ export default defineComponent({
   },
   methods: {
     handleFinish() {
-      const tmp = this.formState
-      this.formState.startCreateTimetmp = this.formState.rangetimepicker[0]
-      this.formState.endCreateTime = this.formState.rangetimepicker[0]
-      debugger
+  
       this.query()
     },
-    //搜索角色
-    handleRoleSearch(val) {
-      debugger
-    },
+
     /**
      * 查询数据
      */
     query() {
       this.$http
         .request({
-          url: '/personkit/sys/user/findPage',
+          url: '/personkit/record/personal/visit/page',
           data: {
             num: this.pagination.current,
             query: this.formState,
@@ -195,65 +166,65 @@ export default defineComponent({
   setup() {
     const columns = [
       {
-        title: '账号',
-        dataIndex: 'username',
-        key: 'username',
+        title: '请求地址',
+        dataIndex: 'uri',
+        key: 'uri',
         align: 'center',
         fixed: 'left',
         width: 150
       },
       {
-        title: '昵称',
-        dataIndex: 'nickname',
-        key: 'nickname',
+        title: '方法',
+        dataIndex: 'method',
+        key: 'method',
         align: 'center',
         width: 150,
         fixed: 'left'
       },
       {
-        title: '角色',
-        dataIndex: 'roleName',
-        key: 'roleName',
+        title: '请求参数',
+        dataIndex: 'queryParam',
+        key: 'queryParam',
         ellipsis: true,
         align: 'center',
         width: 100,
         fixed: 'left'
       },
       {
-        title: '状态',
-        dataIndex: 'statName',
-        key: 'statName',
+        title: '请求头',
+        dataIndex: 'headerParam',
+        key: 'headerParam',
         ellipsis: true,
         width: 100,
         align: 'center'
       },
       {
-        title: '邮箱',
-        dataIndex: 'email',
-        key: 'email',
+        title: '请求体',
+        dataIndex: 'requestBody',
+        key: 'requestBody',
         ellipsis: true,
         width: 150,
         align: 'center'
       },
       {
-        title: '证件号码',
-        dataIndex: 'certNo',
-        key: 'certNo',
+        title: '响应数据',
+        dataIndex: 'responseBody',
+        key: 'responseBody',
         ellipsis: true,
         width: 150,
         align: 'center'
       },
       {
-        title: '手机号',
-        dataIndex: 'phone',
-        key: 'phone',
+        title: '耗时(毫秒)',
+        dataIndex: 'useMillis',
+        key: 'useMillis',
         width: 150,
         ellipsis: true,
         align: 'center'
       },
 
       {
-        title: '创建时间',
+        title: '请求时间',
         dataIndex: 'createTime',
         key: 'createTime',
         width: 150,
@@ -261,18 +232,10 @@ export default defineComponent({
         align: 'center'
       },
       {
-        title: '最后登录时间',
-        dataIndex: 'userName',
-        key: 'userName',
-        width: 100,
-        ellipsis: true,
-        align: 'center'
-      },
-      {
         title: '操作',
         dataIndex: 'action',
         key: 'action',
-        width: 300,
+        width: 100,
         align: 'center',
         fixed: 'right'
       }
