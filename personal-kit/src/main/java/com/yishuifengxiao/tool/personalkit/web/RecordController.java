@@ -3,8 +3,8 @@ package com.yishuifengxiao.tool.personalkit.web;
 import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysSecurityRecord;
 import com.yishuifengxiao.tool.personalkit.domain.request.RecordReq;
+import com.yishuifengxiao.tool.personalkit.domain.vo.SysSecurityRecordVo;
 import com.yishuifengxiao.tool.personalkit.service.RecordService;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,7 +34,7 @@ public class RecordController {
 
 
     @PostMapping("/personal/login/page")
-    public Page<SysSecurityRecord> loginRecord(@RequestBody PageQuery<RecordReq> param) {
+    public Page<SysSecurityRecordVo> loginRecord(@RequestBody PageQuery<RecordReq> param) {
 
         RecordReq recordReq = param.query().orElse(new RecordReq());
         recordReq.setUsername(ContextCache.currentUser().get().getUsername());

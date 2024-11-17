@@ -16,4 +16,12 @@ import java.util.List;
 public class MenuVo extends SysMenu {
 
     private List<SysPermission> permissions;
+
+    private String parentName;
+
+    private String authName;
+
+    private String typeName;
+
+    private String roleNames;
 }

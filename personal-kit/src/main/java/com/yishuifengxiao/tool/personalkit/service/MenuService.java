@@ -1,6 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
+import com.yishuifengxiao.common.jdbc.entity.Order;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
@@ -66,8 +67,18 @@ public class MenuService {
     public Page<MenuVo> findPage(PageQuery<SysMenu> pageQuery) {
         return JdbcUtil.jdbcHelper().findPage(pageQuery.query().orElse(new SysMenu()), false,
                 pageQuery.size().intValue(),
-                pageQuery.num().intValue()).map(v -> {
+                pageQuery.num().intValue(), Order.asc("parentId")).map(v -> {
             MenuVo vo = BeanUtil.copy(v, new MenuVo());
+            vo.setParentName(Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysMenu.class,
+                    v.getParentId())).map(s -> s.getName()).orElse(""));
+            vo.setAuthName(BoolStat.isTrue(v.getAuth()) ? "是" : "否");
+            vo.setTypeName(BoolStat.isTrue(v.getType()) ? "上部" : "左侧");
+            String roleSql = """
+                    SELECT DISTINCT sr.`name` from sys_role sr,sys_role_menu srm where sr.id=srm.role_id and srm.menu_id=?
+                    """;
+            String roleNames =
+                    JdbcUtil.jdbcHelper().findAll(String.class, roleSql, v.getId()).stream().collect(Collectors.joining(","));
+            vo.setRoleNames(roleNames);
             String sql = "SELECT DISTINCT sp.* from sys_permission sp,sys_menu_permission smp "
                     + "where  smp" +
                     ".permission_id " + "=sp.id and smp.menu_id=?";

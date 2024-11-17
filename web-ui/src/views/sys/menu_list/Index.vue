@@ -112,7 +112,7 @@ export default defineComponent({
     query() {
       this.$http
         .request({
-          url: '/personkit/sys/user/findPage',
+          url: '/personkit/sys/menu/page',
           data: {
             num: this.pagination.current,
             query: this.formState,
@@ -172,8 +172,8 @@ export default defineComponent({
       },
       {
         title: '角色',
-        dataIndex: 'roleName',
-        key: 'roleName',
+        dataIndex: 'roleNames',
+        key: 'roleNames',
         ellipsis: true,
         align: 'center'
       },
@@ -187,16 +187,16 @@ export default defineComponent({
       },
       {
         title: '需要鉴权',
-        dataIndex: 'auth',
-        key: 'auth',
+        dataIndex: 'authName',
+        key: 'authName',
         ellipsis: true,
 
         align: 'center'
       },
       {
         title: '菜单位置',
-        dataIndex: 'type',
-        key: 'type',
+        dataIndex: 'typeName',
+        key: 'typeName',
         ellipsis: true,
 
         align: 'center'

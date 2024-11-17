@@ -7,82 +7,22 @@
       autocomplete="off"
       :model="formState"
       @finish="handleFinish"
-      :label-col="labelCol"
-      
     >
-      <a-row :gutter="24">
-        <a-col :span="6">
-          <a-form-item label="账号" name="username" class="input">
-            <a-input v-model:value="formState.username" placeholder="账号，模糊查询"> </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="昵称" name="nickname" class="input">
-            <a-input v-model:value="formState.nickname" placeholder="昵称，模糊查询"> </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="手机号" name="phone" class="input">
-            <a-input v-model:value="formState.phone" placeholder="手机号，模糊查询"> </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="邮箱" name="email" class="input">
-            <a-input v-model:value="formState.email" placeholder="邮箱，模糊查询"> </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="证件号码" name="certNo" class="input">
-            <a-input v-model:value="formState.certNo" placeholder="证件号码，模糊查询"> </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="5">
-          <a-form-item label="角色" name="roleId" class="input">
-            <a-select
-              v-model:value="formState.roleId"
-              show-search
-              placeholder="input search text"
-              :default-active-first-option="false"
-              :show-arrow="false"
-              :filter-option="false"
-              :not-found-content="null"
-              :options="roleSource"
-              @search="handleRoleSearch"
-            ></a-select>
-          </a-form-item>
-        </a-col>
-        <a-col :span="5">
-          <a-form-item label="状态" name="stat" class="input">
-            <a-select
-              placeholder="状态"
-              v-model:value="formState.stat"
-              :options="userStatusOptions"
-            ></a-select>
-          </a-form-item>
-        </a-col>
-        <a-col :span="8">
-          <a-form-item label="创建时间" name="fileName" class="input">
-            <a-range-picker
-              v-model:value="formState['rangetimepicker']"
-              :placeholder="['开始时间', '结束时间']"
-              show-time
-              format="YYYY-MM-DD HH:mm:ss"
-              value-format="YYYY-MM-DD HH:mm:ss"
-            />
-          </a-form-item>
-        </a-col>
-        <a-col :span="1" class="input">
-          <a-button type="primary" html-type="submit"> 搜索 </a-button>
-        </a-col>
-        <a-col :span="20" class="input" style="float: right">
-          <a-space>
-            <a-button type="primary" html-type="submit"> 创建账号 </a-button>
-            <a-button type="primary" html-type="submit"> 修改角色 </a-button>
-            <a-button type="primary" danger>批量删除</a-button>
-            <a-button type="primary" danger>批量禁用</a-button>
-          </a-space>
-        </a-col>
-      </a-row>
+      <a-form-item label="类型" name="username">
+        <a-input v-model:value="formState.username" placeholder="动作类型"> </a-input>
+      </a-form-item>
+
+      <a-form-item label="账号" name="nickname">
+        <a-input v-model:value="formState.nickname" placeholder="昵称，模糊查询"> </a-input>
+      </a-form-item>
+
+      <a-form-item label="结果" name="phone">
+        <a-input v-model:value="formState.phone" placeholder="手机号，模糊查询"> </a-input>
+      </a-form-item>
+
+      <a-form-item>
+        <a-button type="primary" html-type="submit"> 搜索 </a-button>
+      </a-form-item>
     </a-form>
 
     <!-- 上部搜索条件区域 -->
@@ -99,8 +39,8 @@
               :disabled="record.stat != 2 || record.actualTotalNum === 0"
               >详情</a-button
             >
-            <a>删除</a> <a>修改角色</a> <a>修改状态</a></a-space
-          >
+            <a>删除</a>
+          </a-space>
         </template>
       </template>
     </a-table>
@@ -128,22 +68,7 @@ import { useUserStore } from '@/stores/user'
 export default defineComponent({
   data() {
     const formState = reactive({
-      id: '',
-      username: '',
-      nickname: '',
-      phone: '',
-      email: '',
-      certNo: '',
-      stat: 0,
-      createTime: '',
-      lockTime: '',
-      lastUpdateTime: '',
-      roleName: '',
-      roleId: '',
-      startCreateTime: '',
-      endCreateTime: '',
-      startLockTime: '',
-      endLockTime: ''
+ 
     })
     const data = reactive([])
     const roleSource = reactive([])
@@ -163,23 +88,16 @@ export default defineComponent({
   },
   methods: {
     handleFinish() {
-      const tmp = this.formState
-      this.formState.startCreateTimetmp = this.formState.rangetimepicker[0]
-      this.formState.endCreateTime = this.formState.rangetimepicker[0]
-      debugger
       this.query()
     },
-    //搜索角色
-    handleRoleSearch(val) {
-      debugger
-    },
+
     /**
      * 查询数据
      */
     query() {
       this.$http
         .request({
-          url: '/personkit/sys/user/findPage',
+          url: '/personkit/record/personal/login/page',
           data: {
             num: this.pagination.current,
             query: this.formState,
@@ -227,76 +145,59 @@ export default defineComponent({
   setup() {
     const columns = [
       {
-        title: '账号',
-        dataIndex: 'username',
-        key: 'username',
+        title: '操作类型',
+        dataIndex: 'strategyName',
+        key: 'strategyName',
         align: 'center',
         fixed: 'left',
         width: 150
       },
       {
-        title: '昵称',
-        dataIndex: 'nickname',
-        key: 'nickname',
+        title: '操作用户',
+        dataIndex: 'username',
+        key: 'username',
         align: 'center',
         width: 150,
         fixed: 'left'
       },
       {
-        title: '角色',
-        dataIndex: 'roleName',
-        key: 'roleName',
+        title: 'IP地址',
+        dataIndex: 'ip',
+        key: 'ip',
         ellipsis: true,
         align: 'center',
         width: 100,
         fixed: 'left'
       },
       {
-        title: '状态',
-        dataIndex: 'statName',
-        key: 'statName',
+        title: '来源',
+        dataIndex: 'referer',
+        key: 'referer',
         ellipsis: true,
         width: 100,
         align: 'center'
       },
       {
-        title: '邮箱',
-        dataIndex: 'email',
-        key: 'email',
+        title: '浏览器',
+        dataIndex: 'userAgent',
+        key: 'userAgent',
         ellipsis: true,
         width: 150,
         align: 'center'
       },
       {
-        title: '证件号码',
-        dataIndex: 'certNo',
-        key: 'certNo',
-        ellipsis: true,
-        width: 150,
-        align: 'center'
-      },
-      {
-        title: '手机号',
-        dataIndex: 'phone',
-        key: 'phone',
-        width: 150,
-        ellipsis: true,
-        align: 'center'
-      },
-
-      {
-        title: '创建时间',
+        title: '时间',
         dataIndex: 'createTime',
         key: 'createTime',
-        width: 150,
         ellipsis: true,
+        width: 150,
         align: 'center'
       },
       {
-        title: '最后登录时间',
-        dataIndex: 'userName',
-        key: 'userName',
-        width: 100,
+        title: '处理信息',
+        dataIndex: 'msg',
+        key: 'msg',
+        width: 150,
         ellipsis: true,
         align: 'center'
       },
