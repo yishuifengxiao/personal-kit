@@ -50,8 +50,7 @@ public class DataCenterService {
     public Page<DiskUploadRecordVo> findPageDataRecord(PageQuery<DiskUploadRecord> pageQuery) {
         DiskUploadRecord uploadRecord = pageQuery.query().orElse(new DiskUploadRecord());
         uploadRecord.setUploadMode(UploadMode.ANALYSIS.getCode());
-        return JdbcUtil.jdbcHelper().findPage(uploadRecord, false, pageQuery.size().intValue(),
-                pageQuery.num().intValue(),
+        return JdbcUtil.jdbcHelper().findPage(pageQuery, false,
                 Order.desc("create_time")).map(v -> {
 
             //上传记录关联的全部文件
@@ -121,6 +120,6 @@ public class DataCenterService {
     public Page<DiskFile> findPageDiskFile(PageQuery<DiskFile> pageQuery) {
         DiskFile diskFile = pageQuery.query().orElse(new DiskFile());
         diskFile.setUserId(ContextCache.currentUserId());
-        return JdbcUtil.jdbcHelper().findPage(diskFile, false, pageQuery.size().intValue(), pageQuery.num().intValue());
+        return JdbcUtil.jdbcHelper().findPage(diskFile, false, pageQuery);
     }
 }

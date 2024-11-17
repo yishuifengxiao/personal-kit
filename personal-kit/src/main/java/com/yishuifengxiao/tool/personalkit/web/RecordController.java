@@ -38,8 +38,8 @@ public class RecordController {
 
         RecordReq recordReq = param.query().orElse(new RecordReq());
         recordReq.setUsername(ContextCache.currentUser().get().getUsername());
-        recordReq.setStrategys(Arrays.asList(Strategy.AUTHENTICATION_SUCCESS.getCode(),
-                Strategy.AUTHENTICATION_FAILURE.getCode()));
+        recordReq.setStrategys(Arrays.asList(Strategy.AUTHENTICATION_SUCCESS.code(),
+                Strategy.AUTHENTICATION_FAILURE.code()));
 
         return recordService.findPageSysSecurityRecord(param);
     }

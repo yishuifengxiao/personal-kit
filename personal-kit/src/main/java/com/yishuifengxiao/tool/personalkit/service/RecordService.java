@@ -24,11 +24,11 @@ public class RecordService {
     public Page<SysSecurityRecordVo> findPageSysSecurityRecord(PageQuery<RecordReq> param) {
         RecordReq recordReq = param.query().orElse(new RecordReq());
         SysSecurityRecord record = new SysSecurityRecord();
-        return JdbcUtil.jdbcHelper().findPage(record, true, param.size().intValue(), param.num().intValue())
+        return JdbcUtil.jdbcHelper().findPage(record, true, param)
                 .map(s -> {
                     SysSecurityRecordVo vo = BeanUtil.copy(s, new SysSecurityRecordVo());
-                    vo.setStrategyName(Strategy.AUTHENTICATION_SUCCESS.getCode() == s.getStrategy() ?
-                            Strategy.AUTHENTICATION_SUCCESS.getName() : Strategy.AUTHENTICATION_FAILURE.getName());
+                    vo.setStrategyName(Strategy.AUTHENTICATION_SUCCESS.code() == s.getStrategy() ?
+                            Strategy.AUTHENTICATION_SUCCESS.enumName() : Strategy.AUTHENTICATION_FAILURE.enumName());
                     return vo;
                 });
     }

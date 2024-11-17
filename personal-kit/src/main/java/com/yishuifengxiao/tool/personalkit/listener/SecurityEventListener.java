@@ -60,7 +60,7 @@ public class SecurityEventListener {
                 .setUserAgent(request.getHeader(HttpHeaders.USER_AGENT))
                 .setReferer(request.getHeader(HttpHeaders.REFERER))
                 .setIp(request.getRemoteAddr())
-                .setStrategy(event.getStrategy().getCode())
+                .setStrategy(event.getStrategy().code())
                 .setMsg(Optional.ofNullable(event.getException()).map(Throwable::getMessage).orElse(null))
                 .setCreateTime(LocalDateTime.ofInstant(Instant.ofEpochMilli( event.getTimestamp()),ZoneId.of("+8")));
         JdbcUtil.jdbcHelper().saveOrUpdate(sysSecurityRecord);

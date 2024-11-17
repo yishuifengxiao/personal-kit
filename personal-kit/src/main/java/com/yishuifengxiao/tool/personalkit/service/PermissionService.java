@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class PermissionService {
     public Page<PermissionVo> findPagePermission(PageQuery<SysPermission> pageQuery) {
         Page<SysPermission> page = JdbcUtil.jdbcHelper().findPage(pageQuery.query().orElse(new SysPermission()),
-                true, pageQuery.size().intValue(), pageQuery.num().intValue());
+                true, pageQuery);
         return page.map(v -> {
             PermissionVo permissionVo = BeanUtil.copy(v, new PermissionVo());
             String sql = "SELECT DISTINCT sm.* from sys_permission sp,sys_menu_permission smp,sys_menu sm where smp" +
