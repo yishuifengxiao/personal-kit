@@ -108,7 +108,6 @@ export default defineComponent({
   },
   methods: {
     handleFinish() {
-  
       this.query()
     },
 
@@ -171,6 +170,7 @@ export default defineComponent({
         key: 'uri',
         align: 'center',
         fixed: 'left',
+        ellipsis: true,
         width: 150
       },
       {
@@ -178,7 +178,8 @@ export default defineComponent({
         dataIndex: 'method',
         key: 'method',
         align: 'center',
-        width: 150,
+        ellipsis: true,
+        width: 80,
         fixed: 'left'
       },
       {
@@ -218,7 +219,7 @@ export default defineComponent({
         title: '耗时(毫秒)',
         dataIndex: 'useMillis',
         key: 'useMillis',
-        width: 150,
+        width: 100,
         ellipsis: true,
         align: 'center'
       },
@@ -227,7 +228,7 @@ export default defineComponent({
         title: '请求时间',
         dataIndex: 'createTime',
         key: 'createTime',
-        width: 150,
+        width: 100,
         ellipsis: true,
         align: 'center'
       },
