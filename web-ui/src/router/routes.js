@@ -120,6 +120,65 @@ const routes = [
           label: '系统管理',
           breadcrumbName: ['系统管理', '用户管理', '用户列表']
         }
+      },
+      {
+        path: 'role_manager',
+        name: 'role_manager',
+        component: () => import('@/views/sys/role_list/Index.vue'),
+        props: (route) => ({
+          id: route.query.id
+        }),
+        meta: {
+          label: '系统管理',
+          breadcrumbName: ['系统管理', '角色管理', '角色列表']
+        }
+      },
+      {
+        path: 'menu_manager',
+        name: 'menu_manager',
+        component: () => import('@/views/sys/menu_list/Index.vue'),
+        props: (route) => ({
+          id: route.query.id
+        }),
+        meta: {
+          label: '系统管理',
+          breadcrumbName: ['系统管理', '菜单管理', '菜单列表']
+        }
+      }, {
+        path: 'perssion_mananer',
+        name: 'perssion_mananer',
+        component: () => import('@/views/sys/resource_list/Index.vue'),
+        props: (route) => ({
+          id: route.query.id
+        }),
+        meta: {
+          label: '系统管理',
+          breadcrumbName: ['系统管理', '权限管理', '权限列表']
+        }
+      },
+      {
+        path: 'login_record',
+        name: 'login_record',
+        component: () => import('@/views/sys/visit_list/Index.vue'),
+        props: (route) => ({
+          id: route.query.id
+        }),
+        meta: {
+          label: '系统管理',
+          breadcrumbName: ['系统管理', '认证管理', '认证列表']
+        }
+      },
+      {
+        path: 'http_log',
+        name: 'http_log',
+        component: () => import('@/views/sys/http_log/Index.vue'),
+        props: (route) => ({
+          id: route.query.id
+        }),
+        meta: {
+          label: '系统管理',
+          breadcrumbName: ['系统管理', '认证管理', '认证列表']
+        }
       }
     ]
   }
