@@ -9,40 +9,31 @@
       @finish="handleFinish"
       :label-col="labelCol"
     >
-      <a-row :gutter="24">
-        <a-col :span="6">
-          <a-form-item label="资源名称" name="name" class="input">
-            <a-input allowClear v-model:value="formState.name" placeholder="资源名称，模糊查询">
-            </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="所属应用" name="applicationName" class="input">
-            <a-input
-              allowClear
-              v-model:value="formState.applicationName"
-              placeholder="所属应用，模糊查询"
-            >
-            </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="所属模块" name="module" class="input">
-            <a-input allowClear v-model:value="formState.module" placeholder="所属模块，模糊查询">
-            </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="资源路径" name="url" class="input">
-            <a-input allowClear v-model:value="formState.url" placeholder="邮箱，模糊查询">
-            </a-input>
-          </a-form-item>
-        </a-col>
+      <a-form-item label="资源名称" name="name" class="input">
+        <a-input allowClear v-model:value="formState.name" placeholder="资源名称，模糊查询">
+        </a-input>
+      </a-form-item>
 
-        <a-col :span="1" class="input">
-          <a-button type="primary" html-type="submit"> 搜索 </a-button>
-        </a-col>
-      </a-row>
+      <a-form-item label="所属应用" name="applicationName" class="input">
+        <a-input
+          allowClear
+          v-model:value="formState.applicationName"
+          placeholder="所属应用，模糊查询"
+        >
+        </a-input>
+      </a-form-item>
+
+      <a-form-item label="所属模块" name="module" class="input">
+        <a-input allowClear v-model:value="formState.module" placeholder="所属模块，模糊查询">
+        </a-input>
+      </a-form-item>
+
+      <a-form-item label="资源路径" name="url" class="input">
+        <a-input allowClear v-model:value="formState.url" placeholder="邮箱，模糊查询"> </a-input>
+      </a-form-item>
+      <a-space class="input">
+        <a-button type="primary" html-type="submit"> 搜索 </a-button>
+      </a-space>
     </a-form>
 
     <!-- 上部搜索条件区域 -->
@@ -92,7 +83,7 @@ export default defineComponent({
       name: '',
       applicationName: '',
       module: '',
-      url: '',
+      url: ''
     })
     const data = reactive([])
     const roleSource = reactive([])

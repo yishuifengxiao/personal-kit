@@ -9,37 +9,26 @@
       @finish="handleFinish"
       :label-col="labelCol"
     >
-      <a-row :gutter="24">
-        <a-col :span="6">
-          <a-form-item label="角色名称" name="name" class="input">
-            <a-input v-model:value="formState.name" placeholder="角色名称，模糊查询"> </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="角色状态" name="stat" class="input">
-            <a-input v-model:value="formState.stat" placeholder="角色状态"> </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="角色描述" name="description" class="input">
-            <a-input v-model:value="formState.description" placeholder="角色描述，模糊查询">
-            </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="包含菜单" name="menuName" class="input">
-            <a-input v-model:value="formState.menuName" placeholder="包含菜单，模糊查询"> </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="1" class="input">
-          <a-button type="primary" html-type="submit"> 搜索 </a-button>
-        </a-col>
-        <a-col :span="20" class="input" style="float: right">
-          <a-space>
-            <a-button type="primary" html-type="submit"> 创建角色 </a-button>
-          </a-space>
-        </a-col>
-      </a-row>
+      <a-form-item label="角色名称" name="name" class="input">
+        <a-input v-model:value="formState.name" placeholder="角色名称，模糊查询"> </a-input>
+      </a-form-item>
+
+      <a-form-item label="角色状态" name="stat" class="input">
+        <a-input v-model:value="formState.stat" placeholder="角色状态"> </a-input>
+      </a-form-item>
+
+      <a-form-item label="角色描述" name="description" class="input">
+        <a-input v-model:value="formState.description" placeholder="角色描述，模糊查询"> </a-input>
+      </a-form-item>
+
+      <a-form-item label="包含菜单" name="menuName" class="input">
+        <a-input v-model:value="formState.menuName" placeholder="包含菜单，模糊查询"> </a-input>
+      </a-form-item>
+
+      <a-space class="input">
+        <a-button type="primary" html-type="submit"> 搜索 </a-button>
+        <a-button type="primary" html-type="submit"> 创建角色 </a-button>
+      </a-space>
     </a-form>
 
     <!-- 上部搜索条件区域 -->

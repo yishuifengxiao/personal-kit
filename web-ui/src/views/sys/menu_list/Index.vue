@@ -9,32 +9,24 @@
       @finish="handleFinish"
       :label-col="labelCol"
     >
-      <a-row :gutter="24">
-        <a-col :span="6">
-          <a-form-item label="菜单名称" name="name" class="input">
-            <a-input v-model:value="formState.name" placeholder="账号，模糊查询"> </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="父级菜单" name="父级菜单" class="input">
-            <a-input v-model:value="formState.parentName" placeholder="昵称，模糊查询"> </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="路由名称" name="routerName" class="input">
-            <a-input v-model:value="formState.routerName" placeholder="手机号，模糊查询"> </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="需要鉴权" name="auth" class="input">
-            <a-input v-model:value="formState.auth" placeholder="邮箱，模糊查询"> </a-input>
-          </a-form-item>
-        </a-col>
+      <a-form-item label="菜单名称" name="name" class="input">
+        <a-input v-model:value="formState.name" placeholder="账号，模糊查询"> </a-input>
+      </a-form-item>
 
-        <a-col :span="1" class="input">
-          <a-button type="primary" html-type="submit"> 搜索 </a-button>
-        </a-col>
-      </a-row>
+      <a-form-item label="父级菜单" name="父级菜单" class="input">
+        <a-input v-model:value="formState.parentName" placeholder="昵称，模糊查询"> </a-input>
+      </a-form-item>
+
+      <a-form-item label="路由名称" name="routerName" class="input">
+        <a-input v-model:value="formState.routerName" placeholder="手机号，模糊查询"> </a-input>
+      </a-form-item>
+
+      <a-form-item label="需要鉴权" name="auth" class="input">
+        <a-input v-model:value="formState.auth" placeholder="邮箱，模糊查询"> </a-input>
+      </a-form-item>
+      <a-space class="input">
+        <a-button type="primary" html-type="submit"> 搜索 </a-button>
+      </a-space>
     </a-form>
 
     <!-- 上部搜索条件区域 -->

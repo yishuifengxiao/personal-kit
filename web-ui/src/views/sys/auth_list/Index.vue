@@ -8,81 +8,61 @@
       :model="formState"
       @finish="handleFinish"
       :label-col="labelCol"
-      
     >
-      <a-row :gutter="24">
-        <a-col :span="6">
-          <a-form-item label="账号" name="username" class="input">
-            <a-input v-model:value="formState.username" placeholder="账号，模糊查询"> </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="昵称" name="nickname" class="input">
-            <a-input v-model:value="formState.nickname" placeholder="昵称，模糊查询"> </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="手机号" name="phone" class="input">
-            <a-input v-model:value="formState.phone" placeholder="手机号，模糊查询"> </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="邮箱" name="email" class="input">
-            <a-input v-model:value="formState.email" placeholder="邮箱，模糊查询"> </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="6">
-          <a-form-item label="证件号码" name="certNo" class="input">
-            <a-input v-model:value="formState.certNo" placeholder="证件号码，模糊查询"> </a-input>
-          </a-form-item>
-        </a-col>
-        <a-col :span="5">
-          <a-form-item label="角色" name="roleId" class="input">
-            <a-select
-              v-model:value="formState.roleId"
-              show-search
-              placeholder="input search text"
-              :default-active-first-option="false"
-              :show-arrow="false"
-              :filter-option="false"
-              :not-found-content="null"
-              :options="roleSource"
-              @search="handleRoleSearch"
-            ></a-select>
-          </a-form-item>
-        </a-col>
-        <a-col :span="5">
-          <a-form-item label="状态" name="stat" class="input">
-            <a-select
-              placeholder="状态"
-              v-model:value="formState.stat"
-              :options="userStatusOptions"
-            ></a-select>
-          </a-form-item>
-        </a-col>
-        <a-col :span="8">
-          <a-form-item label="创建时间" name="fileName" class="input">
-            <a-range-picker
-              v-model:value="formState['rangetimepicker']"
-              :placeholder="['开始时间', '结束时间']"
-              show-time
-              format="YYYY-MM-DD HH:mm:ss"
-              value-format="YYYY-MM-DD HH:mm:ss"
-            />
-          </a-form-item>
-        </a-col>
-        <a-col :span="1" class="input">
-          <a-button type="primary" html-type="submit"> 搜索 </a-button>
-        </a-col>
-        <a-col :span="20" class="input" style="float: right">
-          <a-space>
-            <a-button type="primary" html-type="submit"> 创建账号 </a-button>
-            <a-button type="primary" html-type="submit"> 修改角色 </a-button>
-            <a-button type="primary" danger>批量删除</a-button>
-            <a-button type="primary" danger>批量禁用</a-button>
-          </a-space>
-        </a-col>
-      </a-row>
+      <a-form-item label="账号" name="username" class="input">
+        <a-input v-model:value="formState.username" placeholder="账号，模糊查询"> </a-input>
+      </a-form-item>
+
+      <a-form-item label="昵称" name="nickname" class="input">
+        <a-input v-model:value="formState.nickname" placeholder="昵称，模糊查询"> </a-input>
+      </a-form-item>
+
+      <a-form-item label="手机号" name="phone" class="input">
+        <a-input v-model:value="formState.phone" placeholder="手机号，模糊查询"> </a-input>
+      </a-form-item>
+
+      <a-form-item label="邮箱" name="email" class="input">
+        <a-input v-model:value="formState.email" placeholder="邮箱，模糊查询"> </a-input>
+      </a-form-item>
+
+      <a-form-item label="证件号码" name="certNo" class="input">
+        <a-input v-model:value="formState.certNo" placeholder="证件号码，模糊查询"> </a-input>
+      </a-form-item>
+
+      <a-form-item label="角色" name="roleId" class="input">
+        <a-select
+          v-model:value="formState.roleId"
+          show-search
+          placeholder="input search text"
+          :default-active-first-option="false"
+          :show-arrow="false"
+          :filter-option="false"
+          :not-found-content="null"
+          :options="roleSource"
+          @search="handleRoleSearch"
+        ></a-select>
+      </a-form-item>
+
+      <a-form-item label="状态" name="stat" class="input">
+        <a-select
+          placeholder="状态"
+          v-model:value="formState.stat"
+          :options="userStatusOptions"
+        ></a-select>
+      </a-form-item>
+
+      <a-form-item label="创建时间" name="fileName" class="input">
+        <a-range-picker
+          v-model:value="formState['rangetimepicker']"
+          :placeholder="['开始时间', '结束时间']"
+          show-time
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="YYYY-MM-DD HH:mm:ss"
+        />
+      </a-form-item>
+      <a-space class="input">
+        <a-button type="primary" html-type="submit"> 搜索 </a-button>
+      </a-space>
     </a-form>
 
     <!-- 上部搜索条件区域 -->
