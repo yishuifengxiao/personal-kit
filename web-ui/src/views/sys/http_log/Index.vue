@@ -29,19 +29,6 @@
          <a-input allowClear v-model:value="formState.certNo" placeholder="证件号码，模糊查询"> </a-input>
       </a-form-item>
 
-      <a-form-item label="角色" name="roleId" class="input">
-        <a-select
-          v-model:value="formState.roleId"
-          show-search
-          placeholder="input search text"
-          :default-active-first-option="false"
-          :show-arrow="false"
-          :filter-option="false"
-          :not-found-content="null"
-          :options="roleSource"
-          @search="handleRoleSearch"
-        ></a-select>
-      </a-form-item>
 
       <a-form-item label="状态" name="stat" class="input">
         <a-select allowClear

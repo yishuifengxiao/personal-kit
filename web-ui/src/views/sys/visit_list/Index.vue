@@ -9,7 +9,14 @@
       @finish="handleFinish"
     >
       <a-form-item label="类型" name="username">
-         <a-input allowClear v-model:value="formState.username" placeholder="动作类型"> </a-input>
+      
+         <a-select
+          allowClear
+          style="width: 180px"
+          placeholder="状态"
+          v-model:value="formState.auth"
+          :options="statusOptions"
+        ></a-select>
       </a-form-item>
 
       <a-form-item label="账号" name="nickname">
