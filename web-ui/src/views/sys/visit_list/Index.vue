@@ -9,8 +9,7 @@
       @finish="handleFinish"
     >
       <a-form-item label="类型" name="username">
-      
-         <a-select
+        <a-select
           allowClear
           style="width: 180px"
           placeholder="状态"
@@ -20,11 +19,13 @@
       </a-form-item>
 
       <a-form-item label="账号" name="nickname">
-         <a-input allowClear v-model:value="formState.nickname" placeholder="昵称，模糊查询"> </a-input>
+        <a-input allowClear v-model:value="formState.nickname" placeholder="昵称，模糊查询">
+        </a-input>
       </a-form-item>
 
       <a-form-item label="结果" name="phone">
-         <a-input allowClear v-model:value="formState.phone" placeholder="手机号，模糊查询"> </a-input>
+        <a-input allowClear v-model:value="formState.phone" placeholder="手机号，模糊查询">
+        </a-input>
       </a-form-item>
 
       <a-form-item>
@@ -74,9 +75,7 @@ import { mapState } from 'pinia'
 import { useUserStore } from '@/stores/user'
 export default defineComponent({
   data() {
-    const formState = reactive({
- 
-    })
+    const formState = reactive({})
     const data = reactive([])
     const roleSource = reactive([])
     return { formState, data, roleSource }
@@ -225,14 +224,11 @@ export default defineComponent({
     const fileList = ref([])
     const labelCol = { style: { width: '80px' } }
     const wrapperCol = { span: 14 }
-    const userStatusOptions = reactive([
-      { label: '账号正常', value: 0 },
-      { label: '账号禁用', value: 1 },
-      { label: '账号过期', value: 2 },
-      { label: '密码过期', value: 3 },
-      { label: '账号锁定', value: 4 }
+    const statusOptions = reactive([
+      { label: '认证成功', value: 0 },
+      { label: '认证失败', value: 1 }
     ])
-    return { columns, pagination, fileList, labelCol, wrapperCol, userStatusOptions }
+    return { columns, pagination, fileList, labelCol, wrapperCol, statusOptions }
   }
 })
 </script>
