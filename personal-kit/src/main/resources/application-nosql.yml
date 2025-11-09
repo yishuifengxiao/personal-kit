@@ -15,14 +15,9 @@ spring:
           min-idle: 0
 
 
+de:
+  flapdoodle:
     mongodb:
-      host: localhost
-      port: 27017
-      database: personkit
-  #      uri: mongodb://localhost/personkit
-  #      uri: mongodb://admin:123456@10.168.1.115/admin
-  mongodb:
-    embedded:
-      storage:
-        database-dir: ./mongo
-      version: 3.5.5
+      embedded:
+        version: 4.4.18
+        database-dir: target/embedded-mongo
