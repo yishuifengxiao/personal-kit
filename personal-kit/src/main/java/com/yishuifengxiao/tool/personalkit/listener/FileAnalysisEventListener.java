@@ -3,10 +3,9 @@ package com.yishuifengxiao.tool.personalkit.listener;
 import com.google.common.eventbus.Subscribe;
 import com.yishuifengxiao.common.guava.EventPublisher;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
-import com.yishuifengxiao.common.tool.codec.MD5;
+import com.yishuifengxiao.common.tool.codec.Md5;
 import com.yishuifengxiao.common.tool.io.IoUtil;
 import com.yishuifengxiao.common.tool.random.IdWorker;
-import com.yishuifengxiao.tool.personalkit.listener.event.FileAnalysisEvent;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
 import com.yishuifengxiao.tool.personalkit.domain.enums.SupportedSuffix;
@@ -16,6 +15,7 @@ import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyRow;
 import com.yishuifengxiao.tool.personalkit.helper.data.FileParserHelper;
 import com.yishuifengxiao.tool.personalkit.helper.data.ParserResult;
+import com.yishuifengxiao.tool.personalkit.listener.event.FileAnalysisEvent;
 import com.yishuifengxiao.tool.personalkit.support.UploadClient;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.BooleanUtils;
@@ -61,7 +61,7 @@ public class FileAnalysisEventListener {
                 String objectName = uploadClient.upload(fileAnalysisEvent.getSysUser(), file);
                 DiskFile diskFile = new DiskFile(
                         fileId, file.getName(), fileAnalysisEvent.getDiskFolder().getId(),
-                        fileAnalysisEvent.getSysUser().getId(), objectName, MD5.md5Short(file),
+                        fileAnalysisEvent.getSysUser().getId(), objectName, Md5.md5Short(file),
                         IoUtil.suffix(file), null, file.getName(), fileAnalysisEvent.getUploadRecord().getId(),
                         file.length(), fileAnalysisEvent.getUploadMode().getCode(), LocalDateTime.now());
                 reference.set(diskFile);

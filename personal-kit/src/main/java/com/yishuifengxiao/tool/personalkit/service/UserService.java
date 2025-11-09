@@ -9,7 +9,7 @@ import com.yishuifengxiao.common.security.utils.TokenUtil;
 import com.yishuifengxiao.common.support.SpringContext;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.codec.DES;
-import com.yishuifengxiao.common.tool.codec.MD5;
+import com.yishuifengxiao.common.tool.codec.Md5;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.entity.StringKeyValue;
@@ -196,7 +196,7 @@ public class UserService {
         for (String roleId : user.getRoleIds()) {
             Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, roleId)).orElseThrow(ValidateUtils.orElseThrow("角色不存在"));
         }
-        String salt = MD5.md5Short(IdWorker.snowflakeStringId());
+        String salt = Md5.md5Short(IdWorker.snowflakeStringId());
         String encrypt = DES.encrypt(salt, Constant.DEFAULT_PWD);
         SysUser sysUser = new SysUser(IdWorker.snowflakeStringId(), user.getUsername(),
                 user.getNickname(), user.getPhone(), user.getEmail(), user.getCertNo(), salt,

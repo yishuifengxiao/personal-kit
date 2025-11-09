@@ -69,53 +69,68 @@ public class SysUserDao {
     public Page<SysUser> findPage(PageQuery<UserQuery> query, SysRole role) {
         UserQuery userQuery = query.query().orElse(new UserQuery());
         UserStat userStat = UserStat.code(userQuery.getStat()).orElse(null);
-        String sql = """
-                SELECT
-                  u.*          
-                FROM
-                  sys_user u
-                  LEFT JOIN sys_user_role sur ON u.id = sur.user_id
-                  LEFT JOIN sys_role r ON r.id = sur.role_id          
-                WHERE
-                  u.ver = 0 
-                """;
-        if (StringUtils.isNotBlank(userQuery.getUsername())) {
-            sql += " AND u.username LIKE '%" + userQuery.getUsername() + "%'";
-        }
-        if (StringUtils.isNotBlank(userQuery.getNickname())) {
-            sql += " AND u.nickname LIKE '%" + userQuery.getNickname() + "%'";
-        }
-        if (StringUtils.isNotBlank(userQuery.getPhone())) {
-            sql += " AND u.phone LIKE '%" + userQuery.getPhone() + "%'";
-        }
-        if (StringUtils.isNotBlank(userQuery.getEmail())) {
-            sql += " AND u.email LIKE '%" + userQuery.getEmail() + "%'";
-        }
-        if (null != userStat) {
-            sql += " AND u.stat = " + userStat.code();
-        }
-        if (StringUtils.isNotBlank(userQuery.getRoleName())) {
-            sql += " AND r.name LIKE '%" + userQuery.getRoleName() + "%'";
-        }
-        if (null != userQuery.getStartCreateTime()) {
-            sql += " AND u.create_time >= '" + userQuery.getCreateTime() + "'";
-        }
-        if (null != userQuery.getEndCreateTime()) {
-            sql += " AND u.create_time <= '" + userQuery.getEndCreateTime() + "'";
-        }
-        if (null != userQuery.getStartLockTime()) {
-            sql += " AND u.lock_time >= '" + userQuery.getLockTime() + "'";
-        }
-        if (null != userQuery.getEndLockTime()) {
-            sql += " AND u.lock_time <= '" + userQuery.getLockTime() + "'";
-        }
-        if (StringUtils.isNotBlank(userQuery.getRoleId())) {
-            sql += " and r.id = " + userQuery.getRoleId() + "";
-        }
-        if (null == role || !RoleStat.ROLE_INIT.equalCode(role.getStat())) {
-            //
-            sql += " and r.stat != " + RoleStat.ROLE_INIT.code() + "";
-        }
-        return JdbcUtil.jdbcHelper().findPage(SysUser.class, query, sql);
+        Page<SysUser> page = JdbcUtil.jdbcHelper().findPage(SysUser.class, query, params -> {
+            String sql = """
+                    SELECT
+                      u.*          
+                    FROM
+                      sys_user u
+                      LEFT JOIN sys_user_role sur ON u.id = sur.user_id
+                      LEFT JOIN sys_role r ON r.id = sur.role_id          
+                    WHERE
+                      u.ver = 0 
+                    """;
+            if (StringUtils.isNotBlank(userQuery.getUsername())) {
+                sql += " AND u.username LIKE  concat('%', :username, '%')";
+                params.put("username", userQuery.getUsername());
+            }
+            if (StringUtils.isNotBlank(userQuery.getNickname())) {
+                sql += " AND u.nickname LIKE  concat('%', :nickname, '%')";
+                params.put("nickname", userQuery.getNickname());
+            }
+            if (StringUtils.isNotBlank(userQuery.getPhone())) {
+                sql += " AND u.phone LIKE  concat('%', :phone, '%')";
+                params.put("phone", userQuery.getPhone());
+            }
+            if (StringUtils.isNotBlank(userQuery.getEmail())) {
+                sql += " AND u.email LIKE  concat('%', :email, '%')";
+                params.put("email", userQuery.getEmail());
+            }
+            if (null != userStat) {
+                sql += " AND u.stat = " + userStat.code();
+            }
+            if (StringUtils.isNotBlank(userQuery.getRoleName())) {
+                sql += " AND r.name LIKE  concat('%', :roleName, '%')";
+                params.put("roleName", userQuery.getRoleName());
+            }
+            if (null != userQuery.getStartCreateTime()) {
+                sql += " AND u.create_time >= :startCreateTime";
+                params.put("startCreateTime", userQuery.getStartCreateTime());
+            }
+            if (null != userQuery.getEndCreateTime()) {
+                sql += " AND u.create_time <= :endCreateTime";
+                params.put("endCreateTime", userQuery.getEndCreateTime());
+            }
+            if (null != userQuery.getStartLockTime()) {
+                sql += " AND u.lock_time >= :startLockTime";
+                params.put("startLockTime", userQuery.getStartLockTime());
+            }
+            if (null != userQuery.getEndLockTime()) {
+                sql += " AND u.lock_time <= :endLockTime";
+                params.put("endLockTime", userQuery.getEndLockTime());
+            }
+            if (null != role) {
+                sql += " AND r.id = :roleId";
+                params.put("roleId", role.getId());
+            }
+            if (null == role || !RoleStat.ROLE_INIT.equalCode(role.getStat())) {
+                sql += " and r.stat != " + RoleStat.ROLE_INIT.code() + "";
+            }
+
+
+            return sql;
+        });
+
+        return page;
     }
 }

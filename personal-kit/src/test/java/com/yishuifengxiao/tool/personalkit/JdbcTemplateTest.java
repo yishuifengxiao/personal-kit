@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit;
 
 import com.yishuifengxiao.common.jdbc.JdbcHelper;
-import com.yishuifengxiao.common.jdbc.util.ColumnNameRowMapper;
+import com.yishuifengxiao.common.jdbc.util.SimpleRowMapper;
 import com.yishuifengxiao.common.tool.bean.JsonUtil;
 import com.yishuifengxiao.tool.personalkit.domain.entity.AutoTable;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
@@ -36,7 +36,7 @@ public class JdbcTemplateTest {
 
     @Test
     public void test1() {
-        List list = jdbcTemplate.query("select * from sys_role;", new ColumnNameRowMapper(SysRole.class));
+        List list = jdbcTemplate.query("select * from sys_role;", new SimpleRowMapper(SysRole.class));
         list.stream().map(JsonUtil::toJSONString).forEach(System.out::println);
 
     }
@@ -56,7 +56,7 @@ public class JdbcTemplateTest {
 
     @Test
     public void test_saveorUpdate() {
-        SysUserRole userRole = new SysUserRole("10000", null, null);
+        SysUserRole userRole = new SysUserRole("10", "12", "23");
         KeyHolder keyHolder = jdbcHelper.saveOrUpdate(userRole);
         String key = keyHolder.getKeyAs(String.class);
         Map<String, Object> keys = keyHolder.getKeys();

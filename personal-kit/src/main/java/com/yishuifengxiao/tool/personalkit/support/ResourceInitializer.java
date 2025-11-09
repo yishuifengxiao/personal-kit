@@ -1,11 +1,11 @@
 package com.yishuifengxiao.tool.personalkit.support;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.yishuifengxiao.common.guava.EventPublisher;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
-import com.yishuifengxiao.common.tool.bean.JsonUtil;
-import com.yishuifengxiao.common.tool.codec.MD5;
+import com.yishuifengxiao.common.support.api.ApiInfo;
+import com.yishuifengxiao.common.tool.codec.Md5;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
-import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
@@ -13,29 +13,21 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUserRole;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
 import com.yishuifengxiao.tool.personalkit.listener.event.UserCreateEvent;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.yishuifengxiao.tool.personalkit.domain.constant.Constant.DEFAULT_HOME_URL;
@@ -66,6 +58,9 @@ public class ResourceInitializer implements CommandLineRunner {
     @Autowired
     private ResourceLoader resourceLoader;
 
+    @Autowired
+    private ApplicationContext applicationContext;
+
     public void doInit() throws IOException {
         JdbcUtil.jdbcHelper().jdbcTemplate().update("DELETE from sys_permission where application_name=?",
                 this.applicationName);
@@ -83,7 +78,7 @@ public class ResourceInitializer implements CommandLineRunner {
         JdbcUtil.jdbcHelper().saveOrUpdate(sysRole);
 
         //初始化 用户-角色 关联关系
-        SysUserRole userRole = new SysUserRole(MD5.md5Short(sysUser.getId() + sysRole.getId()),
+        SysUserRole userRole = new SysUserRole(Md5.md5Short(sysUser.getId() + sysRole.getId()),
                 sysUser.getId(), sysRole.getId());
         JdbcUtil.jdbcHelper().saveOrUpdate(userRole);
 
@@ -115,101 +110,16 @@ public class ResourceInitializer implements CommandLineRunner {
     }
 
     public List<SysPermission> scanSysPermissions() {
-        Map<String, Object> map = new HashMap();
-        map.putAll(context.getBeansWithAnnotation(RestController.class));
-        map.putAll(context.getBeansWithAnnotation(Controller.class));
+        List<ApiInfo> permissions = new com.yishuifengxiao.common.support.ApiEndpointScanner(applicationContext).allApiEndpoints();
+        return permissions.stream().map(apiInfo -> {
+            SysPermission sysPermission = new SysPermission(null, apiInfo.getModuleName(),
+                    apiInfo.getMethodValue(), apiInfo.getMethodDescription(), CollUtil.first(apiInfo.getPath()).get(),
+                    CollUtil.first(apiInfo.getHttpMethods()).get(), contextPath, applicationName, 1
+            );
+            sysPermission.setId(Md5.md5Short(JSONObject.toJSONString(sysPermission)));
+            return sysPermission;
 
-        List<SysPermission> list =
-                map.values().stream().filter(Objects::nonNull).filter(v -> !sets.stream().anyMatch(s -> StringUtils.containsIgnoreCase(v.getClass().getPackageName(), s))).map(controller -> {
-                    // 得到的是controller
-                    String moduleName = extractModuleName(controller);
-                    List<String> classUrls = extractClassUrls(controller);
-                    classUrls = CollUtil.isEmpty(classUrls) ? Arrays.asList("") : classUrls;
-                    String className =
-                            StringUtils.substringBefore(controller.getClass().getName(), "$");
-
-                    //方法
-                    return classUrls.stream().map(classUrl -> Arrays.stream(controller.getClass().getMethods()).filter(m -> Modifier.isPublic(m.getModifiers())).map(declaredMethod -> {
-                        String[] methodPaths = methodPath(declaredMethod);
-                        if (CollUtil.isEmpty(methodPaths)) {
-                            return null;
-                        }
-
-                        String path = className + "::" + declaredMethod.getName();
-
-                        Operation apiOperation = AnnotationUtils.findAnnotation(declaredMethod,
-                                Operation.class);
-                        String summary = null != apiOperation ? apiOperation.summary() : "";
-                        String description = null != apiOperation ? apiOperation.description() : "";
-
-                        return Arrays.asList(methodPaths).stream().map(methodUrl -> {
-                            String url = StringUtils.trim(classUrl + methodUrl);
-                            SysPermission permission =
-                                    new SysPermission(null,
-                                            moduleName, summary, description, url, contextPath,
-                                            applicationName,
-                                            path, BoolStat.True.code());
-                            permission.setId(MD5.md5Short(JsonUtil.toJSONString(permission)));
-                            return permission;
-                        }).collect(Collectors.toList());
-                    }).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList())).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList());
-                }).filter(Objects::nonNull).flatMap(Collection::stream).collect(Collectors.toList());
-        return list;
-    }
-
-    private List<String> extractClassUrls(Object controller) {
-        RequestMapping requestMapping = AnnotationUtils.findAnnotation(controller.getClass(),
-                RequestMapping.class);
-        if (null != requestMapping) {
-            String[] value = requestMapping.value();
-            if (CollUtil.isNotEmpty(value)) {
-                return Arrays.asList(value);
-            }
-        }
-        return Collections.EMPTY_LIST;
-    }
-
-    private String extractModuleName(Object controller) {
-        Tag tag = controller.getClass().getAnnotation(Tag.class);
-        if (null != tag) {
-            return tag.name();
-        }
-        Schema api = controller.getClass().getAnnotation(Schema.class);
-        String moduleName = null;
-        if (null != api) {
-            moduleName = api.name();
-            if (StringUtils.isBlank(moduleName)) {
-                moduleName = CollUtil.stream(api.types()).collect(Collectors.joining(","));
-            }
-        }
-        return moduleName;
-    }
-
-    private String[] methodPath(Method method) {
-
-        GetMapping methodGetMapping = AnnotationUtils.findAnnotation(method, GetMapping.class);
-        if (null != methodGetMapping) {
-            return methodGetMapping.value();
-        }
-        PostMapping methodPostMapping = AnnotationUtils.findAnnotation(method, PostMapping.class);
-        if (null != methodPostMapping) {
-            return methodPostMapping.value();
-        }
-        DeleteMapping methodDeleteMapping = AnnotationUtils.findAnnotation(method,
-                DeleteMapping.class);
-        if (null != methodDeleteMapping) {
-            return methodDeleteMapping.value();
-        }
-        PutMapping methodPutMapping = AnnotationUtils.findAnnotation(method, PutMapping.class);
-        if (null != methodPutMapping) {
-            return methodPutMapping.value();
-        }
-        RequestMapping methodRequestMapping = AnnotationUtils.findAnnotation(method,
-                RequestMapping.class);
-        if (null != methodRequestMapping) {
-            return methodRequestMapping.value();
-        }
-        return null;
+        }).collect(Collectors.toList());
     }
 
 

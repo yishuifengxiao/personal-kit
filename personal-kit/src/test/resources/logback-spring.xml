@@ -45,7 +45,7 @@
         </layout>
     </appender>
 
-    <root level="info">
+    <root level="ERROR">
         <appender-ref ref="STDOUT"/>
         <!--不输出日志到文件-->
 <!--        <appender-ref ref="file"/>-->
@@ -101,7 +101,7 @@
     <!-- 显示加载的配置-->
     <logger name="org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener"
             level="ERROR"/>
-
+    <logger name="com.yishuifengxiao.common.jdbc" level="trace"/>
 
     <logger name="org.springframework.boot.autoconfigure.mongo.embedded" level="WARN"/>
 

@@ -3,7 +3,7 @@ package com.yishuifengxiao.tool.personalkit.tool;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.yishuifengxiao.common.tool.bean.JsonUtil;
-import com.yishuifengxiao.common.tool.codec.MD5;
+import com.yishuifengxiao.common.tool.codec.Md5;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.Ontology;
 import org.apache.commons.collections4.MapUtils;
@@ -45,7 +45,7 @@ public class OntHelper {
                         return null;
                     }
                     if (StringUtils.isBlank(nodeId)) {
-                        nodeId = MD5.md5Short(nodeName);
+                        nodeId = Md5.md5Short(nodeName);
                     }
 
 

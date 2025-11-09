@@ -1,5 +1,6 @@
 package com.yishuifengxiao.tool.personalkit;
 
+import com.yishuifengxiao.common.EnableAllExtensions;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.tool.personalkit.utils.IpUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ import java.util.Date;
 @EnableMethodSecurity
 @EnableWebSecurity
 @EnableAspectJAutoProxy
+@EnableAllExtensions
 public class App extends SpringBootServletInitializer {
 
 

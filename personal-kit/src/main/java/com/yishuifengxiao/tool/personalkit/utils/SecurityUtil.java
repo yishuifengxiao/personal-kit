@@ -2,7 +2,7 @@ package com.yishuifengxiao.tool.personalkit.utils;
 
 
 import com.yishuifengxiao.common.tool.codec.DES;
-import com.yishuifengxiao.common.tool.codec.MD5;
+import com.yishuifengxiao.common.tool.codec.Md5;
 
 /**
  * @author qingteng
@@ -13,7 +13,7 @@ import com.yishuifengxiao.common.tool.codec.MD5;
 public class SecurityUtil {
 
     public static String createSalt() {
-        String salt = MD5.md5Short(System.currentTimeMillis() + "");
+        String salt = Md5.md5Short(System.currentTimeMillis() + "");
         return salt;
     }
 

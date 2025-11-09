@@ -10,6 +10,7 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -97,7 +98,7 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
                           AND srm.role_id IN ( :roleIds )  
                       )  
                   )
-                                
+                
                 """;
         Map map = Map.of("roleIds", Arrays.asList(currentRole.getId()));
 
@@ -129,7 +130,11 @@ public class SimpleCustomResourceConfigurator implements CustomResourceConfigura
             if (CollUtil.isEmpty(list)) {
                 return null;
             }
-            return new OrRequestMatcher(list.stream().map(AntPathRequestMatcher::new).collect(Collectors.toList()));
+            List<RequestMatcher> matchers = list.stream().filter(StringUtils::isNotBlank).map(AntPathRequestMatcher::new).collect(Collectors.toList());
+            if (null == matchers || matchers.isEmpty()) {
+                return null;
+            }
+            return new OrRequestMatcher(matchers);
         } catch (Exception e) {
             e.printStackTrace();
         }

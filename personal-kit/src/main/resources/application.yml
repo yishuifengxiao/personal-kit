@@ -32,5 +32,24 @@ spring:
 
 yishuifengxiao:
   web:
+    enable: true
     response:
       enable: true
+    cors:
+      enable: true
+    aop:
+      enable: true
+    traced:
+      enable: true
+    error:
+      enable: true
+  security:
+    enable: true
+    oauth2server:
+      enable: true
+  code:
+    enable: true
+  redis:
+    enable: true
+  swagger:
+    enable: true

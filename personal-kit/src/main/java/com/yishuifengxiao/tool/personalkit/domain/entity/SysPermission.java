@@ -39,13 +39,14 @@ public class SysPermission implements Serializable {
 
     private String url;
 
+    @Column(name = "http_method")
+    private String httpMethod;
+
     @Column(name = "context_path")
     private String contextPath;
 
     @Column(name = "application_name")
     private String applicationName;
-
-    private String path;
 
 
     @JsonIgnore

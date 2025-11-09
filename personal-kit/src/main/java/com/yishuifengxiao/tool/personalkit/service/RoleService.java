@@ -1,6 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
+import com.yishuifengxiao.common.jdbc.NamedHandler;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
@@ -10,10 +11,7 @@ import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.common.tool.utils.ValidateUtils;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysRoleMenu;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysUserRole;
+import com.yishuifengxiao.tool.personalkit.domain.entity.*;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
 import com.yishuifengxiao.tool.personalkit.domain.query.RoleQuery;
 import com.yishuifengxiao.tool.personalkit.domain.vo.RoleVo;
@@ -22,10 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -50,48 +45,55 @@ public class RoleService {
         if (RoleStat.ROLE_INIT.equalCode(roleQuery.getStat())) {
             roleQuery.setStat(null);
         }
-        String sql = """
-                SELECT DISTINCTROW
-                	sr.*   
-                FROM
-                	sys_role sr   
-                WHERE
-                	1 = 1   
-                AND
-                IF
-                	( ? IS NULL, TRUE, sr.`id` = ? )   
-                AND
-                IF
-                	( ? IS NULL, TRUE, sr.`name` LIKE CONCAT( '%',?, '%' ) )   
-                AND
-                IF
-                	( ? IS NULL, TRUE, sr.`description` LIKE CONCAT( '%',?, '%' ) )   
-                AND
-                IF
-                	( ? IS NULL, TRUE, sr.`home_url` LIKE CONCAT( '%',?, '%' ) )   
-                AND
-                IF
-                	( ? IS NULL, TRUE, sr.`parent_id` = ? )   
-                AND
-                IF
-                	( ? IS NULL, sr.`stat` != -1 , sr.`stat` = ? )   
-                AND
-                IF
-                	(
-                		? IS NULL,
-                		TRUE,
-                	(
-                	sr.id IN ( SELECT srm.role_id FROM sys_menu m, sys_role_menu srm WHERE m.id = srm.role_id AND m.`name` LIKE CONCAT( '%',?, '%' ) )))
-                """;
+
+        Page<SysUser> result = JdbcUtil.jdbcHelper().findPage(SysUser.class, pageQuery, new NamedHandler() {
+            @Override
+            public String handle(Map<String, Object> params) {
+                String sql = """
+                                    SELECT DISTINCTROW
+                        	sr.*   
+                        FROM
+                        	sys_role sr   
+                        WHERE
+                        	1 = 1   
+                        
+                        """;
+                if (null != roleQuery.getId()) {
+                    sql += "AND sr.`id` = :id ";
+                    params.put("id", roleQuery.getId());
+                }
+                if (null != roleQuery.getName()) {
+                    sql += "AND sr.`name` LIKE CONCAT( '%',:name, '%' )";
+                    params.put("name", roleQuery.getName());
+                }
+                if (null != roleQuery.getDescription()) {
+                    sql += "AND sr.`description` LIKE CONCAT( '%',:description, '%' )";
+                    params.put("description", roleQuery.getDescription());
+                }
+                if (null != roleQuery.getHomeUrl()) {
+                    sql += "AND sr.`home_url` LIKE CONCAT( '%',:homeUrl, '%' )";
+                    params.put("homeUrl", roleQuery.getHomeUrl());
+                }
+                if (null != roleQuery.getParentId()) {
+                    sql += "AND sr.`parent_id` = :parentId ";
+                    params.put("parentId", roleQuery.getParentId());
+                }
+                if (null != roleQuery.getStat()) {
+                    sql += "AND sr.`stat` = :stat ";
+                    params.put("stat", roleQuery.getStat());
+                }
+                if (null != roleQuery.getMenuName()) {
+                    sql += "AND sr.`id` IN ( SELECT srm.role_id FROM sys_menu m, sys_role_menu srm WHERE m.id = srm.role_id AND m.`name` LIKE CONCAT( '%',:menuName, '%' ) )";
+                    params.put("menuName", roleQuery.getMenuName());
+                }
 
 
-        Page<SysRole> page = JdbcUtil.jdbcHelper().findPage(SysRole.class, pageQuery, sql,
-                roleQuery.getId(), roleQuery.getId(), roleQuery.getName(), roleQuery.getName(),
-                roleQuery.getDescription(), roleQuery.getDescription(), roleQuery.getHomeUrl(),
-                roleQuery.getHomeUrl(), roleQuery.getParentId(), roleQuery.getParentId(),
-                roleQuery.getStat(), roleQuery.getStat(), roleQuery.getMenuName(),
-                roleQuery.getMenuName());
-        return page.map(v -> {
+                return sql;
+            }
+        });
+
+
+        return result.map(v -> {
             RoleVo roleVo = BeanUtil.copy(v, new RoleVo());
             String psql = "SELECT DISTINCTROW sm.* from sys_role sr ,sys_role_menu srm ,sys_menu "
                     + "sm " + "WHERE sr.id=srm" + ".role_id and srm.menu_id=sm.id AND sr.id= ? ";

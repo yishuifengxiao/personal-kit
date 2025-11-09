@@ -101,6 +101,7 @@
     <!-- 显示加载的配置-->
     <logger name="org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener"
             level="trace"/>
+    <logger name="com.yishuifengxiao.common.jdbc" level="info"/>
 
 
     <logger name="org.springframework.boot.autoconfigure.mongo.embedded" level="WARN"/>
