@@ -1,4 +1,4 @@
-package com.yishuifengxiao.tool.personalkit.web;
+package com.yishuifengxiao.tool.personalkit.web.system;
 
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;

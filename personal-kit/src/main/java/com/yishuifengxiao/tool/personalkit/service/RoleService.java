@@ -1,7 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
-import com.yishuifengxiao.common.jdbc.NamedHandler;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
@@ -20,7 +19,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -46,50 +48,47 @@ public class RoleService {
             roleQuery.setStat(null);
         }
 
-        Page<SysUser> result = JdbcUtil.jdbcHelper().findPage(SysUser.class, pageQuery, new NamedHandler() {
-            @Override
-            public String handle(Map<String, Object> params) {
-                String sql = """
-                                    SELECT DISTINCTROW
-                        	sr.*   
-                        FROM
-                        	sys_role sr   
-                        WHERE
-                        	1 = 1   
-                        
-                        """;
-                if (null != roleQuery.getId()) {
-                    sql += "AND sr.`id` = :id ";
-                    params.put("id", roleQuery.getId());
-                }
-                if (null != roleQuery.getName()) {
-                    sql += "AND sr.`name` LIKE CONCAT( '%',:name, '%' )";
-                    params.put("name", roleQuery.getName());
-                }
-                if (null != roleQuery.getDescription()) {
-                    sql += "AND sr.`description` LIKE CONCAT( '%',:description, '%' )";
-                    params.put("description", roleQuery.getDescription());
-                }
-                if (null != roleQuery.getHomeUrl()) {
-                    sql += "AND sr.`home_url` LIKE CONCAT( '%',:homeUrl, '%' )";
-                    params.put("homeUrl", roleQuery.getHomeUrl());
-                }
-                if (null != roleQuery.getParentId()) {
-                    sql += "AND sr.`parent_id` = :parentId ";
-                    params.put("parentId", roleQuery.getParentId());
-                }
-                if (null != roleQuery.getStat()) {
-                    sql += "AND sr.`stat` = :stat ";
-                    params.put("stat", roleQuery.getStat());
-                }
-                if (null != roleQuery.getMenuName()) {
-                    sql += "AND sr.`id` IN ( SELECT srm.role_id FROM sys_menu m, sys_role_menu srm WHERE m.id = srm.role_id AND m.`name` LIKE CONCAT( '%',:menuName, '%' ) )";
-                    params.put("menuName", roleQuery.getMenuName());
-                }
-
-
-                return sql;
+        Page<SysRole> result = JdbcUtil.jdbcHelper().findPage(SysRole.class, pageQuery, params -> {
+            String sql = """
+                                SELECT DISTINCTROW
+                        sr.*   
+                    FROM
+                        sys_role sr   
+                    WHERE
+                        1 = 1   
+                    
+                    """;
+            if (null != roleQuery.getId()) {
+                sql += "AND sr.`id` = :id ";
+                params.put("id", roleQuery.getId());
             }
+            if (null != roleQuery.getName()) {
+                sql += "AND sr.`name` LIKE CONCAT( '%',:name, '%' )";
+                params.put("name", roleQuery.getName());
+            }
+            if (null != roleQuery.getDescription()) {
+                sql += "AND sr.`description` LIKE CONCAT( '%',:description, '%' )";
+                params.put("description", roleQuery.getDescription());
+            }
+            if (null != roleQuery.getHomeUrl()) {
+                sql += "AND sr.`home_url` LIKE CONCAT( '%',:homeUrl, '%' )";
+                params.put("homeUrl", roleQuery.getHomeUrl());
+            }
+            if (null != roleQuery.getParentId()) {
+                sql += "AND sr.`parent_id` = :parentId ";
+                params.put("parentId", roleQuery.getParentId());
+            }
+            if (null != roleQuery.getStat()) {
+                sql += "AND sr.`stat` = :stat ";
+                params.put("stat", roleQuery.getStat());
+            }
+            if (null != roleQuery.getMenuName()) {
+                sql += "AND sr.`id` IN ( SELECT srm.role_id FROM sys_menu m, sys_role_menu srm WHERE m.id = srm.role_id AND m.`name` LIKE CONCAT( '%',:menuName, '%' ) )";
+                params.put("menuName", roleQuery.getMenuName());
+            }
+
+
+            return sql.replaceAll("\r", " ").replaceAll("\n", " ").trim();
         });
 
 

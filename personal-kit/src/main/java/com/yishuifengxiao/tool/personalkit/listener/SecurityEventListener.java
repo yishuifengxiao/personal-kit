@@ -50,7 +50,7 @@ public class SecurityEventListener {
     public void onEvent(SecurityEvent event) {
         HttpServletRequest request = event.getRequest();
         Authentication authentication = event.getAuthentication();
-        String name = authentication.getName();
+        String name = Optional.ofNullable(authentication).map(Authentication::getName).orElse(null);
         requestRateLimiter(name, event.getStrategy(), request);
 
         //@formatter:off

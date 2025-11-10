@@ -1,4 +1,4 @@
-package com.yishuifengxiao.tool.personalkit.web;
+package com.yishuifengxiao.tool.personalkit.web.system;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
