@@ -17,14 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -82,8 +78,6 @@ public class ResourceInitializer implements CommandLineRunner {
                 sysUser.getId(), sysRole.getId());
         JdbcUtil.jdbcHelper().saveOrUpdate(userRole);
 
-        //初始化餐单
-        String sql = initSql();
 
         // 初始化角色-菜单关系
         JdbcUtil.jdbcHelper().jdbcTemplate().execute("""
@@ -94,20 +88,6 @@ public class ResourceInitializer implements CommandLineRunner {
         eventPublisher.post(new UserCreateEvent(sysUser));
     }
 
-    private String initSql() {
-        Resource resource = resourceLoader.getResource("classpath:db/dml.sql");
-        String result = "";
-        try (InputStream inputStream = resource.getInputStream(); BufferedReader reader =
-                new BufferedReader(new InputStreamReader(inputStream))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                result = result + line;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return result.trim();
-    }
 
     public List<SysPermission> scanSysPermissions() {
         List<ApiInfo> permissions = new com.yishuifengxiao.common.support.ApiEndpointScanner(applicationContext).allApiEndpoints();

@@ -21,9 +21,9 @@ spring:
         bootstrap-mode: default
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-#    password: "Yishui@36"
-#    url: jdbc:mysql://47.97.30.247:3306/personkit?useUnicode=true&characterEncoding=UTF-8&pinGlobalTxToPhysicalConnection=true&useSSL=false&createDatabaseIfNotExist=true
-#    password: "123456ss"
+    #    password: "Yishui@36"
+    #    url: jdbc:mysql://47.97.30.247:3306/personkit?useUnicode=true&characterEncoding=UTF-8&pinGlobalTxToPhysicalConnection=true&useSSL=false&createDatabaseIfNotExist=true
+    #    password: "123456ss"
     url: jdbc:mysql://localhost:3306/personkit?useUnicode=true&characterEncoding=UTF-8&pinGlobalTxToPhysicalConnection=true&useSSL=false&createDatabaseIfNotExist=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
     username: root
     password: "123456"
@@ -43,13 +43,5 @@ spring:
       login-timeout: 5
       # 池中维护的最小空闲连接数
       minimum-idle: 10
-
-  sql:
-    init:
-      schema-locations: classpath*:db/dml.sql
-      mode: always
-      continue-on-error: true
-      encoding: UTF-8
-
 
 

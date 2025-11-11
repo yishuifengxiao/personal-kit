@@ -11,6 +11,8 @@ management:
         include: "*"
   server:
     port: 8601
+
+
 server:
   port: 8600
   servlet:
@@ -20,6 +22,13 @@ spring:
     name: personkit
   main:
     banner-mode: off
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/ddl.sql
+      data-locations: classpath:db/dml.sql
+      continue-on-error: false
+      encoding: UTF-8
   servlet:
     multipart:
       max-file-size: 1000MB

@@ -31,3 +31,5 @@ INSERT IGNORE INTO `sys_menu` VALUES ('7', 0, NULL, NULL, 7, 1, 'eSIM', '0', 'eS
 INSERT IGNORE INTO `sys_menu` VALUES ('8', 0, NULL, NULL, 8, 0, '默认菜单', '0', 'default_menu', NULL, 0);
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+INSERT IGNORE INTO db_init_status (id, initialized) VALUES (1, TRUE);
