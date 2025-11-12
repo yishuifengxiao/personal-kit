@@ -30,19 +30,30 @@
     <!-- 上部搜索条件区域 -->
     <a-divider dashed />
     <!-- 中间内容区域 -->
-    <!-- 表格区 -->
-    <a-table :columns="columns" :data-source="tableData" :pagination="false" :scroll="{ x: 1500 }" size="small"
-      :row-selection="rowSelection" :expandable="expandable" :row-key="(record) => record.id">
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.dataIndex === 'action'">
-          <a-space>
-            <a-button type="link" @click="showDetail(record)"
-              :disabled="record.stat != 2 || record.actualTotalNum === 0">详情</a-button>
-            <a>删除</a> <a>修改角色</a> <a>修改状态</a></a-space>
+    <!-- 表格容器，添加固定高度和滚动 -->
+    <div class="table-container">
+      <!-- 表格区 -->
+      <a-table 
+        :columns="columns" 
+        :data-source="tableData" 
+        :pagination="false" 
+        :scroll="{ x: 1500, y: tableHeight }" 
+        size="small"
+        :row-selection="rowSelection" 
+        :expandable="expandable" 
+        :row-key="(record) => record.id"
+      >
+        <template #bodyCell="{ column, record }">
+          <template v-if="column.dataIndex === 'action'">
+            <a-space>
+              <a-button type="link" @click="showDetail(record)"
+                :disabled="record.stat != 2 || record.actualTotalNum === 0">详情</a-button>
+              <a>删除</a> <a>修改角色</a> <a>修改状态</a></a-space>
+          </template>
         </template>
-      </template>
-    </a-table>
-    <!-- 表格区 -->
+      </a-table>
+      <!-- 表格区 -->
+    </div>
 
     <!-- 分页区 -->
     <div style="margin-top: 15px; float: right">
@@ -55,7 +66,7 @@
 </template>
 
 <script>
-import { reactive, defineComponent, ref } from 'vue'
+import { reactive, defineComponent, ref, onMounted, onUnmounted } from 'vue'
 import { UserOutlined } from '@ant-design/icons-vue'
 import { mapState } from 'pinia'
 import { useUserStore } from '@/stores/user'
@@ -65,6 +76,7 @@ export default defineComponent({
     const data = reactive([])
     const roleSource = reactive([])
     const expandedRowKeys = ref([]) // 存储展开的行key
+    const tableHeight = ref(400) // 表格初始高度
 
     const rowSelection = ref({
       checkStrictly: false,
@@ -103,7 +115,8 @@ export default defineComponent({
       roleSource,
       rowSelection,
       expandable,
-      expandedRowKeys
+      expandedRowKeys,
+      tableHeight
     }
   },
   computed: {
@@ -161,6 +174,30 @@ export default defineComponent({
       })
     },
 
+    /**
+     * 计算表格高度
+     */
+    calculateTableHeight() {
+      // 获取窗口高度
+      const windowHeight = window.innerHeight
+      // 计算表格容器可用高度（减去搜索区域、分页区域等）
+      const searchHeight = 120 // 搜索区域高度
+      const paginationHeight = 60 // 分页区域高度
+      const margins = 40 // 边距
+      
+      const availableHeight = windowHeight - searchHeight - paginationHeight - margins
+      
+      // 设置最小高度和最大高度
+      this.tableHeight = Math.max(300, Math.min(600, availableHeight))
+    },
+
+    /**
+     * 窗口大小变化监听
+     */
+    handleResize() {
+      this.calculateTableHeight()
+    },
+
     handleChange(info) {
       if (info.file.status !== 'uploading') {
         console.log(info.file, info.fileList)
@@ -189,6 +226,14 @@ export default defineComponent({
   },
   mounted() {
     this.query()
+    // 初始化表格高度
+    this.calculateTableHeight()
+    // 监听窗口大小变化
+    window.addEventListener('resize', this.handleResize)
+  },
+  beforeUnmount() {
+    // 移除事件监听
+    window.removeEventListener('resize', this.handleResize)
   },
   setup() {
     const columns = [
@@ -268,5 +313,39 @@ export default defineComponent({
 .input {
   margin: 5px 5px 10px 5px;
   padding-right: 10px;
+}
+
+.table-container {
+  // 添加边框和圆角
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  // 添加内边距
+  padding: 8px;
+  // 设置背景色
+  background-color: #fff;
+  // 添加阴影效果
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px rgba(0, 0, 0, 0.02);
+  
+  // 确保表格在容器内正确显示
+  :deep(.ant-table) {
+    border-radius: 4px;
+  }
+  
+  :deep(.ant-table-container) {
+    border-radius: 4px;
+  }
+}
+
+// 响应式设计
+@media (max-height: 700px) {
+  .table-container {
+    max-height: 400px;
+  }
+}
+
+@media (max-height: 500px) {
+  .table-container {
+    max-height: 250px;
+  }
 }
 </style>
