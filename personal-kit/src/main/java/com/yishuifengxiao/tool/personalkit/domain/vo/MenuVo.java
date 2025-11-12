@@ -3,6 +3,7 @@ package com.yishuifengxiao.tool.personalkit.domain.vo;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * @date 2023/12/9 22:07
  * @since 1.0.0
  */
+@Accessors(chain = true)
 @Data
 public class MenuVo extends SysMenu {
 
@@ -24,4 +26,6 @@ public class MenuVo extends SysMenu {
     private String typeName;
 
     private String roleNames;
+
+    private List<MenuVo> children;
 }

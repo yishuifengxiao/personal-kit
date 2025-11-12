@@ -1,20 +1,12 @@
 <template>
   <a-layout class="root_view">
     <!-- 顶部导航栏 -->
-    <a-layout-header
-      class="header"
-      style="vertical-align: middle; display: flex; float: right; font-size: 1rem"
-    >
+    <a-layout-header class="header" style="vertical-align: middle; display: flex; float: right; font-size: 1rem">
       <div class="logo" style="width: 10vw" />
       <div :style="{ lineHeight: '64px', width: '70vw', 'font-size': '1rem !important' }">
         <!-- 顶部菜单 -->
-        <a-menu
-          v-model:selectedKeys="selectedTopKeysSource"
-          theme="dark"
-          mode="horizontal"
-          @select="onTopMenuSelect"
-          :style="{ lineHeight: '64px', 'font-size': '1.3rem !important' }"
-        >
+        <a-menu v-model:selectedKeys="selectedTopKeysSource" theme="dark" mode="horizontal" @select="onTopMenuSelect"
+          :style="{ lineHeight: '64px', 'font-size': '1.3rem !important' }">
           <a-menu-item v-for="item in menu.topMenus" :key="item.routerName" :id="item.id">{{
             item.name
           }}</a-menu-item>
@@ -23,18 +15,16 @@
       </div>
 
       <!-- 头部菜单最右侧 -->
-      <div
-        :style="{
-          lineHeight: '64px',
-          color: 'white',
-          float: 'right',
-          width: '20vw',
-          display: 'inline-block',
-          'text-align': 'right',
-          'vertical-align': 'middle',
-          'padding-right': '-1vw'
-        }"
-      >
+      <div :style="{
+        lineHeight: '64px',
+        color: 'white',
+        float: 'right',
+        width: '20vw',
+        display: 'inline-block',
+        'text-align': 'right',
+        'vertical-align': 'middle',
+        'padding-right': '-1vw'
+      }">
         <span>{{ user.nickname }}</span>
         <a-dropdown>
           <a class="ant-dropdown-link" @click.prevent>
@@ -66,14 +56,8 @@
     <a-layout style="overflow-x: hidden">
       <a-layout-sider width="200" style="background: #fff">
         <!-- 左侧菜单 -->
-        <a-menu
-          v-model:selectedKeys="selectedLeftKeysSource"
-          v-model:openKeys="openKeysSource"
-          mode="inline"
-          :items="leftMenuSource"
-          @select="onLeftMenuSelect"
-          :style="{ height: '100%', borderRight: 0 }"
-        >
+        <a-menu v-model:selectedKeys="selectedLeftKeysSource" v-model:openKeys="openKeysSource" mode="inline"
+          :items="leftMenuSource" @select="onLeftMenuSelect" :style="{ height: '100%', borderRight: 0 }">
         </a-menu>
         <!-- 左侧菜单 -->
       </a-layout-sider>
@@ -85,9 +69,7 @@
           }}</a-breadcrumb-item>
         </a-breadcrumb>
         <!-- 面包屑导航 -->
-        <a-layout-content
-          :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
-        >
+        <a-layout-content :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }">
           <!-- 内容区 -->
           <RouterView />
           <!-- 内容区 -->
@@ -102,8 +84,6 @@ import { mapState, mapActions } from 'pinia'
 import { useUserStore } from '@/stores/user'
 import {
   UserOutlined,
-  LaptopOutlined,
-  NotificationOutlined,
   DownOutlined
 } from '@ant-design/icons-vue'
 export default defineComponent({
@@ -293,9 +273,9 @@ export default defineComponent({
       // 自动选择左侧菜单的第一个选项
       await this.autoSelectFirstLeftMenu()
     },
-   /**
-     * 自动选择左侧菜单的第一个选项
-     */
+    /**
+      * 自动选择左侧菜单的第一个选项
+      */
     async autoSelectFirstLeftMenu() {
       if (this.menu.leftMenus && this.menu.leftMenus.length > 0) {
         const firstMenu = this.menu.leftMenus[0]
@@ -312,7 +292,7 @@ export default defineComponent({
         if (targetRouteName) {
           this.selectedLeftKeys = targetRouteName
           this.setLeftMenuId(targetRouteName)
-          
+
           // 检查路由是否存在，如果不存在则跳转到默认路由
           try {
             // 尝试解析路由，如果路由不存在会抛出错误
@@ -335,7 +315,7 @@ export default defineComponent({
               name: 'data_source_management'
             })
           }
-          
+
           // 强制更新视图，确保面包屑导航栏重新计算
           this.$forceUpdate()
         }
@@ -371,8 +351,6 @@ export default defineComponent({
 
   components: {
     UserOutlined,
-    LaptopOutlined,
-    NotificationOutlined,
     DownOutlined
   }
 })

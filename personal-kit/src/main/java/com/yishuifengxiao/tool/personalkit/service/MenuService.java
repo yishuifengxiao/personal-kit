@@ -65,28 +65,104 @@ public class MenuService {
     }
 
     public Page<MenuVo> findPage(PageQuery<SysMenu> pageQuery) {
-        return JdbcUtil.jdbcHelper().findPage(pageQuery.query().orElse(new SysMenu()), true,
-                pageQuery, Order.asc("parentId")).map(v -> {
+        if (null == pageQuery.getQuery().getParentId()) {
+            pageQuery.setQuery(pageQuery.getQuery().setParentId(Constant.DEFAULT_PARENT_ROOT_ID));
+        }
+        Page<SysMenu> page = JdbcUtil.jdbcHelper().findPage(pageQuery.query().orElse(new SysMenu()), false, pageQuery, Order.asc("idx"));
+
+        // 获取当前页所有菜单的ID列表
+        List<String> menuIds = page.getData().stream()
+                .map(SysMenu::getId)
+                .collect(Collectors.toList());
+
+        // 如果没有数据，直接返回
+        if (CollUtil.isEmpty(menuIds)) {
+            return page.map(v -> {
+                MenuVo vo = BeanUtil.copy(v, new MenuVo());
+                buildMenuVoDetails(vo, v);
+                return vo;
+            });
+        }
+
+        // 查询这些菜单的所有子孙菜单
+        String allChildrenSql = """
+                WITH RECURSIVE menu_tree AS (
+                    SELECT id, name, parent_id, router_name, router_path, icon, type, auth, idx, is_show, description
+                    FROM sys_menu 
+                    WHERE id IN (%s)
+                    UNION ALL
+                    SELECT sm.id, sm.name, sm.parent_id, sm.router_name, sm.router_path, sm.icon, sm.type, sm.auth, sm.idx, sm.is_show, sm.description
+                    FROM sys_menu sm
+                    INNER JOIN menu_tree mt ON sm.parent_id = mt.id
+                )
+                SELECT * FROM menu_tree
+                """;
+
+        String inClause = menuIds.stream().map(id -> "'" + id + "'").collect(Collectors.joining(","));
+        String finalSql = String.format(allChildrenSql, inClause);
+
+        List<SysMenu> allMenus = JdbcUtil.jdbcHelper().findAll(SysMenu.class, finalSql);
+
+        // 构建ID到菜单的映射
+        Map<String, SysMenu> menuMap = allMenus.stream()
+                .collect(Collectors.toMap(SysMenu::getId, menu -> menu));
+
+        // 构建ID到子菜单列表的映射
+        Map<String, List<SysMenu>> childrenMap = new HashMap<>();
+        for (SysMenu menu : allMenus) {
+            childrenMap.computeIfAbsent(menu.getParentId(), k -> new ArrayList<>()).add(menu);
+        }
+
+        return page.map(v -> {
             MenuVo vo = BeanUtil.copy(v, new MenuVo());
-            vo.setParentName(Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysMenu.class,
-                    v.getParentId())).map(s -> s.getName()).orElse(""));
-            vo.setAuthName(BoolStat.isTrue(v.getAuth()) ? "是" : "否");
-            vo.setTypeName(BoolStat.isTrue(v.getType()) ? "上部" : "左侧");
-            String roleSql = """
-                    SELECT DISTINCT sr.`name` from sys_role sr,sys_role_menu srm where sr.id=srm.role_id and srm.menu_id=?
-                    """;
-            String roleNames =
-                    JdbcUtil.jdbcHelper().findAll(String.class, roleSql, v.getId()).stream().collect(Collectors.joining(","));
-            vo.setRoleNames(roleNames);
-            String sql = "SELECT DISTINCT sp.* from sys_permission sp,sys_menu_permission smp "
-                    + "where  smp" +
-                    ".permission_id " + "=sp.id and smp.menu_id=?";
-            List<SysPermission> list =
-                    JdbcUtil.jdbcHelper().findAll(SysPermission.class, sql, v.getId());
-            vo.setPermissions(list);
+            buildMenuVoDetails(vo, v);
+
+            // 构建菜单树
+            List<MenuVo> children = buildMenuTree(v.getId(), menuMap, childrenMap);
+            vo.setChildren(children);
+
             return vo;
         });
     }
+
+    private void buildMenuVoDetails(MenuVo vo, SysMenu menu) {
+        vo.setParentName(Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysMenu.class, menu.getParentId()))
+                .map(SysMenu::getName)
+                .orElse(""));
+        vo.setAuthName(BoolStat.isTrue(menu.getAuth()) ? "是" : "否");
+        vo.setTypeName(BoolStat.isTrue(menu.getType()) ? "上部" : "左侧");
+
+        String roleSql = """
+                SELECT DISTINCT sr.`name` from sys_role sr,sys_role_menu srm where sr.id=srm.role_id and srm.menu_id=?
+                """;
+        String roleNames = JdbcUtil.jdbcHelper().findAll(String.class, roleSql, menu.getId()).stream()
+                .collect(Collectors.joining(","));
+        vo.setRoleNames(roleNames);
+
+        String sql = "SELECT DISTINCT sp.* from sys_permission sp,sys_menu_permission smp " +
+                "where smp.permission_id = sp.id and smp.menu_id=?";
+        List<SysPermission> list = JdbcUtil.jdbcHelper().findAll(SysPermission.class, sql, menu.getId());
+        vo.setPermissions(list);
+    }
+
+    private List<MenuVo> buildMenuTree(String parentId, Map<String, SysMenu> menuMap, Map<String, List<SysMenu>> childrenMap) {
+        List<SysMenu> directChildren = childrenMap.getOrDefault(parentId, Collections.emptyList());
+
+        return directChildren.stream()
+                .sorted(Comparator.comparing(SysMenu::getIdx))
+                .map(child -> {
+                    MenuVo childVo = BeanUtil.copy(child, new MenuVo());
+                    buildMenuVoDetails(childVo, child);
+
+                    // 递归构建子菜单树
+                    List<MenuVo> grandchildren = buildMenuTree(child.getId(), menuMap, childrenMap);
+                    childVo.setChildren(grandchildren);
+
+                    return childVo;
+                })
+                .collect(Collectors.toList());
+    }
+
 
 
     public void updateMenuPermission(MenuPermissionReq req) {
@@ -113,14 +189,11 @@ public class MenuService {
             return new RoleMenuVo(Collections.emptyList(), Collections.emptyList());
         }
         // 上部的菜单
-        List<SysMenu> topMenus =
-                list.stream().filter(v -> BoolStat.isFalse(v.getType())).sorted(Comparator.comparing(SysMenu::getIdx
-                )).collect(Collectors.toList());
+        List<SysMenu> topMenus = list.stream().filter(v -> BoolStat.isFalse(v.getType())).sorted(Comparator.comparing(SysMenu::getIdx)).collect(Collectors.toList());
         if (CollUtil.isEmpty(topMenus)) {
             return new RoleMenuVo(Collections.emptyList(), Collections.emptyList());
         }
-        SysMenu selectTop =
-                topMenus.stream().filter(v -> StringUtils.equalsIgnoreCase(v.getId(), topMenuId)).findFirst().orElse(topMenus.get(0));
+        SysMenu selectTop = topMenus.stream().filter(v -> StringUtils.equalsIgnoreCase(v.getId(), topMenuId)).findFirst().orElse(topMenus.get(0));
 
 
         List<MenuTree> menuTrees = buildTree(list, selectTop);
@@ -130,14 +203,10 @@ public class MenuService {
     }
 
     public static List<MenuTree> buildTree(List<SysMenu> nodes, SysMenu selectTop) {
-        List<MenuTree> trees = nodes.stream().filter(v -> StringUtils.equalsIgnoreCase(v.getParentId(),
-                selectTop.getId())).sorted(Comparator.comparing(SysMenu::getIdx
-        )).map(v -> {
+        List<MenuTree> trees = nodes.stream().filter(v -> StringUtils.equalsIgnoreCase(v.getParentId(), selectTop.getId())).sorted(Comparator.comparing(SysMenu::getIdx)).map(v -> {
             MenuTree firstLevel = BeanUtil.copy(v, new MenuTree());
 
-            List<MenuTree> secondLevel = nodes.stream().filter(s -> StringUtils.equalsIgnoreCase(s.getParentId(),
-                    firstLevel.getId())).sorted(Comparator.comparing(SysMenu::getIdx
-            )).map(s -> BeanUtil.copy(s, new MenuTree())).collect(Collectors.toList());
+            List<MenuTree> secondLevel = nodes.stream().filter(s -> StringUtils.equalsIgnoreCase(s.getParentId(), firstLevel.getId())).sorted(Comparator.comparing(SysMenu::getIdx)).map(s -> BeanUtil.copy(s, new MenuTree())).collect(Collectors.toList());
             firstLevel.setChildrens(secondLevel);
             return firstLevel;
         }).collect(Collectors.toList());

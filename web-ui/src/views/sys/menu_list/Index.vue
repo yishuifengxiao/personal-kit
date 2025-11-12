@@ -1,25 +1,15 @@
 <template>
   <div>
     <!-- 上部搜索条件区域 -->
-    <a-form
-      layout="inline"
-      name="basic"
-      autocomplete="off"
-      :model="formState"
-      @finish="handleFinish"
-      :label-col="labelCol"
-    >
+    <a-form layout="inline" name="basic" autocomplete="off" :model="formState" @finish="handleFinish"
+      :label-col="labelCol">
       <a-form-item label="菜单名称" name="name" class="input">
         <a-input allowClear v-model:value="formState.name" placeholder="菜单名称，模糊查询">
         </a-input>
       </a-form-item>
 
       <a-form-item label="父级菜单" name="父级菜单" class="input">
-        <a-input
-          allowClear
-          v-model:value="formState.parentName"
-          placeholder="父级菜单名称，模糊查询"
-        >
+        <a-input allowClear v-model:value="formState.parentName" placeholder="父级菜单名称，模糊查询">
         </a-input>
       </a-form-item>
 
@@ -29,13 +19,8 @@
       </a-form-item>
 
       <a-form-item label="需要鉴权" name="auth" class="input">
-        <a-select
-          allowClear
-          style="width: 180px"
-          placeholder="状态"
-          v-model:value="formState.auth"
-          :options="statusOptions"
-        ></a-select>
+        <a-select allowClear style="width: 180px" placeholder="状态" v-model:value="formState.auth"
+          :options="statusOptions"></a-select>
       </a-form-item>
       <a-space class="input">
         <a-button type="primary" html-type="submit"> 搜索 </a-button>
@@ -46,18 +31,14 @@
     <a-divider dashed />
     <!-- 中间内容区域 -->
     <!-- 表格区 -->
-    <a-table :columns="columns" :data-source="tableData" :pagination="false" :scroll="{ x: 1500 }">
+    <a-table :columns="columns" :data-source="tableData" :pagination="false" :scroll="{ x: 1500 }" size="small"
+      :row-selection="rowSelection" :expandable="expandable" :row-key="(record) => record.id">
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'action'">
           <a-space>
-            <a-button
-              type="link"
-              @click="showDetail(record)"
-              :disabled="record.stat != 2 || record.actualTotalNum === 0"
-              >详情</a-button
-            >
-            <a>删除</a> <a>修改角色</a> <a>修改状态</a></a-space
-          >
+            <a-button type="link" @click="showDetail(record)"
+              :disabled="record.stat != 2 || record.actualTotalNum === 0">详情</a-button>
+            <a>删除</a> <a>修改角色</a> <a>修改状态</a></a-space>
         </template>
       </template>
     </a-table>
@@ -65,12 +46,8 @@
 
     <!-- 分页区 -->
     <div style="margin-top: 15px; float: right">
-      <a-pagination
-        v-model:current="pagination.current"
-        :total="pagination.total"
-        :show-total="(total) => `共 ${total} 条数据`"
-        @change="onPaginationChange"
-      />
+      <a-pagination v-model:current="pagination.current" :total="pagination.total"
+        :show-total="(total) => `共 ${total} 条数据`" @change="onPaginationChange" />
     </div>
     <!-- 分页区 -->
     <!-- 中间内容区域 -->
@@ -87,7 +64,47 @@ export default defineComponent({
     const formState = reactive({})
     const data = reactive([])
     const roleSource = reactive([])
-    return { formState, data, roleSource }
+    const expandedRowKeys = ref([]) // 存储展开的行key
+
+    const rowSelection = ref({
+      checkStrictly: false,
+      onChange: (selectedRowKeys, selectedRows) => {
+        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
+      },
+      onSelect: (record, selected, selectedRows) => {
+        console.log(record, selected, selectedRows)
+      },
+      onSelectAll: (selected, selectedRows, changeRows) => {
+        console.log(selected, selectedRows, changeRows)
+      }
+    })
+
+    // 展开配置
+    const expandable = ref({
+      expandedRowKeys: expandedRowKeys.value,
+      onExpand: (expanded, record) => {
+        if (expanded) {
+          // 展开当前行，收起其他行
+          expandedRowKeys.value = [record.id]
+        } else {
+          // 收起当前行
+          expandedRowKeys.value = []
+        }
+      },
+      // 判断是否有子节点
+      rowExpandable: (record) => {
+        return record.children && record.children.length > 0
+      }
+    })
+
+    return {
+      formState,
+      data,
+      roleSource,
+      rowSelection,
+      expandable,
+      expandedRowKeys
+    }
   },
   computed: {
     ...mapState(useUserStore, ['tokenVal']),
@@ -122,9 +139,26 @@ export default defineComponent({
         .then((res) => {
           this.pagination.current = res.num
           this.pagination.total = res.total
-          this.data = reactive(res.data)
+
+          // 处理数据，确保有children字段用于树形展示
+          this.data = reactive(this.processTreeData(res.data))
         })
         .catch((err) => console.log(err))
+    },
+
+    /**
+     * 处理树形数据
+     */
+    processTreeData(data) {
+      if (!data || !Array.isArray(data)) return []
+
+      return data.map((item) => {
+        // 确保每个item都有children字段，即使为空数组
+        return {
+          ...item,
+          children: item.children || []
+        }
+      })
     },
 
     handleChange(info) {
@@ -170,13 +204,7 @@ export default defineComponent({
         key: 'parentName',
         align: 'center'
       },
-      {
-        title: '角色',
-        dataIndex: 'roleNames',
-        key: 'roleNames',
-        ellipsis: true,
-        align: 'center'
-      },
+
       {
         title: '路由名称',
         dataIndex: 'routerName',
