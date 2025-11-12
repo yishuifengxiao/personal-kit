@@ -293,7 +293,7 @@ export default defineComponent({
       // 自动选择左侧菜单的第一个选项
       await this.autoSelectFirstLeftMenu()
     },
-    /**
+   /**
      * 自动选择左侧菜单的第一个选项
      */
     async autoSelectFirstLeftMenu() {
@@ -312,10 +312,30 @@ export default defineComponent({
         if (targetRouteName) {
           this.selectedLeftKeys = targetRouteName
           this.setLeftMenuId(targetRouteName)
-          // 路由跳转到第一个菜单，使用replace确保浏览器历史记录正确
-          await this.$router.replace({
-            name: targetRouteName
-          })
+          
+          // 检查路由是否存在，如果不存在则跳转到默认路由
+          try {
+            // 尝试解析路由，如果路由不存在会抛出错误
+            const route = this.$router.resolve({ name: targetRouteName })
+            if (route.matched.length > 0) {
+              // 路由存在，进行跳转
+              await this.$router.replace({
+                name: targetRouteName
+              })
+            } else {
+              // 路由不存在，跳转到默认路由
+              await this.$router.replace({
+                name: 'data_source_management'
+              })
+            }
+          } catch (error) {
+            // 路由解析失败，跳转到默认路由
+            console.warn(`路由 ${targetRouteName} 不存在，跳转到默认路由`)
+            await this.$router.replace({
+              name: 'data_source_management'
+            })
+          }
+          
           // 强制更新视图，确保面包屑导航栏重新计算
           this.$forceUpdate()
         }

@@ -218,7 +218,7 @@ export default defineComponent({
     UserOutlined
   },
   mounted() {
-    console.log('------------------------- data sourc emounte')
+   
     this.query()
   },
   setup() {

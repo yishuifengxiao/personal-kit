@@ -143,7 +143,6 @@ export default defineComponent({
     }
   },
   mounted() {
-    console.log('------------------------- data sourc emounte')
     this.query()
   },
   setup() {
