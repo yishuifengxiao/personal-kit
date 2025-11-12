@@ -177,7 +177,7 @@ const routes = [
         }),
         meta: {
           label: '系统管理',
-          breadcrumbName: ['系统管理', '认证管理', '认证列表']
+          breadcrumbName: ['系统管理', '认证管理', '访问记录']
         }
       }
     ]

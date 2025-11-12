@@ -34,7 +34,6 @@ public class JdbcTokenHolder implements TokenHolder {
         return BeanUtil.byteToObject(HexUtil.hexToBytes(token.getValue()), SecurityToken.class);
     }
 
-    // ... existing code ...
     @Override
     public List<SecurityToken> getAll(String username) {
         List<UserToken> tokens = jdbcHelper.findAll(new UserToken().setUserName(username), false);
@@ -42,7 +41,6 @@ public class JdbcTokenHolder implements TokenHolder {
             return BeanUtil.byteToObject(HexUtil.hexToBytes(token.getValue()), SecurityToken.class);
         }).toList();
     }
-// ... existing code ...
 
 
     @Override
