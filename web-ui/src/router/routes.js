@@ -144,7 +144,20 @@ const routes = [
           label: '系统管理',
           breadcrumbName: ['系统管理', '菜单管理', '菜单列表']
         }
-      }, {
+      },
+      {
+        path: 'menu_permission_management',
+        name: 'menu_permission_management',
+        component: () => import('@/views/sys/menu_list/PermissionManagement.vue'),
+        props: (route) => ({
+          menuId: route.query.menuId
+        }),
+        meta: {
+          label: '菜单权限管理',
+          breadcrumbName: ['系统管理', '菜单管理', '权限管理']
+        }
+      },
+      {
         path: 'perssion_mananer',
         name: 'perssion_mananer',
         component: () => import('@/views/sys/resource_list/Index.vue'),

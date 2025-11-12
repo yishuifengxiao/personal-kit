@@ -67,8 +67,10 @@
                 :disabled="record.stat != 2 || record.actualTotalNum === 0"
                 >详情</a-button
               >
-              <a>删除</a> <a>修改权限</a> <a>修改状态</a></a-space
-            >
+              <a>删除</a> 
+              <a-button type="link" @click="modifyPermissions(record)">修改权限</a-button> 
+              <a>修改状态</a>
+            </a-space>
           </template>
         </template>
       </a-table>
@@ -94,6 +96,7 @@ import { reactive, defineComponent, ref, onMounted, onUnmounted } from 'vue'
 import { UserOutlined } from '@ant-design/icons-vue'
 import { mapState } from 'pinia'
 import { useUserStore } from '@/stores/user'
+
 export default defineComponent({
   data() {
     const formState = reactive({})
@@ -243,6 +246,24 @@ export default defineComponent({
       sessionStorage.setItem('current_view_file', JSON.stringify(record))
 
       this.$router.push({ name: 'data_source_detail', query: { record: record.id } })
+    },
+    
+    /**
+     * 修改权限 - 跳转到权限管理页面
+     */
+    modifyPermissions(record) {
+      // 将当前菜单信息存储到sessionStorage，供权限管理页面使用
+      sessionStorage.setItem('current_menu_for_permission', JSON.stringify({
+        id: record.id,
+        name: record.name,
+        routerName: record.routerName
+      }))
+      
+      // 跳转到权限管理页面
+      this.$router.push({ 
+        name: 'menu_permission_management', 
+        query: { menuId: record.id }
+      })
     }
   },
   components: {
