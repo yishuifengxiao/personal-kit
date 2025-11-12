@@ -1,11 +1,9 @@
 package com.yishuifengxiao.tool.personalkit.domain.vo;
 
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author yishui
@@ -16,5 +14,5 @@ import java.util.List;
 @Data
 public class PermissionVo extends SysPermission implements Serializable {
 
-    private List<SysMenu> menus;
+
 }

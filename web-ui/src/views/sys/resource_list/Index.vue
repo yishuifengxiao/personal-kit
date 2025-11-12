@@ -9,54 +9,56 @@
       @finish="handleFinish"
       :label-col="labelCol"
     >
+      <a-form-item label="应用名称" name="applicationName" class="input">
+        <a-input allowClear v-model:value="formState.applicationName" placeholder="应用名称，模糊查询">
+        </a-input>
+      </a-form-item>
+
+      <a-form-item label="模板名称" name="模板名称" class="input">
+        <a-input allowClear v-model:value="formState.module" placeholder="模板名称，模糊查询">
+        </a-input>
+      </a-form-item>
+
       <a-form-item label="资源名称" name="name" class="input">
         <a-input allowClear v-model:value="formState.name" placeholder="资源名称，模糊查询">
         </a-input>
       </a-form-item>
 
-      <a-form-item label="所属应用" name="applicationName" class="input">
-        <a-input
-          allowClear
-          v-model:value="formState.applicationName"
-          placeholder="所属应用，模糊查询"
-        >
-        </a-input>
-      </a-form-item>
-
-      <a-form-item label="所属模块" name="module" class="input">
-        <a-input allowClear v-model:value="formState.module" placeholder="所属模块，模糊查询">
-        </a-input>
-      </a-form-item>
-
-      <a-form-item label="资源路径" name="url" class="input">
-        <a-input allowClear v-model:value="formState.url" placeholder="资源路径，模糊查询">
-        </a-input>
-      </a-form-item>
       <a-space class="input">
         <a-button type="primary" html-type="submit"> 搜索 </a-button>
       </a-space>
     </a-form>
 
     <!-- 上部搜索条件区域 -->
-    <!-- <a-divider dashed /> -->
+    <a-divider dashed />
     <!-- 中间内容区域 -->
-    <!-- 表格区 -->
-    <a-table :columns="columns" :data-source="tableData" :pagination="false" :scroll="{ x: 1500 }">
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.dataIndex === 'action'">
-          <a-space>
-            <a-button
-              type="link"
-              @click="showDetail(record)"
-              :disabled="record.stat != 2 || record.actualTotalNum === 0"
-              >详情</a-button
+    <!-- 表格容器，添加固定高度和滚动 -->
+    <div class="table-container">
+      <!-- 表格区 -->
+      <a-table
+        :columns="columns"
+        :data-source="tableData"
+        :pagination="false"
+        :scroll="{ x: 1500, y: tableHeight }"
+        size="small"
+        :row-selection="rowSelection"
+      >
+        <template #bodyCell="{ column, record }">
+          <template v-if="column.dataIndex === 'action'">
+            <a-space>
+              <a-button
+                type="link"
+                @click="showDetail(record)"
+                :disabled="record.stat != 2 || record.actualTotalNum === 0"
+                >详情</a-button
+              >
+              <a>删除</a> <a>修改</a> <a>修改状态</a></a-space
             >
-            <a>删除</a> <a>修改角色</a> <a>修改状态</a></a-space
-          >
+          </template>
         </template>
-      </template>
-    </a-table>
-    <!-- 表格区 -->
+      </a-table>
+      <!-- 表格区 -->
+    </div>
 
     <!-- 分页区 -->
     <div style="margin-top: 15px; float: right">
@@ -73,7 +75,7 @@
 </template>
 
 <script>
-import { reactive, defineComponent, ref } from 'vue'
+import { reactive, defineComponent, ref} from 'vue'
 import { UserOutlined } from '@ant-design/icons-vue'
 import { mapState } from 'pinia'
 import { useUserStore } from '@/stores/user'
@@ -82,7 +84,28 @@ export default defineComponent({
     const formState = reactive({})
     const data = reactive([])
     const roleSource = reactive([])
-    return { formState, data, roleSource }
+    const tableHeight = ref(400) // 表格初始高度
+
+    const rowSelection = ref({
+      checkStrictly: false,
+      onChange: (selectedRowKeys, selectedRows) => {
+        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows)
+      },
+      onSelect: (record, selected, selectedRows) => {
+        console.log(record, selected, selectedRows)
+      },
+      onSelectAll: (selected, selectedRows, changeRows) => {
+        console.log(selected, selectedRows, changeRows)
+      }
+    })
+
+    return {
+      formState,
+      data,
+      roleSource,
+      rowSelection,
+      tableHeight
+    }
   },
   computed: {
     ...mapState(useUserStore, ['tokenVal']),
@@ -117,9 +140,35 @@ export default defineComponent({
         .then((res) => {
           this.pagination.current = res.num
           this.pagination.total = res.total
+
+          // 直接使用返回的数据，不需要树形处理
           this.data = reactive(res.data)
         })
         .catch((err) => console.log(err))
+    },
+
+    /**
+     * 计算表格高度
+     */
+    calculateTableHeight() {
+      // 获取窗口高度
+      const windowHeight = window.innerHeight
+      // 计算表格容器可用高度（减去搜索区域、分页区域等）
+      const searchHeight = 120 // 搜索区域高度
+      const paginationHeight = 60 // 分页区域高度
+      const margins = 40 // 边距
+
+      const availableHeight = windowHeight - searchHeight - paginationHeight - margins
+
+      // 设置最小高度和最大高度
+      this.tableHeight = Math.max(300, Math.min(600, availableHeight))
+    },
+
+    /**
+     * 窗口大小变化监听
+     */
+    handleResize() {
+      this.calculateTableHeight()
     },
 
     handleChange(info) {
@@ -150,64 +199,69 @@ export default defineComponent({
   },
   mounted() {
     this.query()
+    // 初始化表格高度
+    this.calculateTableHeight()
+    // 监听窗口大小变化
+    window.addEventListener('resize', this.handleResize)
+  },
+  beforeUnmount() {
+    // 移除事件监听
+    window.removeEventListener('resize', this.handleResize)
   },
   setup() {
     const columns = [
       {
-        title: '资源路径',
-        dataIndex: 'url',
-        key: 'url',
-        align: 'center',
-        width: 150
+        title: '应用名称',
+        dataIndex: 'applicationName',
+        key: 'applicationName',
+        align: 'center'
       },
+      {
+        title: '模板名称',
+        dataIndex: 'module',
+        key: 'module',
+        align: 'center'
+      },
+
       {
         title: '资源名称',
         dataIndex: 'name',
         key: 'name',
-        align: 'center',
-
-        width: 150
-      },
-
-      {
-        title: '所属模块',
-        dataIndex: 'module',
-        key: 'module',
         ellipsis: true,
-        width: 100,
+
         align: 'center'
       },
       {
-        title: '所属应用',
-        dataIndex: 'applicationName',
-        key: 'applicationName',
+        title: '请求方法',
+        dataIndex: 'httpMethod',
+        key: 'httpMethod',
         ellipsis: true,
-        align: 'center',
-        width: 100
+
+        align: 'center'
       },
       {
-        title: '资源前缀',
-        dataIndex: 'contextPath',
-        key: 'contextPath',
+        title: '资源路径',
+        dataIndex: 'url',
+        key: 'url',
         ellipsis: true,
-        align: 'center',
-        width: 100
+
+        align: 'center'
       },
       {
-        title: '资源描述',
+        title: '描述',
         dataIndex: 'description',
         key: 'description',
+
         ellipsis: true,
-        width: 150,
         align: 'center'
       },
       {
-        title: '资源位置',
-        dataIndex: 'path',
-        key: 'path',
-        ellipsis: true,
-        width: 150,
-        align: 'center'
+        title: '操作',
+        dataIndex: 'action',
+        key: 'action',
+        width: 300,
+        align: 'center',
+        fixed: 'right'
       }
     ]
     const pagination = {
@@ -218,14 +272,11 @@ export default defineComponent({
     const fileList = ref([])
     const labelCol = { style: { width: '80px' } }
     const wrapperCol = { span: 14 }
-    const userStatusOptions = reactive([
-      { label: '账号正常', value: 0 },
-      { label: '账号禁用', value: 1 },
-      { label: '账号过期', value: 2 },
-      { label: '密码过期', value: 3 },
-      { label: '账号锁定', value: 4 }
+    const statusOptions = reactive([
+      { label: '需要鉴权', value: 1 },
+      { label: '无需鉴权', value: 0 }
     ])
-    return { columns, pagination, fileList, labelCol, wrapperCol, userStatusOptions }
+    return { columns, pagination, fileList, labelCol, wrapperCol, statusOptions }
   }
 })
 </script>
@@ -234,5 +285,42 @@ export default defineComponent({
 .input {
   margin: 5px 5px 10px 5px;
   padding-right: 10px;
+}
+
+.table-container {
+  // 添加边框和圆角
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  // 添加内边距
+  padding: 8px;
+  // 设置背景色
+  background-color: #fff;
+  // 添加阴影效果
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 1px 6px -1px rgba(0, 0, 0, 0.02),
+    0 2px 4px rgba(0, 0, 0, 0.02);
+
+  // 确保表格在容器内正确显示
+  :deep(.ant-table) {
+    border-radius: 4px;
+  }
+
+  :deep(.ant-table-container) {
+    border-radius: 4px;
+  }
+}
+
+// 响应式设计
+@media (max-height: 700px) {
+  .table-container {
+    max-height: 400px;
+  }
+}
+
+@media (max-height: 500px) {
+  .table-container {
+    max-height: 250px;
+  }
 }
 </style>

@@ -1,15 +1,25 @@
 <template>
   <div>
     <!-- 上部搜索条件区域 -->
-    <a-form layout="inline" name="basic" autocomplete="off" :model="formState" @finish="handleFinish"
-      :label-col="labelCol">
+    <a-form
+      layout="inline"
+      name="basic"
+      autocomplete="off"
+      :model="formState"
+      @finish="handleFinish"
+      :label-col="labelCol"
+    >
       <a-form-item label="菜单名称" name="name" class="input">
         <a-input allowClear v-model:value="formState.name" placeholder="菜单名称，模糊查询">
         </a-input>
       </a-form-item>
 
       <a-form-item label="父级菜单" name="父级菜单" class="input">
-        <a-input allowClear v-model:value="formState.parentName" placeholder="父级菜单名称，模糊查询">
+        <a-input
+          allowClear
+          v-model:value="formState.parentName"
+          placeholder="父级菜单名称，模糊查询"
+        >
         </a-input>
       </a-form-item>
 
@@ -19,8 +29,13 @@
       </a-form-item>
 
       <a-form-item label="需要鉴权" name="auth" class="input">
-        <a-select allowClear style="width: 180px" placeholder="状态" v-model:value="formState.auth"
-          :options="statusOptions"></a-select>
+        <a-select
+          allowClear
+          style="width: 180px"
+          placeholder="状态"
+          v-model:value="formState.auth"
+          :options="statusOptions"
+        ></a-select>
       </a-form-item>
       <a-space class="input">
         <a-button type="primary" html-type="submit"> 搜索 </a-button>
@@ -33,22 +48,27 @@
     <!-- 表格容器，添加固定高度和滚动 -->
     <div class="table-container">
       <!-- 表格区 -->
-      <a-table 
-        :columns="columns" 
-        :data-source="tableData" 
-        :pagination="false" 
-        :scroll="{ x: 1500, y: tableHeight }" 
+      <a-table
+        :columns="columns"
+        :data-source="tableData"
+        :pagination="false"
+        :scroll="{ x: 1500, y: tableHeight }"
         size="small"
-        :row-selection="rowSelection" 
-        :expandable="expandable" 
+        :row-selection="rowSelection"
+        :expandable="expandable"
         :row-key="(record) => record.id"
       >
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'action'">
             <a-space>
-              <a-button type="link" @click="showDetail(record)"
-                :disabled="record.stat != 2 || record.actualTotalNum === 0">详情</a-button>
-              <a>删除</a> <a>修改角色</a> <a>修改状态</a></a-space>
+              <a-button
+                type="link"
+                @click="showDetail(record)"
+                :disabled="record.stat != 2 || record.actualTotalNum === 0"
+                >详情</a-button
+              >
+              <a>删除</a> <a>修改权限</a> <a>修改状态</a></a-space
+            >
           </template>
         </template>
       </a-table>
@@ -57,8 +77,12 @@
 
     <!-- 分页区 -->
     <div style="margin-top: 15px; float: right">
-      <a-pagination v-model:current="pagination.current" :total="pagination.total"
-        :show-total="(total) => `共 ${total} 条数据`" @change="onPaginationChange" />
+      <a-pagination
+        v-model:current="pagination.current"
+        :total="pagination.total"
+        :show-total="(total) => `共 ${total} 条数据`"
+        @change="onPaginationChange"
+      />
     </div>
     <!-- 分页区 -->
     <!-- 中间内容区域 -->
@@ -184,9 +208,9 @@ export default defineComponent({
       const searchHeight = 120 // 搜索区域高度
       const paginationHeight = 60 // 分页区域高度
       const margins = 40 // 边距
-      
+
       const availableHeight = windowHeight - searchHeight - paginationHeight - margins
-      
+
       // 设置最小高度和最大高度
       this.tableHeight = Math.max(300, Math.min(600, availableHeight))
     },
@@ -282,7 +306,14 @@ export default defineComponent({
         ellipsis: true,
         align: 'center'
       },
+      {
+        title: '所需权限',
+        dataIndex: 'permissions',
+        key: 'permissions',
 
+        ellipsis: true,
+        align: 'center'
+      },
       {
         title: '操作',
         dataIndex: 'action',
@@ -324,13 +355,16 @@ export default defineComponent({
   // 设置背景色
   background-color: #fff;
   // 添加阴影效果
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px rgba(0, 0, 0, 0.02);
-  
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    0 1px 6px -1px rgba(0, 0, 0, 0.02),
+    0 2px 4px rgba(0, 0, 0, 0.02);
+
   // 确保表格在容器内正确显示
   :deep(.ant-table) {
     border-radius: 4px;
   }
-  
+
   :deep(.ant-table-container) {
     border-radius: 4px;
   }
