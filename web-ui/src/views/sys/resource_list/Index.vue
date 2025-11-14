@@ -216,7 +216,7 @@ export default defineComponent({
     window.removeEventListener('resize', this.handleResize)
   },
   setup() {
-        const { proxy } = getCurrentInstance()
+  
     const columns = [
       {
         title: '应用名称',

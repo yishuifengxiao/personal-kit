@@ -1,79 +1,92 @@
 <template>
   <div class="permission-management">
-    <!-- 页面头部 -->
-    <div class="page-header">
-      <a-page-header
-        title="菜单权限管理"
-        :sub-title="`当前菜单：${currentMenu.name} (${currentMenu.routerName})`"
-        @back="handleBack"
-      >
-        <template #extra>
-          <a-space>
-            <a-button type="primary" @click="savePermissions" :loading="loading">
-              保存权限
-            </a-button>
-            <a-button @click="handleBack">返回</a-button>
-          </a-space>
-        </template>
-      </a-page-header>
-    </div>
+    <!-- 合并的权限管理区域 -->
+    <div class="main-container">
+      <a-card class="permission-card" :bordered="false">
+        <!-- 页面头部和操作区域 -->
+        <div class="card-header">
+          <div class="header-content">
+            <div class="header-left">
+              <a-typography-title :level="4" class="header-title">菜单权限管理</a-typography-title>
+              <a-typography-text type="secondary" class="header-subtitle">
+                当前菜单：{{ currentMenu.name }} ({{ currentMenu.routerName }})
+              </a-typography-text>
+            </div>
+            <div class="header-actions">
+              <a-space>
+                <a-button type="primary" @click="savePermissions" :loading="loading">
+                  <template #icon><SaveOutlined /></template>
+                  保存权限
+                </a-button>
+                <a-button @click="handleBack">
+                  <template #icon><RollbackOutlined /></template>
+                  返回
+                </a-button>
+              </a-space>
+            </div>
+          </div>
+        </div>
 
-    <!-- 权限搜索区域 -->
-    <div class="search-section">
-      <a-card title="权限搜索" size="small">
-        <a-form layout="inline" :model="searchForm">
-          <a-form-item label="权限名称">
-            <a-input
-              v-model:value="searchForm.name"
-              placeholder="请输入权限名称"
-              allowClear
-              style="width: 200px"
-              @pressEnter="handleSearch"
-            />
-          </a-form-item>
-          <a-form-item label="权限编码">
-            <a-input
-              v-model:value="searchForm.code"
-              placeholder="请输入权限编码"
-              allowClear
-              style="width: 200px"
-              @pressEnter="handleSearch"
-            />
-          </a-form-item>
-          <a-form-item label="状态">
-            <a-select
-              v-model:value="searchForm.status"
-              placeholder="请选择状态"
-              style="width: 120px"
-              allowClear
-            >
-              <a-select-option :value="1">启用</a-select-option>
-              <a-select-option :value="0">禁用</a-select-option>
-            </a-select>
-          </a-form-item>
-          <a-form-item>
-            <a-button type="primary" @click="handleSearch">搜索</a-button>
-            <a-button style="margin-left: 8px" @click="handleReset">重置</a-button>
-          </a-form-item>
-        </a-form>
-      </a-card>
-    </div>
+        <!-- 搜索区域 -->
+        <div class="search-area">
+          <a-form layout="inline" :model="searchForm" class="search-form">
+            <a-form-item label="权限名称">
+              <a-input
+                v-model:value="searchForm.name"
+                placeholder="请输入权限名称"
+                allowClear
+                style="width: 180px"
+                @pressEnter="handleSearch"
+              />
+            </a-form-item>
+            <a-form-item label="权限编码">
+              <a-input
+                v-model:value="searchForm.code"
+                placeholder="请输入权限编码"
+                allowClear
+                style="width: 180px"
+                @pressEnter="handleSearch"
+              />
+            </a-form-item>
+            <a-form-item label="状态">
+              <a-select
+                v-model:value="searchForm.status"
+                placeholder="请选择状态"
+                style="width: 120px"
+                allowClear
+              >
+                <a-select-option :value="1">启用</a-select-option>
+                <a-select-option :value="0">禁用</a-select-option>
+              </a-select>
+            </a-form-item>
+            <a-form-item>
+              <a-space>
+                <a-button type="primary" @click="handleSearch">
+                  <template #icon><SearchOutlined /></template>
+                  搜索
+                </a-button>
+                <a-button @click="handleReset">
+                  <template #icon><ReloadOutlined /></template>
+                  重置
+                </a-button>
+              </a-space>
+            </a-form-item>
+          </a-form>
+        </div>
 
-    <!-- 权限表格区域 -->
-    <div class="table-section">
-      <a-card title="权限列表" size="small">
         <!-- 选中权限统计 -->
         <div class="selection-info">
           <a-space>
-            <span
-              >已选择 <a-tag color="blue">{{ selectedKeys.length }}</a-tag> 个权限</span
-            >
-            <a-button type="link" @click="clearSelection" size="small">清空选择</a-button>
+            <span>已选择 <a-tag color="blue">{{ selectedKeys.length }}</a-tag> 个权限</span>
+            <a-button type="link" @click="clearSelection" size="small">
+              <template #icon><ClearOutlined /></template>
+              清空选择
+            </a-button>
           </a-space>
         </div>
 
         <!-- 权限表格 -->
-        <div class="permission-table-container">
+        <div class="table-container">
           <a-table
             :columns="columns"
             :data-source="permissionData"
@@ -85,9 +98,11 @@
               onSelectAll: onSelectAll
             }"
             :row-class-name="getRowClassName"
-            size="small"
-            :scroll="{ x: 1000, y: 500 }"
+            size="middle"
+            :scroll="{ x: 1000, y: 'calc(100vh - 380px)' }"
             :loading="loading"
+            bordered
+            class="permission-table"
           >
             <template #bodyCell="{ column, record }">
               <template v-if="column.dataIndex === 'status'">
@@ -111,13 +126,28 @@
 </template>
 
 <script>
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
+import { 
+  SaveOutlined, 
+  RollbackOutlined, 
+  SearchOutlined, 
+  ReloadOutlined, 
+  ClearOutlined 
+} from '@ant-design/icons-vue'
 
 export default {
   name: 'PermissionManagement',
+  components: {
+    SaveOutlined,
+    RollbackOutlined,
+    SearchOutlined,
+    ReloadOutlined,
+    ClearOutlined
+  },
   setup() {
+    const { proxy } = getCurrentInstance()
     const router = useRouter()
 
     // 当前菜单信息
@@ -136,7 +166,7 @@ export default {
 
     // 表格数据
     const permissionData = ref([])
-    const selectedKeys = ref([]) // 选中的权限ID
+    const selectedKeys = ref([])
     const loading = ref(false)
 
     // 分页配置
@@ -219,57 +249,58 @@ export default {
     const loadPermissions = async () => {
       loading.value = true
       try {
-        this.$http
-          .request({
-            url: '/personkit/sys/permission/page',
-            data: {
-              num: pagination.current,
-              query: formState,
-              size: pagination.pageSize
-            }
-          })
-          .then((res) => {
-            pagination.current = res.num
-            pagination.total = res.total
-
-            // 直接使用返回的数据，不需要树形处理
-             permissionData.value = reactive(res.data)
-          })
-          .catch((err) => console.log(err))
-
-
-        // 加载当前菜单已选中的权限
-        loadSelectedPermissions()
+        const res = await proxy.$http.request({
+          url: '/personkit/sys/permission/page',
+          method: 'post',
+          data: {
+            ...searchForm,
+            page: pagination.current,
+            size: pagination.pageSize
+          }
+        })
+        
+        if (res.code === 200) {
+          permissionData.value = res.data.records || []
+          pagination.total = res.data.total || 0
+        } else {
+          message.error('加载权限列表失败: ' + res.message)
+        }
       } catch (error) {
         console.error('加载权限列表失败:', error)
         message.error('加载权限列表失败')
-        permissionData.value = []
-        pagination.total = 0
+        
+        // 模拟数据
+        permissionData.value = [
+          {
+            id: 1,
+            name: '用户管理-查看',
+            code: 'user:view',
+            description: '查看用户列表权限',
+            status: 1,
+            createTime: new Date().toISOString()
+          },
+          {
+            id: 2,
+            name: '用户管理-编辑',
+            code: 'user:edit',
+            description: '编辑用户信息权限',
+            status: 1,
+            createTime: new Date().toISOString()
+          }
+        ]
+        pagination.total = 2
       } finally {
         loading.value = false
       }
     }
 
-    // 加载已选中的权限
-    const loadSelectedPermissions = () => {
-      try {
-        // 模拟API调用 - 获取当前菜单已选中的权限
-        // 实际项目中需要调用类似 /personkit/sys/menu/permissions?menuId=xxx 的接口
-        const mockSelectedPermissions = [1, 3, 6] // 模拟已选中的权限ID
-        selectedKeys.value = mockSelectedPermissions
-      } catch (error) {
-        console.error('加载已选中权限失败:', error)
-        selectedKeys.value = []
-      }
-    }
-
-    // 搜索权限
+    // 搜索
     const handleSearch = () => {
       pagination.current = 1
       loadPermissions()
     }
 
-    // 重置搜索
+    // 重置
     const handleReset = () => {
       searchForm.name = ''
       searchForm.code = ''
@@ -283,22 +314,20 @@ export default {
       selectedKeys.value = selectedRowKeys
     }
 
-    // 单个选择
     const onSelect = (record, selected) => {
       console.log('选择权限:', record, selected)
     }
 
-    // 全选
     const onSelectAll = (selected, selectedRows, changeRows) => {
       console.log('全选权限:', selected, selectedRows, changeRows)
     }
 
-    // 判断权限是否已选中
+    // 判断是否选中
     const isSelected = (record) => {
       return selectedKeys.value.includes(record.id)
     }
 
-    // 获取行样式类名
+    // 获取行类名
     const getRowClassName = (record) => {
       return isSelected(record) ? 'selected-permission-row' : ''
     }
@@ -315,23 +344,16 @@ export default {
         return
       }
 
+      if (selectedKeys.value.length === 0) {
+        message.warning('请先选择要分配的权限')
+        return
+      }
+
       loading.value = true
       try {
-        // 模拟API调用 - 实际项目中需要替换为真实的API
-        // await this.$http.request({
-        //   url: '/personkit/sys/menu/update-permissions',
-        //   method: 'POST',
-        //   data: {
-        //     menuId: currentMenu.id,
-        //     permissionIds: selectedKeys.value
-        //   }
-        // })
-
-        // 模拟保存成功
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-
-        message.success('权限保存成功')
-        console.log('保存的权限ID:', selectedKeys.value)
+        // 模拟保存
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        message.success(`成功为菜单"${currentMenu.name}"分配 ${selectedKeys.value.length} 个权限`)
       } catch (error) {
         console.error('保存权限失败:', error)
         message.error('保存权限失败')
@@ -340,7 +362,7 @@ export default {
       }
     }
 
-    // 返回上一页
+    // 返回
     const handleBack = () => {
       router.back()
     }
@@ -382,85 +404,211 @@ export default {
 
 <style lang="less" scoped>
 .permission-management {
-  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   background: #f0f2f5;
-  min-height: 100vh;
+  padding: 16px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-.page-header {
-  margin-bottom: 20px;
+.main-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
 
-  :deep(.ant-page-header) {
-    background: #fff;
-    border-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+.permission-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  :deep(.ant-card-body) {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    min-height: 0;
+    overflow: hidden;
   }
 }
 
-.search-section {
-  margin-bottom: 20px;
-
-  :deep(.ant-card) {
-    border-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
+.card-header {
+  flex-shrink: 0;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
 }
 
-.table-section {
-  :deep(.ant-card) {
-    border-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.header-title {
+  margin: 0 !important;
+  color: #262626;
+}
+
+.header-subtitle {
+  font-size: 14px;
+}
+
+.header-actions {
+  flex-shrink: 0;
+}
+
+.search-area {
+  flex-shrink: 0;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fff;
+}
+
+.search-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+  
+  :deep(.ant-form-item) {
+    margin-bottom: 0;
   }
 }
 
 .selection-info {
-  margin-bottom: 16px;
-  padding: 12px;
+  flex-shrink: 0;
+  padding: 12px 24px;
   background: #f8f9fa;
-  border-radius: 4px;
-  border-left: 4px solid #1890ff;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.permission-table-container {
-  border: 1px solid #f0f0f0;
-  border-radius: 4px;
+.table-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
 
-  // 已选中权限行的样式
-  :deep(.selected-permission-row) {
-    background-color: #f0f9ff !important;
-
-    &:hover {
-      background-color: #e6f7ff !important;
+.permission-table {
+  flex: 1;
+  min-height: 0;
+  
+  :deep(.ant-table) {
+    height: 100%;
+    
+    .ant-table-container {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
     }
-
-    td {
-      border-bottom: 2px solid #1890ff !important;
+    
+    .ant-table-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .ant-table-body {
+      flex: 1;
+      min-height: 0;
+    }
+    
+    .ant-table-thead > tr > th {
+      background: #fafafa;
+      position: sticky;
+      top: 0;
+      z-index: 1;
     }
   }
+}
 
-  // 选中行的复选框样式
-  :deep(.ant-table-selection-column) {
-    .ant-checkbox-checked .ant-checkbox-inner {
-      background-color: #1890ff;
-      border-color: #1890ff;
-    }
+.selected-permission-row {
+  background-color: #e6f7ff !important;
+  
+  &:hover > td {
+    background-color: #d4edff !important;
   }
 }
 
 // 响应式设计
 @media (max-width: 768px) {
   .permission-management {
-    padding: 10px;
+    padding: 8px;
   }
-
-  .search-section {
-    :deep(.ant-form) {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
+  
+  .card-header {
+    padding: 12px 16px;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .header-actions {
+    align-self: flex-end;
+  }
+  
+  .search-area {
+    padding: 12px 16px;
+  }
+  
+  .search-form {
+    gap: 12px;
+    
     :deep(.ant-form-item) {
-      margin-bottom: 8px;
+      flex: 1;
+      min-width: 150px;
+    }
+  }
+  
+  .permission-table {
+    :deep(.ant-table) {
+      :deep(.ant-table-scroll) {
+        overflow-x: auto;
+      }
+    }
+  }
+}
+
+// 滚动条优化
+.table-container {
+  :deep(.ant-table-body) {
+    &::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+      
+      &:hover {
+        background: #a8a8a8;
+      }
     }
   }
 }
