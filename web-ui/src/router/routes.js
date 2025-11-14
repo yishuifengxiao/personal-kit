@@ -192,6 +192,18 @@ const routes = [
           label: '系统管理',
           breadcrumbName: ['系统管理', '认证管理', '访问记录']
         }
+      },
+      {
+        path: 'role_menu_management',
+        name: 'role_menu_management',
+        component: () => import('@/views/sys/role_list/MenuManagement.vue'),
+        props: (route) => ({
+          roleId: route.query.roleId
+        }),
+        meta: {
+          label: '角色菜单管理',
+          breadcrumbName: ['系统管理', '角色管理', '菜单配置']
+        }
       }
     ]
   }
