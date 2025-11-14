@@ -35,7 +35,8 @@
               <a-space>
                 <a-button type="link" @click="showEditModal(record)">编辑</a-button>
                 <a-button type="link" @click="modifyPermissions(record)">修改权限</a-button>
-                <a-button v-if="record.stat === 1" type="link" danger @click="handleToggleStatus(record, 0)">禁用</a-button>
+                <a-button v-if="record.stat === 1" type="link" danger
+                  @click="handleToggleStatus(record, 0)">禁用</a-button>
                 <a-button v-else type="link" @click="handleToggleStatus(record, 1)">启用</a-button>
               </a-space>
             </template>
@@ -92,8 +93,11 @@
     <!-- 分页区 -->
 
     <!-- 新增/编辑菜单模态框 -->
-    <a-modal v-model:visible="modalVisible" :title="modalTitle" width="600px" @ok="handleModalOk" @cancel="handleModalCancel">
-      <a-form ref="menuFormRef" :model="menuForm" :rules="menuFormRules" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
+    <a-modal v-model:visible="modalVisible" :title="modalTitle" width="600px" @ok="handleModalOk"
+      @cancel="handleModalCancel">
+      <a-form ref="menuFormRef" :model="menuForm" :rules="menuFormRules" :label-col="{ span: 6 }"
+        :wrapper-col="{ span: 16 }">
+
         <a-form-item label="菜单名称" name="name">
           <a-input v-model:value="menuForm.name" placeholder="请输入菜单名称" />
         </a-form-item>
@@ -114,6 +118,10 @@
             <a-select-option :value="2">侧边菜单</a-select-option>
             <a-select-option :value="3">底部菜单</a-select-option>
           </a-select>
+        </a-form-item>
+        <a-form-item label="序号" name="idx">
+          <a-input-number v-model:value="menuForm.idx" placeholder="请输入序号" :min="0" :precision="0"
+            style="width: 100%" />
         </a-form-item>
         <a-form-item label="是否显示" name="isShow">
           <a-radio-group v-model:value="menuForm.isShow">
@@ -187,6 +195,7 @@ export default defineComponent({
 
     // 菜单表单数据
     const menuForm = reactive({
+      idx: 0,
       name: '',
       parentId: 0,
       routerName: '',
@@ -198,6 +207,7 @@ export default defineComponent({
 
     // 菜单表单验证规则
     const menuFormRules = {
+      idx: [{ required: true, message: '请输入序号', trigger: 'blur' }],
       name: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
       routerName: [{ required: true, message: '请输入路由名称', trigger: 'blur' }],
       type: [{ required: true, message: '请选择菜单位置', trigger: 'change' }]
@@ -274,7 +284,7 @@ export default defineComponent({
 
           // 处理数据，确保有children字段用于树形展示
           this.data = reactive(this.processTreeData(res.data))
-          
+
           // 更新菜单列表用于父级菜单选择
           this.menuList = this.getAllMenus(res.data)
         })
@@ -402,6 +412,7 @@ export default defineComponent({
       this.currentEditId = record.id
       // 填充表单数据
       Object.assign(this.menuForm, {
+        idx: record.idx || 0,
         name: record.name || '',
         parentId: record.parentId || 0,
         routerName: record.routerName || '',
@@ -434,7 +445,7 @@ export default defineComponent({
     handleModalOk() {
       this.$refs.menuFormRef.validate().then(() => {
         const apiUrl = this.isEditMode ? '/personkit/sys/menu/update' : '/personkit/sys/menu/save'
-        const requestData = this.isEditMode 
+        const requestData = this.isEditMode
           ? { ...this.menuForm, id: this.currentEditId }
           : this.menuForm
 
@@ -510,6 +521,13 @@ export default defineComponent({
   },
   setup() {
     const columns = [
+      {
+        title: '序号',
+        dataIndex: 'idx',
+        key: 'idx',
+        align: 'center',
+        width: 80
+      },
       {
         title: '菜单名称',
         dataIndex: 'name',
