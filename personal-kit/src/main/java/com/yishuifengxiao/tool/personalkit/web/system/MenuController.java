@@ -4,20 +4,19 @@ import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
 import com.yishuifengxiao.tool.personalkit.domain.query.MenuQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.MenuPermissionReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.MenuTree;
 import com.yishuifengxiao.tool.personalkit.domain.vo.MenuVo;
 import com.yishuifengxiao.tool.personalkit.domain.vo.RoleMenuVo;
 import com.yishuifengxiao.tool.personalkit.service.MenuService;
+import com.yishuifengxiao.tool.personalkit.service.PermissionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,6 +35,7 @@ import java.util.List;
 public class MenuController {
 
     private final MenuService menuService;
+    private final PermissionService permissionService;
 
     @Operation(summary = "查询菜单树", description = "查询左侧的菜单树")
     @PostMapping("/menuTree")
@@ -47,6 +47,11 @@ public class MenuController {
     @PostMapping("/page")
     public Page<MenuVo> findPage(@RequestBody PageQuery<SysMenu> pageQuery) {
         return menuService.findPage(pageQuery);
+    }
+
+    @GetMapping("/permission")
+    public List<String> permission(@RequestParam("menuId") String menuId) {
+        return permissionService.findSysPermission(menuId).stream().map(SysPermission::getId).toList();
     }
 
     @Operation(summary = "更新菜单权限", description = "更新菜单拥有的权限资源")

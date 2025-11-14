@@ -10,6 +10,9 @@ import com.yishuifengxiao.tool.personalkit.domain.vo.PermissionVo;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author qingteng
  * @version 1.0.0
@@ -28,5 +31,10 @@ public class PermissionService {
                     ".menu_id=sm.id and smp.permission_id =sp.id and sp.id=?";
             return permissionVo;
         });
+    }
+
+    public List<SysPermission> findSysPermission(String menuId) {
+        String sql = "SELECT p.* from sys_permission p,sys_menu_permission  r where p.id=r.permission_id and r.menu_id= :menuId";
+        return JdbcUtil.jdbcHelper().find(SysPermission.class, sql, Map.of("menuId", menuId));
     }
 }

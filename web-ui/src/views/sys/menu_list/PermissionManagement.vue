@@ -35,19 +35,24 @@
         <div class="search-area">
           <a-form layout="inline" :model="searchForm" class="search-form">
             <a-form-item label="权限名称">
-              <a-input v-model:value="searchForm.name" placeholder="请输入权限名称" allowClear style="width: 180px"
-                @pressEnter="handleSearch" />
+              <a-input
+                v-model:value="searchForm.name"
+                placeholder="请输入权限名称"
+                allowClear
+                style="width: 180px"
+                @pressEnter="handleSearch"
+              />
             </a-form-item>
-            <a-form-item label="权限编码">
-              <a-input v-model:value="searchForm.code" placeholder="请输入权限编码" allowClear style="width: 180px"
-                @pressEnter="handleSearch" />
+            <a-form-item label="资源路径">
+              <a-input
+                v-model:value="searchForm.url"
+                placeholder="请输入资源路径"
+                allowClear
+                style="width: 180px"
+                @pressEnter="handleSearch"
+              />
             </a-form-item>
-            <a-form-item label="状态">
-              <a-select v-model:value="searchForm.status" placeholder="请选择状态" style="width: 120px" allowClear>
-                <a-select-option :value="1">启用</a-select-option>
-                <a-select-option :value="0">禁用</a-select-option>
-              </a-select>
-            </a-form-item>
+      
             <a-form-item>
               <a-space>
                 <a-button type="primary" @click="handleSearch">
@@ -70,7 +75,9 @@
         <!-- 选中权限统计 -->
         <div class="selection-info">
           <a-space>
-            <span>已选择 <a-tag color="blue">{{ selectedKeys.length }}</a-tag> 个权限</span>
+            <span
+              >已选择 <a-tag color="blue">{{ selectedKeys.length }}</a-tag> 个权限</span
+            >
             <a-button type="link" @click="clearSelection" size="small">
               <template #icon>
                 <ClearOutlined />
@@ -82,17 +89,26 @@
 
         <!-- 权限表格 -->
         <div class="table-container">
-          <a-table :columns="columns" size="small" :data-source="permissionData" :pagination="pagination"
+          <a-table
+            :columns="columns"
+            size="small"
+            :data-source="permissionData"
+            :pagination="pagination"
             :row-selection="{
               selectedRowKeys: selectedKeys,
               onChange: onSelectionChange,
               onSelect: onSelect,
               onSelectAll: onSelectAll,
               checkStrictly: true
-            }" :row-class-name="getRowClassName" :scroll="{ x: 1000, y: 'calc(100vh - 380px)' }" :loading="loading"
-            :row-key="record => record.id" bordered class="permission-table">
+            }"
+            :row-class-name="getRowClassName"
+            :scroll="{ x: 1000, y: 'calc(100vh - 380px)' }"
+            :loading="loading"
+            :row-key="(record) => record.id"
+            bordered
+            class="permission-table"
+          >
             <template #bodyCell="{ column, record }">
-
               <template v-if="column.dataIndex === 'selectionStatus'">
                 <a-tag v-if="isSelected(record)" color="blue">已选中</a-tag>
                 <span v-else>-</span>
@@ -140,8 +156,7 @@ export default {
     // 搜索表单
     const searchForm = reactive({
       name: '',
-      code: '',
-      status: undefined
+      url: ''
     })
 
     // 表格数据
@@ -239,14 +254,15 @@ export default {
           url: '/personkit/sys/permission/page',
           method: 'post',
           data: {
-            ...searchForm,
+            query:searchForm,
             page: pagination.current,
             size: pagination.pageSize
           }
         })
         permissionData.value = res.data || []
         pagination.total = res.total || 0
-
+        // 加载完成后，查询当前菜单已关联的权限并标记选中状态
+        await loadMenuPermissions()
       } catch (error) {
         console.error('加载权限列表失败:', error)
         message.error('加载权限列表失败')
@@ -275,7 +291,31 @@ export default {
         loading.value = false
       }
     }
+    // 查询当前菜单已关联的权限
+    const loadMenuPermissions = async () => {
+      if (!currentMenu.id) {
+        console.warn('菜单ID为空，无法查询关联权限')
+        return
+      }
 
+      try {
+        const res = await proxy.$http.request({
+          url: '/personkit/sys/menu/permission',
+          method: 'get',
+          params: {
+            menuId: currentMenu.id
+          }
+        })
+        
+        // 直接使用返回的权限ID字符串数组
+        selectedKeys.value = res
+        
+      } catch (error) {
+        console.error('查询菜单关联权限失败:', error)
+        // 模拟数据用于演示
+        console.log('使用模拟数据演示关联权限功能')
+      }
+    }
     // 搜索
     const handleSearch = () => {
       pagination.current = 1
@@ -304,7 +344,7 @@ export default {
       console.log('全选权限:', selected, selectedRows, changeRows)
       if (selected) {
         // 全选时，只选择当前页的数据
-        selectedKeys.value = selectedRows.map(row => row.id)
+        selectedKeys.value = selectedRows.map((row) => row.id)
       } else {
         // 取消全选时，清空选择
         selectedKeys.value = []
@@ -338,17 +378,15 @@ export default {
         return
       }
 
-      loading.value = true
-      try {
-        // 模拟保存
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        message.success(`成功为菜单"${currentMenu.name}"分配 ${selectedKeys.value.length} 个权限`)
-      } catch (error) {
-        console.error('保存权限失败:', error)
-        message.error('保存权限失败')
-      } finally {
-        loading.value = false
-      }
+    await proxy.$http.request({
+        url: '/personkit/sys/menu/updateMenuPermission',
+        method: 'post',
+        data: {
+          id: currentMenu.id,
+          permissionIds: selectedKeys.value
+        }
+      })
+      message.success('权限分配成功')
     }
 
     // 返回
@@ -519,7 +557,7 @@ export default {
       min-height: 0;
     }
 
-    .ant-table-thead>tr>th {
+    .ant-table-thead > tr > th {
       background: #fafafa;
       position: sticky;
       top: 0;
@@ -531,7 +569,7 @@ export default {
 .selected-permission-row {
   background-color: #e6f7ff !important;
 
-  &:hover>td {
+  &:hover > td {
     background-color: #d4edff !important;
   }
 }

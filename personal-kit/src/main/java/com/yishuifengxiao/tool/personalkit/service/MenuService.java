@@ -164,18 +164,14 @@ public class MenuService {
     }
 
 
-
     public void updateMenuPermission(MenuPermissionReq req) {
         //@formatter:off
         SysMenu menu = JdbcUtil.jdbcHelper().findByPrimaryKey(SysMenu.class, req.getId().trim());
+        String sql="delete from sys_menu_permission where menu_id= ?";
+        JdbcUtil.jdbcHelper().jdbcTemplate().update(sql,menu.getId());
         Assert.isNotNull("记录不存在", menu);
-        JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysMenuPermission.class,
-                JdbcUtil.jdbcHelper().findAll(new SysMenuPermission().setMenuId(menu.getId()),false).stream().map(SysMenuPermission::getId).toArray(Object[]::new) );
-        CollUtil.stream(req.getPermissionIds())
-                .filter(StringUtils::isNotBlank)
-                .filter(v -> JdbcUtil.jdbcHelper().countAll(new SysPermission().setId(v),false) > 0)
-                .map(v -> new SysMenuPermission(menu.getId(), v))
-                .forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
+        List<SysMenuPermission> list = req.getPermissionIds().stream().map(id -> new SysMenuPermission(menu.getId()+id.trim(),menu.getId(), id.trim())).collect(Collectors.toList());
+        JdbcUtil.jdbcHelper().saveAll(list);
         //@formatter:on
     }
 

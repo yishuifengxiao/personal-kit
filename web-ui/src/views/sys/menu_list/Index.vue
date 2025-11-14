@@ -58,7 +58,7 @@
         :expandable="expandable"
         :row-key="(record) => record.id"
       >
-        <template #bodyCell="{ column, record }">
+      <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'action'">
             <!-- 只在叶子节点显示操作按钮 -->
             <template v-if="!record.children || record.children.length === 0">
@@ -69,6 +69,27 @@
               </a-space>
             </template>
             <!-- 非叶子节点不显示操作按钮 -->
+            <template v-else>
+              <span style="color: #999">-</span>
+            </template>
+          </template>
+          
+          <!-- 所需权限列显示逻辑 -->
+          <template v-else-if="column.dataIndex === 'permissions'">
+            <template v-if="record.permissions && record.permissions.length > 0">
+              <a-tooltip placement="topLeft">
+                <template #title>
+                  <div style="max-width: 300px">
+                    <div v-for="(permission, index) in record.permissions" :key="permission.id">
+                      {{ permission.httpMethod }} {{ permission.url }}
+                    </div>
+                  </div>
+                </template>
+                <span class="permission-urls">
+                  {{ record.permissions.map(p => p.url).join(', ') }}
+                </span>
+              </a-tooltip>
+            </template>
             <template v-else>
               <span style="color: #999">-</span>
             </template>
@@ -364,7 +385,6 @@ export default defineComponent({
   }
 })
 </script>
-
 <style lang="less" scoped>
 .input {
   margin: 5px 5px 10px 5px;
@@ -392,6 +412,16 @@ export default defineComponent({
 
   :deep(.ant-table-container) {
     border-radius: 4px;
+  }
+  
+  // 所需权限列样式
+  :deep(.permission-urls) {
+    display: inline-block;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
   }
 }
 
