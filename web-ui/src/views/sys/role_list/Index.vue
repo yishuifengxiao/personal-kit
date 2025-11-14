@@ -1,28 +1,22 @@
 <template>
   <div>
     <!-- 上部搜索条件区域 -->
-    <a-form
-      layout="inline"
-      name="basic"
-      autocomplete="off"
-      :model="formState"
-      @finish="handleFinish"
-      :label-col="labelCol"
-    >
+    <a-form layout="inline" name="basic" autocomplete="off" :model="formState" @finish="handleFinish"
+      :label-col="labelCol">
       <a-form-item label="角色名称" name="name" class="input">
-         <a-input allowClear v-model:value="formState.name" placeholder="角色名称，模糊查询"> </a-input>
+        <a-input allowClear v-model:value="formState.name" placeholder="角色名称，模糊查询"> </a-input>
       </a-form-item>
 
       <a-form-item label="角色状态" name="stat" class="input">
-         <a-input allowClear v-model:value="formState.stat" placeholder="角色状态"> </a-input>
+        <a-input allowClear v-model:value="formState.stat" placeholder="角色状态"> </a-input>
       </a-form-item>
 
       <a-form-item label="角色描述" name="description" class="input">
-         <a-input allowClear v-model:value="formState.description" placeholder="角色描述，模糊查询"> </a-input>
+        <a-input allowClear v-model:value="formState.description" placeholder="角色描述，模糊查询"> </a-input>
       </a-form-item>
 
       <a-form-item label="包含菜单" name="menuName" class="input">
-         <a-input allowClear v-model:value="formState.menuName" placeholder="包含菜单，模糊查询"> </a-input>
+        <a-input allowClear v-model:value="formState.menuName" placeholder="包含菜单，模糊查询"> </a-input>
       </a-form-item>
 
       <a-space class="input">
@@ -39,14 +33,8 @@
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'action'">
           <a-space>
-            <a-button
-              type="link"
-              @click="showDetail(record)"
-              :disabled="record.stat != 2 || record.actualTotalNum === 0"
-              >详情</a-button
-            >
-            <a>删除</a> <a>修改角色</a> <a>修改状态</a></a-space
-          >
+
+            <a>删除</a> <a>修改菜单</a> <a>修改状态</a></a-space>
         </template>
       </template>
     </a-table>
@@ -54,12 +42,8 @@
 
     <!-- 分页区 -->
     <div style="margin-top: 15px; float: right">
-      <a-pagination
-        v-model:current="pagination.current"
-        :total="pagination.total"
-        :show-total="(total) => `共 ${total} 条数据`"
-        @change="onPaginationChange"
-      />
+      <a-pagination v-model:current="pagination.current" :total="pagination.total"
+        :show-total="(total) => `共 ${total} 条数据`" @change="onPaginationChange" />
     </div>
     <!-- 分页区 -->
     <!-- 中间内容区域 -->

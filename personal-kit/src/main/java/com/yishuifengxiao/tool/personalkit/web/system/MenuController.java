@@ -46,7 +46,8 @@ public class MenuController {
     @Operation(summary = "分页查询", description = "分页查询菜单数据")
     @PostMapping("/page")
     public Page<MenuVo> findPage(@RequestBody PageQuery<SysMenu> pageQuery) {
-        return menuService.findPage(pageQuery);
+        Page<MenuVo> page = menuService.findPage(pageQuery);
+        return page;
     }
 
     @GetMapping("/permission")

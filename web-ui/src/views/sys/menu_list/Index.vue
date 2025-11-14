@@ -1,25 +1,15 @@
 <template>
   <div>
     <!-- 上部搜索条件区域 -->
-    <a-form
-      layout="inline"
-      name="basic"
-      autocomplete="off"
-      :model="formState"
-      @finish="handleFinish"
-      :label-col="labelCol"
-    >
+    <a-form layout="inline" name="basic" autocomplete="off" :model="formState" @finish="handleFinish"
+      :label-col="labelCol">
       <a-form-item label="菜单名称" name="name" class="input">
         <a-input allowClear v-model:value="formState.name" placeholder="菜单名称，模糊查询">
         </a-input>
       </a-form-item>
 
       <a-form-item label="父级菜单" name="父级菜单" class="input">
-        <a-input
-          allowClear
-          v-model:value="formState.parentName"
-          placeholder="父级菜单名称，模糊查询"
-        >
+        <a-input allowClear v-model:value="formState.parentName" placeholder="父级菜单名称，模糊查询">
         </a-input>
       </a-form-item>
 
@@ -29,13 +19,8 @@
       </a-form-item>
 
       <a-form-item label="需要鉴权" name="auth" class="input">
-        <a-select
-          allowClear
-          style="width: 180px"
-          placeholder="状态"
-          v-model:value="formState.auth"
-          :options="statusOptions"
-        ></a-select>
+        <a-select allowClear style="width: 180px" placeholder="状态" v-model:value="formState.auth"
+          :options="statusOptions"></a-select>
       </a-form-item>
       <a-space class="input">
         <a-button type="primary" html-type="submit"> 搜索 </a-button>
@@ -48,17 +33,9 @@
     <!-- 表格容器，添加固定高度和滚动 -->
     <div class="table-container">
       <!-- 表格区 -->
-      <a-table
-        :columns="columns"
-        :data-source="tableData"
-        :pagination="false"
-        :scroll="{ x: 1500, y: tableHeight }"
-        size="small"
-        :row-selection="rowSelection"
-        :expandable="expandable"
-        :row-key="(record) => record.id"
-      >
-      <template #bodyCell="{ column, record }">
+      <a-table :columns="columns" :data-source="tableData" :pagination="false" :scroll="{ x: 1500, y: tableHeight }"
+        size="small" :row-selection="rowSelection" :expandable="expandable" :row-key="(record) => record.id">
+        <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'action'">
             <!-- 只在叶子节点显示操作按钮 -->
             <template v-if="!record.children || record.children.length === 0">
@@ -73,7 +50,7 @@
               <span style="color: #999">-</span>
             </template>
           </template>
-          
+
           <!-- 所需权限列显示逻辑 -->
           <template v-else-if="column.dataIndex === 'permissions'">
             <template v-if="record.permissions && record.permissions.length > 0">
@@ -86,7 +63,7 @@
                   </div>
                 </template>
                 <span class="permission-urls">
-                  {{ record.permissions.map(p => p.url).join(', ') }}
+                  {{record.permissions.map(p => p.url).join(', ')}}
                 </span>
               </a-tooltip>
             </template>
@@ -101,12 +78,8 @@
 
     <!-- 分页区 -->
     <div style="margin-top: 15px; float: right">
-      <a-pagination
-        v-model:current="pagination.current"
-        :total="pagination.total"
-        :show-total="(total) => `共 ${total} 条数据`"
-        @change="onPaginationChange"
-      />
+      <a-pagination v-model:current="pagination.current" :total="pagination.total"
+        :show-total="(total) => `共 ${total} 条数据`" @change="onPaginationChange" />
     </div>
     <!-- 分页区 -->
     <!-- 中间内容区域 -->
@@ -328,18 +301,18 @@ export default defineComponent({
 
         align: 'center'
       },
-      {
-        title: '需要鉴权',
-        dataIndex: 'authName',
-        key: 'authName',
-        ellipsis: true,
 
-        align: 'center'
-      },
       {
         title: '菜单位置',
         dataIndex: 'typeName',
         key: 'typeName',
+        ellipsis: true,
+
+        align: 'center'
+      }, {
+        title: '是否显示',
+        dataIndex: 'isShow',
+        key: 'isShow',
         ellipsis: true,
 
         align: 'center'
@@ -413,7 +386,7 @@ export default defineComponent({
   :deep(.ant-table-container) {
     border-radius: 4px;
   }
-  
+
   // 所需权限列样式
   :deep(.permission-urls) {
     display: inline-block;

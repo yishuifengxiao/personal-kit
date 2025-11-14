@@ -1,6 +1,5 @@
 package com.yishuifengxiao.tool.personalkit.domain.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yishuifengxiao.common.tool.validate.Group;
 import com.yishuifengxiao.tool.personalkit.utils.CustomIdGenerator;
 import jakarta.persistence.*;
@@ -77,10 +76,12 @@ public class SysMenu implements Serializable {
     @Column(name = "auth", length = 1, columnDefinition = "tinyint(1) default 0")
     private Integer auth;
 
+
+
     @Column(name = "idx")
     private Integer idx;
 
-    @JsonIgnore
+//    @JsonIgnore
     @Column(name = "is_show", length = 1, columnDefinition = "tinyint(1) default 1")
     private Integer isShow;
 
