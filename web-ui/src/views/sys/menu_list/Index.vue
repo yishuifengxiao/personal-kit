@@ -47,7 +47,7 @@
     <!-- 中间内容区域 -->
     <!-- 表格容器，添加固定高度和滚动 -->
     <div class="table-container">
-      <!-- 表格区 -->
+       <!-- 表格区 -->
       <a-table
         :columns="columns"
         :data-source="tableData"
@@ -60,17 +60,24 @@
       >
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'action'">
-            <a-space>
-              <a-button
-                type="link"
-                @click="showDetail(record)"
-                :disabled="record.stat != 2 || record.actualTotalNum === 0"
-                >详情</a-button
-              >
-              <a>删除</a> 
-              <a-button type="link" @click="modifyPermissions(record)">修改权限</a-button> 
-              <a>修改状态</a>
-            </a-space>
+            <!-- 只在叶子节点显示操作按钮 -->
+            <template v-if="!record.children || record.children.length === 0">
+              <a-space>
+                <a-button
+                  type="link"
+                  @click="showDetail(record)"
+                  :disabled="record.stat != 2 || record.actualTotalNum === 0"
+                  >详情</a-button
+                >
+                <a>删除</a> 
+                <a-button type="link" @click="modifyPermissions(record)">修改权限</a-button> 
+                <a>修改状态</a>
+              </a-space>
+            </template>
+            <!-- 非叶子节点不显示操作按钮 -->
+            <template v-else>
+              <span style="color: #999;">-</span>
+            </template>
           </template>
         </template>
       </a-table>
