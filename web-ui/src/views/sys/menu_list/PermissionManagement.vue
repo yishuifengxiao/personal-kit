@@ -15,11 +15,15 @@
             <div class="header-actions">
               <a-space>
                 <a-button type="primary" @click="savePermissions" :loading="loading">
-                  <template #icon><SaveOutlined /></template>
+                  <template #icon>
+                    <SaveOutlined />
+                  </template>
                   保存权限
                 </a-button>
                 <a-button @click="handleBack">
-                  <template #icon><RollbackOutlined /></template>
+                  <template #icon>
+                    <RollbackOutlined />
+                  </template>
                   返回
                 </a-button>
               </a-space>
@@ -31,30 +35,15 @@
         <div class="search-area">
           <a-form layout="inline" :model="searchForm" class="search-form">
             <a-form-item label="权限名称">
-              <a-input
-                v-model:value="searchForm.name"
-                placeholder="请输入权限名称"
-                allowClear
-                style="width: 180px"
-                @pressEnter="handleSearch"
-              />
+              <a-input v-model:value="searchForm.name" placeholder="请输入权限名称" allowClear style="width: 180px"
+                @pressEnter="handleSearch" />
             </a-form-item>
             <a-form-item label="权限编码">
-              <a-input
-                v-model:value="searchForm.code"
-                placeholder="请输入权限编码"
-                allowClear
-                style="width: 180px"
-                @pressEnter="handleSearch"
-              />
+              <a-input v-model:value="searchForm.code" placeholder="请输入权限编码" allowClear style="width: 180px"
+                @pressEnter="handleSearch" />
             </a-form-item>
             <a-form-item label="状态">
-              <a-select
-                v-model:value="searchForm.status"
-                placeholder="请选择状态"
-                style="width: 120px"
-                allowClear
-              >
+              <a-select v-model:value="searchForm.status" placeholder="请选择状态" style="width: 120px" allowClear>
                 <a-select-option :value="1">启用</a-select-option>
                 <a-select-option :value="0">禁用</a-select-option>
               </a-select>
@@ -62,11 +51,15 @@
             <a-form-item>
               <a-space>
                 <a-button type="primary" @click="handleSearch">
-                  <template #icon><SearchOutlined /></template>
+                  <template #icon>
+                    <SearchOutlined />
+                  </template>
                   搜索
                 </a-button>
                 <a-button @click="handleReset">
-                  <template #icon><ReloadOutlined /></template>
+                  <template #icon>
+                    <ReloadOutlined />
+                  </template>
                   重置
                 </a-button>
               </a-space>
@@ -79,7 +72,9 @@
           <a-space>
             <span>已选择 <a-tag color="blue">{{ selectedKeys.length }}</a-tag> 个权限</span>
             <a-button type="link" @click="clearSelection" size="small">
-              <template #icon><ClearOutlined /></template>
+              <template #icon>
+                <ClearOutlined />
+              </template>
               清空选择
             </a-button>
           </a-space>
@@ -87,32 +82,17 @@
 
         <!-- 权限表格 -->
         <div class="table-container">
-          <a-table
-            :columns="columns"
-            :data-source="permissionData"
-            :pagination="pagination"
+          <a-table :columns="columns" size="small" :data-source="permissionData" :pagination="pagination"
             :row-selection="{
               selectedRowKeys: selectedKeys,
               onChange: onSelectionChange,
               onSelect: onSelect,
-              onSelectAll: onSelectAll
-            }"
-            :row-class-name="getRowClassName"
-            size="middle"
-            :scroll="{ x: 1000, y: 'calc(100vh - 380px)' }"
-            :loading="loading"
-            bordered
-            class="permission-table"
-          >
+              onSelectAll: onSelectAll,
+              checkStrictly: true
+            }" :row-class-name="getRowClassName" :scroll="{ x: 1000, y: 'calc(100vh - 380px)' }" :loading="loading"
+            :row-key="record => record.id" bordered class="permission-table">
             <template #bodyCell="{ column, record }">
-              <template v-if="column.dataIndex === 'status'">
-                <a-tag :color="record.status === 1 ? 'green' : 'red'">
-                  {{ record.status === 1 ? '启用' : '禁用' }}
-                </a-tag>
-              </template>
-              <template v-if="column.dataIndex === 'createTime'">
-                {{ formatTime(record.createTime) }}
-              </template>
+
               <template v-if="column.dataIndex === 'selectionStatus'">
                 <a-tag v-if="isSelected(record)" color="blue">已选中</a-tag>
                 <span v-else>-</span>
@@ -129,12 +109,12 @@
 import { reactive, ref, onMounted, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
-import { 
-  SaveOutlined, 
-  RollbackOutlined, 
-  SearchOutlined, 
-  ReloadOutlined, 
-  ClearOutlined 
+import {
+  SaveOutlined,
+  RollbackOutlined,
+  SearchOutlined,
+  ReloadOutlined,
+  ClearOutlined
 } from '@ant-design/icons-vue'
 
 export default {
@@ -187,36 +167,42 @@ export default {
     // 表格列定义
     const columns = [
       {
-        title: '权限名称',
+        title: '资源路径',
+        dataIndex: 'url',
+        key: 'url',
+        align: 'center'
+      },
+      {
+        title: '请求方法',
+        dataIndex: 'httpMethod',
+        key: 'httpMethod',
+        align: 'center'
+      },
+
+      {
+        title: '模块名称',
+        dataIndex: 'module',
+        key: 'module',
+        ellipsis: true,
+
+        align: 'center'
+      },
+      {
+        title: '资源名称',
         dataIndex: 'name',
         key: 'name',
-        width: 150,
-        ellipsis: true
+        ellipsis: true,
+
+        align: 'center'
       },
+
       {
-        title: '权限编码',
-        dataIndex: 'code',
-        key: 'code',
-        width: 120
-      },
-      {
-        title: '权限描述',
+        title: '描述',
         dataIndex: 'description',
         key: 'description',
-        width: 200,
-        ellipsis: true
-      },
-      {
-        title: '状态',
-        dataIndex: 'status',
-        key: 'status',
-        width: 80
-      },
-      {
-        title: '创建时间',
-        dataIndex: 'createTime',
-        key: 'createTime',
-        width: 150
+
+        ellipsis: true,
+        align: 'center'
       },
       {
         title: '选中状态',
@@ -258,17 +244,13 @@ export default {
             size: pagination.pageSize
           }
         })
-        
-        if (res.code === 200) {
-          permissionData.value = res.data.records || []
-          pagination.total = res.data.total || 0
-        } else {
-          message.error('加载权限列表失败: ' + res.message)
-        }
+        permissionData.value = res.data || []
+        pagination.total = res.total || 0
+
       } catch (error) {
         console.error('加载权限列表失败:', error)
         message.error('加载权限列表失败')
-        
+
         // 模拟数据
         permissionData.value = [
           {
@@ -320,6 +302,13 @@ export default {
 
     const onSelectAll = (selected, selectedRows, changeRows) => {
       console.log('全选权限:', selected, selectedRows, changeRows)
+      if (selected) {
+        // 全选时，只选择当前页的数据
+        selectedKeys.value = selectedRows.map(row => row.id)
+      } else {
+        // 取消全选时，清空选择
+        selectedKeys.value = []
+      }
     }
 
     // 判断是否选中
@@ -428,7 +417,7 @@ export default {
   min-height: 0;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  
+
   :deep(.ant-card-body) {
     flex: 1;
     display: flex;
@@ -485,7 +474,7 @@ export default {
   flex-wrap: wrap;
   gap: 16px;
   align-items: flex-start;
-  
+
   :deep(.ant-form-item) {
     margin-bottom: 0;
   }
@@ -509,28 +498,28 @@ export default {
 .permission-table {
   flex: 1;
   min-height: 0;
-  
+
   :deep(.ant-table) {
     height: 100%;
-    
+
     .ant-table-container {
       height: 100%;
       display: flex;
       flex-direction: column;
     }
-    
+
     .ant-table-content {
       flex: 1;
       display: flex;
       flex-direction: column;
     }
-    
+
     .ant-table-body {
       flex: 1;
       min-height: 0;
     }
-    
-    .ant-table-thead > tr > th {
+
+    .ant-table-thead>tr>th {
       background: #fafafa;
       position: sticky;
       top: 0;
@@ -541,8 +530,8 @@ export default {
 
 .selected-permission-row {
   background-color: #e6f7ff !important;
-  
-  &:hover > td {
+
+  &:hover>td {
     background-color: #d4edff !important;
   }
 }
@@ -552,34 +541,34 @@ export default {
   .permission-management {
     padding: 8px;
   }
-  
+
   .card-header {
     padding: 12px 16px;
   }
-  
+
   .header-content {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
   }
-  
+
   .header-actions {
     align-self: flex-end;
   }
-  
+
   .search-area {
     padding: 12px 16px;
   }
-  
+
   .search-form {
     gap: 12px;
-    
+
     :deep(.ant-form-item) {
       flex: 1;
       min-width: 150px;
     }
   }
-  
+
   .permission-table {
     :deep(.ant-table) {
       :deep(.ant-table-scroll) {
@@ -596,16 +585,16 @@ export default {
       width: 6px;
       height: 6px;
     }
-    
+
     &::-webkit-scrollbar-track {
       background: #f1f1f1;
       border-radius: 3px;
     }
-    
+
     &::-webkit-scrollbar-thumb {
       background: #c1c1c1;
       border-radius: 3px;
-      
+
       &:hover {
         background: #a8a8a8;
       }
