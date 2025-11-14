@@ -42,63 +42,14 @@ public class RoleService {
      * @param pageQuery
      * @return
      */
-    public Page<RoleVo> findPageRole(PageQuery<RoleQuery> pageQuery) {
+    public Page<SysRole> findPageRole(PageQuery<RoleQuery> pageQuery) {
         RoleQuery roleQuery = pageQuery.query().orElse(new RoleQuery());
-        if (RoleStat.ROLE_INIT.equalCode(roleQuery.getStat())) {
-            roleQuery.setStat(null);
-        }
-
-        Page<SysRole> result = JdbcUtil.jdbcHelper().findPage(SysRole.class, pageQuery, params -> {
-            String sql = """
-                                SELECT DISTINCTROW
-                        sr.*   
-                    FROM
-                        sys_role sr   
-                    WHERE
-                        1 = 1   
-                    
-                    """;
-            if (null != roleQuery.getId()) {
-                sql += "AND sr.`id` = :id ";
-                params.put("id", roleQuery.getId());
-            }
-            if (null != roleQuery.getName()) {
-                sql += "AND sr.`name` LIKE CONCAT( '%',:name, '%' )";
-                params.put("name", roleQuery.getName());
-            }
-            if (null != roleQuery.getDescription()) {
-                sql += "AND sr.`description` LIKE CONCAT( '%',:description, '%' )";
-                params.put("description", roleQuery.getDescription());
-            }
-            if (null != roleQuery.getHomeUrl()) {
-                sql += "AND sr.`home_url` LIKE CONCAT( '%',:homeUrl, '%' )";
-                params.put("homeUrl", roleQuery.getHomeUrl());
-            }
-            if (null != roleQuery.getParentId()) {
-                sql += "AND sr.`parent_id` = :parentId ";
-                params.put("parentId", roleQuery.getParentId());
-            }
-            if (null != roleQuery.getStat()) {
-                sql += "AND sr.`stat` = :stat ";
-                params.put("stat", roleQuery.getStat());
-            }
-            if (null != roleQuery.getMenuName()) {
-                sql += "AND sr.`id` IN ( SELECT srm.role_id FROM sys_menu m, sys_role_menu srm WHERE m.id = srm.role_id AND m.`name` LIKE CONCAT( '%',:menuName, '%' ) )";
-                params.put("menuName", roleQuery.getMenuName());
-            }
 
 
-            return sql.replaceAll("\r", " ").replaceAll("\n", " ").trim();
-        });
+        Page<SysRole> result = JdbcUtil.jdbcHelper().findPage(roleQuery, true, pageQuery);
 
 
-        return result.map(v -> {
-            RoleVo roleVo = BeanUtil.copy(v, new RoleVo());
-            String psql = "SELECT DISTINCTROW sm.* from sys_role sr ,sys_role_menu srm ,sys_menu "
-                    + "sm " + "WHERE sr.id=srm" + ".role_id and srm.menu_id=sm.id AND sr.id= ? ";
-            roleVo.setMenus(JdbcUtil.jdbcHelper().findAll(SysMenu.class, psql, v.getId()));
-            return roleVo;
-        });
+        return result;
     }
 
 
@@ -121,7 +72,6 @@ public class RoleService {
 
         JdbcUtil.jdbcHelper().saveOrUpdate(sysRole);
 
-        this.updateRoleMenu(param.getId(),param.getMenus());
         //@formatter:on
     }
 
@@ -148,7 +98,6 @@ public class RoleService {
         }
 
         JdbcUtil.jdbcHelper().updateByPrimaryKeySelective(role);
-        this.updateRoleMenu(param.getId(),param.getMenus());
 
         //@formatter:on
     }
@@ -169,7 +118,7 @@ public class RoleService {
             Assert.isNotBlank("记录主键不能为空", id);
             SysRole sysRole =
                     Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, id)).filter(r -> !RoleStat.ROLE_INIT.equalCode(r.getStat())).orElseThrow(ValidateUtils.orElseThrow("记录不存在"));
-            Assert.isFalse("未禁用的角色不允许删除", RoleStat.ROLE_DISABLE.equalCode(sysRole.getStat()));
+            Assert.isTrue("未禁用的角色不允许删除", RoleStat.ROLE_DISABLE.equalCode(sysRole.getStat()));
             JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysRole.class, id.trim());
 
             // 删除关联关系

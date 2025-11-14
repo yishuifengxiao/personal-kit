@@ -4,6 +4,7 @@ import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.validate.Group;
 import com.yishuifengxiao.tool.personalkit.aspect.Trim;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
 import com.yishuifengxiao.tool.personalkit.domain.query.RoleQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdListReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
@@ -39,8 +40,8 @@ public class RoleController {
     private final RoleService roleService;
 
     @PostMapping("/page")
-    public Page<RoleVo> findPageRole(@RequestBody PageQuery<RoleQuery> pageQuery) {
-        Page<RoleVo> page = roleService.findPageRole(pageQuery);
+    public Page<SysRole> findPageRole(@RequestBody PageQuery<RoleQuery> pageQuery) {
+        Page<SysRole> page = roleService.findPageRole(pageQuery);
 
         return page;
 
