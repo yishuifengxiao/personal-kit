@@ -2,6 +2,7 @@ package com.yishuifengxiao.tool.personalkit.web.system;
 
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
+import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
 import com.yishuifengxiao.tool.personalkit.domain.query.MenuQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.MenuPermissionReq;
@@ -31,6 +32,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/sys/menu")
 @RequiredArgsConstructor
+@Trim
 public class MenuController {
 
     private final MenuService menuService;

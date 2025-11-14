@@ -7,6 +7,7 @@ import com.yishuifengxiao.common.security.token.SecurityToken;
 import com.yishuifengxiao.common.security.token.holder.TokenHolder;
 import com.yishuifengxiao.common.tool.bean.JsonUtil;
 import com.yishuifengxiao.common.tool.exception.CustomException;
+import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.vo.CurrentUser;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
@@ -42,6 +43,7 @@ import java.util.stream.Collectors;
 @Tag(name = "首页")
 @Valid
 @Controller
+@Trim
 public class IndexController {
     @Autowired
     private TokenHolder tokenHolder;

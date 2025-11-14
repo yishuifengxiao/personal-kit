@@ -65,7 +65,9 @@
         <!-- 选中权限统计 -->
         <div class="selection-info">
           <a-space>
-            <span>已选择 <a-tag color="blue">{{ selectedKeys.length }}</a-tag> 个权限</span>
+            <span
+              >已选择 <a-tag color="blue">{{ selectedKeys.length }}</a-tag> 个权限</span
+            >
             <a-button type="link" @click="clearSelection" size="small">清空选择</a-button>
           </a-space>
         </div>
@@ -117,7 +119,7 @@ export default {
   name: 'PermissionManagement',
   setup() {
     const router = useRouter()
-    
+
     // 当前菜单信息
     const currentMenu = reactive({
       id: '',
@@ -217,33 +219,24 @@ export default {
     const loadPermissions = async () => {
       loading.value = true
       try {
-        // 模拟API调用 - 实际项目中需要替换为真实的API
-        const mockData = [
-          { id: 1, name: '查看权限', code: 'view', description: '查看菜单内容的权限', status: 1, createTime: '2024-01-01' },
-          { id: 2, name: '编辑权限', code: 'edit', description: '编辑菜单内容的权限', status: 1, createTime: '2024-01-01' },
-          { id: 3, name: '删除权限', code: 'delete', description: '删除菜单内容的权限', status: 1, createTime: '2024-01-01' },
-          { id: 4, name: '导出权限', code: 'export', description: '导出菜单数据的权限', status: 1, createTime: '2024-01-02' },
-          { id: 5, name: '导入权限', code: 'import', description: '导入菜单数据的权限', status: 0, createTime: '2024-01-02' },
-          { id: 6, name: '审核权限', code: 'audit', description: '审核菜单内容的权限', status: 1, createTime: '2024-01-03' },
-          { id: 7, name: '发布权限', code: 'publish', description: '发布菜单的权限', status: 1, createTime: '2024-01-03' },
-          { id: 8, name: '配置权限', code: 'config', description: '配置菜单设置的权限', status: 1, createTime: '2024-01-04' },
-          { id: 9, name: '统计权限', code: 'statistics', description: '查看菜单统计的权限', status: 1, createTime: '2024-01-04' },
-          { id: 10, name: '管理权限', code: 'manage', description: '管理菜单的完整权限', status: 1, createTime: '2024-01-05' }
-        ]
+        this.$http
+          .request({
+            url: '/personkit/sys/permission/page',
+            data: {
+              num: pagination.current,
+              query: formState,
+              size: pagination.pageSize
+            }
+          })
+          .then((res) => {
+            pagination.current = res.num
+            pagination.total = res.total
 
-        // 过滤数据（模拟搜索功能）
-        let filteredData = mockData.filter(item => {
-          const nameMatch = !searchForm.name || item.name.includes(searchForm.name)
-          const codeMatch = !searchForm.code || item.code.includes(searchForm.code)
-          const statusMatch = searchForm.status === undefined || item.status === searchForm.status
-          return nameMatch && codeMatch && statusMatch
-        })
+            // 直接使用返回的数据，不需要树形处理
+             permissionData.value = reactive(res.data)
+          })
+          .catch((err) => console.log(err))
 
-        // 模拟分页
-        const start = (pagination.current - 1) * pagination.pageSize
-        const end = start + pagination.pageSize
-        permissionData.value = filteredData.slice(start, end)
-        pagination.total = filteredData.length
 
         // 加载当前菜单已选中的权限
         loadSelectedPermissions()
@@ -333,10 +326,10 @@ export default {
         //     permissionIds: selectedKeys.value
         //   }
         // })
-        
+
         // 模拟保存成功
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+
         message.success('权限保存成功')
         console.log('保存的权限ID:', selectedKeys.value)
       } catch (error) {
@@ -396,7 +389,7 @@ export default {
 
 .page-header {
   margin-bottom: 20px;
-  
+
   :deep(.ant-page-header) {
     background: #fff;
     border-radius: 6px;
@@ -406,7 +399,7 @@ export default {
 
 .search-section {
   margin-bottom: 20px;
-  
+
   :deep(.ant-card) {
     border-radius: 6px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -431,20 +424,20 @@ export default {
 .permission-table-container {
   border: 1px solid #f0f0f0;
   border-radius: 4px;
-  
+
   // 已选中权限行的样式
   :deep(.selected-permission-row) {
     background-color: #f0f9ff !important;
-    
+
     &:hover {
       background-color: #e6f7ff !important;
     }
-    
+
     td {
       border-bottom: 2px solid #1890ff !important;
     }
   }
-  
+
   // 选中行的复选框样式
   :deep(.ant-table-selection-column) {
     .ant-checkbox-checked .ant-checkbox-inner {
@@ -459,13 +452,13 @@ export default {
   .permission-management {
     padding: 10px;
   }
-  
+
   .search-section {
     :deep(.ant-form) {
       flex-direction: column;
       align-items: flex-start;
     }
-    
+
     :deep(.ant-form-item) {
       margin-bottom: 8px;
     }

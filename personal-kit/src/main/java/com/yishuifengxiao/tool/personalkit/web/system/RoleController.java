@@ -3,6 +3,7 @@ package com.yishuifengxiao.tool.personalkit.web.system;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.validate.Group;
+import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.query.RoleQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdListReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.RoleVo;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/sys/role")
 @RequiredArgsConstructor
+@Trim
 public class RoleController {
 
     private final RoleService roleService;

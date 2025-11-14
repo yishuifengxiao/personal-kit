@@ -2,6 +2,7 @@ package com.yishuifengxiao.tool.personalkit.web.system;
 
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
+import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
 import com.yishuifengxiao.tool.personalkit.domain.vo.PermissionVo;
 import com.yishuifengxiao.tool.personalkit.service.PermissionService;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/sys/permission")
 @RequiredArgsConstructor
+@Trim
 public class PermissionController {
 
     private final PermissionService permissionService;

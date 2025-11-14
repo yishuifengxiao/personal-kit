@@ -10,12 +10,16 @@
       :label-col="labelCol"
     >
       <a-form-item label="应用名称" name="applicationName" class="input">
-        <a-input allowClear v-model:value="formState.applicationName" placeholder="应用名称，模糊查询">
+        <a-input
+          allowClear
+          v-model:value="formState.applicationName"
+          placeholder="应用名称，模糊查询"
+        >
         </a-input>
       </a-form-item>
 
-      <a-form-item label="模板名称" name="模板名称" class="input">
-        <a-input allowClear v-model:value="formState.module" placeholder="模板名称，模糊查询">
+      <a-form-item label="模块名称" name="模块名称" class="input">
+        <a-input allowClear v-model:value="formState.module" placeholder="模块名称，模糊查询">
         </a-input>
       </a-form-item>
 
@@ -23,7 +27,10 @@
         <a-input allowClear v-model:value="formState.name" placeholder="资源名称，模糊查询">
         </a-input>
       </a-form-item>
-
+      <a-form-item label="资源路径" name="url" class="input">
+        <a-input allowClear v-model:value="formState.url" placeholder="资源路径，模糊查询">
+        </a-input>
+      </a-form-item>
       <a-space class="input">
         <a-button type="primary" html-type="submit"> 搜索 </a-button>
       </a-space>
@@ -43,7 +50,7 @@
         size="small"
         :row-selection="rowSelection"
       >
-        <template #bodyCell="{ column, record }">
+        <!-- <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'action'">
             <a-space>
               <a-button
@@ -55,7 +62,7 @@
               <a>删除</a> <a>修改</a> <a>修改状态</a></a-space
             >
           </template>
-        </template>
+</template> -->
       </a-table>
       <!-- 表格区 -->
     </div>
@@ -75,7 +82,7 @@
 </template>
 
 <script>
-import { reactive, defineComponent, ref} from 'vue'
+import { reactive, defineComponent, ref ,getCurrentInstance } from 'vue'
 import { UserOutlined } from '@ant-design/icons-vue'
 import { mapState } from 'pinia'
 import { useUserStore } from '@/stores/user'
@@ -209,6 +216,7 @@ export default defineComponent({
     window.removeEventListener('resize', this.handleResize)
   },
   setup() {
+        const { proxy } = getCurrentInstance()
     const columns = [
       {
         title: '应用名称',
@@ -217,18 +225,10 @@ export default defineComponent({
         align: 'center'
       },
       {
-        title: '模板名称',
-        dataIndex: 'module',
-        key: 'module',
-        align: 'center'
-      },
-
-      {
-        title: '资源名称',
-        dataIndex: 'name',
-        key: 'name',
+        title: '资源路径',
+        dataIndex: 'url',
+        key: 'url',
         ellipsis: true,
-
         align: 'center'
       },
       {
@@ -240,13 +240,20 @@ export default defineComponent({
         align: 'center'
       },
       {
-        title: '资源路径',
-        dataIndex: 'url',
-        key: 'url',
-        ellipsis: true,
-
+        title: '模块名称',
+        dataIndex: 'module',
+        key: 'module',
         align: 'center'
       },
+
+      {
+        title: '资源名称',
+        dataIndex: 'name',
+        key: 'name',
+        ellipsis: true,
+        align: 'center'
+      },
+
       {
         title: '描述',
         dataIndex: 'description',
@@ -254,14 +261,6 @@ export default defineComponent({
 
         ellipsis: true,
         align: 'center'
-      },
-      {
-        title: '操作',
-        dataIndex: 'action',
-        key: 'action',
-        width: 300,
-        align: 'center',
-        fixed: 'right'
       }
     ]
     const pagination = {

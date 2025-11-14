@@ -1,6 +1,5 @@
 package com.yishuifengxiao.tool.personalkit.support;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.yishuifengxiao.common.guava.EventPublisher;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.support.api.ApiInfo;
@@ -96,7 +95,7 @@ public class ResourceInitializer implements CommandLineRunner {
                     apiInfo.getMethodValue(), apiInfo.getMethodDescription(), CollUtil.first(apiInfo.getPath()).get(),
                     CollUtil.first(apiInfo.getHttpMethods()).get(), contextPath, applicationName, 1
             );
-            sysPermission.setId(Md5.md5Short(JSONObject.toJSONString(sysPermission)));
+            sysPermission.setId(Md5.md5Short(sysPermission.getModule() + sysPermission.getUrl() + sysPermission.getHttpMethod()));
             return sysPermission;
 
         }).collect(Collectors.toList());
