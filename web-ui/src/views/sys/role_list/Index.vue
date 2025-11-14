@@ -8,7 +8,13 @@
       </a-form-item>
 
       <a-form-item label="角色状态" name="stat" class="input">
-        <a-input allowClear v-model:value="formState.stat" placeholder="角色状态"> </a-input>
+        <a-select 
+          allowClear 
+          style="width: 180px" 
+          placeholder="请选择状态" 
+          v-model:value="formState.stat"
+          :options="statusOptions"
+        ></a-select>
       </a-form-item>
 
       <a-form-item label="角色描述" name="description" class="input">
@@ -35,8 +41,13 @@
           <a-space>
             <a>删除</a> 
             <a-button type="link" @click="modifyMenus(record)">修改菜单</a-button> 
-            <a>修改状态</a>
+            <a-button type="link" @click="toggleStatus(record)">{{ record.stat === 1 ? '禁用' : '启用' }}</a-button>
           </a-space>
+        </template>
+        <template v-else-if="column.dataIndex === 'stat'">
+          <a-tag :color="record.stat === 1 ? 'green' : 'red'">
+            {{ record.stat === 1 ? '启用' : '禁用' }}
+          </a-tag>
         </template>
       </template>
     </a-table>
@@ -56,13 +67,15 @@
 import { reactive, defineComponent, ref } from 'vue'
 import { mapState } from 'pinia'
 import { useUserStore } from '@/stores/user'
+import { message } from 'ant-design-vue'
+
 export default defineComponent({
   data() {
     const formState = reactive({
       menuName: '',
       name: '',
       description: '',
-      stat: ''
+      stat: undefined
     })
     const data = reactive([])
     const roleSource = reactive([])
@@ -105,6 +118,37 @@ export default defineComponent({
         .catch((err) => console.log(err))
     },
 
+    /**
+     * 切换角色状态
+     */
+    toggleStatus(record) {
+      const newStatus = record.stat === 1 ? 0 : 1
+      const statusText = newStatus === 1 ? '启用' : '禁用'
+      
+      this.$http
+        .request({
+          url: '/personkit/sys/role/status',
+          method: 'post',
+          data: {
+            roleId: record.id,
+            stat: newStatus
+          }
+        })
+        .then((res) => {
+          if (res.code === 200) {
+            message.success(`角色${statusText}成功`)
+            // 更新本地数据
+            record.stat = newStatus
+          } else {
+            message.error(res.message || `${statusText}失败`)
+          }
+        })
+        .catch((err) => {
+          console.error('切换状态失败:', err)
+          message.error(`${statusText}失败`)
+        })
+    },
+
     handleChange(info) {
       if (info.file.status !== 'uploading') {
         console.log(info.file, info.fileList)
@@ -137,7 +181,8 @@ export default defineComponent({
         JSON.stringify({
           id: record.id,
           name: record.name,
-          description: record.description
+          description: record.description,
+          stat: record.stat
         })
       )
 
@@ -161,9 +206,10 @@ export default defineComponent({
       },
       {
         title: '角色状态',
-        dataIndex: 'statName',
-        key: 'statName',
-        align: 'center'
+        dataIndex: 'stat',
+        key: 'stat',
+        align: 'center',
+        width: 100
       },
       {
         title: '角色描述',
@@ -197,11 +243,11 @@ export default defineComponent({
     const fileList = ref([])
     const labelCol = { style: { width: '80px' } }
     const wrapperCol = { span: 14 }
-    const userStatusOptions = reactive([
-      { label: '系统', value: -1 },
-      { label: '启用', value: 1 }
+    const statusOptions = reactive([
+      { label: '启用', value: 1 },
+      { label: '禁用', value: 0 }
     ])
-    return { columns, pagination, fileList, labelCol, wrapperCol, userStatusOptions }
+    return { columns, pagination, fileList, labelCol, wrapperCol, statusOptions }
   }
 })
 </script>

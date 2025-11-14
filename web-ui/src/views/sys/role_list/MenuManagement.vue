@@ -10,11 +10,14 @@
               <a-typography-title :level="4" class="header-title">角色菜单配置</a-typography-title>
               <a-typography-text type="secondary" class="header-subtitle">
                 当前角色：{{ currentRole.name }} ({{ currentRole.description }})
+                <a-tag :color="currentRole.stat === 1 ? 'green' : 'red'" style="margin-left: 8px">
+                  {{ currentRole.stat === 1 ? '启用' : '禁用' }}
+                </a-tag>
               </a-typography-text>
             </div>
             <div class="header-actions">
               <a-space>
-                <a-button type="primary" @click="saveMenus" :loading="loading">
+                <a-button type="primary" @click="saveMenus" :loading="loading" :disabled="currentRole.stat === 0">
                   <template #icon>
                     <SaveOutlined />
                   </template>
@@ -31,28 +34,22 @@
           </div>
         </div>
 
+        <!-- 禁用状态提示 -->
+        <a-alert v-if="currentRole.stat === 0" message="当前角色已禁用，无法保存菜单配置" type="warning" show-icon
+          style="margin-bottom: 16px" />
+
         <!-- 搜索区域 -->
         <div class="search-area">
           <a-form layout="inline" :model="searchForm" class="search-form">
             <a-form-item label="菜单名称">
-              <a-input
-                v-model:value="searchForm.name"
-                placeholder="请输入菜单名称"
-                allowClear
-                style="width: 180px"
-                @pressEnter="handleSearch"
-              />
+              <a-input v-model:value="searchForm.name" placeholder="请输入菜单名称" allowClear style="width: 180px"
+                @pressEnter="handleSearch" />
             </a-form-item>
             <a-form-item label="路由名称">
-              <a-input
-                v-model:value="searchForm.routerName"
-                placeholder="请输入路由名称"
-                allowClear
-                style="width: 180px"
-                @pressEnter="handleSearch"
-              />
+              <a-input v-model:value="searchForm.routerName" placeholder="请输入路由名称" allowClear style="width: 180px"
+                @pressEnter="handleSearch" />
             </a-form-item>
-      
+
             <a-form-item>
               <a-space>
                 <a-button type="primary" @click="handleSearch">
@@ -75,9 +72,7 @@
         <!-- 选中菜单统计 -->
         <div class="selection-info">
           <a-space>
-            <span
-              >已选择 <a-tag color="blue">{{ selectedKeys.length }}</a-tag> 个菜单</span
-            >
+            <span>已选择 <a-tag color="blue">{{ selectedKeys.length }}</a-tag> 个菜单</span>
             <a-button type="link" @click="clearSelection" size="small">
               <template #icon>
                 <ClearOutlined />
@@ -89,29 +84,23 @@
 
         <!-- 菜单表格 -->
         <div class="table-container">
-          <a-table
-            :columns="columns"
-            size="small"
-            :data-source="menuData"
-            :pagination="pagination"
-            :row-selection="{
-              selectedRowKeys: selectedKeys,
-              onChange: onSelectionChange,
-              onSelect: onSelect,
-              onSelectAll: onSelectAll,
-              checkStrictly: true
-            }"
-            :row-class-name="getRowClassName"
-            :scroll="{ x: 1000, y: 'calc(100vh - 380px)' }"
-            :loading="loading"
-            :row-key="(record) => record.id"
-            bordered
-            class="menu-table"
-          >
+          <a-table :columns="columns" size="small" :data-source="menuData" :pagination="pagination" :row-selection="{
+            selectedRowKeys: selectedKeys,
+            onChange: onSelectionChange,
+            onSelect: onSelect,
+            onSelectAll: onSelectAll,
+            checkStrictly: true
+          }" :row-class-name="getRowClassName" :scroll="{ x: 1000, y: 'calc(100vh - 380px)' }" :loading="loading"
+            :row-key="(record) => record.id" bordered class="menu-table">
             <template #bodyCell="{ column, record }">
               <template v-if="column.dataIndex === 'selectionStatus'">
                 <a-tag v-if="isSelected(record)" color="blue">已选中</a-tag>
                 <span v-else>-</span>
+              </template>
+              <template v-else-if="column.dataIndex === 'isShow'">
+                <a-tag :color="record.isShow === 1 ? 'green' : 'red'">
+                  {{ record.isShow === 1 ? '显示' : '隐藏' }}
+                </a-tag>
               </template>
             </template>
           </a-table>
@@ -150,7 +139,8 @@ export default {
     const currentRole = reactive({
       id: '',
       name: '',
-      description: ''
+      description: '',
+      stat: 1 // 默认启用状态
     })
 
     // 搜索表单
@@ -209,7 +199,8 @@ export default {
         title: '是否显示',
         dataIndex: 'isShow',
         key: 'isShow',
-        align: 'center'
+        align: 'center',
+        width: 80
       },
       {
         title: '描述',
@@ -234,13 +225,37 @@ export default {
         currentRole.id = role.id
         currentRole.name = role.name
         currentRole.description = role.description
+        currentRole.stat = role.stat || 1 // 默认为启用状态
       } else {
         // 从路由参数获取
         const route = router.currentRoute.value
         if (route.query.roleId) {
           currentRole.id = route.query.roleId
           // 这里可以调用接口获取角色详情
+          loadRoleDetail()
         }
+      }
+    }
+
+    // 加载角色详情
+    const loadRoleDetail = async () => {
+      if (!currentRole.id) return
+
+      try {
+        const res = await proxy.$http.request({
+          url: '/personkit/sys/role/detail',
+          data: {
+            roleId: currentRole.id
+          }
+        })
+
+        if (res.code === 200 && res.data) {
+          currentRole.name = res.data.name
+          currentRole.description = res.data.description
+          currentRole.stat = res.data.stat || 1
+        }
+      } catch (error) {
+        console.error('加载角色详情失败:', error)
       }
     }
 
@@ -256,10 +271,10 @@ export default {
             size: pagination.pageSize
           }
         })
-        
+
         menuData.value = res.data || []
         pagination.total = res.total || 0
-        
+
         // 加载当前角色已关联的菜单
         await loadRoleMenus()
       } catch (error) {
@@ -273,19 +288,15 @@ export default {
     // 加载角色已关联的菜单
     const loadRoleMenus = async () => {
       if (!currentRole.id) return
-      
+
       try {
         const res = await proxy.$http.request({
           url: '/personkit/sys/role/menu',
           data: {
-            roleId: currentRole.id
+            id: currentRole.id
           }
         })
-        
-        if (res.code === 200 && res.data) {
-          // 假设返回的是菜单ID数组
-          selectedKeys.value = res.data.map(menu => menu.id || menu)
-        }
+        selectedKeys.value = res || []
       } catch (error) {
         console.error('加载角色菜单失败:', error)
       }
@@ -297,23 +308,23 @@ export default {
         message.warning('请先选择角色')
         return
       }
-      
+
+      if (currentRole.stat === 0) {
+        message.warning('当前角色已禁用，无法保存菜单配置')
+        return
+      }
+
       loading.value = true
       try {
         const res = await proxy.$http.request({
-          url: '/personkit/sys/role/menu/save',
+          url: '/personkit/sys/role/updateMenu',
           method: 'post',
           data: {
-            roleId: currentRole.id,
-            menuIds: selectedKeys.value
+            id: currentRole.id,
+            menus: selectedKeys.value.map(v => ({ "id": v }))
           }
         })
-        
-        if (res.code === 200) {
-          message.success('菜单配置保存成功')
-        } else {
-          message.error(res.message || '保存失败')
-        }
+        message.success('菜单配置保存成功')
       } catch (error) {
         console.error('保存菜单配置失败:', error)
         message.error('保存菜单配置失败')

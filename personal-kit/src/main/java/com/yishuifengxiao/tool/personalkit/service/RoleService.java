@@ -2,27 +2,27 @@ package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
-import com.yishuifengxiao.common.tool.collections.CollUtil;
-import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.common.tool.utils.ValidateUtils;
 import com.yishuifengxiao.tool.personalkit.domain.constant.Constant;
-import com.yishuifengxiao.tool.personalkit.domain.entity.*;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysRoleMenu;
+import com.yishuifengxiao.tool.personalkit.domain.entity.SysUserRole;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
 import com.yishuifengxiao.tool.personalkit.domain.query.RoleQuery;
 import com.yishuifengxiao.tool.personalkit.domain.vo.RoleVo;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotBlank;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -157,25 +157,9 @@ public class RoleService {
         Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, roleId)).filter(r -> !RoleStat.ROLE_INIT.equalCode(r.getStat())).orElseThrow(ValidateUtils.orElseThrow("记录不存在"));
         //@formatter:off
         //删除旧的关联关系
-        JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysRoleMenu.class,
-                JdbcUtil.jdbcHelper().findAll(new SysRoleMenu().setRoleId(roleId),false).stream().map(SysRoleMenu::getId).toArray(Object[]::new)
-                );
-
-        Set<String> menuIds = CollUtil.stream(menus)
-                .filter(Objects::nonNull)
-                .filter(v -> StringUtils.isNotBlank(v.getId()))
-                .filter(v -> JdbcUtil.jdbcHelper().countAll(new SysMenu().setId(v.getId().trim()),false) > 0)
-                .distinct()
-                .map(SysMenu::getId)
-                .collect(Collectors.toSet());
-
-        //增加隐藏菜单
-        menuIds.addAll(JdbcUtil.jdbcHelper().findAll(new SysMenu().setIsShow(BoolStat.True.code()),false).stream().map(SysMenu::getId).filter(menuId->menuIds.stream().noneMatch(s->s.equals(menuId)))
-                .distinct().collect(Collectors.toList()));
-
-
-        menuIds.stream().filter(StringUtils::isNotBlank).map(v -> new SysRoleMenu(IdWorker.snowflakeStringId(),roleId
-                , v)).forEach(JdbcUtil.jdbcHelper()::saveOrUpdate);
+        JdbcUtil.jdbcHelper().jdbcTemplate().update("DELETE FROM sys_role_menu WHERE role_id = ?", roleId);
+        List<SysRoleMenu> menuList = menus.stream().map(menu -> new SysRoleMenu(roleId+menu.getId(),roleId,menu.getId())).collect(Collectors.toList());
+        JdbcUtil.jdbcHelper().saveAll(menuList);
         //@formatter:on
     }
 
@@ -197,4 +181,7 @@ public class RoleService {
     }
 
 
+    public List<String> findMenu(@NotBlank(message = "请选择一个记录") String id) {
+        return JdbcUtil.jdbcHelper().findAll(new SysRoleMenu().setRoleId(id.trim()), false).stream().map(SysRoleMenu::getMenuId).collect(Collectors.toList());
+    }
 }

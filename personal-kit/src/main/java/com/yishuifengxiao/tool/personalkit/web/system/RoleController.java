@@ -6,6 +6,7 @@ import com.yishuifengxiao.common.tool.validate.Group;
 import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.query.RoleQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdListReq;
+import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.RoleVo;
 import com.yishuifengxiao.tool.personalkit.service.RoleService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 
 /**
@@ -43,6 +46,11 @@ public class RoleController {
 
     }
 
+    @PostMapping("/menu")
+    public List<String> menu(@RequestBody IdReq req) {
+        return roleService.findMenu(req.getId());
+    }
+
     @PostMapping("/add")
     public void addRole(@Validated(Group.Create.class) @RequestBody RoleVo param,
                         BindingResult errors) {
@@ -60,5 +68,10 @@ public class RoleController {
         roleService.deleteRoles(param.getIds());
     }
 
+
+    @PostMapping("/updateMenu")
+    public void updateRoleMenu(@RequestBody RoleVo param) {
+        roleService.updateRoleMenu(param.getId(), param.getMenus());
+    }
 
 }
