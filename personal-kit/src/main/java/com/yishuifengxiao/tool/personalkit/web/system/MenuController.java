@@ -50,6 +50,13 @@ public class MenuController {
         return page;
     }
 
+
+    @PostMapping("/list")
+    public List<SysMenu> list(@RequestBody SysMenu sysMenu) {
+        List<SysMenu> sysPermissions = menuService.list(sysMenu);
+        return sysPermissions;
+    }
+
     @GetMapping("/permission")
     public List<String> permission(@RequestParam("menuId") String menuId) {
         return permissionService.findSysPermission(menuId).stream().map(SysPermission::getId).toList();
@@ -68,12 +75,12 @@ public class MenuController {
     }
 
     @PostMapping("/save")
-    public void save(@RequestBody SysMenu menu){
+    public void save(@RequestBody SysMenu menu) {
         menuService.addRole(menu);
     }
 
     @PostMapping("/update")
-    public void update(@RequestBody SysMenu menu){
+    public void update(@RequestBody SysMenu menu) {
         menuService.updateRole(menu);
     }
 }

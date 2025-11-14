@@ -7,6 +7,7 @@ import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.entity.BoolStat;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
+import com.yishuifengxiao.common.tool.entity.Slice;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.dao.MenuDao;
@@ -225,11 +226,16 @@ public class MenuService {
         Assert.isNotNull("记录不存在", exist);
         Long counted = JdbcUtil.jdbcHelper().countAll(new SysMenu().setParentId(menu.getParentId()), false);
         Assert.isTrue("父级菜单不存在", counted > 0);
-        if(!StringUtils.equalsIgnoreCase(menu.getName(),exist.getName())){
+        if (!StringUtils.equalsIgnoreCase(menu.getName(), exist.getName())) {
             // 名称发生了改变
             counted = JdbcUtil.jdbcHelper().countAll(new SysMenu().setName(menu.getName()), false);
             Assert.isTrue("菜单名称已存在", counted == 0);
         }
         JdbcUtil.jdbcHelper().updateByPrimaryKeySelective(menu);
+    }
+
+    public List<SysMenu> list(SysMenu sysMenu) {
+        Page<SysMenu> page = JdbcUtil.jdbcHelper().findPage(sysMenu, true, Slice.of(10, 1));
+        return page.getData();
     }
 }

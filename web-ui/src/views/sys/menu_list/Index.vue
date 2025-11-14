@@ -18,7 +18,7 @@
         <a-button @click="handleReset">重置</a-button>
         <a-button type="primary" @click="showAddModal">增加菜单</a-button>
       </a-space>
-    </a-form>
+</a-form>
 
     <!-- 上部搜索条件区域 -->
     <a-divider dashed />
@@ -42,7 +42,7 @@
             </template>
             <!-- 非叶子节点不显示操作按钮 -->
             <template v-else>
-              <span style="color: #999">-</span>
+<span style="color: #999">-</span>
             </template>
           </template>
 
@@ -102,9 +102,18 @@
           <a-input v-model:value="menuForm.name" placeholder="请输入菜单名称" />
         </a-form-item>
         <a-form-item label="父级菜单" name="parentId">
-          <a-select v-model:value="menuForm.parentId" placeholder="请选择父级菜单" allowClear>
+          <a-select 
+            v-model:value="menuForm.parentId" 
+            placeholder="请选择父级菜单" 
+            allowClear
+            show-search
+            :filter-option="false"
+            :loading="menuLoading"
+            @search="handleMenuSearch"
+            @focus="handleMenuFocus"
+          >
             <a-select-option :value="0">根菜单</a-select-option>
-            <a-select-option v-for="menu in menuList" :key="menu.id" :value="menu.id">
+            <a-select-option v-for="menu in filteredMenuList" :key="menu.id" :value="menu.id">
               {{ menu.name }}
             </a-select-option>
           </a-select>
@@ -160,7 +169,10 @@ export default defineComponent({
     const modalVisible = ref(false) // 模态框显示状态
     const isEditMode = ref(false) // 是否为编辑模式
     const currentEditId = ref(null) // 当前编辑的菜单ID
-    const menuList = ref([]) // 菜单列表用于父级菜单选择
+    const menuList = ref([]) // 完整菜单列表
+    const filteredMenuList = ref([]) // 过滤后的菜单列表
+    const menuLoading = ref(false) // 菜单加载状态
+    const searchKeyword = ref('') // 搜索关键词
 
     const rowSelection = ref({
       checkStrictly: false,
@@ -231,6 +243,9 @@ export default defineComponent({
       isEditMode,
       currentEditId,
       menuList,
+      filteredMenuList,
+      menuLoading,
+      searchKeyword,
       menuForm,
       menuFormRules,
       defaultFormState
@@ -289,6 +304,51 @@ export default defineComponent({
           this.menuList = this.getAllMenus(res.data)
         })
         .catch((err) => console.log(err))
+    },
+
+    /**
+     * 加载菜单列表
+     */
+    loadMenuList() {
+      this.menuLoading = true
+      this.$http
+        .request({
+          url: '/personkit/sys/menu/list',
+          data: {}
+        })
+        .then((res) => {
+          this.menuList = res.data || []
+          this.filteredMenuList = this.menuList
+          this.menuLoading = false
+        })
+        .catch((err) => {
+          console.log(err)
+          this.menuLoading = false
+        })
+    },
+
+    /**
+     * 处理菜单搜索
+     */
+    handleMenuSearch(value) {
+      this.searchKeyword = value
+      if (!value) {
+        this.filteredMenuList = this.menuList
+        return
+      }
+      
+      this.filteredMenuList = this.menuList.filter(menu => 
+        menu.name && menu.name.toLowerCase().includes(value.toLowerCase())
+      )
+    },
+
+    /**
+     * 处理菜单选择框获取焦点
+     */
+    handleMenuFocus() {
+      if (this.menuList.length === 0) {
+        this.loadMenuList()
+      }
     },
 
     /**
@@ -402,6 +462,10 @@ export default defineComponent({
       this.currentEditId = null
       this.resetMenuForm()
       this.modalVisible = true
+      // 预加载菜单列表
+      if (this.menuList.length === 0) {
+        this.loadMenuList()
+      }
     },
 
     /**
@@ -422,6 +486,10 @@ export default defineComponent({
         description: record.description || ''
       })
       this.modalVisible = true
+      // 预加载菜单列表
+      if (this.menuList.length === 0) {
+        this.loadMenuList()
+      }
     },
 
     /**
@@ -503,7 +571,58 @@ export default defineComponent({
             })
         }
       })
+    },
+
+    /**
+     * 加载菜单列表
+     */
+    loadMenuList() {
+      this.menuLoading = true
+      this.$http
+        .request({
+          url: '/personkit/sys/menu/list'
+        })
+        .then((res) => {
+          this.menuList = res || []
+          this.filteredMenuList = [...this.menuList]
+        })
+        .catch((err) => {
+          console.log(err)
+          this.$msg.error('获取菜单列表失败')
+          this.menuList = []
+          this.filteredMenuList = []
+        })
+        .finally(() => {
+          this.menuLoading = false
+        })
+    },
+
+    /**
+     * 菜单搜索处理
+     */
+    handleMenuSearch(value) {
+      this.searchKeyword = value
+      if (!value) {
+        this.filteredMenuList = [...this.menuList]
+        return
+      }
+      
+      // 根据菜单名称进行模糊搜索
+      this.filteredMenuList = this.menuList.filter(menu => 
+        menu.name && menu.name.toLowerCase().includes(value.toLowerCase())
+      )
+    },
+
+    /**
+     * 菜单下拉框焦点事件处理
+     */
+    handleMenuFocus() {
+      // 如果菜单列表为空，则加载数据
+      if (this.menuList.length === 0) {
+        this.loadMenuList()
+      }
     }
+
   },
   components: {
     UserOutlined
