@@ -66,4 +66,14 @@ public class MenuController {
     public RoleMenuVo findRoleMenu(@RequestBody MenuQuery param) {
         return menuService.findRoleMenu(param.getRoleId(), param.getTopMenuId());
     }
+
+    @PostMapping("/save")
+    public void save(@RequestBody SysMenu menu){
+        menuService.addRole(menu);
+    }
+
+    @PostMapping("/update")
+    public void update(@RequestBody SysMenu menu){
+        menuService.updateRole(menu);
+    }
 }

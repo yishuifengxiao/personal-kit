@@ -13,17 +13,10 @@
         </a-input>
       </a-form-item>
 
-      <a-form-item label="路由名称" name="routerName" class="input">
-        <a-input allowClear v-model:value="formState.routerName" placeholder="路由名称，模糊查询">
-        </a-input>
-      </a-form-item>
-
-      <a-form-item label="需要鉴权" name="auth" class="input">
-        <a-select allowClear style="width: 180px" placeholder="状态" v-model:value="formState.auth"
-          :options="statusOptions"></a-select>
-      </a-form-item>
       <a-space class="input">
         <a-button type="primary" html-type="submit"> 搜索 </a-button>
+        <a-button @click="handleReset">重置</a-button>
+        <a-button type="primary" @click="showAddModal">增加菜单</a-button>
       </a-space>
     </a-form>
 
@@ -40,15 +33,30 @@
             <!-- 只在叶子节点显示操作按钮 -->
             <template v-if="!record.children || record.children.length === 0">
               <a-space>
-                <a>删除</a>
+                <a-button type="link" @click="showEditModal(record)">编辑</a-button>
                 <a-button type="link" @click="modifyPermissions(record)">修改权限</a-button>
-                <a>修改状态</a>
+                <a-button v-if="record.stat === 1" type="link" danger @click="handleToggleStatus(record, 0)">禁用</a-button>
+                <a-button v-else type="link" @click="handleToggleStatus(record, 1)">启用</a-button>
               </a-space>
             </template>
             <!-- 非叶子节点不显示操作按钮 -->
             <template v-else>
               <span style="color: #999">-</span>
             </template>
+          </template>
+
+          <!-- 状态列显示逻辑 -->
+          <template v-else-if="column.dataIndex === 'stat'">
+            <a-tag :color="record.stat === 1 ? 'green' : 'red'">
+              {{ record.stat === 1 ? '启用' : '禁用' }}
+            </a-tag>
+          </template>
+
+          <!-- 是否显示列显示逻辑 -->
+          <template v-else-if="column.dataIndex === 'isShow'">
+            <a-tag :color="record.isShow === 1 ? 'blue' : 'orange'">
+              {{ record.isShow === 1 ? '显示' : '隐藏' }}
+            </a-tag>
           </template>
 
           <!-- 所需权限列显示逻辑 -->
@@ -82,6 +90,48 @@
         :show-total="(total) => `共 ${total} 条数据`" @change="onPaginationChange" />
     </div>
     <!-- 分页区 -->
+
+    <!-- 新增/编辑菜单模态框 -->
+    <a-modal v-model:visible="modalVisible" :title="modalTitle" width="600px" @ok="handleModalOk" @cancel="handleModalCancel">
+      <a-form ref="menuFormRef" :model="menuForm" :rules="menuFormRules" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
+        <a-form-item label="菜单名称" name="name">
+          <a-input v-model:value="menuForm.name" placeholder="请输入菜单名称" />
+        </a-form-item>
+        <a-form-item label="父级菜单" name="parentId">
+          <a-select v-model:value="menuForm.parentId" placeholder="请选择父级菜单" allowClear>
+            <a-select-option :value="0">根菜单</a-select-option>
+            <a-select-option v-for="menu in menuList" :key="menu.id" :value="menu.id">
+              {{ menu.name }}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="路由名称" name="routerName">
+          <a-input v-model:value="menuForm.routerName" placeholder="请输入路由名称" />
+        </a-form-item>
+        <a-form-item label="菜单位置" name="type">
+          <a-select v-model:value="menuForm.type" placeholder="请选择菜单位置">
+            <a-select-option :value="1">顶部菜单</a-select-option>
+            <a-select-option :value="2">侧边菜单</a-select-option>
+            <a-select-option :value="3">底部菜单</a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="是否显示" name="isShow">
+          <a-radio-group v-model:value="menuForm.isShow">
+            <a-radio :value="1">显示</a-radio>
+            <a-radio :value="0">隐藏</a-radio>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item label="状态" name="stat">
+          <a-radio-group v-model:value="menuForm.stat">
+            <a-radio :value="1">启用</a-radio>
+            <a-radio :value="0">禁用</a-radio>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item label="描述" name="description">
+          <a-textarea v-model:value="menuForm.description" placeholder="请输入菜单描述" :rows="3" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
     <!-- 中间内容区域 -->
   </div>
 </template>
@@ -99,6 +149,10 @@ export default defineComponent({
     const roleSource = reactive([])
     const expandedRowKeys = ref([]) // 存储展开的行key
     const tableHeight = ref(400) // 表格初始高度
+    const modalVisible = ref(false) // 模态框显示状态
+    const isEditMode = ref(false) // 是否为编辑模式
+    const currentEditId = ref(null) // 当前编辑的菜单ID
+    const menuList = ref([]) // 菜单列表用于父级菜单选择
 
     const rowSelection = ref({
       checkStrictly: false,
@@ -131,6 +185,30 @@ export default defineComponent({
       }
     })
 
+    // 菜单表单数据
+    const menuForm = reactive({
+      name: '',
+      parentId: 0,
+      routerName: '',
+      type: 1,
+      isShow: 1,
+      stat: 1,
+      description: ''
+    })
+
+    // 菜单表单验证规则
+    const menuFormRules = {
+      name: [{ required: true, message: '请输入菜单名称', trigger: 'blur' }],
+      routerName: [{ required: true, message: '请输入路由名称', trigger: 'blur' }],
+      type: [{ required: true, message: '请选择菜单位置', trigger: 'change' }]
+    }
+
+    // 默认表单状态
+    const defaultFormState = {
+      name: '',
+      parentName: ''
+    }
+
     return {
       formState,
       data,
@@ -138,7 +216,14 @@ export default defineComponent({
       rowSelection,
       expandable,
       expandedRowKeys,
-      tableHeight
+      tableHeight,
+      modalVisible,
+      isEditMode,
+      currentEditId,
+      menuList,
+      menuForm,
+      menuFormRules,
+      defaultFormState
     }
   },
   computed: {
@@ -151,10 +236,22 @@ export default defineComponent({
     },
     uploadUrl: function () {
       return this.$cfg.rootUrl() + '/personkit/disk/file/import'
+    },
+    modalTitle: function () {
+      return this.isEditMode ? '编辑菜单' : '新增菜单'
     }
   },
   methods: {
     handleFinish() {
+      this.query()
+    },
+
+    /**
+     * 重置搜索条件
+     */
+    handleReset() {
+      Object.assign(this.formState, this.defaultFormState)
+      this.pagination.current = 1
       this.query()
     },
 
@@ -177,8 +274,31 @@ export default defineComponent({
 
           // 处理数据，确保有children字段用于树形展示
           this.data = reactive(this.processTreeData(res.data))
+          
+          // 更新菜单列表用于父级菜单选择
+          this.menuList = this.getAllMenus(res.data)
         })
         .catch((err) => console.log(err))
+    },
+
+    /**
+     * 获取所有菜单用于父级菜单选择
+     */
+    getAllMenus(data) {
+      const menus = []
+      const traverse = (items) => {
+        items.forEach(item => {
+          menus.push({
+            id: item.id,
+            name: item.name
+          })
+          if (item.children && item.children.length > 0) {
+            traverse(item.children)
+          }
+        })
+      }
+      traverse(data)
+      return menus
     },
 
     /**
@@ -262,6 +382,116 @@ export default defineComponent({
         name: 'menu_permission_management',
         query: { menuId: record.id }
       })
+    },
+
+    /**
+     * 显示新增菜单模态框
+     */
+    showAddModal() {
+      this.isEditMode = false
+      this.currentEditId = null
+      this.resetMenuForm()
+      this.modalVisible = true
+    },
+
+    /**
+     * 显示编辑菜单模态框
+     */
+    showEditModal(record) {
+      this.isEditMode = true
+      this.currentEditId = record.id
+      // 填充表单数据
+      Object.assign(this.menuForm, {
+        name: record.name || '',
+        parentId: record.parentId || 0,
+        routerName: record.routerName || '',
+        type: record.type || 1,
+        isShow: record.isShow || 1,
+        stat: record.stat || 1,
+        description: record.description || ''
+      })
+      this.modalVisible = true
+    },
+
+    /**
+     * 重置菜单表单
+     */
+    resetMenuForm() {
+      Object.assign(this.menuForm, {
+        name: '',
+        parentId: 0,
+        routerName: '',
+        type: 1,
+        isShow: 1,
+        stat: 1,
+        description: ''
+      })
+    },
+
+    /**
+     * 模态框确定按钮
+     */
+    handleModalOk() {
+      this.$refs.menuFormRef.validate().then(() => {
+        const apiUrl = this.isEditMode ? '/personkit/sys/menu/update' : '/personkit/sys/menu/save'
+        const requestData = this.isEditMode 
+          ? { ...this.menuForm, id: this.currentEditId }
+          : this.menuForm
+
+        this.$http
+          .request({
+            url: apiUrl,
+            data: requestData
+          })
+          .then((res) => {
+            this.$msg.success(this.isEditMode ? '菜单更新成功' : '菜单新增成功')
+            this.modalVisible = false
+            this.query() // 刷新列表
+          })
+          .catch((err) => {
+            console.log(err)
+            this.$msg.error(this.isEditMode ? '菜单更新失败' : '菜单新增失败')
+          })
+      }).catch(() => {
+        this.$msg.warning('请完善表单信息')
+      })
+    },
+
+    /**
+     * 模态框取消按钮
+     */
+    handleModalCancel() {
+      this.modalVisible = false
+      this.resetMenuForm()
+    },
+
+    /**
+     * 切换菜单状态
+     */
+    handleToggleStatus(record, newStatus) {
+      const actionText = newStatus === 1 ? '启用' : '禁用'
+      this.$confirm({
+        title: `确认${actionText}菜单`,
+        content: `确定要${actionText}菜单 "${record.name}" 吗？`,
+        onOk: () => {
+          this.$http
+            .request({
+              url: '/personkit/sys/menu/update',
+              data: {
+                id: record.id,
+                stat: newStatus
+              }
+            })
+            .then((res) => {
+              this.$msg.success(`菜单${actionText}成功`)
+              this.query() // 刷新列表
+            })
+            .catch((err) => {
+              console.log(err)
+              this.$msg.error(`菜单${actionText}失败`)
+            })
+        }
+      })
     }
   },
   components: {
@@ -292,36 +522,37 @@ export default defineComponent({
         key: 'parentName',
         align: 'center'
       },
-
       {
         title: '路由名称',
         dataIndex: 'routerName',
         key: 'routerName',
         ellipsis: true,
-
         align: 'center'
       },
-
       {
         title: '菜单位置',
         dataIndex: 'typeName',
         key: 'typeName',
         ellipsis: true,
-
         align: 'center'
-      }, {
+      },
+      {
         title: '是否显示',
         dataIndex: 'isShow',
         key: 'isShow',
         ellipsis: true,
-
+        align: 'center'
+      },
+      {
+        title: '状态',
+        dataIndex: 'stat',
+        key: 'stat',
         align: 'center'
       },
       {
         title: '描述',
         dataIndex: 'description',
         key: 'description',
-
         ellipsis: true,
         align: 'center'
       },
@@ -329,7 +560,6 @@ export default defineComponent({
         title: '所需权限',
         dataIndex: 'permissions',
         key: 'permissions',
-
         ellipsis: true,
         align: 'center'
       },
