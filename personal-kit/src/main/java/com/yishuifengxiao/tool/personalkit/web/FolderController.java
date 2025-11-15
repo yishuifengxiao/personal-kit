@@ -1,5 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.web;
 
+import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.request.FolderCreateReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.FolderNameReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.FolderParentReq;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @Slf4j
 @RequestMapping("/disk/folder")
+@Trim
 public class FolderController {
     @Autowired
     private FolderService folderService;

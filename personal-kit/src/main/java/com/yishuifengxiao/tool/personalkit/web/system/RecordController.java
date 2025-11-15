@@ -3,6 +3,7 @@ package com.yishuifengxiao.tool.personalkit.web.system;
 import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
+import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.entity.HttpLog;
 import com.yishuifengxiao.tool.personalkit.domain.request.HttpLogReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.RecordReq;
@@ -30,6 +31,7 @@ import java.util.Arrays;
 @RestController
 @RequestMapping("/record")
 @RequiredArgsConstructor
+@Trim
 public class RecordController {
 
     private final RecordService recordService;

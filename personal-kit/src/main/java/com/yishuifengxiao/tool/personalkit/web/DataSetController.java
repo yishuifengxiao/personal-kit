@@ -2,6 +2,7 @@ package com.yishuifengxiao.tool.personalkit.web;
 
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
+import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.DataSet;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.DataSetDetail;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequestMapping("/data/dataSet")
 @RestController
+@Trim
 public class DataSetController {
 
     @Autowired

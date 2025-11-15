@@ -2,6 +2,7 @@ package com.yishuifengxiao.tool.personalkit.web;
 
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
+import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.GraphBuildRecord;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.service.GraphBuildRecordService;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/graph/build")
 @RequiredArgsConstructor
+@Trim
 public class BuildController {
     private final GraphBuildRecordService graphBuildRecordService;
 

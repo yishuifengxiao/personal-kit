@@ -2,12 +2,12 @@ package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.guava.EventPublisher;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
+import com.yishuifengxiao.common.tool.codec.Md5;
 import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.io.IoUtil;
 import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.common.tool.utils.OsUtils;
-import com.yishuifengxiao.tool.personalkit.listener.event.FileAnalysisEvent;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFolder;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
@@ -16,6 +16,7 @@ import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadStat;
 import com.yishuifengxiao.tool.personalkit.domain.request.FileMoveReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdListReq;
+import com.yishuifengxiao.tool.personalkit.listener.event.FileAnalysisEvent;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import com.yishuifengxiao.tool.personalkit.support.UploadClient;
 import jakarta.servlet.http.HttpServletRequest;
@@ -81,9 +82,10 @@ public class FileService {
 
     public DiskFolder diskFolder(String folder) {
         if (StringUtils.isBlank(folder)) {
-            DiskFolder diskFolder = new DiskFolder().setId(IdWorker.snowflakeStringId()).setFolderName(DEFAULT_FOLDER_NAME)
+            DiskFolder diskFolder = new DiskFolder().setFolderName(DEFAULT_FOLDER_NAME)
                     //
                     .setParentId(DEFAULT_PARENT_ROOT_ID).setUserId(ContextCache.currentUserId()).setCreateTime(LocalDateTime.now());
+            diskFolder.setId(Md5.md5Short(diskFolder.getFolderName() + diskFolder.getUserId() + diskFolder.getParentId()));
             //不存在则新增
             JdbcUtil.jdbcHelper().saveOrUpdate(diskFolder);
 

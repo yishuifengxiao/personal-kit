@@ -2,6 +2,7 @@ package com.yishuifengxiao.tool.personalkit.web;
 
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
+import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.GraphDefine;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.GraphDefineVo;
@@ -29,6 +30,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/graph/define")
 @RequiredArgsConstructor
+@Trim
 public class GraphController {
 
     @Autowired

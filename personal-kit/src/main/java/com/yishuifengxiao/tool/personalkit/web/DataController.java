@@ -2,6 +2,7 @@ package com.yishuifengxiao.tool.personalkit.web;
 
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
+import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
@@ -34,6 +35,7 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/data/center")
 @RestController
+@Trim
 public class DataController {
 
     @Autowired

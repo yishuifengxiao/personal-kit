@@ -2,6 +2,7 @@ package com.yishuifengxiao.tool.personalkit.web;
 
 
 import com.yishuifengxiao.common.tool.entity.Response;
+import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
 import com.yishuifengxiao.tool.personalkit.domain.request.FileMoveReq;
@@ -32,6 +33,7 @@ import java.io.IOException;
 @Validated
 @Slf4j
 @RequestMapping("/disk/file")
+@Trim
 public class FileController {
 
     @Autowired

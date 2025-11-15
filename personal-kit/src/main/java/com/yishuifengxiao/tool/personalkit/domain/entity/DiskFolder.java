@@ -23,7 +23,9 @@ import java.time.LocalDateTime;
  * @date 2023/11/28 22:47
  * @since 1.0.0
  */
-@Table(name = "disk_folder", indexes = {@Index(name = "idx_user_id", columnList = "user_id"), @Index(name = "idx_parent_id", columnList = "parent_id")}, uniqueConstraints = {@UniqueConstraint(name = "uk_folder_name", columnNames = {"folder_name", "parent_id", "user_id"})})
+@Table(name = "disk_folder", indexes = {@Index(name = "idx_user_id", columnList = "user_id"),
+        @Index(name = "idx_parent_id", columnList = "parent_id")},
+        uniqueConstraints = {@UniqueConstraint(name = "uk_folder_name", columnNames = {"folder_name", "parent_id", "user_id"})})
 @Entity(name = "disk_folder")
 @Data
 @AllArgsConstructor
