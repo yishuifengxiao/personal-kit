@@ -1,28 +1,32 @@
 <template>
 	<div>
-		<a-drawer :width="768" :title="title" :placement="placement" :open="open" @close="onClose" :closable="false">
-			<template #extra>
-				<a-button style="margin-right: 8px" @click="onClose">取消</a-button>
-				<a-button type="primary" @click="onOk">确认</a-button>
-			</template>
-
-			<a-form ref="formRef" :model="formState" name="basic" autocomplete="off">
+		<a-modal :title="title" :open="open" @ok="onOk" @cancel="onClose" okText="确认" cancelText="取消" :width="600">
+			<a-form ref="formRef" :model="formState" name="basic" autocomplete="off" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
 				<a-form-item label="数据集名称" name="name" :rules="[{ required: true, message: '请输入数据集名称' }]">
-					<a-input v-model:value="formState.name" placeholder="数据集名称" allowClear />
+					<a-input v-model:value="formState.name" placeholder="请输入数据集名称" allowClear />
 				</a-form-item>
 
-				<a-form-item label="&nbsp;&nbsp;&nbsp;数据集描述" name="description">
-					<a-textarea v-model:value="formState.description" placeholder="数据集描述" :rows="4" allowClear />
+				<a-form-item label="数据集描述" name="description">
+					<a-textarea v-model:value="formState.description" placeholder="请输入数据集描述" :rows="3" allowClear />
 				</a-form-item>
 
-				<a-form-item label="选择数据源" name="diskFiles" :rules="[{ required: true, message: '选择数据源' }]">
-					<a-select allowClear v-model:value="formState.diskFiles" show-search placeholder="输入关键字搜索数据源"
-						mode="multiple" :default-active-first-option="false" :show-arrow="false" :filter-option="false"
-						:not-found-content="null" :options="selectOptionSource" @search="handleSearch"></a-select>
+				<a-form-item label="选择数据源" name="diskFiles" :rules="[{ required: true, message: '请选择数据源' }]">
+					<a-select 
+						allowClear 
+						v-model:value="formState.diskFiles" 
+						show-search 
+						placeholder="请输入关键字搜索数据源"
+						mode="multiple" 
+						:default-active-first-option="false" 
+						:show-arrow="false" 
+						:filter-option="false"
+						:not-found-content="null" 
+						:options="selectOptionSource" 
+						@search="handleSearch">
+					</a-select>
 				</a-form-item>
 			</a-form>
-			{{formState}}
-		</a-drawer>
+		</a-modal>
 	</div>
 </template>
 <script>
@@ -71,7 +75,7 @@
 				this.$refs.formRef
 					.validate()
 					.then((res) => {
-						console.info('-=-=-=-=通过' + JSON.stringify(res))
+	
 						if (this.isUpdate) {
 							this.updateData(Object.assign(this.formState, res));
 						} else {
@@ -150,8 +154,6 @@
 			this.handleSearch('')
 		},
 		setup() {
-			const placement = ref('left')
-
 			const open = ref(false)
 			let title = ref('添加数据集')
 			let formState = reactive({
@@ -164,11 +166,9 @@
 				open.value = false
 			}
 
-
 			const selectOptions = ref([])
 
 			return {
-				placement,
 				open,
 				onClose,
 				title,
