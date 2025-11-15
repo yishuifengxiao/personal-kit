@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="high-data-table">
     <!-- 上部搜索条件区域 -->
     <a-form
       layout="inline"
@@ -48,8 +48,9 @@
     </a-form>
 
     <!-- 中间内容区域 -->
+    <div style="margin-top: 16px;">
     <!-- 表格区 -->
-    <a-table :columns="columns" :data-source="tableData" :pagination="false" :scroll="{ x: 1500 }">
+    <a-table :columns="columns" :data-source="tableData" :pagination="false" size="small" :scroll="{ x: 1500 }">
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'action'">
           <a-space>
@@ -76,6 +77,7 @@
       />
     </div>
     <!-- 分页区 -->
+    </div>
     <!-- 中间内容区域 -->
   </div>
 </template>

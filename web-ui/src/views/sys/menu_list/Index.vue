@@ -1,6 +1,7 @@
 <template>
-  <div>
+  <div class="page-content-wrapper medium-data-table">
     <!-- 上部搜索条件区域 -->
+    <div class="search-area">
     <a-form layout="inline" name="basic" autocomplete="off" :model="formState" @finish="handleFinish"
       :label-col="labelCol">
       <a-form-item label="菜单名称" name="name" class="input">
@@ -19,10 +20,10 @@
         <a-button type="primary" @click="showAddModal">增加菜单</a-button>
       </a-space>
     </a-form>
+    </div>
 
-    <!-- 上部搜索条件区域 -->
-    <a-divider dashed />
     <!-- 中间内容区域 -->
+    <div class="content-min-height">
     <!-- 表格容器，添加固定高度和滚动 -->
     <div class="table-container">
       <!-- 表格区 -->
@@ -88,11 +89,12 @@
     </div>
 
     <!-- 分页区 -->
-    <div style="margin-top: 15px; float: right">
+    <div class="pagination-wrapper">
       <a-pagination v-model:current="pagination.current" :total="pagination.total"
         :show-total="(total) => `共 ${total} 条数据`" @change="onPaginationChange" />
     </div>
     <!-- 分页区 -->
+    </div>
 
     <!-- 新增/编辑菜单模态框 -->
     <a-modal v-model:open="modalVisible" :title="modalTitle" width="600px" @ok="handleModalOk"

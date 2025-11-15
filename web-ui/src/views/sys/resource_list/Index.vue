@@ -1,5 +1,5 @@
 <template>
-  <div class="page-content-wrapper">
+  <div class="page-content-wrapper medium-data-table">
     <!-- 上部搜索条件区域 -->
     <div class="search-area">
     <a-form

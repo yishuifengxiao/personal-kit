@@ -24,7 +24,7 @@
     <!-- 中间内容区域 -->
     <div class="content-min-height">
     <!-- 表格区 -->
-    <a-table :columns="columns" :data-source="tableData" :pagination="false" :scroll="{ x: 1500 }">
+    <a-table :columns="columns" :data-source="tableData" :pagination="false" size="small":scroll="{ x: 1500 }">
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'action'">
           <a-space  :size="2">

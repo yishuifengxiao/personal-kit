@@ -986,6 +986,16 @@ export default defineComponent({
   max-height: calc(100vh - 350px); /* 默认最大高度 */
 }
 
+/* 中等数据量页面的表格高度控制 */
+.medium-data-table .ant-table-wrapper {
+  max-height: calc(100vh - 400px); /* 中等数据量页面最大高度 */
+}
+
+/* 小数据量页面的表格高度控制 */
+.small-data-table .ant-table-wrapper {
+  max-height: calc(100vh - 450px); /* 小数据量页面最大高度 */
+}
+
 /* 针对内容区域的表格高度控制 */
 .content-area .ant-table-wrapper {
   max-height: calc(100vh - 450px); /* 在content-area中的最大高度 */
@@ -1025,9 +1035,52 @@ export default defineComponent({
   max-height: calc(100vh - 600px) !important;
 }
 
+/* 固定表头样式 */
+.high-data-table .ant-table-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* 大数据量页面的搜索区域固定 */
+.high-data-table .search-area {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #fff;
+  margin-bottom: 16px;
+}
+
+/* 大数据量页面的表格容器样式 */
+.high-data-table .table-container {
+  max-height: calc(100vh - 400px); /* 为大数据量页面提供更大的显示区域 */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 大数据量页面的表格wrapper */
+.high-data-table .table-wrapper {
+  max-height: calc(100vh - 450px); /* 大数据量页面的表格最大高度 */
+  overflow: auto;
+}
+
+/* 大数据量页面的分页区域 */
+.high-data-table .pagination-wrapper {
+  flex-shrink: 0;
+  margin-top: auto;
+}
+
 /* 针对数据量中等的页面的特殊处理 */
 .medium-data-table .ant-table-body {
-  max-height: calc(100vh - 500px) !important;
+  max-height: calc(100vh - 450px) !important; /* 调整为中等数据量页面的合理高度 */
+}
+
+/* 针对数据量小的页面的特殊处理 */
+.small-data-table .ant-table-body {
+  max-height: calc(100vh - 500px) !important; /* 小数据量页面高度 */
 }
 
 /* 分页区域样式 */

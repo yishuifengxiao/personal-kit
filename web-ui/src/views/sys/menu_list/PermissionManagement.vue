@@ -1,10 +1,9 @@
 <template>
-  <div class="permission-management">
+  <div class="page-content-wrapper">
     <!-- 合并的权限管理区域 -->
     <div class="main-container">
-      <a-card class="permission-card" :bordered="false">
         <!-- 页面头部和操作区域 -->
-        <div class="card-header">
+        <div class="search-area">
           <div class="header-content">
             <div class="header-left">
               <a-typography-title :level="4" class="header-title">菜单权限管理</a-typography-title>
@@ -32,7 +31,6 @@
         </div>
 
         <!-- 搜索区域 -->
-        <div class="search-area">
           <a-form layout="inline" :model="searchForm" class="search-form">
             <a-form-item label="权限名称">
               <a-input
@@ -70,8 +68,9 @@
               </a-space>
             </a-form-item>
           </a-form>
-        </div>
 
+        <!-- 中间内容区域 -->
+        <div class="content-min-height">
         <!-- 选中权限统计 -->
         <div class="selection-info">
           <a-space>
@@ -116,7 +115,7 @@
             </template>
           </a-table>
         </div>
-      </a-card>
+        </div>
     </div>
   </div>
 </template>
@@ -430,14 +429,11 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.permission-management {
-  height: 100%;
+.page-content-wrapper {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  background: #f0f2f5;
-  padding: 16px;
-  box-sizing: border-box;
-  overflow: hidden;
+  gap: 16px;
 }
 
 .main-container {
@@ -446,31 +442,6 @@ export default {
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
-}
-
-.permission-card {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-  :deep(.ant-card-body) {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    min-height: 0;
-    overflow: hidden;
-  }
-}
-
-.card-header {
-  flex-shrink: 0;
-  padding: 16px 24px;
-  border-bottom: 1px solid #f0f0f0;
-  background: #fafafa;
 }
 
 .header-content {
@@ -500,13 +471,6 @@ export default {
   flex-shrink: 0;
 }
 
-.search-area {
-  flex-shrink: 0;
-  padding: 16px 24px;
-  border-bottom: 1px solid #f0f0f0;
-  background: #fff;
-}
-
 .search-form {
   display: flex;
   flex-wrap: wrap;
@@ -516,6 +480,14 @@ export default {
   :deep(.ant-form-item) {
     margin-bottom: 0;
   }
+}
+
+.content-min-height {
+  flex: 1;
+  min-height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .selection-info {
