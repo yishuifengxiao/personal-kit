@@ -30,6 +30,8 @@
 
       <a-space class="input">
         <a-button type="primary" html-type="submit"> 搜索 </a-button>
+        <a-button @click="handleReset"> 重置 </a-button>
+        <a-button type="dashed" danger @click="handleClear"> 清空 </a-button>
       </a-space>
     </a-form>
 
@@ -73,6 +75,7 @@ import { reactive, defineComponent, ref } from 'vue'
 import { UserOutlined } from '@ant-design/icons-vue'
 import { mapState } from 'pinia'
 import { useUserStore } from '@/stores/user'
+import { message, Modal } from 'ant-design-vue'
 export default defineComponent({
   data() {
     const formState = reactive({})
@@ -95,6 +98,43 @@ export default defineComponent({
   methods: {
     handleFinish() {
       this.query()
+    },
+
+    /**
+     * 重置搜索条件
+     */
+    handleReset() {
+      this.formState = reactive({})
+      this.pagination.current = 1
+      this.query()
+    },
+
+    /**
+     * 清空所有数据
+     */
+    handleClear() {
+      Modal.confirm({
+        title: '确认清空',
+        content: '确定要清空所有HTTP访问记录吗？此操作不可恢复。',
+        okText: '确认',
+        cancelText: '取消',
+        okType: 'danger',
+        onOk: () => {
+          this.$http
+            .request({
+              url: '/personkit/record/personal/visitRecord/clear',
+              method: 'post'
+            })
+            .then(() => {
+              message.success('清空数据成功')
+              this.query() // 重新查询数据
+            })
+            .catch((err) => {
+              console.error('清空数据失败:', err)
+              message.error('清空数据失败')
+            })
+        }
+      })
     },
 
     /**
