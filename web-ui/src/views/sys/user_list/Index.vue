@@ -91,8 +91,22 @@
                 >详情</a-button
               >
               <a-button type="link" @click="showEditModal(record)">编辑</a-button>
-              <a>删除</a>  <a>修改状态</a></a-space
-            >
+              <a>删除</a>
+              <a-dropdown>
+                <template #overlay>
+                  <a-menu @click="({ key }) => handleStatusChange(record, key)">
+                    <a-menu-item key="0" :disabled="record.stat === 0">账号正常</a-menu-item>
+                    <a-menu-item key="1" :disabled="record.stat === 1">账号禁用</a-menu-item>
+                    <a-menu-item key="2" :disabled="record.stat === 2">账号过期</a-menu-item>
+                    <a-menu-item key="3" :disabled="record.stat === 3">密码过期</a-menu-item>
+                    <a-menu-item key="4" :disabled="record.stat === 4">账号锁定</a-menu-item>
+                  </a-menu>
+                </template>
+                <a-button type="link">
+                  修改状态 <DownOutlined />
+                </a-button>
+              </a-dropdown>
+          </a-space>
         </template>
       </template>
     </a-table>
@@ -155,7 +169,7 @@
 
 <script>
 import { reactive, defineComponent, ref } from 'vue'
-import { UserOutlined } from '@ant-design/icons-vue'
+import { UserOutlined, DownOutlined } from '@ant-design/icons-vue'
 import { mapState } from 'pinia'
 import { useUserStore } from '@/stores/user'
 export default defineComponent({
@@ -487,10 +501,38 @@ export default defineComponent({
     handleModalCancel() {
       this.modalVisible = false
       this.resetUserForm()
+    },
+
+    /**
+     * 处理状态修改
+     */
+    handleStatusChange(record, status) {
+      // 如果状态没有变化，不执行操作
+      if (record.stat === parseInt(status)) {
+        return
+      }
+
+      this.$http
+        .request({
+          url: '/personkit/sys/user/updateStat',
+          data: {
+            id: record.id,
+            stat: parseInt(status)
+          }
+        })
+        .then((res) => {
+          this.$msg.success('状态修改成功')
+          this.query() // 重新查询数据刷新列表
+        })
+        .catch((err) => {
+          this.$msg.error('状态修改失败')
+          console.log(err)
+        })
     }
   },
   components: {
-    UserOutlined
+    UserOutlined,
+    DownOutlined
   },
   mounted() {
     // 初始化角色数据

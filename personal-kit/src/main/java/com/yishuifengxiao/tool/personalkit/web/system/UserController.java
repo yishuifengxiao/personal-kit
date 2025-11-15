@@ -8,6 +8,7 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.query.UserQuery;
 import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
+import com.yishuifengxiao.tool.personalkit.domain.request.UpdateStatReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.UserCreateReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.PageUser;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
@@ -87,5 +88,10 @@ public class UserController {
     @PostMapping("/update")
     public void update(@Validated(Group.Create.class) @RequestBody UserCreateReq user) {
         userService.update(user);
+    }
+
+    @PostMapping("/updateStat")
+    public void updateStat(@Validated(Group.Create.class) @RequestBody UpdateStatReq req) {
+        userService.updateStat(req);
     }
 }

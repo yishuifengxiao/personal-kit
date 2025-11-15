@@ -28,10 +28,7 @@ import com.yishuifengxiao.tool.personalkit.domain.entity.SysUserRole;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UserStat;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.query.UserQuery;
-import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
-import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
-import com.yishuifengxiao.tool.personalkit.domain.request.UserCreateReq;
-import com.yishuifengxiao.tool.personalkit.domain.request.UserRoleReq;
+import com.yishuifengxiao.tool.personalkit.domain.request.*;
 import com.yishuifengxiao.tool.personalkit.domain.vo.CurrentUser;
 import com.yishuifengxiao.tool.personalkit.domain.vo.PageUser;
 import com.yishuifengxiao.tool.personalkit.listener.event.UserCreateEvent;
@@ -209,5 +206,13 @@ public class UserService {
             Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, roleId)).orElseThrow(ValidateUtils.orElseThrow("角色不存在"));
             JdbcUtil.jdbcHelper().insert(new SysUserRole(IdWorker.snowflakeStringId(), user.getId(), roleId));
         }
+    }
+
+    public void updateStat(UpdateStatReq req) {
+        SysUser exist = JdbcUtil.jdbcHelper().findByPrimaryKey(SysUser.class, req.getId());
+        ValidateUtils.isTrue(null != exist, "记录不存在");
+        exist.setStat(UserStat.code(req.getStat()).orElseThrow(ValidateUtils.orElseThrow("状态不存在")).code());
+        exist.setLastUpdateTime(LocalDateTime.now());
+        JdbcUtil.jdbcHelper().updateByPrimaryKey(exist);
     }
 }
