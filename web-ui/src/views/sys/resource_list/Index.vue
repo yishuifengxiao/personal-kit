@@ -70,7 +70,7 @@
       </div>
 
       <!-- 分页区 -->
-      <div class="pagination-wrapper">
+      <div style="margin-top: 15px; float: right">
         <a-pagination
           v-model:current="pagination.current"
           :total="pagination.total"

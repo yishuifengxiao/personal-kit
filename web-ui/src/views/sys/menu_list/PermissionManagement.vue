@@ -114,6 +114,13 @@
             </template>
           </a-table>
         </div>
+
+        <!-- 分页区 -->
+        <div style="margin-top: 15px; float: right">
+          <a-pagination v-model:current="pagination.current" :total="pagination.total"
+            :show-total="(total) => `共 ${total} 条权限数据`" show-size-changer show-quick-jumper
+            @change="pagination.onChange" />
+        </div>
         </div>
     </div>
   </div>

@@ -46,7 +46,7 @@
     <!-- 表格区 -->
 
       <!-- 分页区 -->
-      <div class="pagination-wrapper">
+      <div style="margin-top: 15px; float: right">
         <a-pagination v-model:current="pagination.current" :total="pagination.total"
           :show-total="(total) => `共 ${total} 条数据`" @change="onPaginationChange" />
       </div>
