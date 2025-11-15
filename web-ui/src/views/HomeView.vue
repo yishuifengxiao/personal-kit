@@ -82,8 +82,8 @@
         <!-- 面包屑导航 -->
         <div class="content-area">
           <!-- 内容区 -->
-          <RouterView class="router-view-content" />
-          <!-- 内容区 -->
+        <RouterView />
+        <!-- 内容区 -->
         </div>
       </div>
     </div>
@@ -1097,7 +1097,7 @@ export default defineComponent({
 }
 
 /* RouterView 内容样式 */
-.router-view-content {
+.content-area > div:first-child {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -1106,7 +1106,7 @@ export default defineComponent({
 }
 
 /* 页面内容容器 */
-.router-view-content > div {
+.content-area > div:first-child > div {
   flex: 1;
   display: flex;
   flex-direction: column;

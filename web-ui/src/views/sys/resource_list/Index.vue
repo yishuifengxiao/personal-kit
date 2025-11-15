@@ -61,10 +61,10 @@
                 :disabled="record.stat != 2 || record.actualTotalNum === 0"
                 >详情</a-button
               >
-              <a>删除</a> <a>修改</a> <a>修改状态</a></a-space
-            >
+              <a>删除</a> <a>修改</a> <a>修改状态</a>
+            </a-space>
           </template>
-</template> -->
+        </template> -->
       </a-table>
       <!-- 表格区 -->
       </div>
