@@ -21,7 +21,9 @@
                   @contextmenu.prevent.stop="showNodeMenus(node, $event)"
                   @mouseover="nodeSlotOver(node, $event)"
                   @mouseout="nodeSlotOut(node, $event)"
-                ></div>
+                >
+                  {{ node.text.charAt(0) }}
+                </div>
                 <div class="node-label">
                   {{ node.text }}
                 </div>
@@ -343,7 +345,11 @@ export default {
         }
       })
     },
-    onContextmenu($event) {},
+    onContextmenu(nodeObject, $event) {
+      // 右键点击节点时显示操作菜单
+      console.log('onContextmenu:', nodeObject)
+      this.showNodeMenus(nodeObject, $event)
+    },
     onNodeClick(nodeObject, $event) {
       console.log('onNodeClick:', nodeObject)
       // 将点击的节点数据回显到右侧编辑区
@@ -401,7 +407,7 @@ export default {
     },
     showNodeMenus(nodeObject, $event) {
       // const _base_position = this.$refs.myPage.getBoundingClientRect()
-      // console.log('showNodeMenus:', $event, _base_position)
+      console.log('showNodeMenus triggered:', nodeObject, $event)
       const nodeData = JSON.parse(jsonNode(nodeObject))
       // 确保节点有完整的属性结构
       if (!nodeData.nodeProperties) {
@@ -431,6 +437,9 @@ export default {
         const results = nodes.filter((v) => v.text !== currentNode.text)
         this.graph_json_data.nodes = results
         this.render()
+      } else if ('editNode' === actionName) {
+        //编辑节点 - 只需要关闭弹窗，节点信息已经在currentNode中
+        this.isShowNodeOperateDialog = false
       } else if ('addRelation' === actionName) {
         //添加关系
         this.isShowNodeOperateDialog = false
@@ -908,6 +917,11 @@ export default {
   display: flex;
   place-items: center;
   justify-content: center;
+  background-color: rgba(66, 187, 66, 0.8);
+  color: white;
+  font-weight: bold;
+  font-size: 24px;
+  border: 2px solid #42bb42;
 }
 
 .c-node-menu-item {
