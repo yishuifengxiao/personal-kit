@@ -136,7 +136,7 @@
         <a-input v-model:value="userForm.phone" placeholder="请输入手机号（选填）" />
       </a-form-item>
       <a-form-item label="邮箱" name="email">
-        <a-input v-model:value="userForm.email" placeholder="请输入邮箱" />
+        <a-input v-model:value="userForm.email" placeholder="请输入邮箱（选填）" />
       </a-form-item>
       <a-form-item label="证件号码" name="certNo">
         <a-input v-model:value="userForm.certNo" placeholder="请输入证件号码（选填）" />
@@ -224,8 +224,22 @@ export default defineComponent({
         }
       ],
       email: [
-        { required: true, message: '请输入邮箱', trigger: 'blur' },
-        { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
+        { required: false, message: '请输入邮箱', trigger: 'blur' },
+        { 
+          type: 'email', 
+          message: '请输入正确的邮箱格式', 
+          trigger: 'blur',
+          validator: (rule, value) => {
+            if (!value || value === '') {
+              return Promise.resolve()
+            }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+            if (!emailRegex.test(value)) {
+              return Promise.reject('请输入正确的邮箱格式')
+            }
+            return Promise.resolve()
+          }
+        }
       ],
       certNo: [{ required: false, message: '请输入证件号码', trigger: 'blur' }],
       roleIds: [{ required: true, message: '请选择角色', trigger: 'change' }]
@@ -375,7 +389,8 @@ export default defineComponent({
       this.userForm.phone = record.phone
       this.userForm.email = record.email
       this.userForm.certNo = record.certNo
-      this.userForm.roleIds = record.roleIds || []
+      // 从record.roles中提取角色ID数组进行回显
+      this.userForm.roleIds = record.roles ? record.roles.map(role => role.key) : []
       this.modalVisible = true
     },
 
