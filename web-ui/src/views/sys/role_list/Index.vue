@@ -15,7 +15,7 @@
       <a-space class="input">
         <a-button type="primary" html-type="submit"> 搜索 </a-button>
         <a-button @click="handleReset"> 重置 </a-button>
-        <a-button type="primary" @click="showCreateModal"> 创建角色 </a-button>
+        <a-button type="primary" @click="showCreateModal"> 增加角色 </a-button>
       </a-space>
     </a-form>
 
@@ -52,8 +52,8 @@
     <!-- 分页区 -->
     <!-- 中间内容区域 -->
 
-    <!-- 创建角色模态框 -->
-    <a-modal v-model:visible="createModalVisible" title="创建角色" @ok="handleCreate" @cancel="handleCreateCancel"
+    <!-- 增加角色模态框 -->
+    <a-modal v-model:visible="createModalVisible" title="增加角色" @ok="handleCreate" @cancel="handleCreateCancel"
       :confirm-loading="createLoading">
       <a-form :model="createForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
         <a-form-item label="角色名称" required>
@@ -112,7 +112,7 @@ export default defineComponent({
     const data = reactive([])
     const roleSource = reactive([])
 
-    // 创建角色相关数据
+    // 增加角色相关数据
     const createModalVisible = ref(false)
     const createLoading = ref(false)
     const createForm = reactive({
@@ -263,7 +263,7 @@ export default defineComponent({
     },
 
     /**
-     * 显示创建角色模态框
+     * 显示增加角色模态框
      */
     showCreateModal() {
       this.createForm.name = ''
@@ -273,7 +273,7 @@ export default defineComponent({
     },
 
     /**
-     * 创建角色
+     * 增加角色
      */
     handleCreate() {
       if (!this.createForm.name.trim()) {
@@ -289,13 +289,13 @@ export default defineComponent({
           data: this.createForm
         })
         .then((res) => {
-          message.success('创建角色成功')
+          message.success('增加角色成功')
           this.createModalVisible = false
           this.query() // 重新加载数据
         })
         .catch((err) => {
-          console.error('创建角色失败:', err)
-          message.error('创建角色失败')
+          console.error('增加角色失败:', err)
+          message.error('增加角色失败')
         })
         .finally(() => {
           this.createLoading = false

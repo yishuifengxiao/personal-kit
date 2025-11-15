@@ -33,6 +33,7 @@
       </a-form-item>
       <a-space class="input">
         <a-button type="primary" html-type="submit"> 搜索 </a-button>
+        <a-button @click="handleReset"> 重置 </a-button>
       </a-space>
     </a-form>
 
@@ -128,6 +129,18 @@ export default defineComponent({
   },
   methods: {
     handleFinish() {
+      this.query()
+    },
+
+    /**
+     * 重置搜索条件
+     */
+    handleReset() {
+      // 重置表单数据
+      this.formState = reactive({})
+      // 重置分页到第一页
+      this.pagination.current = 1
+      // 重新查询数据
       this.query()
     },
 
