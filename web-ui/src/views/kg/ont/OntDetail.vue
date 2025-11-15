@@ -76,8 +76,8 @@
                 <a-divider class="compact-divider" />
                 
                 <div class="node-properties">
-                  <a-row :gutter="16" class="property-row">
-                    <a-col :span="16">
+                  <div class="concept-info-row">
+                    <div class="concept-name-group">
                       <span class="property-label">概念名称:</span>
                       <a-input
                         placeholder="请输入概念名称"
@@ -86,8 +86,8 @@
                         @change="onNodeNameChange"
                         class="name-input"
                       />
-                    </a-col>
-                    <a-col :span="8">
+                    </div>
+                    <div class="concept-color-group">
                       <span class="property-label">概念颜色:</span>
                       <a-input
                         v-model:value="currentNode.color"
@@ -95,8 +95,8 @@
                         @change="onNodeColorChange"
                         class="color-input"
                       />
-                    </a-col>
-                  </a-row>
+                    </div>
+                  </div>
 
                   <div class="properties-list">
                     <a-form
@@ -119,6 +119,7 @@
                               v-model:value="nodeProperty.nodePropertyName"
                               placeholder="属性名称"
                               class="property-input"
+                              @change="onNodePropertyChange"
                             />
                           </a-form-item>
                           <a-form-item
@@ -134,6 +135,7 @@
                               :options="selectOptions"
                               placeholder="数据类型"
                               class="type-select"
+                              @change="onNodePropertyChange"
                             ></a-select>
                           </a-form-item>
                           <a-button type="text" danger size="small" @click="removeUser(nodeProperty)" class="remove-btn">
@@ -344,6 +346,21 @@ export default {
     onContextmenu($event) {},
     onNodeClick(nodeObject, $event) {
       console.log('onNodeClick:', nodeObject)
+      // 将点击的节点数据回显到右侧编辑区
+      const nodeData = JSON.parse(jsonNode(nodeObject))
+      // 确保节点有完整的属性结构
+      if (!nodeData.nodeProperties) {
+        nodeData.nodeProperties = []
+      }
+      if (!nodeData.data) {
+        nodeData.data = {}
+      }
+      if (!nodeData.data.nodeProperties) {
+        nodeData.data.nodeProperties = nodeData.nodeProperties
+      }
+      this.currentNode = reactive(nodeData)
+      // 切换到普通模式配置标签页（key=1）
+      this.activeKey = '1'
     },
     // 点击线条事件
     onLineClick(lineObject, linkObject, $event) {
@@ -354,7 +371,18 @@ export default {
     nodeSlotOver(nodeObject, $event) {
       // console.log('nodeSlotOver:', nodeObject)
       // const {id,text,styleClass,nodeShape,data}=
-      this.currentNode = reactive(JSON.parse(jsonNode(nodeObject)))
+      const nodeData = JSON.parse(jsonNode(nodeObject))
+      // 确保节点有完整的属性结构
+      if (!nodeData.nodeProperties) {
+        nodeData.nodeProperties = []
+      }
+      if (!nodeData.data) {
+        nodeData.data = {}
+      }
+      if (!nodeData.data.nodeProperties) {
+        nodeData.data.nodeProperties = nodeData.nodeProperties
+      }
+      this.currentNode = reactive(nodeData)
       this.isShowNodeOperateDialog = false
       this.isShowNodeTipsPanel = true
 
@@ -368,6 +396,18 @@ export default {
     showNodeMenus(nodeObject, $event) {
       // const _base_position = this.$refs.myPage.getBoundingClientRect()
       // console.log('showNodeMenus:', $event, _base_position)
+      const nodeData = JSON.parse(jsonNode(nodeObject))
+      // 确保节点有完整的属性结构
+      if (!nodeData.nodeProperties) {
+        nodeData.nodeProperties = []
+      }
+      if (!nodeData.data) {
+        nodeData.data = {}
+      }
+      if (!nodeData.data.nodeProperties) {
+        nodeData.data.nodeProperties = nodeData.nodeProperties
+      }
+      this.currentNode = reactive(nodeData)
       this.nodeMenuPanelPosition.x = $event.clientX + 10
       this.nodeMenuPanelPosition.y = $event.clientY
       this.isShowNodeTipsPanel = false
@@ -424,12 +464,18 @@ export default {
     onNodeColorChange() {
       this.onNodeNameChange()
     },
+    // 节点属性变化
+    onNodePropertyChange() {
+      this.onNodeNameChange()
+    },
     // 动态移除一个表单项
     removeUser(item) {
       const index = this.currentNode.nodeProperties.indexOf(item)
       if (index !== -1) {
         this.currentNode.nodeProperties.splice(index, 1)
       }
+      // 同步更新到图谱数据
+      this.onNodeNameChange()
     },
     //动态增加一个表单项
     addUser() {
@@ -443,6 +489,8 @@ export default {
         id: Date.now()
       })
       this.currentNode = currentNode
+      // 同步更新到图谱数据
+      this.onNodeNameChange()
     },
     // 确定保存操作
     onSaveAction() {
@@ -673,6 +721,28 @@ export default {
   
 }
 
+.concept-info-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+}
+
+.concept-name-group {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.concept-color-group {
+  display: flex;
+  align-items: center;
+}
+
 .property-row {
   margin-bottom: 16px;
   align-items: center;
@@ -683,10 +753,12 @@ export default {
   font-weight: 500;
   color: #595959;
   margin-right: 8px;
+  white-space: nowrap;
 }
 
 .name-input {
-  width: calc(100% - 60px);
+  flex: 1;
+  min-width: 120px;
 }
 
 .color-input {
@@ -694,6 +766,7 @@ export default {
   height: 28px;
   padding: 2px;
   border-radius: 4px;
+  cursor: pointer;
 }
 
 .properties-list {
