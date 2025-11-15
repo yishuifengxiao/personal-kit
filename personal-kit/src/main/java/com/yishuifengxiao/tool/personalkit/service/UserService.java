@@ -48,6 +48,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -150,7 +151,7 @@ public class UserService {
         SysRole role =
                 ContextCache.getRole(ContextCache.currentUser().map(v -> v.getUsername()).orElse(
                         "")).orElse(null);
-        Page<SysUser> page = sysUserDao.findPage(query, role);
+        Page<SysUser> page = sysUserDao.findPage(query, Arrays.asList(query.getQuery().getRoleId()));
         return page.map(s -> {
             PageUser pageUser = BeanUtil.copy(s, new PageUser());
             List<StringKeyValue> roles =
