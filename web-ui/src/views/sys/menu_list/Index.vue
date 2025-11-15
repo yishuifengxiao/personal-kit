@@ -33,7 +33,7 @@
           <template v-if="column.dataIndex === 'action'">
             <!-- 只在叶子节点显示操作按钮 -->
             <template v-if="!record.children || record.children.length === 0">
-              <a-space>
+              <a-space :size="2">
                 <a-button type="link" @click="showEditModal(record)">编辑</a-button>
                 <a-button type="link" @click="modifyPermissions(record)">修改权限</a-button>
                 <a-button type="link" danger @click="handleDelete(record)">删除</a-button>
@@ -41,7 +41,7 @@
             </template>
             <!-- 非叶子节点不显示操作按钮 -->
             <template v-else>
-              <a-space>
+              <a-space :size="2">
                 <a-button type="link" @click="showEditModal(record)">编辑</a-button>
                 <a-button type="link" danger @click="handleDelete(record)">删除</a-button>
               </a-space>

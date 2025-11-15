@@ -83,7 +83,7 @@
           </a-tag>
         </template>
         <template v-if="column.dataIndex === 'action'">
-          <a-space>
+          <a-space :size="2">
               <a-button type="link" @click="showEditModal(record)">编辑</a-button>
               <a-dropdown>
                 <template #overlay>

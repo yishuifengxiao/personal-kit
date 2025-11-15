@@ -26,7 +26,7 @@
     <a-table :columns="columns" :data-source="tableData" :pagination="false" :scroll="{ x: 1500 }">
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'action'">
-          <a-space>
+          <a-space  :size="2">
             <a-button type="link" danger @click="handleDelete(record)">删除</a-button>
             <a-button type="link" @click="showEditModal(record)">编辑</a-button>
             <a-button type="link" @click="modifyMenus(record)">修改菜单</a-button>
@@ -53,7 +53,7 @@
     <!-- 中间内容区域 -->
 
     <!-- 增加角色模态框 -->
-    <a-modal v-model:visible="createModalVisible" title="增加角色" @ok="handleCreate" @cancel="handleCreateCancel"
+    <a-modal v-model:open="createModalVisible" title="增加角色" @ok="handleCreate" @cancel="handleCreateCancel"
       :confirm-loading="createLoading">
       <a-form :model="createForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
         <a-form-item label="角色名称" required>
@@ -72,7 +72,7 @@
     </a-modal>
 
     <!-- 编辑角色模态框 -->
-    <a-modal v-model:visible="editModalVisible" title="编辑角色" @ok="handleEdit" @cancel="handleEditCancel"
+    <a-modal v-model:open="editModalVisible" title="编辑角色" @ok="handleEdit" @cancel="handleEditCancel"
       :confirm-loading="editLoading">
       <a-form :model="editForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }">
         <a-form-item label="角色名称" required>
