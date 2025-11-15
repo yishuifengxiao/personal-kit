@@ -18,7 +18,7 @@
         <a-button @click="handleReset">重置</a-button>
         <a-button type="primary" @click="showAddModal">增加菜单</a-button>
       </a-space>
-</a-form>
+    </a-form>
 
     <!-- 上部搜索条件区域 -->
     <a-divider dashed />
@@ -42,7 +42,7 @@
             </template>
             <!-- 非叶子节点不显示操作按钮 -->
             <template v-else>
-<span style="color: #999">-</span>
+              <span style="color: #999">-</span>
             </template>
           </template>
 
@@ -72,7 +72,7 @@
                   </div>
                 </template>
                 <span class="permission-urls">
-                  {{record.permissions.map(p => p.url).join(', ')}}
+                  {{record.permissions.map((p) => p.url).join(', ')}}
                 </span>
               </a-tooltip>
             </template>
@@ -97,22 +97,13 @@
       @cancel="handleModalCancel">
       <a-form ref="menuFormRef" :model="menuForm" :rules="menuFormRules" :label-col="{ span: 6 }"
         :wrapper-col="{ span: 16 }">
-
         <a-form-item label="菜单名称" name="name">
           <a-input v-model:value="menuForm.name" placeholder="请输入菜单名称" />
         </a-form-item>
         <a-form-item label="父级菜单" name="parentId">
-          <a-select 
-            v-model:value="menuForm.parentId" 
-            placeholder="请选择父级菜单" 
-            allowClear
-            show-search
-            :filter-option="false"
-            :loading="menuLoading"
-            @search="handleMenuSearch"
-            @focus="handleMenuFocus"
-          >
-            <a-select-option :value="0">根菜单</a-select-option>
+          <a-select v-model:value="menuForm.parentId" placeholder="请选择父级菜单" allowClear show-search
+            :filter-option="false" :loading="menuLoading" @search="handleMenuSearch" @focus="handleMenuFocus">
+
             <a-select-option v-for="menu in filteredMenuList" :key="menu.id" :value="menu.id">
               {{ menu.name }}
             </a-select-option>
@@ -314,11 +305,13 @@ export default defineComponent({
       this.$http
         .request({
           url: '/personkit/sys/menu/list',
-          data: {}
+          data: {
+            "name": ""
+          }
         })
         .then((res) => {
-          this.menuList = res.data || []
-          this.filteredMenuList = this.menuList
+          this.menuList = res || []
+          this.filteredMenuList = res || []
           this.menuLoading = false
         })
         .catch((err) => {
@@ -332,14 +325,32 @@ export default defineComponent({
      */
     handleMenuSearch(value) {
       this.searchKeyword = value
-      if (!value) {
-        this.filteredMenuList = this.menuList
-        return
-      }
-      
-      this.filteredMenuList = this.menuList.filter(menu => 
-        menu.name && menu.name.toLowerCase().includes(value.toLowerCase())
-      )
+      this.$http
+        .request({
+          url: '/personkit/sys/menu/list',
+          data: {
+            "name": value
+          }
+        })
+        .then((res) => {
+
+          this.menuList = res || []
+          this.filteredMenuList = res || []
+          this.menuLoading = false
+        })
+        .catch((err) => {
+          console.log(err)
+          this.menuLoading = false
+        })
+
+      // if (!value) {
+      //   this.filteredMenuList = this.menuList
+      //   return
+      // }
+
+      // this.filteredMenuList = this.menuList.filter(
+      //   (menu) => menu.name && menu.name.toLowerCase().includes(value.toLowerCase())
+      // )
     },
 
     /**
@@ -357,7 +368,7 @@ export default defineComponent({
     getAllMenus(data) {
       const menus = []
       const traverse = (items) => {
-        items.forEach(item => {
+        items.forEach((item) => {
           menus.push({
             id: item.id,
             name: item.name
@@ -458,20 +469,21 @@ export default defineComponent({
      * 显示新增菜单模态框
      */
     showAddModal() {
+         // 预加载菜单列表
+     this.loadMenuList()
       this.isEditMode = false
       this.currentEditId = null
       this.resetMenuForm()
       this.modalVisible = true
-      // 预加载菜单列表
-      if (this.menuList.length === 0) {
-        this.loadMenuList()
-      }
+   
     },
 
     /**
      * 显示编辑菜单模态框
      */
     showEditModal(record) {
+        // 预加载菜单列表
+      this.loadMenuList()
       this.isEditMode = true
       this.currentEditId = record.id
       // 填充表单数据
@@ -486,10 +498,7 @@ export default defineComponent({
         description: record.description || ''
       })
       this.modalVisible = true
-      // 预加载菜单列表
-      if (this.menuList.length === 0) {
-        this.loadMenuList()
-      }
+    
     },
 
     /**
@@ -511,29 +520,32 @@ export default defineComponent({
      * 模态框确定按钮
      */
     handleModalOk() {
-      this.$refs.menuFormRef.validate().then(() => {
-        const apiUrl = this.isEditMode ? '/personkit/sys/menu/update' : '/personkit/sys/menu/save'
-        const requestData = this.isEditMode
-          ? { ...this.menuForm, id: this.currentEditId }
-          : this.menuForm
+      this.$refs.menuFormRef
+        .validate()
+        .then(() => {
+          const apiUrl = this.isEditMode ? '/personkit/sys/menu/update' : '/personkit/sys/menu/save'
+          const requestData = this.isEditMode
+            ? { ...this.menuForm, id: this.currentEditId }
+            : this.menuForm
 
-        this.$http
-          .request({
-            url: apiUrl,
-            data: requestData
-          })
-          .then((res) => {
-            this.$msg.success(this.isEditMode ? '菜单更新成功' : '菜单新增成功')
-            this.modalVisible = false
-            this.query() // 刷新列表
-          })
-          .catch((err) => {
-            console.log(err)
-            this.$msg.error(this.isEditMode ? '菜单更新失败' : '菜单新增失败')
-          })
-      }).catch(() => {
-        this.$msg.warning('请完善表单信息')
-      })
+          this.$http
+            .request({
+              url: apiUrl,
+              data: requestData
+            })
+            .then((res) => {
+              this.$msg.success(this.isEditMode ? '菜单更新成功' : '菜单新增成功')
+              this.modalVisible = false
+              this.query() // 刷新列表
+            })
+            .catch((err) => {
+              console.log(err)
+              this.$msg.error(this.isEditMode ? '菜单更新失败' : '菜单新增失败')
+            })
+        })
+        .catch(() => {
+          this.$msg.warning('请完善表单信息')
+        })
     },
 
     /**
@@ -572,56 +584,6 @@ export default defineComponent({
         }
       })
     },
-
-    /**
-     * 加载菜单列表
-     */
-    loadMenuList() {
-      this.menuLoading = true
-      this.$http
-        .request({
-          url: '/personkit/sys/menu/list'
-        })
-        .then((res) => {
-          this.menuList = res || []
-          this.filteredMenuList = [...this.menuList]
-        })
-        .catch((err) => {
-          console.log(err)
-          this.$msg.error('获取菜单列表失败')
-          this.menuList = []
-          this.filteredMenuList = []
-        })
-        .finally(() => {
-          this.menuLoading = false
-        })
-    },
-
-    /**
-     * 菜单搜索处理
-     */
-    handleMenuSearch(value) {
-      this.searchKeyword = value
-      if (!value) {
-        this.filteredMenuList = [...this.menuList]
-        return
-      }
-      
-      // 根据菜单名称进行模糊搜索
-      this.filteredMenuList = this.menuList.filter(menu => 
-        menu.name && menu.name.toLowerCase().includes(value.toLowerCase())
-      )
-    },
-
-    /**
-     * 菜单下拉框焦点事件处理
-     */
-    handleMenuFocus() {
-      // 如果菜单列表为空，则加载数据
-      if (this.menuList.length === 0) {
-        this.loadMenuList()
-      }
-    }
 
   },
   components: {
