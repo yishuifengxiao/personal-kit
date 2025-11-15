@@ -398,6 +398,7 @@ export default {
       this.isShowNodeOperateDialog = false
       this.isShowNodeTipsPanel = true
 
+      // 精确定位：使用鼠标事件的确切坐标作为提示框的左上角
       this.nodeMenuPanelPosition.x = $event.clientX
       this.nodeMenuPanelPosition.y = $event.clientY
     },
@@ -423,7 +424,8 @@ export default {
         nodeData.data.nodeProperties = nodeData.nodeProperties
       }
       this.currentNode = reactive(nodeData)
-      this.nodeMenuPanelPosition.x = $event.clientX + 10
+      // 精确定位：使用鼠标事件的确切坐标作为菜单的左上角
+      this.nodeMenuPanelPosition.x = $event.clientX
       this.nodeMenuPanelPosition.y = $event.clientY
       this.isShowNodeTipsPanel = false
       this.isShowNodeOperateDialog = true
