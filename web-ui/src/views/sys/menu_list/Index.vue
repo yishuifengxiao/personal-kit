@@ -27,7 +27,8 @@
     <div class="table-container">
       <!-- 表格区 -->
       <a-table :columns="columns" :data-source="tableData" :pagination="false" :scroll="{ x: 1500, y: tableHeight }"
-        size="small" :row-selection="rowSelection" :expandable="expandable" :row-key="(record) => record.id">
+        size="small" :row-selection="rowSelection" :expandable="expandable" :row-key="(record) => record.id"
+        :row-class-name="getRowClassName">
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'action'">
             <!-- 只在叶子节点显示操作按钮 -->
@@ -153,7 +154,7 @@
 </template>
 
 <script>
-import { reactive, defineComponent, ref, onMounted, onUnmounted } from 'vue'
+import { reactive, defineComponent, ref, onMounted, onUnmounted, h } from 'vue'
 import { UserOutlined } from '@ant-design/icons-vue'
 import { mapState } from 'pinia'
 import { useUserStore } from '@/stores/user'
@@ -198,9 +199,18 @@ export default defineComponent({
           expandedRowKeys.value = []
         }
       },
-      // 判断是否有子节点
+      // 判断是否有子节点 - 只有非叶子节点才显示展开按钮
       rowExpandable: (record) => {
         return record.children && record.children.length > 0
+      },
+      // 自定义展开图标 - 对叶子节点不显示图标
+      expandIcon: ({ record, expanded, expandable: iconExpandable, onExpand }) => {
+        // 如果是叶子节点（没有子节点），不显示展开图标
+        if (!record.children || record.children.length === 0) {
+          return null // 返回null表示不渲染任何内容
+        }
+        // 对非叶子节点使用默认展开图标
+        return null
       }
     })
 
@@ -625,6 +635,17 @@ export default defineComponent({
       })
     },
 
+    /**
+     * 获取行类名 - 用于区分叶子节点和非叶子节点
+     */
+    getRowClassName(record) {
+      // 如果是叶子节点（没有子节点），添加叶子节点样式类
+      if (!record.children || record.children.length === 0) {
+        return 'leaf-node-row'
+      }
+      return ''
+    },
+
   },
   components: {
     UserOutlined
@@ -765,6 +786,38 @@ export default defineComponent({
     text-overflow: ellipsis;
     white-space: nowrap;
     vertical-align: middle;
+  }
+
+  // 叶子节点行样式 - 使用淡蓝色背景进行区分
+  :deep(.leaf-node-row) {
+    background-color: #f0f9ff !important;  // 淡蓝色背景
+    
+    &:hover {
+      background-color: #e6f7ff !important;  // 鼠标悬停时的稍深蓝色
+    }
+    
+    // 确保子表格也继承样式
+    td {
+      background-color: transparent !important;
+    }
+  }
+
+  // 隐藏叶子节点的展开图标
+  :deep(.leaf-node-row) {
+    // 隐藏展开图标按钮
+    .ant-table-row-expand-icon {
+      display: none !important;
+    }
+    // 隐藏展开图标单元格
+    .ant-table-row-expand-icon-cell {
+      width: 0 !important;
+      padding: 0 !important;
+      border: none !important;
+    }
+    // 隐藏第一列中的展开图标（某些版本的Ant Design）
+    td:first-child .ant-table-row-expand-icon {
+      display: none !important;
+    }
   }
 }
 
