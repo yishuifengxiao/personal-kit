@@ -1,14 +1,9 @@
 <template>
-  <div>
-    <a-row>
+  <div class="ont-detail-container">
+    <a-row class="detail-row" :gutter="16">
       <!-- 左侧图谱区 -->
-      <a-col :span="14">
-        <!-- 参见 https://www.relation-graph.com/#/docs/start-vue3 -->
-        <div
-          id="mountNode"
-          ref="myPage"
-          style="border: gray dashed thin; height: 80vh; width: 50vw"
-        >
+      <a-col :span="14" class="graph-col">
+        <div class="graph-container">
           <RelationGraph
             ref="graphRef"
             :options="graphOptions"
@@ -16,9 +11,10 @@
             :on-line-click="onLineClick"
             :on-contextmenu="onContextmenu"
             :on-canvas-click="onCanvasClick"
+            class="relation-graph"
           >
             <template #node="{ node }">
-              <div>
+              <div class="node-container">
                 <div
                   class="c-my-rg-node"
                   @click="showNodeMenus(node, $event)"
@@ -26,261 +22,210 @@
                   @mouseover="nodeSlotOver(node, $event)"
                   @mouseout="nodeSlotOut(node, $event)"
                 ></div>
-                <div
-                  style="
-                    color: forestgreen;
-                    font-size: 16px;
-                    position: absolute;
-                    width: 160px;
-                    height: 25px;
-                    line-height: 25px;
-                    margin-top: 5px;
-                    margin-left: -48px;
-                    text-align: center;
-                    background-color: rgba(66, 187, 66, 0.2);
-                  "
-                >
+                <div class="node-label">
                   {{ node.text }}
-                  <!-- {{ node.data.myicon }} -->
                 </div>
               </div>
             </template>
           </RelationGraph>
         </div>
       </a-col>
-      <!-- 左侧图谱区 -->
       <!-- 右侧配置区 -->
-      <a-col :span="9" :offset="1">
-        <a-tabs v-model:activeKey="activeKey">
-          <!-- 节点属性配置区 -->
-          <a-tab-pane key="1" tab="普通模式配置">
-            <div>
-              <a-form
-                :model="graph_json_data"
-                :label-col="{ span: 3 }"
-                :wrapper-col="{ span: 21 }"
-                name="basic"
-                autocomplete="off"
-              >
-                <a-form-item
-                  label="名称"
-                  name="graphName"
-                  :rules="[{ required: true, message: 'Please input your graphName!' }]"
-                >
-                  <a-input v-model:value="graph_json_data.graphName" allowClear />
-                </a-form-item>
-
-                <a-form-item label="描述" name="description">
-                  <a-textarea
-                    v-model:value="graph_json_data.description"
-                    allowClear
-                    showCount
-                    :autoSize="{ minRows: 4, maxRows: 6 }"
-                  />
-                </a-form-item>
-              </a-form>
-            </div>
-
-            <!-- 属性配置区 -->
-            <a-row>
-              <!-- 按钮区 -->
-              <a-col :span="20"
-                ><a-space>
-                  <a-button type="primary" @click="addNodeAction">添加概念</a-button>
-                </a-space></a-col
-              >
-              <!-- 按钮区 -->
-            </a-row>
-            <a-row>
-              <a-col :span="24"> <a-divider /></a-col>
-            </a-row>
-            <a-row>
-              <a-col :span="16">
-                <span>概念名称:</span>
-
-                <a-input
-                  placeholder="概念名称"
-                  v-model:value="currentNode.text"
-                  allowClear
-                  @change="onNodeNameChange"
-                  style="width: 13vw; margin-left: 10px"
-              /></a-col>
-              <a-col :span="8">
-                <span>概念颜色:</span>
-
-                <a-input
-                  placeholder="概念颜色"
-                  v-model:value="currentNode.color"
-                  type="color"
-                  @change="onNodeColorChange"
-                  style="width: 3vw; margin-left: 10px"
-              /></a-col>
-            </a-row>
-            <a-row
-              style="margin-top: 10px; max-height: 200px; overflow-y: auto; overflow-x: hidden"
-            >
-              <!-- 节点属性项配置 -->
-              <a-col :span="24">
+      <a-col :span="10" class="config-col">
+        <div class="config-panel">
+          <a-tabs v-model:activeKey="activeKey" class="config-tabs">
+            <!-- 节点属性配置区 -->
+            <a-tab-pane key="1" tab="普通模式配置">
+              <div class="basic-config">
                 <a-form
-                  ref="dynamic_form_nest_item"
-                  name="dynamic_form_nest_item"
-                  :model="currentNode"
+                  :model="graph_json_data"
+                  :label-col="{ span: 4 }"
+                  :wrapper-col="{ span: 20 }"
+                  name="basic"
+                  autocomplete="off"
+                  class="compact-form"
                 >
-                  <a-space
-                    v-for="(nodeProperty, index) in currentNode.nodeProperties"
-                    :key="index"
-                    style="display: flex"
-                    align="baseline"
+                  <a-form-item
+                    label="名称"
+                    name="graphName"
+                    :rules="[{ required: true, message: '请输入本体名称!' }]"
                   >
-                    <a-form-item
-                      :name="['nodeProperties', index, 'nodePropertyName']"
-                      :rules="{
-                        required: true,
-                        message: '节点属性名字不能为空'
-                      }"
-                    >
-                      <a-input
-                        v-model:value="nodeProperty.nodePropertyName"
-                        placeholder="节点属性名字"
-                      />
-                    </a-form-item>
-                    <a-form-item
-                      :name="['nodeProperties', index, 'dataType']"
-                      :rules="{
-                        required: true,
-                        message: '属性数据类型不能为空'
-                      }"
-                    >
-                      <a-select
-                        ref="select"
-                        style="width: 120px"
-                        v-model:value="nodeProperty.dataType"
-                        :options="selectOptions"
-                      ></a-select>
-                    </a-form-item>
-                    <MinusCircleOutlined @click="removeUser(nodeProperty)" />
-                  </a-space>
-                  <a-form-item>
-                    <a-button type="dashed" block @click="addUser">
-                      <PlusOutlined />
-                      添加属性
-                    </a-button>
+                    <a-input v-model:value="graph_json_data.graphName" allowClear placeholder="请输入本体名称" />
                   </a-form-item>
-                  <a-form-item>
-                    <a-button style="visibility: hidden" type="primary" html-type="submit"
-                      >Submit</a-button
-                    >
-                  </a-form-item>
-                </a-form></a-col
-              >
-              <!-- 节点属性项配置 -->
-            </a-row>
-            <!-- 属性配置区 -->
-          </a-tab-pane>
 
-          <!-- 节点属性配置区 -->
-          <!-- 代码编辑区 -->
-          <a-tab-pane key="3" tab="代码模式配置">
-            <!-- <a-textarea v-model:value="code" placeholder="配置代码" :rows="20" /> -->
-            <JsonEditorVue class="editor" v-model="code" style="height: 50vh"></JsonEditorVue>
-          </a-tab-pane>
-          <!-- 代码编辑区 -->
-        </a-tabs>
-        <div><a-divider /> <a-button type="primary" @click="onSaveAction">保存本体</a-button></div>
+                  <a-form-item label="描述" name="description">
+                    <a-textarea
+                      v-model:value="graph_json_data.description"
+                      allowClear
+                      showCount
+                      :autoSize="{ minRows: 3, maxRows: 5 }"
+                      placeholder="请输入本体描述"
+                    />
+                  </a-form-item>
+                </a-form>
+              </div>
+
+              <div class="node-config">
+                <div class="config-header">
+                  <a-button type="primary" size="small" @click="addNodeAction">
+                    <PlusOutlined />
+                    添加概念
+                  </a-button>
+                </div>
+                
+                <a-divider class="compact-divider" />
+                
+                <div class="node-properties">
+                  <a-row :gutter="16" class="property-row">
+                    <a-col :span="16">
+                      <span class="property-label">概念名称:</span>
+                      <a-input
+                        placeholder="请输入概念名称"
+                        v-model:value="currentNode.text"
+                        allowClear
+                        @change="onNodeNameChange"
+                        class="name-input"
+                      />
+                    </a-col>
+                    <a-col :span="8">
+                      <span class="property-label">概念颜色:</span>
+                      <a-input
+                        v-model:value="currentNode.color"
+                        type="color"
+                        @change="onNodeColorChange"
+                        class="color-input"
+                      />
+                    </a-col>
+                  </a-row>
+
+                  <div class="properties-list">
+                    <a-form
+                      ref="dynamic_form_nest_item"
+                      name="dynamic_form_nest_item"
+                      :model="currentNode"
+                      class="properties-form"
+                    >
+                      <div class="property-item" v-for="(nodeProperty, index) in currentNode.nodeProperties" :key="index">
+                        <a-space align="baseline" class="property-space">
+                          <a-form-item
+                            :name="['nodeProperties', index, 'nodePropertyName']"
+                            :rules="{
+                              required: true,
+                              message: '节点属性名字不能为空'
+                            }"
+                            class="property-name-item"
+                          >
+                            <a-input
+                              v-model:value="nodeProperty.nodePropertyName"
+                              placeholder="属性名称"
+                              class="property-input"
+                            />
+                          </a-form-item>
+                          <a-form-item
+                            :name="['nodeProperties', index, 'dataType']"
+                            :rules="{
+                              required: true,
+                              message: '属性数据类型不能为空'
+                            }"
+                            class="property-type-item"
+                          >
+                            <a-select
+                              v-model:value="nodeProperty.dataType"
+                              :options="selectOptions"
+                              placeholder="数据类型"
+                              class="type-select"
+                            ></a-select>
+                          </a-form-item>
+                          <a-button type="text" danger size="small" @click="removeUser(nodeProperty)" class="remove-btn">
+                            <MinusCircleOutlined />
+                          </a-button>
+                        </a-space>
+                      </div>
+                      <div class="add-property-btn">
+                        <a-button type="dashed" block @click="addUser" size="small">
+                          <PlusOutlined />
+                          添加属性
+                        </a-button>
+                      </div>
+                    </a-form>
+                  </div>
+                </div>
+              </div>
+            </a-tab-pane>
+
+            <!-- 代码编辑区 -->
+            <a-tab-pane key="3" tab="代码模式配置">
+              <div class="code-editor-container">
+                <JsonEditorVue class="editor" v-model="code" style="height: 45vh"></JsonEditorVue>
+              </div>
+            </a-tab-pane>
+          </a-tabs>
+          
+          <div class="save-section">
+            <a-divider class="compact-divider" />
+            <a-button type="primary" @click="onSaveAction" class="save-btn">
+              保存本体
+            </a-button>
+          </div>
+        </div>
       </a-col>
-      <!-- 右侧配置区 -->
     </a-row>
 
     <!-- 弹窗区 -->
     <div
       v-show="isShowNodeOperateDialog"
       :style="{ left: nodeMenuPanelPosition.x + 'px', top: nodeMenuPanelPosition.y + 'px' }"
-      style="
-        z-index: 999;
-        padding: 10px;
-        background-color: #ffffff;
-        border: #eeeeee solid 1px;
-        box-shadow: 0px 0px 8px #cccccc;
-        position: absolute;
-        border-radius: 10px;
-      "
+      class="context-menu"
       @mouseleave="isShowNodeOperateDialog = false"
     >
-      <div style="line-height: 25px; padding-left: 10px; color: #888888; font-size: 12px">
-        对这个节点进行操作：
-      </div>
-      <div class="c-node-menu-item" @click.stop="doAction('editNode')">编辑</div>
-      <div class="c-node-menu-item" @click.stop="doAction('addRelation')">添加关系</div>
-      <div class="c-node-menu-item" @click.stop="doAction('deleteNode')">删除节点</div>
+      <div class="context-menu-title">对这个节点进行操作：</div>
+      <div class="context-menu-item" @click.stop="doAction('editNode')">编辑</div>
+      <div class="context-menu-item" @click.stop="doAction('addRelation')">添加关系</div>
+      <div class="context-menu-item" @click.stop="doAction('deleteNode')">删除节点</div>
     </div>
-    <!-- 弹窗区 -->
     <!-- 鼠标悬浮时的弹窗 -->
     <div
       v-if="isShowNodeTipsPanel"
       :style="{ left: nodeMenuPanelPosition.x + 'px', top: nodeMenuPanelPosition.y + 'px' }"
-      style="
-        z-index: 999;
-        padding: 10px;
-        background-color: #ffffff;
-        border: #eeeeee solid 1px;
-        box-shadow: 0px 0px 8px #cccccc;
-        position: absolute;
-      "
+      class="node-tooltip"
     >
-      <div style="line-height: 25px; padding-left: 10px; color: #888888; font-size: 12px">
-        节点名称：{{ currentNode.text }}
-      </div>
-      <div class="c-node-menu-item">id:{{ currentNode.id }}</div>
-      <div class="c-node-menu-item">名称:{{ currentNode.text }}</div>
-      <div class="c-node-menu-item">图标:{{ currentNode.data.myicon }}</div>
+      <div class="tooltip-title">节点名称：{{ currentNode.text }}</div>
+      <div class="tooltip-item">id: {{ currentNode.id }}</div>
+      <div class="tooltip-item">名称: {{ currentNode.text }}</div>
+      <div class="tooltip-item">图标: {{ currentNode.data.myicon }}</div>
     </div>
-    <!-- 鼠标悬浮时的弹窗 -->
     <!-- 当在图谱中点击右键时 -->
     <div
       v-if="isShowTipsPanel"
       :style="{ left: nodeMenuPanelPosition.x + 'px', top: nodeMenuPanelPosition.y + 'px' }"
-      style="
-        z-index: 999;
-        padding: 10px;
-        background-color: #ffffff;
-        border: #eeeeee solid 1px;
-        box-shadow: 0px 0px 8px #cccccc;
-        position: absolute;
-      "
+      class="context-menu"
     >
-      <div class="c-node-menu-item">添加节点</div>
+      <div class="context-menu-item">添加节点</div>
     </div>
-    <!-- 当在图谱中点击右键时 -->
     <!-- 添加关系弹窗 -->
     <div
       v-if="isSHowAddRelationDialog"
       :style="{ left: nodeMenuPanelPosition.x + 'px', top: nodeMenuPanelPosition.y + 'px' }"
-      style="
-        z-index: 999;
-        padding: 10px;
-        background-color: #ffffff;
-        border: #eeeeee solid 1px;
-        box-shadow: 0px 0px 8px #cccccc;
-        position: absolute;
-      "
+      class="relation-dialog"
     >
-      <div style="display: inline-block">
-        <span style="display: inline-block">关系名称</span>
-        <a-input style="width: 200px" v-model:value="currentLine.text" placeholder="关系名称" />
-      </div>
-      <div style="display: inline-block; margin-left: 10px">
-        尾概念
-        <a-select style="width: 120px" v-model:value="currentLine.to">
-          <a-select-option :value="item.id" v-for="item in relationNodes" :key="item.id">{{
-            item.text
-          }}</a-select-option>
-        </a-select>
-      </div>
-      <div style="display: inline-block; margin-left: 10px">
-        <a-button type="primary" @click="doAddRelation">确认</a-button>
+      <div class="relation-form">
+        <div class="form-group">
+          <span class="form-label">关系名称</span>
+          <a-input v-model:value="currentLine.text" placeholder="请输入关系名称" class="relation-input" />
+        </div>
+        <div class="form-group">
+          <span class="form-label">尾概念</span>
+          <a-select v-model:value="currentLine.to" placeholder="选择目标概念" class="concept-select">
+            <a-select-option :value="item.id" v-for="item in relationNodes" :key="item.id">
+              {{ item.text }}
+            </a-select-option>
+          </a-select>
+        </div>
+        <div class="form-actions">
+          <a-button type="primary" @click="doAddRelation" size="small">确认</a-button>
+        </div>
       </div>
     </div>
-    <!-- 添加关系弹窗 -->
     <!-- 删除关系弹窗 -->
     <div
       v-if="isSHowDeleteRelationDialog"
@@ -288,19 +233,11 @@
         left: nodeMenuPanelPosition.x - 100 + 'px',
         top: nodeMenuPanelPosition.y - 100 + 'px'
       }"
-      style="
-        z-index: 999;
-        padding: 10px;
-        background-color: #ffffff;
-        border: #eeeeee solid 1px;
-        box-shadow: 0px 0px 8px #cccccc;
-        position: absolute;
-      "
+      class="context-menu"
       @mouseleave="isSHowDeleteRelationDialog = false"
     >
-      <div class="c-node-menu-item" @click.stop="deleteRelation('deleteRelation')">删除此关系</div>
+      <div class="context-menu-item" @click.stop="deleteRelation('deleteRelation')">删除此关系</div>
     </div>
-    <!-- 删除关系弹窗 -->
   </div>
 </template>
 
@@ -620,9 +557,267 @@ export default {
 }
 </script>
 
-<style></style>
+<style lang="less" scoped>
+.ont-detail-container {
+  height: calc(100vh - 64px - 48px - 48px); /* 视口高度 - header - padding - breadcrumb */
+  max-height: calc(100vh - 64px - 48px - 48px);
+  overflow: hidden;
+  background: #f5f5f5;
+  padding: 16px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
 
-<style lang="css" scoped>
+.detail-row {
+  height: 100%;
+  margin: 0 !important;
+  flex: 1;
+  display: flex;
+}
+
+.graph-col {
+  height: 100%;
+  padding: 0 !important;
+}
+
+.graph-container {
+  height: 100%;
+  background: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.relation-graph {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+}
+
+.config-col {
+  height: 100%;
+  padding: 0 !important;
+}
+
+.config-panel {
+  height: 100%;
+  background: white;
+  border: 1px solid #e8e8e8;
+  border-left: none;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.config-tabs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  
+  :deep(.ant-tabs-nav) {
+    padding-right: 140px; /* 为保存按钮留出更多空间 */
+    margin-bottom: 0;
+    padding-top: 8px; /* 增加顶部内边距 */
+  }
+  
+  :deep(.ant-tabs-content) {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+  }
+  
+  :deep(.ant-tabs-content-holder) {
+    flex: 1;
+    overflow: auto;
+    max-height: calc(100vh - 64px - 48px - 48px - 56px); /* 减去标签栏高度 */
+  }
+  
+  :deep(.ant-tabs-tabpane) {
+    height: 100%;
+    overflow-y: auto;
+  }
+}
+
+.basic-config {
+  margin-bottom: 16px;
+}
+
+.compact-form {
+  :deep(.ant-form-item) {
+    margin-bottom: 12px;
+  }
+  
+  :deep(.ant-form-item-label) {
+    padding-bottom: 0;
+    font-weight: 500;
+  }
+}
+
+.node-config {
+  background: #fafafa;
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.config-header {
+  margin-bottom: 12px;
+}
+
+.compact-divider {
+  margin: 12px 0;
+}
+
+.node-properties {
+  
+}
+
+.property-row {
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.property-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #595959;
+  margin-right: 8px;
+}
+
+.name-input {
+  width: calc(100% - 60px);
+}
+
+.color-input {
+  width: 40px;
+  height: 28px;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.properties-list {
+  max-height: 250px; /* 固定最大高度 */
+  overflow-y: auto;
+  padding-right: 8px;
+  
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #d9d9d9;
+    border-radius: 2px;
+  }
+}
+
+.properties-form {
+  
+}
+
+.property-item {
+  margin-bottom: 8px;
+  padding: 8px;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #f0f0f0;
+}
+
+.property-space {
+  width: 100%;
+  align-items: center;
+}
+
+.property-name-item {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.property-type-item {
+  width: 120px;
+  margin-bottom: 0;
+  margin-left: 8px;
+}
+
+.property-input {
+  
+}
+
+.type-select {
+  width: 120px;
+}
+
+.remove-btn {
+  margin-left: 8px;
+  min-width: 24px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+}
+
+.add-property-btn {
+  margin-top: 12px;
+}
+
+.code-editor-container {
+  height: calc(100vh - 64px - 48px - 48px - 280px); /* 进一步降低编辑器高度 */
+  max-height: calc(100vh - 64px - 48px - 48px - 280px);
+  min-height: 200px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  overflow: hidden;
+  
+  .editor {
+    height: 100% !important;
+    border: none !important;
+  }
+}
+
+.save-section {
+  padding: 16px;
+  background: white;
+  border-top: 1px solid #f0f0f0;
+  position: absolute;
+  top: 4px;
+  right: 16px;
+  left: auto;
+  width: auto;
+  border-top: none;
+  padding: 0;
+  background: transparent;
+  z-index: 10;
+}
+
+.save-btn {
+  width: auto;
+  min-width: 100px;
+}
+
+.node-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.node-label {
+  color: forestgreen;
+  font-size: 14px;
+  position: absolute;
+  width: 140px;
+  height: 24px;
+  line-height: 24px;
+  margin-top: 5px;
+  margin-left: -48px;
+  text-align: center;
+  background-color: rgba(66, 187, 66, 0.2);
+  border-radius: 4px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .c-my-rg-node {
   height: 80px;
   line-height: 80px;
@@ -644,5 +839,134 @@ export default {
 
 .c-node-menu-item:hover {
   background-color: rgba(66, 187, 66, 0.2);
+}
+
+/* 弹窗样式优化 */
+.context-menu {
+  z-index: 999;
+  padding: 8px 0;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: absolute;
+  border-radius: 6px;
+  min-width: 140px;
+}
+
+.context-menu-title {
+  line-height: 24px;
+  padding: 4px 12px;
+  color: #8c8c8c;
+  font-size: 11px;
+  font-weight: 500;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 4px;
+}
+
+.context-menu-item {
+  line-height: 28px;
+  padding: 0 12px;
+  cursor: pointer;
+  color: #262626;
+  font-size: 13px;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: #f5f5f5;
+  }
+}
+
+.node-tooltip {
+  z-index: 999;
+  padding: 8px 12px;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: absolute;
+  border-radius: 6px;
+  min-width: 160px;
+}
+
+.tooltip-title {
+  line-height: 20px;
+  color: #8c8c8c;
+  font-size: 11px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 4px;
+}
+
+.tooltip-item {
+  line-height: 20px;
+  color: #262626;
+  font-size: 12px;
+  padding: 2px 0;
+}
+
+.relation-dialog {
+  z-index: 999;
+  padding: 16px;
+  background-color: #ffffff;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: absolute;
+  border-radius: 6px;
+  min-width: 280px;
+}
+
+.relation-form {
+  
+}
+
+.form-group {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #595959;
+  min-width: 60px;
+}
+
+.relation-input {
+  flex: 1;
+}
+
+.concept-select {
+  flex: 1;
+}
+
+.form-actions {
+  text-align: right;
+  margin-top: 8px;
+}
+
+/* 响应式布局 */
+@media (max-width: 1200px) {
+  .ont-detail-container {
+    height: auto;
+    min-height: 100vh;
+  }
+  
+  .detail-row {
+    height: auto;
+  }
+  
+  .graph-col,
+  .config-col {
+    height: auto;
+    min-height: 50vh;
+  }
+  
+  .graph-container,
+  .config-panel {
+    height: auto;
+    min-height: 50vh;
+  }
 }
 </style>
