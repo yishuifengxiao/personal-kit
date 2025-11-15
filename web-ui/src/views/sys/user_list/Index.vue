@@ -34,13 +34,14 @@
           style="width: 180px"
           v-model:value="formState.roleId"
           show-search
-          placeholder="input search text"
+          placeholder="请选择角色"
           :default-active-first-option="false"
-          :show-arrow="false"
+          :show-arrow="true"
           :filter-option="false"
           :not-found-content="null"
           :options="roleSource"
           @search="handleRoleSearch"
+          @focus="handleRoleSearch('')"
         ></a-select>
       </a-form-item>
 
@@ -65,6 +66,7 @@
 
       <a-space>
         <a-button type="primary" html-type="submit"> 搜索 </a-button>
+        <a-button @click="handleReset"> 重置 </a-button>
         <a-button type="primary" @click="showCreateModal"> 创建账号 </a-button>
       </a-space>
     </a-form>
@@ -73,8 +75,13 @@
     <a-divider dashed />
     <!-- 中间内容区域 -->
     <!-- 表格区 -->
-    <a-table :columns="columns" :data-source="tableData" :pagination="false" :scroll="{ x: 1500 }">
+    <a-table :columns="columns" :data-source="tableData" :pagination="false" :scroll="{ x: 1500 }" size="small">
       <template #bodyCell="{ column, record }">
+        <template v-if="column.dataIndex === 'stat'">
+          <a-tag :color="record.stat === 0 ? 'green' : record.stat === 1 ? 'red' : record.stat === 2 ? 'orange' : record.stat === 3 ? 'blue' : 'purple'">
+            {{ record.stat === 0 ? '账号正常' : record.stat === 1 ? '账号禁用' : record.stat === 2 ? '账号过期' : record.stat === 3 ? '密码过期' : '账号锁定' }}
+          </a-tag>
+        </template>
         <template v-if="column.dataIndex === 'action'">
           <a-space>
               <a-button
@@ -166,7 +173,7 @@ export default defineComponent({
       phone: '',
       email: '',
       certNo: '',
-      stat: 0,
+      stat: undefined,
       createTime: '',
       lockTime: '',
       lastUpdateTime: '',
@@ -258,6 +265,23 @@ export default defineComponent({
         this.formState.startCreateTime = ''
         this.formState.endCreateTime = ''
       }
+      this.query()
+    },
+    /**
+     * 重置搜索条件
+     */
+    handleReset() {
+      this.formState.username = ''
+      this.formState.nickname = ''
+      this.formState.phone = ''
+      this.formState.email = ''
+      this.formState.certNo = ''
+      this.formState.roleId = undefined
+      this.formState.stat = undefined
+      this.formState.rangetimepicker = []
+      this.formState.startCreateTime = ''
+      this.formState.endCreateTime = ''
+      this.pagination.current = 1
       this.query()
     },
     //搜索角色
@@ -473,8 +497,8 @@ export default defineComponent({
       },
       {
         title: '状态',
-        dataIndex: 'statName',
-        key: 'statName',
+        dataIndex: 'stat',
+        key: 'stat',
         ellipsis: true,
         width: 100,
         align: 'center'
