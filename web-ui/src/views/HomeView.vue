@@ -1,67 +1,78 @@
 <template>
   <a-layout class="root_view">
     <!-- 顶部导航栏 -->
-    <a-layout-header class="header" style="vertical-align: middle; display: flex; float: right; font-size: 1rem">
-      <div class="logo" style="width: 10vw" />
-      <div :style="{ lineHeight: '64px', width: '70vw', 'font-size': '1rem !important' }">
-        <!-- 顶部菜单 -->
-        <a-menu v-model:selectedKeys="selectedTopKeysSource" theme="dark" mode="horizontal" @select="onTopMenuSelect"
-          :style="{ lineHeight: '64px', 'font-size': '1.3rem !important' }">
-          <a-menu-item v-for="item in menu.topMenus" :key="item.routerName" :id="item.id">{{
-            item.name
-          }}</a-menu-item>
+    <a-layout-header class="header">
+      <!-- Logo区域 -->
+      <div class="logo-container">
+        <div class="logo">PersonKit</div>
+      </div>
+      
+      <!-- 顶部菜单区域 -->
+      <div class="top-menu-container">
+        <a-menu 
+          v-model:selectedKeys="selectedTopKeysSource" 
+          theme="dark" 
+          mode="horizontal" 
+          @select="onTopMenuSelect"
+          class="top-menu"
+        >
+          <a-menu-item v-for="item in menu.topMenus" :key="item.routerName" :id="item.id">
+            {{ item.name }}
+          </a-menu-item>
         </a-menu>
-        <!-- 顶部菜单 -->
       </div>
 
-      <!-- 头部菜单最右侧 -->
-      <div :style="{
-        lineHeight: '64px',
-        color: 'white',
-        float: 'right',
-        width: '20vw',
-        display: 'inline-block',
-        'text-align': 'right',
-        'vertical-align': 'middle',
-        'padding-right': '-1vw'
-      }">
-        <span>{{ user.nickname }}</span>
-        <a-dropdown>
-          <a class="ant-dropdown-link" @click.prevent>
-            <a-avatar size="large" style="position: relative; top: -1vh">
-              <template #icon>
-                <UserOutlined />
-              </template>
-            </a-avatar>
-            <DownOutlined />
-          </a>
+      <!-- 用户信息区域 -->
+      <div class="user-info-container">
+        <span class="user-nickname">{{ user.nickname }}</span>
+        <a-dropdown @visibleChange="handleDropdownVisible">
           <template #overlay>
-            <a-menu>
-              <a-menu-item>
-                <a href="javascript:;">基本信息</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a href="javascript:;">修改密码</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a href="javascript:;" @click="exit">退出</a>
-              </a-menu-item>
-            </a-menu>
+            <div class="user-dropdown-menu">
+              <div class="user-info-header">
+                <a-avatar size="large" class="user-avatar">
+                  <template #icon><UserOutlined /></template>
+                </a-avatar>
+                <div class="user-info-text">
+                  <div class="user-name">{{ user.nickname }}</div>
+                  <div class="user-role">{{ user.roleName || '普通用户' }}</div>
+                </div>
+              </div>
+              <a-divider style="margin: 8px 0" />
+              <a-menu>
+                <a-menu-item key="profile" @click="showUserProfile">
+                  <template #icon><UserOutlined /></template>
+                  基本信息
+                </a-menu-item>
+                <a-menu-item key="password" @click="showPasswordModal">
+                  <template #icon><KeyOutlined /></template>
+                  修改密码
+                </a-menu-item>
+                <a-menu-item key="logout" @click="handleLogout">
+                  <template #icon><LogoutOutlined /></template>
+                  退出登录
+                </a-menu-item>
+              </a-menu>
+            </div>
           </template>
+          <a-button type="text" class="user-dropdown-trigger">
+            <a-avatar size="small" class="trigger-avatar">
+              <template #icon><UserOutlined /></template>
+            </a-avatar>
+            <DownOutlined class="dropdown-icon" />
+          </a-button>
         </a-dropdown>
       </div>
-      <!-- 头部菜单最右侧 -->
     </a-layout-header>
-    <!-- 顶部导航栏 -->
-    <a-layout style="overflow-x: hidden">
-      <a-layout-sider width="200" style="background: #fff">
+    <!-- 主体内容区域 -->
+    <div class="main-container">
+      <a-layout-sider width="200" style="background: #fff" class="sider">
         <!-- 左侧菜单 -->
         <a-menu v-model:selectedKeys="selectedLeftKeysSource" v-model:openKeys="openKeysSource" mode="inline"
           :items="leftMenuSource" @select="onLeftMenuSelect" :style="{ height: '100%', borderRight: 0 }">
         </a-menu>
         <!-- 左侧菜单 -->
       </a-layout-sider>
-      <a-layout style="padding: 0 24px 24px">
+      <div class="content-wrapper">
         <!-- 面包屑导航 -->
         <a-breadcrumb style="margin: 16px 0">
           <a-breadcrumb-item v-for="item in breadcrumbName" :key="item">{{
@@ -69,23 +80,113 @@
           }}</a-breadcrumb-item>
         </a-breadcrumb>
         <!-- 面包屑导航 -->
-        <a-layout-content :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }">
+        <div class="content-area">
           <!-- 内容区 -->
           <RouterView />
           <!-- 内容区 -->
-        </a-layout-content>
-      </a-layout>
-    </a-layout>
+        </div>
+      </div>
+    </div>
   </a-layout>
+
+  <!-- 用户详情弹窗 -->
+  <a-modal 
+    v-model:visible="userDetailVisible" 
+    title="用户详情" 
+    @ok="userDetailVisible = false"
+    @cancel="userDetailVisible = false" 
+    width="600px"
+    :footer="null"
+  >
+    <div class="user-detail-content">
+      <div class="user-detail-header">
+        <a-avatar size="large" class="detail-avatar">
+          <template #icon><UserOutlined /></template>
+        </a-avatar>
+        <div class="user-detail-info">
+          <div class="detail-nickname">{{ userDetail.nickname || user.nickname }}</div>
+          <div class="detail-username">{{ userDetail.username || user.username }}</div>
+        </div>
+      </div>
+      
+      <a-descriptions :column="1" bordered class="user-detail-descriptions">
+        <a-descriptions-item label="用户名">
+          {{ userDetail.username || user.username || '-' }}
+        </a-descriptions-item>
+        <a-descriptions-item label="昵称">
+          {{ userDetail.nickname || user.nickname || '-' }}
+        </a-descriptions-item>
+        <a-descriptions-item label="邮箱">
+          {{ userDetail.email || user.email || '-' }}
+        </a-descriptions-item>
+        <a-descriptions-item label="手机号">
+          {{ userDetail.phone || user.phone || '-' }}
+        </a-descriptions-item>
+        <a-descriptions-item label="角色">
+          {{ userDetail.roleName || user.roleName || '普通用户' }}
+        </a-descriptions-item>
+        <a-descriptions-item label="状态">
+          <a-badge :status="getStatusBadge(userDetail.status)" :text="getStatusName(userDetail.status)" />
+        </a-descriptions-item>
+        <a-descriptions-item label="创建时间">
+          {{ formatDate(userDetail.createTime) }}
+        </a-descriptions-item>
+        <a-descriptions-item label="更新时间">
+          {{ formatDate(userDetail.updateTime) }}
+        </a-descriptions-item>
+      </a-descriptions>
+    </div>
+  </a-modal>
+
+  <!-- 修改密码弹窗 -->
+  <a-modal 
+    v-model:visible="passwordModalVisible" 
+    title="修改密码" 
+    @ok="handlePasswordSubmit"
+    @cancel="closePasswordModal" 
+    width="600px"
+    :confirmLoading="passwordLoading"
+  >
+    <a-form 
+      ref="passwordFormRef"
+      :model="passwordForm" 
+      :rules="passwordRules" 
+      layout="horizontal"
+      class="password-form"
+      :labelCol="{ span: 6 }"
+      :wrapperCol="{ span: 18 }"
+    >
+      <a-form-item label="当前密码" name="currentPassword">
+        <a-input-password 
+          v-model:value="passwordForm.currentPassword" 
+          placeholder="请输入当前密码"
+          size="large"
+        />
+      </a-form-item>
+      
+      <a-form-item label="新密码" name="newPassword">
+        <a-input-password 
+          v-model:value="passwordForm.newPassword" 
+          placeholder="请输入新密码"
+          size="large"
+        />
+      </a-form-item>
+      
+      <a-form-item label="确认新密码" name="confirmPassword">
+        <a-input-password 
+          v-model:value="passwordForm.confirmPassword" 
+          placeholder="请再次输入新密码"
+          size="large"
+        />
+      </a-form-item>
+    </a-form>
+  </a-modal>
 </template>
 <script>
 import { ref, reactive, defineComponent } from 'vue'
 import { mapState, mapActions } from 'pinia'
 import { useUserStore } from '@/stores/user'
-import {
-  UserOutlined,
-  DownOutlined
-} from '@ant-design/icons-vue'
+import { UserOutlined, DownOutlined, KeyOutlined, LogoutOutlined } from '@ant-design/icons-vue'
 export default defineComponent({
   data() {
     const user = reactive({})
@@ -101,7 +202,49 @@ export default defineComponent({
       menu,
       selectedTopKeys,
       selectedLeftKeys,
-      openKeys
+      openKeys,
+      userDetailVisible: false,
+      userDetail: {},
+      passwordModalVisible: false,
+      passwordLoading: false,
+      passwordForm: {
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      },
+      passwordRules: {
+        currentPassword: [
+          { required: true, message: '请输入当前密码', trigger: 'blur' },
+          { min: 6, message: '密码长度至少6位', trigger: 'blur' }
+        ],
+        newPassword: [
+          { required: true, message: '请输入新密码', trigger: 'blur' },
+          { min: 6, message: '新密码长度至少6位', trigger: 'blur' },
+          { 
+            validator: (rule, value, callback) => {
+              if (value === this.passwordForm.currentPassword) {
+                callback(new Error('新密码不能与当前密码相同'))
+              } else {
+                callback()
+              }
+            },
+            trigger: 'blur'
+          }
+        ],
+        confirmPassword: [
+          { required: true, message: '请确认新密码', trigger: 'blur' },
+          {
+            validator: (rule, value, callback) => {
+              if (value !== this.passwordForm.newPassword) {
+                callback(new Error('两次输入的密码不一致'))
+              } else {
+                callback()
+              }
+            },
+            trigger: 'blur'
+          }
+        ]
+      }
     }
   },
   computed: {
@@ -207,7 +350,7 @@ export default defineComponent({
     }
   },
   methods: {
-    ...mapActions(useUserStore, ['setRole', 'setUser', 'setTopMenuId', 'setLeftMenuId']),
+    ...mapActions(useUserStore, ['setRole', 'setUser', 'setTopMenuId', 'setLeftMenuId', 'clearUser']),
     /**
      * 加载用户基本信息
      */
@@ -340,6 +483,104 @@ export default defineComponent({
       this.$router.push({
         name: 'login'
       })
+    },
+    formatDate(dateString) {
+      if (!dateString) return '-'
+      return new Date(dateString).toLocaleString('zh-CN')
+    },
+    getStatusName(status) {
+      const statusNames = {
+        1: '正常',
+        2: '禁用',
+        3: '锁定'
+      }
+      return statusNames[status] || '未知状态'
+    },
+    getStatusBadge(status) {
+      const statusBadges = {
+        1: 'success',
+        2: 'error',
+        3: 'warning'
+      }
+      return statusBadges[status] || 'default'
+    },
+    handleDropdownVisible(visible) {
+      // 下拉菜单显示/隐藏时的处理
+      console.log('Dropdown visible:', visible)
+    },
+    showUserProfile() {
+      this.userDetailVisible = true
+      // 如果userDetail为空，尝试从当前用户信息填充
+      if (!this.userDetail.id && this.user.id) {
+        this.userDetail = { ...this.user }
+      }
+    },
+    showPasswordModal() {
+      this.passwordModalVisible = true
+      this.resetPasswordForm()
+    },
+    closePasswordModal() {
+      this.passwordModalVisible = false
+      this.resetPasswordForm()
+    },
+    resetPasswordForm() {
+      this.passwordForm = {
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      }
+      if (this.$refs.passwordFormRef) {
+        this.$refs.passwordFormRef.clearValidate()
+      }
+    },
+    handlePasswordSubmit() {
+      this.$refs.passwordFormRef.validate().then(() => {
+        this.passwordLoading = true
+        const params = {
+          currentPassword: this.passwordForm.currentPassword,
+          newPassword: this.passwordForm.newPassword
+        }
+        
+        this.$http.request({
+          url: '/personkit/sys/user/updatePassword',
+          method: 'post',
+          data: params
+        })
+          .then(response => {
+            this.$message.success('密码修改成功，请重新登录')
+            this.closePasswordModal()
+            // 延迟退出登录，让用户看到成功消息
+            setTimeout(() => {
+              this.handleLogout()
+            }, 1500)
+          })
+          .catch(error => {
+            console.error('修改密码失败:', error)
+            this.$message.error(error.message || '密码修改失败')
+          })
+          .finally(() => {
+            this.passwordLoading = false
+          })
+      }).catch(error => {
+        console.error('表单验证失败:', error)
+      })
+    },
+    handleLogout() {
+      this.$confirm({
+        title: '确认退出',
+        content: '确定要退出登录吗？',
+        onOk: () => {
+          this.clearUser()
+          // 清除所有缓存
+          localStorage.clear()
+          sessionStorage.clear()
+          this.$message.success('已退出登录')
+          this.$router.push('/')
+        },
+        onCancel() {
+          console.log('取消退出')
+        }
+      })
     }
   },
   updated() {
@@ -375,5 +616,331 @@ export default defineComponent({
 
 .root_view {
   width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.header {
+  position: fixed;
+  z-index: 1000;
+  width: 100%;
+  height: 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  background: #001529;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.logo-container {
+  flex-shrink: 0;
+  margin-right: 24px;
+}
+
+.logo {
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  user-select: none;
+}
+
+.top-menu-container {
+  flex: 1;
+  min-width: 0;
+}
+
+.top-menu {
+  line-height: 64px;
+  font-size: 16px;
+  border-bottom: none;
+}
+
+.user-info-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-left: 24px;
+}
+
+.user-nickname {
+  color: white;
+  font-size: 14px;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-dropdown-trigger {
+  padding: 4px 8px;
+  border: none;
+  background: transparent;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.3s ease;
+}
+
+.user-dropdown-trigger:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.trigger-avatar {
+  background: #1890ff;
+}
+
+.dropdown-icon {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.user-dropdown-trigger:hover .dropdown-icon {
+  transform: rotate(180deg);
+}
+
+.user-dropdown-menu {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  padding: 8px 0;
+  min-width: 240px;
+}
+
+.user-info-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.user-avatar {
+  background: #1890ff;
+  flex-shrink: 0;
+}
+
+.user-info-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #262626;
+  margin-bottom: 4px;
+}
+
+.user-role {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+/* 主体内容区域 */
+.main-container {
+  display: flex;
+  min-height: calc(100vh - 64px);
+  margin-top: 64px;
+  position: relative;
+}
+
+.sider {
+  overflow: auto;
+  height: calc(100vh - 64px);
+  position: fixed;
+  left: 0;
+  top: 64px;
+  bottom: 0;
+  background: #fff;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.content-wrapper {
+  flex: 1;
+  margin-left: 200px;
+  padding: 0 24px 24px;
+  background: #f0f2f5;
+  min-height: calc(100vh - 64px);
+  overflow: auto;
+}
+
+.content-area {
+  background: #fff;
+  padding: 24px;
+  margin: 0;
+  min-height: 280px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* 移除旧的content样式，使用新的content-area */
+.content {
+  /* 保留为空，避免影响现有代码 */
+}
+
+/* 用户详情弹窗样式 */
+.user-detail-content {
+  padding: 8px 0;
+}
+
+.user-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+.detail-avatar {
+  background: #1890ff;
+  flex-shrink: 0;
+}
+
+.user-detail-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.detail-nickname {
+  font-size: 18px;
+  font-weight: 500;
+  color: #262626;
+  margin-bottom: 4px;
+}
+
+.detail-username {
+  font-size: 14px;
+  color: #8c8c8c;
+}
+
+.user-detail-descriptions {
+  margin-top: 16px;
+}
+
+/* 修改密码弹窗样式 */
+.password-form {
+  padding: 16px 0;
+}
+
+.password-form .ant-form-item {
+  margin-bottom: 24px;
+}
+
+.password-form .ant-form-item-label {
+  font-weight: 500;
+  color: #262626;
+}
+
+.password-form .ant-input-password {
+  border-radius: 6px;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .header {
+    padding: 0 16px;
+  }
+  
+  .user-nickname {
+    max-width: 80px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 0 12px;
+    height: 56px;
+  }
+  
+  .logo {
+    font-size: 18px;
+  }
+  
+  .user-nickname {
+    display: none;
+  }
+  
+  .user-info-container {
+    margin-left: 12px;
+  }
+  
+  .main-container {
+    margin-top: 56px;
+    min-height: calc(100vh - 56px);
+  }
+  
+  .sider {
+    top: 56px;
+    height: calc(100vh - 56px);
+  }
+  
+  .content-wrapper {
+    padding: 0 16px 16px;
+  }
+  
+  .content-area {
+    padding: 16px;
+  }
+  
+  .user-detail-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  /* 移动端密码表单适配 */
+  .password-form .ant-form-item-label {
+    text-align: left;
+    padding-bottom: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0 8px;
+  }
+  
+  .logo-container {
+    margin-right: 12px;
+  }
+  
+  .content-wrapper {
+    margin-left: 0;
+    padding: 0 12px 12px;
+  }
+  
+  .content-area {
+    padding: 12px;
+  }
+  
+  .user-dropdown-menu {
+    min-width: 200px;
+  }
+  
+  /* 小屏幕下密码表单垂直布局 */
+  .password-form .ant-form-item-label {
+    text-align: left;
+    padding-bottom: 8px;
+  }
+}
+
+/* 暗色模式支持 */
+@media (prefers-color-scheme: dark) {
+  .content {
+    background: #1f1f1f;
+    color: #fff;
+  }
+  
+  .user-detail-header {
+    background: #141414;
+  }
 }
 </style>
