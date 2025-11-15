@@ -1,4 +1,4 @@
-package com.yishuifengxiao.tool.personalkit.web;
+package com.yishuifengxiao.tool.personalkit.web.system;
 
 import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.tool.entity.Page;
@@ -44,6 +44,21 @@ public class RecordController {
 
         return recordService.findPageSysSecurityRecord(param);
     }
+
+    @PostMapping("/personal/loginRecord/clear")
+    public void clearLoginRecord() {
+
+
+        recordService.clearLoginRecord();
+    }
+
+    @PostMapping("/personal/visitRecord/clear")
+    public void clearVisitRecord() {
+
+
+        recordService.clearVisitRecord();
+    }
+
 
     @PostMapping("/personal/visit/page")
     public Page<HttpLog> visitRecord(@RequestBody PageQuery<HttpLog> param) {

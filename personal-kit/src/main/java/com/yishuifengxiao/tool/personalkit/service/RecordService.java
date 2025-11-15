@@ -38,4 +38,12 @@ public class RecordService {
     public Page<HttpLog> findPageVisitRecord(PageQuery<HttpLog> param) {
         return JdbcUtil.jdbcHelper().findPage(param, true, Order.desc("createTime"));
     }
+
+    public void clearLoginRecord() {
+        JdbcUtil.jdbcHelper().jdbcTemplate().update("DELETE from sys_security_record");
+    }
+
+    public void clearVisitRecord() {
+        JdbcUtil.jdbcHelper().jdbcTemplate().update("DELETE from http_log");
+    }
 }
