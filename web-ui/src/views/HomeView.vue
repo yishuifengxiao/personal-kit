@@ -25,7 +25,7 @@
       <!-- 用户信息区域 -->
       <div class="user-info-container">
         <span class="user-nickname">{{ user.nickname }}</span>
-        <a-dropdown @visibleChange="handleDropdownVisible">
+        <a-dropdown @openChange="handleDropdownVisible">
           <template #overlay>
             <div class="user-dropdown-menu">
               <div class="user-info-header">
@@ -44,7 +44,7 @@
                   基本信息
                 </a-menu-item>
                 <a-menu-item key="password" @click="showPasswordModal">
-                  <template #icon><KeyOutlined /></template>
+                  <template #icon><VerticalRightOutlined /></template>
                   修改密码
                 </a-menu-item>
                 <a-menu-item key="logout" @click="handleLogout">
@@ -91,7 +91,7 @@
 
   <!-- 用户详情弹窗 -->
   <a-modal 
-    v-model:visible="userDetailVisible" 
+    v-model:open="userDetailVisible" 
     title="用户详情" 
     @ok="userDetailVisible = false"
     @cancel="userDetailVisible = false" 
@@ -140,7 +140,7 @@
 
   <!-- 修改密码弹窗 -->
   <a-modal 
-    v-model:visible="passwordModalVisible" 
+    v-model:open="passwordModalVisible" 
     title="修改密码" 
     @ok="handlePasswordSubmit"
     @cancel="closePasswordModal" 
@@ -186,7 +186,7 @@
 import { ref, reactive, defineComponent } from 'vue'
 import { mapState, mapActions } from 'pinia'
 import { useUserStore } from '@/stores/user'
-import { UserOutlined, DownOutlined, KeyOutlined, LogoutOutlined } from '@ant-design/icons-vue'
+import { UserOutlined, DownOutlined, VerticalRightOutlined, LogoutOutlined } from '@ant-design/icons-vue'
 export default defineComponent({
   data() {
     const user = reactive({})
@@ -504,9 +504,9 @@ export default defineComponent({
       }
       return statusBadges[status] || 'default'
     },
-    handleDropdownVisible(visible) {
+    handleDropdownVisible(open) {
       // 下拉菜单显示/隐藏时的处理
-      console.log('Dropdown visible:', visible)
+      console.log('Dropdown open:', open)
     },
     showUserProfile() {
       this.userDetailVisible = true
@@ -605,7 +605,9 @@ export default defineComponent({
 
   components: {
     UserOutlined,
-    DownOutlined
+    DownOutlined,
+    VerticalRightOutlined,
+    LogoutOutlined
   }
 })
 </script>
