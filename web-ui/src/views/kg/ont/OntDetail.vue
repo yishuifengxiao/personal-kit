@@ -347,11 +347,11 @@ export default {
     },
     onContextmenu(nodeObject, $event) {
       // 右键点击节点时显示操作菜单
-      console.log('onContextmenu:', nodeObject)
+    
       this.showNodeMenus(nodeObject, $event)
     },
     onNodeClick(nodeObject, $event) {
-      console.log('onNodeClick:', nodeObject)
+    
       // 将点击的节点数据回显到右侧编辑区
       const nodeData = JSON.parse(jsonNode(nodeObject))
       // 确保节点有完整的属性结构
@@ -403,12 +403,12 @@ export default {
       this.nodeMenuPanelPosition.y = $event.clientY
     },
     nodeSlotOut(nodeObject, $event) {
-      // console.log('nodeSlotOut:', nodeObject)
+
       this.isShowNodeTipsPanel = false
     },
     showNodeMenus(nodeObject, $event) {
       // const _base_position = this.$refs.myPage.getBoundingClientRect()
-      console.log('showNodeMenus triggered:', nodeObject, $event)
+   
       const nodeData = JSON.parse(jsonNode(nodeObject))
       // 确保节点有完整的属性结构
       if (!nodeData.nodeProperties) {
