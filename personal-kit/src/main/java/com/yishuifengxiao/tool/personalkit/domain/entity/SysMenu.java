@@ -69,19 +69,21 @@ public class SysMenu implements Serializable {
     private Integer type;
 
     /**
-     * 是否需要鉴权，0:无需鉴权，1:需要鉴权
+     * 状态，0:禁用，1:启用
      *
      * @see com.yishuifengxiao.common.tool.entity.BoolStat
      */
-    @Column(name = "auth", length = 1, columnDefinition = "tinyint(1) default 0")
-    private Integer auth;
-
+    @Column(name = "stat", length = 1, columnDefinition = "tinyint(1) default 0")
+    private Integer stat;
 
 
     @Column(name = "idx")
     private Integer idx;
-
-//    @JsonIgnore
+    /**
+     * 是否显示，0:隐藏，1:显示
+     *
+     * @see com.yishuifengxiao.common.tool.entity.BoolStat
+     */
     @Column(name = "is_show", length = 1, columnDefinition = "tinyint(1) default 1")
     private Integer isShow;
 

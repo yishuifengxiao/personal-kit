@@ -6,6 +6,7 @@ import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
 import com.yishuifengxiao.tool.personalkit.domain.query.MenuQuery;
+import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.MenuPermissionReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.MenuTree;
 import com.yishuifengxiao.tool.personalkit.domain.vo.MenuVo;
@@ -82,5 +83,10 @@ public class MenuController {
     @PostMapping("/update")
     public void update(@RequestBody SysMenu menu) {
         menuService.updateRole(menu);
+    }
+
+    @PostMapping("/delete")
+    public void delete(@RequestBody IdReq req) {
+        menuService.delete(req.getId());
     }
 }

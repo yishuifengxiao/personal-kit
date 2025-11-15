@@ -20,6 +20,7 @@ import com.yishuifengxiao.tool.personalkit.domain.request.MenuPermissionReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.MenuTree;
 import com.yishuifengxiao.tool.personalkit.domain.vo.MenuVo;
 import com.yishuifengxiao.tool.personalkit.domain.vo.RoleMenuVo;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -131,7 +132,6 @@ public class MenuService {
         vo.setParentName(Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysMenu.class, menu.getParentId()))
                 .map(SysMenu::getName)
                 .orElse(""));
-        vo.setAuthName(BoolStat.isTrue(menu.getAuth()) ? "是" : "否");
         vo.setTypeName(BoolStat.isTrue(menu.getType()) ? "上部" : "左侧");
 
         String roleSql = """
@@ -237,5 +237,11 @@ public class MenuService {
     public List<SysMenu> list(SysMenu sysMenu) {
         Page<SysMenu> page = JdbcUtil.jdbcHelper().findPage(sysMenu, true, Slice.of(10, 1));
         return page.getData();
+    }
+
+    public void delete(@NotBlank(message = "请选择一个记录") String id) {
+        SysMenu exist = JdbcUtil.jdbcHelper().findByPrimaryKey(SysMenu.class, id);
+        Assert.isNotNull("记录不存在", exist);
+        JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysMenu.class, id);
     }
 }

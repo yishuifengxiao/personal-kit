@@ -38,16 +38,18 @@
                 <a-button v-if="record.stat === 1" type="link" danger
                   @click="handleToggleStatus(record, 0)">禁用</a-button>
                 <a-button v-else type="link" @click="handleToggleStatus(record, 1)">启用</a-button>
+                <a-button type="link" danger @click="handleDelete(record)">删除</a-button>
               </a-space>
             </template>
             <!-- 非叶子节点不显示操作按钮 -->
             <template v-else>
-            <a-space>
+              <a-space>
                 <a-button type="link" @click="showEditModal(record)">编辑</a-button>
-      
+
                 <a-button v-if="record.stat === 1" type="link" danger
                   @click="handleToggleStatus(record, 0)">禁用</a-button>
                 <a-button v-else type="link" @click="handleToggleStatus(record, 1)">启用</a-button>
+                <a-button type="link" danger @click="handleDelete(record)">删除</a-button>
               </a-space>
             </template>
           </template>
@@ -99,7 +101,7 @@
     <!-- 分页区 -->
 
     <!-- 新增/编辑菜单模态框 -->
-    <a-modal v-model:visible="modalVisible" :title="modalTitle" width="600px" @ok="handleModalOk"
+    <a-modal v-model:open="modalVisible" :title="modalTitle" width="600px" @ok="handleModalOk"
       @cancel="handleModalCancel">
       <a-form ref="menuFormRef" :model="menuForm" :rules="menuFormRules" :label-col="{ span: 6 }"
         :wrapper-col="{ span: 16 }">
@@ -475,20 +477,20 @@ export default defineComponent({
      * 显示新增菜单模态框
      */
     showAddModal() {
-         // 预加载菜单列表
-     this.loadMenuList()
+      // 预加载菜单列表
+      this.loadMenuList()
       this.isEditMode = false
       this.currentEditId = null
       this.resetMenuForm()
       this.modalVisible = true
-   
+
     },
 
     /**
      * 显示编辑菜单模态框
      */
     showEditModal(record) {
-        // 预加载菜单列表
+      // 预加载菜单列表
       this.loadMenuList()
       this.isEditMode = true
       this.currentEditId = record.id
@@ -504,7 +506,7 @@ export default defineComponent({
         description: record.description || ''
       })
       this.modalVisible = true
-    
+
     },
 
     /**
@@ -591,6 +593,38 @@ export default defineComponent({
       })
     },
 
+    /**
+     * 删除菜单
+     */
+    handleDelete(record) {
+      this.$confirm({
+        title: '确认删除菜单',
+        content: `确定要删除菜单 "${record.name}" 吗？此操作不可恢复。`,
+        okText: '确定',
+        cancelText: '取消',
+        okButtonProps: {
+          danger: true
+        },
+        onOk: () => {
+          this.$http
+            .request({
+              url: '/personkit/sys/menu/delete',
+              data: {
+                id: record.id
+              }
+            })
+            .then((res) => {
+              this.$msg.success('菜单删除成功')
+              this.query() // 刷新列表
+            })
+            .catch((err) => {
+              console.log(err)
+              this.$msg.error('菜单删除失败')
+            })
+        }
+      })
+    },
+
   },
   components: {
     UserOutlined
@@ -621,12 +655,7 @@ export default defineComponent({
         key: 'name',
         align: 'center'
       },
-      {
-        title: '父级菜单',
-        dataIndex: 'parentName',
-        key: 'parentName',
-        align: 'center'
-      },
+
       {
         title: '路由名称',
         dataIndex: 'routerName',
@@ -652,6 +681,12 @@ export default defineComponent({
         title: '状态',
         dataIndex: 'stat',
         key: 'stat',
+        align: 'center'
+      },
+      {
+        title: '父级菜单',
+        dataIndex: 'parentName',
+        key: 'parentName',
         align: 'center'
       },
       {
