@@ -36,9 +36,6 @@
               <a-space>
                 <a-button type="link" @click="showEditModal(record)">编辑</a-button>
                 <a-button type="link" @click="modifyPermissions(record)">修改权限</a-button>
-                <a-button v-if="record.stat === 1" type="link" danger
-                  @click="handleToggleStatus(record, 0)">禁用</a-button>
-                <a-button v-else type="link" @click="handleToggleStatus(record, 1)">启用</a-button>
                 <a-button type="link" danger @click="handleDelete(record)">删除</a-button>
               </a-space>
             </template>
@@ -46,10 +43,6 @@
             <template v-else>
               <a-space>
                 <a-button type="link" @click="showEditModal(record)">编辑</a-button>
-
-                <a-button v-if="record.stat === 1" type="link" danger
-                  @click="handleToggleStatus(record, 0)">禁用</a-button>
-                <a-button v-else type="link" @click="handleToggleStatus(record, 1)">启用</a-button>
                 <a-button type="link" danger @click="handleDelete(record)">删除</a-button>
               </a-space>
             </template>
@@ -105,14 +98,16 @@
     <a-modal v-model:open="modalVisible" :title="modalTitle" width="600px" @ok="handleModalOk"
       @cancel="handleModalCancel">
       <a-form ref="menuFormRef" :model="menuForm" :rules="menuFormRules" :label-col="{ span: 6 }"
-        :wrapper-col="{ span: 16 }">
+        :wrapper-col="{ span: 16 }" :key="formRenderKey">
         <a-form-item label="菜单名称" name="name">
           <a-input v-model:value="menuForm.name" placeholder="请输入菜单名称" />
         </a-form-item>
         <a-form-item label="父级菜单" name="parentId">
           <a-select v-model:value="menuForm.parentId" placeholder="请选择父级菜单" allowClear show-search
             :filter-option="false" :loading="menuLoading" @search="handleMenuSearch" @focus="handleMenuFocus">
-
+            <a-select-option :value="0">
+               顶级菜单
+            </a-select-option>
             <a-select-option v-for="menu in filteredMenuList" :key="menu.id" :value="menu.id">
               {{ menu.name }}
             </a-select-option>
@@ -225,6 +220,9 @@ export default defineComponent({
       stat: 1,
       description: ''
     })
+    
+    // 强制重新渲染的key
+    const formRenderKey = ref(0)
 
     // 菜单表单验证规则
     const menuFormRules = {
@@ -257,7 +255,8 @@ export default defineComponent({
       searchKeyword,
       menuForm,
       menuFormRules,
-      defaultFormState
+      defaultFormState,
+      formRenderKey
     }
   },
   computed: {
@@ -504,6 +503,26 @@ export default defineComponent({
       this.loadMenuList()
       this.isEditMode = true
       this.currentEditId = record.id
+      
+      // 调试日志 - 检查原始数据
+      console.log('编辑菜单数据:', {
+        original: record,
+        isShow: record.isShow,
+        isShowType: typeof record.isShow,
+        stat: record.stat,
+        statType: typeof record.stat
+      })
+      
+      // 确保数据类型正确，转换为数字类型
+      const isShowValue = Number(record.isShow) || 0
+      const statValue = Number(record.stat) || 0
+      
+      // 先重置表单，确保清空之前的值
+      this.resetMenuForm()
+      
+      // 增加强制重新渲染的key
+      this.formRenderKey += 1
+      
       // 填充表单数据
       Object.assign(this.menuForm, {
         idx: record.idx || 0,
@@ -511,12 +530,27 @@ export default defineComponent({
         parentId: record.parentId || 0,
         routerName: record.routerName || '',
         type: record.type || 1,
-        isShow: record.isShow || 1,
-        stat: record.stat || 1,
+        isShow: isShowValue,
+        stat: statValue,
         description: record.description || ''
       })
+      
+      // 强制触发响应式更新
+      this.$nextTick(() => {
+        console.log('表单数据回显后:', {
+          menuForm: this.menuForm,
+          isShow: this.menuForm.isShow,
+          stat: this.menuForm.stat,
+          formRenderKey: this.formRenderKey
+        })
+        
+        // 强制更新radio组件
+        if (this.$refs.menuFormRef) {
+          this.$refs.menuFormRef.clearValidate(['isShow', 'stat'])
+        }
+      })
+      
       this.modalVisible = true
-
     },
 
     /**
@@ -656,6 +690,16 @@ export default defineComponent({
     this.calculateTableHeight()
     // 监听窗口大小变化
     window.addEventListener('resize', this.handleResize)
+    
+    // 监听menuForm变化，确保radio组件正确响应
+    this.$watch('menuForm', (newVal) => {
+      console.log('menuForm变化:', {
+        isShow: newVal.isShow,
+        stat: newVal.stat,
+        isShowType: typeof newVal.isShow,
+        statType: typeof newVal.stat
+      })
+    }, { deep: true })
   },
   beforeUnmount() {
     // 移除事件监听
