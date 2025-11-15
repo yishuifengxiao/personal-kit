@@ -39,7 +39,7 @@
     <a-divider dashed />
     <!-- 中间内容区域 -->
     <!-- 表格区 -->
-    <a-table :columns="columns" :data-source="tableData" :pagination="false">
+    <a-table :columns="columns" :data-source="tableData"  size="small"  :pagination="false">
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'action'">
           <a-space>
@@ -93,7 +93,7 @@ export default defineComponent({
       return { Authorization: 'xtoken ' + this.tokenVal }
     },
     uploadUrl: function () {
-      return this.$cfg.rootUrl() + '/personkit/file/upload'
+      return this.$cfg.rootUrl() + '/personkit/upload/file'
     }
   },
   methods: {
@@ -139,7 +139,7 @@ export default defineComponent({
      * 跳转到上传历史页面
      */
     showUploadHistory() {
-      this.$router.push({ name: 'UploadHistory' })
+      this.$router.push({ name: 'upload_history' })
     },
     handleDelete(record) {
       this.$confirm({

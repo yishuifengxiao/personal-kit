@@ -9,6 +9,7 @@ import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.entity.HttpLog;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysSecurityRecord;
+import com.yishuifengxiao.tool.personalkit.domain.entity.UploadRecord;
 import com.yishuifengxiao.tool.personalkit.domain.request.HttpLogReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.RecordReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.SysSecurityRecordVo;
@@ -76,5 +77,13 @@ public class RecordService {
 
     public void clearVisitRecord() {
         JdbcUtil.jdbcHelper().jdbcTemplate().update("DELETE from http_log");
+    }
+
+    public Page<UploadRecord> findPageUploadRecord(PageQuery<UploadRecord> pageQuery) {
+        if (null == pageQuery.getQuery()) {
+            pageQuery.setQuery(new UploadRecord());
+        }
+        return JdbcUtil.jdbcHelper().findPage(pageQuery, true, Order.desc("createTime"));
+
     }
 }

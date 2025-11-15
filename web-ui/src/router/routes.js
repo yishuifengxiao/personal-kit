@@ -45,6 +45,15 @@ const routes = [
         }
       },
       {
+        path: 'upload_history',
+        name: 'upload_history',
+        component: () => import('@/views/kg/data_source/UploadHistory.vue'),
+        meta: {
+          label: '上传历史',
+          breadcrumbName: ['知识图谱', '数据中心', '上传历史']
+        }
+      },
+      {
         path: 'dataSet',
         name: 'dataset_management',
         component: () => import('@/views/kg/data_set/DataSet.vue'),
