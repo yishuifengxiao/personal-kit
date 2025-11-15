@@ -44,6 +44,7 @@ public class UploadController {
                            //
                            @RequestParam(value = "mode", required = false) UploadMode uploadMode) throws IOException {
         final SysUser sysUser = ContextCache.currentLoginUser();
+        uploadMode = uploadMode == null ? UploadMode.UPLOAD : uploadMode;
         final String upload = uploadService.upload(request, sysUser, folder, uploadMode, file,
                 traceId);
         return Response.suc(upload);

@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 上部搜索条件区域 -->
-    <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; justify-content: space-between; align-items: center">
       <a-form
         layout="inline"
         name="basic"
@@ -19,7 +19,7 @@
           <a-button @click="handleReset"> 重置 </a-button>
         </a-form-item>
       </a-form>
-      
+
       <a-space>
         <a-upload
           v-model:file-list="fileList"
@@ -49,11 +49,7 @@
               :disabled="record.stat != 2 || record.actualTotalNum === 0"
               >详情</a-button
             >
-            <a-button
-              type="link"
-              danger
-              @click="handleDelete(record)"
-            >删除</a-button>
+            <a-button type="link" danger @click="handleDelete(record)">删除</a-button>
           </a-space>
         </template>
       </template>
@@ -156,16 +152,18 @@ export default defineComponent({
             fileId: record.id
           }
           this.$http
-            .get('/personkit/data/center/file/delete', { params })
-            .then(res => {
-              if (res.code === 0) {
-                this.$message.success('删除成功')
-                this.query()
-              } else {
-                this.$message.error(res.message || '删除失败')
+            .request({
+              url: '/personkit/disk/file/deletes',
+              method: 'post',
+              data: {
+                ids: [record.id]
               }
             })
-            .catch(err => {
+            .then((res) => {
+              this.$message.success('删除成功')
+              this.query()
+            })
+            .catch((err) => {
               console.error('删除文件失败:', err)
               this.$message.error('删除文件失败')
             })
@@ -174,13 +172,27 @@ export default defineComponent({
     },
 
     handleChange(info) {
+      debugger
       if (info.file.status !== 'uploading') {
         console.log(info.file, info.fileList)
       }
       if (info.file.status === 'done') {
-        this.$msg.success(`${info.file.name} file uploaded successfully`)
+        // 检查上传接口返回的数据
+        const response = info.file.response
+        if (response && response.code === 500) {
+          // 上传失败，显示错误信息
+          this.$message.error(response.msg || '文件上传失败')
+          console.error('文件上传失败:', response)
+        } else if (response && response.code === 0) {
+          // 上传成功
+          this.$message.success(`${info.file.name} 文件上传成功`)
+        } else {
+          // 默认成功提示
+          this.$message.success(`${info.file.name} 文件上传成功`)
+        }
       } else if (info.file.status === 'error') {
-        this.$msg.error(`${info.file.name} file upload failed.`)
+        this.$message.error(`${info.file.name} 文件上传失败`)
+        console.error('文件上传失败:', info.file.error)
       }
       this.query()
     },

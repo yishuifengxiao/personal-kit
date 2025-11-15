@@ -13,12 +13,14 @@ import com.yishuifengxiao.tool.personalkit.domain.enums.UploadStat;
 import com.yishuifengxiao.tool.personalkit.listener.event.FileAnalysisEvent;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.filechooser.FileSystemView;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -30,11 +32,12 @@ import java.util.Map;
  * @version 1.0.0
  * @since 1.0.0
  */
+@Slf4j
 @Component
 @Transactional(rollbackOn = {Exception.class})
 public class UploadService {
 
-    @Value("${file.upload.path:/tmp/upload}")
+    @Value("${file.upload.path:''}")
     private String uploadPath;
     @Autowired
     private EventPublisher eventPublisher;
@@ -149,10 +152,17 @@ public class UploadService {
     private File saveFileToLocal(MultipartFile multipartFile, String uploadRecordId) {
         try {
             // 创建上传目录
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
+            File uploadDir = null;
+
+            if (StringUtils.isNotBlank(uploadPath) && !uploadPath.equalsIgnoreCase("''")) {
+                uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+            } else {
+                uploadDir = FileSystemView.getFileSystemView().getDefaultDirectory();
             }
+            log.info("=============》 上传目录 {}", uploadDir);
 
             // 生成文件名
             String originalFilename = multipartFile.getOriginalFilename();
