@@ -355,7 +355,10 @@ export default {
       if (!nodeData.data) {
         nodeData.data = {}
       }
-      if (!nodeData.data.nodeProperties) {
+      // 优先从 data.nodeProperties 中读取属性数据，如果不存在则使用 nodeProperties
+      if (nodeData.data.nodeProperties && Array.isArray(nodeData.data.nodeProperties)) {
+        nodeData.nodeProperties = nodeData.data.nodeProperties
+      } else if (!nodeData.data.nodeProperties) {
         nodeData.data.nodeProperties = nodeData.nodeProperties
       }
       this.currentNode = reactive(nodeData)
@@ -379,7 +382,10 @@ export default {
       if (!nodeData.data) {
         nodeData.data = {}
       }
-      if (!nodeData.data.nodeProperties) {
+      // 优先从 data.nodeProperties 中读取属性数据，如果不存在则使用 nodeProperties
+      if (nodeData.data.nodeProperties && Array.isArray(nodeData.data.nodeProperties)) {
+        nodeData.nodeProperties = nodeData.data.nodeProperties
+      } else if (!nodeData.data.nodeProperties) {
         nodeData.data.nodeProperties = nodeData.nodeProperties
       }
       this.currentNode = reactive(nodeData)
@@ -404,7 +410,10 @@ export default {
       if (!nodeData.data) {
         nodeData.data = {}
       }
-      if (!nodeData.data.nodeProperties) {
+      // 优先从 data.nodeProperties 中读取属性数据，如果不存在则使用 nodeProperties
+      if (nodeData.data.nodeProperties && Array.isArray(nodeData.data.nodeProperties)) {
+        nodeData.nodeProperties = nodeData.data.nodeProperties
+      } else if (!nodeData.data.nodeProperties) {
         nodeData.data.nodeProperties = nodeData.nodeProperties
       }
       this.currentNode = reactive(nodeData)
