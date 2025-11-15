@@ -52,16 +52,16 @@ public class RoleController {
         return roleService.findMenu(req.getId());
     }
 
-    @PostMapping("/add")
+    @PostMapping("/save")
     public void addRole(@Validated(Group.Create.class) @RequestBody RoleVo param,
                         BindingResult errors) {
         roleService.addRole(param);
     }
 
     @PostMapping("/update")
-    public void updateRole(@Validated(Group.Create.class) @RequestBody RoleVo param,
+    public void updateRole(@Validated(Group.Create.class) @RequestBody SysRole sysRole,
                            BindingResult errors) {
-        roleService.updateRole(param);
+        roleService.updateRole(sysRole);
     }
 
     @PostMapping("/deletes")

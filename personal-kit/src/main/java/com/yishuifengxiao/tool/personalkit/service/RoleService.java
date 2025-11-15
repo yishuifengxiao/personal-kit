@@ -55,7 +55,9 @@ public class RoleService {
 
     public void addRole(RoleVo param) {
         //@formatter:off
-
+        if (StringUtils.isNotBlank(param.getParentId())) {
+            param.setParentId("1");
+        }
         Assert.isNull("角色已存在", JdbcUtil.jdbcHelper().findOne(new SysRole().setName(param.getName().trim()),false));
 
         SysRole sysRole = BeanUtil.copy(param, new SysRole()).setId(IdWorker.snowflakeStringId()).setCreateTime(LocalDateTime.now()).setName(param.getName().trim());
@@ -69,37 +71,34 @@ public class RoleService {
         } else {
             sysRole.setParentId(Constant.DEFAULT_ROOT_ID);
         }
-
+        if (StringUtils.isBlank(sysRole.getParentId())) {
+            sysRole.setParentId("1");
+        }
+        if (null == sysRole.getCreateTime()) {
+            sysRole.setCreateTime(LocalDateTime.now());
+        }
         JdbcUtil.jdbcHelper().saveOrUpdate(sysRole);
 
         //@formatter:on
     }
 
-    public void updateRole(RoleVo param) {
-        //@formatter:off
-        SysRole role =
-                Optional.ofNullable( JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, param.getId())).filter(r->!RoleStat.ROLE_INIT.equalCode(r.getStat())).orElseThrow(ValidateUtils.orElseThrow("记录不存在"));
+    public void updateRole(SysRole sysRole) {
 
-        if (StringUtils.isNotBlank(param.getName()) && !StringUtils.equalsIgnoreCase(param.getName().trim(), role.getName())) {
-
-            Assert.isNull("角色已存在", JdbcUtil.jdbcHelper().findOne(new SysRole().setName(param.getName().trim()),false));
+        Assert.isNotBlank("记录主键不能为空", sysRole.getId());
+        SysRole role = JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, sysRole.getId());
+        Assert.isNotNull("记录不存在", role);
+        if (!StringUtils.equalsIgnoreCase(role.getName(), sysRole.getName())) {
+            SysRole one = JdbcUtil.jdbcHelper().findOne(new SysRole().setName(sysRole.getName().trim()), false);
+            Assert.isNull("角色已存在", one);
         }
-
-        role.setName(StringUtils.trim(param.getName())).setDescription(param.getDescription()).setHomeUrl(param.getHomeUrl());
-
-        if (null != param.getStat()) {
-            role.setStat(RoleStat.code(param.getStat()).orElse(RoleStat.ROLE_DISABLE).code());
+        sysRole.setStat(null == sysRole.getStat() ? role.getStat() : RoleStat.code(sysRole.getStat()).orElse(RoleStat.ROLE_DISABLE).code());
+        if (StringUtils.isBlank(sysRole.getParentId())) {
+            sysRole.setParentId("1");
         }
-
-        if (StringUtils.isNotBlank(param.getParentId()) && StringUtils.equalsIgnoreCase(param.getParentId().trim(), role.getParentId())) {
-            Assert.lteZeroN("父角色不存在", JdbcUtil.jdbcHelper().countAll(new SysRole().setId(param.getParentId().trim()),
-                    false));
-            role.setParentId(param.getParentId().trim());
+        if (null == sysRole.getCreateTime()) {
+            sysRole.setCreateTime(LocalDateTime.now());
         }
-
-        JdbcUtil.jdbcHelper().updateByPrimaryKeySelective(role);
-
-        //@formatter:on
+        JdbcUtil.jdbcHelper().saveOrUpdate(sysRole.setName(sysRole.getName().trim()).setDescription(sysRole.getDescription()).setStat(sysRole.getStat()).setHomeUrl(sysRole.getHomeUrl()));
     }
 
     public void updateRoleMenu(String roleId, List<SysMenu> menus) {
@@ -116,16 +115,13 @@ public class RoleService {
     public void deleteRoles(List<String> ids) {
         for (String id : ids) {
             Assert.isNotBlank("记录主键不能为空", id);
-            SysRole sysRole =
-                    Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, id)).filter(r -> !RoleStat.ROLE_INIT.equalCode(r.getStat())).orElseThrow(ValidateUtils.orElseThrow("记录不存在"));
+            SysRole sysRole = Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, id)).filter(r -> !RoleStat.ROLE_INIT.equalCode(r.getStat())).orElseThrow(ValidateUtils.orElseThrow("记录不存在"));
             Assert.isTrue("未禁用的角色不允许删除", RoleStat.ROLE_DISABLE.equalCode(sysRole.getStat()));
             JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysRole.class, id.trim());
 
             // 删除关联关系
-            JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysRoleMenu.class,
-                    JdbcUtil.jdbcHelper().findAll(new SysRoleMenu().setRoleId(id.trim()), false).stream().map(SysRoleMenu::getId).toArray(Object[]::new));
-            JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysUserRole.class,
-                    JdbcUtil.jdbcHelper().findAll(new SysUserRole().setRoleId(id.trim()), false).stream().map(SysUserRole::getId).toArray(Object[]::new));
+            JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysRoleMenu.class, JdbcUtil.jdbcHelper().findAll(new SysRoleMenu().setRoleId(id.trim()), false).stream().map(SysRoleMenu::getId).toArray(Object[]::new));
+            JdbcUtil.jdbcHelper().deleteByPrimaryKey(SysUserRole.class, JdbcUtil.jdbcHelper().findAll(new SysUserRole().setRoleId(id.trim()), false).stream().map(SysUserRole::getId).toArray(Object[]::new));
         }
     }
 

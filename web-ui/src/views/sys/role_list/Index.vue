@@ -24,23 +24,22 @@
     <!-- 中间内容区域 -->
     <div class="content-min-height">
     <!-- 表格区 -->
-    <a-table :columns="columns" :data-source="tableData" :pagination="false" size="small":scroll="{ x: 1500 }">
+    <a-table :columns="columns" :data-source="tableData" :pagination="false" size="small" :scroll="{ x: 1500 }">
       <template #bodyCell="{ column, record }">
+        <template v-if="column.dataIndex === 'stat'">
+          <a-tag :color="record.stat === 1 ? 'green' : record.stat === 0 ? 'red' : 'blue'">
+            {{ record.stat === 1 ? '启用' : record.stat === 0 ? '禁用' : '系统' }}
+          </a-tag>
+        </template>
         <template v-if="column.dataIndex === 'action'">
           <a-space  :size="2">
             <a-button type="link" danger @click="handleDelete(record)">删除</a-button>
             <a-button type="link" @click="showEditModal(record)">编辑</a-button>
             <a-button type="link" @click="modifyMenus(record)">修改菜单</a-button>
-            <a-button type="link" @click="handleToggleStatus(record)" :type="record.stat === 1 ? 'danger' : 'primary'">
-              {{ record.stat === 1 ? '禁用' : '启用' }}
-            </a-button>
+        
           </a-space>
         </template>
-        <template v-else-if="column.dataIndex === 'stat'">
-          <a-tag :color="record.stat === 1 ? 'green' : 'red'">
-            {{ record.stat === 1 ? '启用' : '禁用' }}
-          </a-tag>
-        </template>
+ 
       </template>
     </a-table>
     <!-- 表格区 -->
@@ -65,8 +64,9 @@
         </a-form-item>
         <a-form-item label="角色状态">
           <a-select v-model:value="createForm.stat" placeholder="请选择状态">
-            <a-select-option :value="1">启用</a-select-option>
-            <a-select-option :value="0">禁用</a-select-option>
+            <a-select-option :value="ROLE_STATUS.INIT.value" :disabled="true">{{ ROLE_STATUS.INIT.label }}</a-select-option>
+            <a-select-option :value="ROLE_STATUS.ENABLE.value">{{ ROLE_STATUS.ENABLE.label }}</a-select-option>
+            <a-select-option :value="ROLE_STATUS.DISABLE.value">{{ ROLE_STATUS.DISABLE.label }}</a-select-option>
           </a-select>
         </a-form-item>
       </a-form>
@@ -84,8 +84,9 @@
         </a-form-item>
         <a-form-item label="角色状态">
           <a-select v-model:value="editForm.stat" placeholder="请选择状态">
-            <a-select-option :value="1">启用</a-select-option>
-            <a-select-option :value="0">禁用</a-select-option>
+            <a-select-option :value="ROLE_STATUS.INIT.value" :disabled="true">{{ ROLE_STATUS.INIT.label }}</a-select-option>
+            <a-select-option :value="ROLE_STATUS.ENABLE.value">{{ ROLE_STATUS.ENABLE.label }}</a-select-option>
+            <a-select-option :value="ROLE_STATUS.DISABLE.value">{{ ROLE_STATUS.DISABLE.label }}</a-select-option>
           </a-select>
         </a-form-item>
       </a-form>
@@ -94,7 +95,7 @@
 </template>
 
 <script>
-import { reactive, defineComponent, ref } from 'vue'
+import { reactive, defineComponent, ref, h } from 'vue'
 import { mapState } from 'pinia'
 import { useUserStore } from '@/stores/user'
 import { message, Modal } from 'ant-design-vue'
@@ -192,7 +193,10 @@ export default defineComponent({
           this.pagination.total = res.total
           this.data = reactive(res.data)
         })
-        .catch((err) => console.log(err))
+        .catch((err) => {
+          console.error('查询角色失败:', err)
+          message.error('查询角色数据失败')
+        })
     },
 
     /**
@@ -230,6 +234,12 @@ export default defineComponent({
      * 切换角色状态
      */
     handleToggleStatus(record) {
+      // 系统状态(-1)不允许切换
+      if (record.stat === -1) {
+        message.warning('系统角色状态不可修改')
+        return
+      }
+
       const newStatus = record.stat === 1 ? 0 : 1
       const statusText = newStatus === 1 ? '启用' : '禁用'
       const currentStatusText = record.stat === 1 ? '启用' : '禁用'
@@ -269,7 +279,7 @@ export default defineComponent({
     showCreateModal() {
       this.createForm.name = ''
       this.createForm.description = ''
-      this.createForm.stat = 1
+      this.createForm.stat = this.ROLE_STATUS.ENABLE.value
       this.createModalVisible = true
     },
 
@@ -408,6 +418,23 @@ export default defineComponent({
     this.query()
   },
   setup() {
+    // 角色状态枚举定义
+    const ROLE_STATUS = {
+      INIT: { label: '系统', value: -1, color: 'blue' },
+      ENABLE: { label: '启用', value: 1, color: 'green' },
+      DISABLE: { label: '禁用', value: 0, color: 'red' }
+    }
+
+    // 获取角色状态信息
+    const getRoleStatus = (statusValue) => {
+      const statusMap = {
+        [-1]: ROLE_STATUS.INIT,
+        1: ROLE_STATUS.ENABLE,
+        0: ROLE_STATUS.DISABLE
+      }
+      return statusMap[statusValue] || ROLE_STATUS.DISABLE
+    }
+
     const columns = [
       {
         title: '角色名称',
@@ -429,14 +456,7 @@ export default defineComponent({
         ellipsis: true,
         align: 'center'
       },
-      {
-        title: '包含菜单',
-        dataIndex: 'menuName',
-        key: 'menuName',
-        ellipsis: true,
-        width: 150,
-        align: 'center'
-      },
+
       {
         title: '操作',
         dataIndex: 'action',
@@ -454,11 +474,24 @@ export default defineComponent({
     const fileList = ref([])
     const labelCol = { style: { width: '80px' } }
     const wrapperCol = { span: 14 }
+    
+    // 状态选项根据角色状态枚举生成
     const statusOptions = reactive([
-      { label: '启用', value: 1 },
-      { label: '禁用', value: 0 }
+      { label: ROLE_STATUS.INIT.label, value: ROLE_STATUS.INIT.value },
+      { label: ROLE_STATUS.ENABLE.label, value: ROLE_STATUS.ENABLE.value },
+      { label: ROLE_STATUS.DISABLE.label, value: ROLE_STATUS.DISABLE.value }
     ])
-    return { columns, pagination, fileList, labelCol, wrapperCol, statusOptions }
+    
+    return { 
+      columns, 
+      pagination, 
+      fileList, 
+      labelCol, 
+      wrapperCol, 
+      statusOptions,
+      ROLE_STATUS,
+      getRoleStatus
+    }
   }
 })
 </script>
