@@ -26,13 +26,13 @@ import java.time.LocalDateTime;
  * @since 1.0.0
  */
 
-@Table(name = "disk_upload_record", indexes = {@Index(name = "idx_file_name", columnList = "file_name")})
-@Entity(name = "disk_upload_record")
+@Table(name = "upload_record", indexes = {@Index(name = "idx_file_name", columnList = "file_name")})
+@Entity(name = "upload_record")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class DiskUploadRecord implements Serializable {
+public class UploadRecord implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "system_uuid")
@@ -40,14 +40,33 @@ public class DiskUploadRecord implements Serializable {
     @Column(name = "id", length = 64, nullable = false, unique = true)
     private String id;
 
+    /**
+     * 文件名称
+     */
     @Column(name = "file_name", nullable = false)
     private String fileName;
+
+
+    /**
+     * 文件夹名称
+     */
+    @Column(name = "folder_name")
+    private String folderName;
 
 
     @Column(name = "user_id", length = 64)
     private String userId;
 
     /**
+     * 关联的磁盘文件id
+     */
+    @Column(name = "disk_file_id", length = 64)
+    private String diskFileId;
+
+
+    /**
+     * 0:上传中，1:上传失败，2:上传成功
+     *
      * @see UploadStat
      */
 
@@ -57,6 +76,7 @@ public class DiskUploadRecord implements Serializable {
 
     /**
      * 上传模式 上传：0，解析：1
+     *
      * @see UploadMode
      */
     @Column(name = "upload_mode", length = 1, columnDefinition = "tinyint(1) default 1")

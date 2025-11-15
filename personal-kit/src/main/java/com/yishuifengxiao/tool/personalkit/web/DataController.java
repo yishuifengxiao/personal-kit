@@ -4,11 +4,9 @@ import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
-import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyFile;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.VirtuallyRow;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
-import com.yishuifengxiao.tool.personalkit.domain.vo.DiskUploadRecordVo;
 import com.yishuifengxiao.tool.personalkit.domain.vo.VirtuallyFileVo;
 import com.yishuifengxiao.tool.personalkit.service.DataCenterService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -41,11 +39,6 @@ public class DataController {
     @Autowired
     private DataCenterService dataCenterService;
 
-    @PostMapping("/upload/page")
-    public Page<DiskUploadRecordVo> reacordPage(@RequestBody PageQuery<DiskUploadRecord> pageQuery) {
-
-        return dataCenterService.findPageDataRecord(pageQuery);
-    }
 
     @PostMapping("/file/page")
     public Page<DiskFile> filesPage(@RequestBody PageQuery<DiskFile> pageQuery) {

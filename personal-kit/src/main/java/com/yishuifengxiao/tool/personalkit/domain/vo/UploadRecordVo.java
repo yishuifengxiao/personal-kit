@@ -1,6 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.domain.vo;
 
-import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
+import com.yishuifengxiao.tool.personalkit.domain.entity.UploadRecord;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-public class DiskUploadRecordVo extends DiskUploadRecord implements Serializable {
+public class UploadRecordVo extends UploadRecord implements Serializable {
 
     /**
      * 实际数据的数量

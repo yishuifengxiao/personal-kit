@@ -1,8 +1,8 @@
 package com.yishuifengxiao.tool.personalkit.listener.event;
 
-import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFolder;
-import com.yishuifengxiao.tool.personalkit.domain.entity.DiskUploadRecord;
+import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.entity.UploadRecord;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,13 +23,8 @@ import java.io.Serializable;
 @Accessors(chain = true)
 public class FileAnalysisEvent implements Serializable {
 
-    private DiskFolder diskFolder;
-
+    private DiskFile diskFile;
     private SysUser sysUser;
-
-    private String filePath;
-
     private UploadMode uploadMode;
-    private
-    DiskUploadRecord uploadRecord;
+    private UploadRecord uploadRecord;
 }

@@ -59,6 +59,9 @@ public class DiskFile implements Serializable {
     private String fileMd5;
 
 
+    /**
+     * 文件后缀
+     */
     @Column(name = "suffix", length = 50)
     private String suffix;
 
@@ -66,12 +69,18 @@ public class DiskFile implements Serializable {
     @Column(name = "file_url", length = 100)
     private String fileUrl;
 
+    /**
+     * 本地路径
+     */
+    @Column(name = "local_path")
+    private String localPath;
+
     @Column(name = "original_file_name")
     private String originalFileName;
 
 
-    @Column(name = "upload_id", length = 64)
-    private String uploadId;
+    @Column(name = "upload_record_id", length = 64)
+    private String uploadRecordId;
 
 
     private Long size;
