@@ -1,6 +1,7 @@
 <template>
-  <div>
+  <div class="page-content-wrapper">
     <!-- 上部搜索条件区域 -->
+    <div class="search-area">
     <a-form
       layout="inline"
       name="basic"
@@ -36,12 +37,12 @@
         <a-button @click="handleReset"> 重置 </a-button>
       </a-space>
     </a-form>
+    </div>
 
-    <!-- 上部搜索条件区域 -->
-    <a-divider dashed />
     <!-- 中间内容区域 -->
-    <!-- 表格容器，添加固定高度和滚动 -->
-    <div class="table-container">
+    <div class="content-min-height">
+      <!-- 表格容器，添加固定高度和滚动 -->
+      <div class="table-container">
       <!-- 表格区 -->
       <a-table
         :columns="columns"
@@ -66,18 +67,18 @@
 </template> -->
       </a-table>
       <!-- 表格区 -->
-    </div>
+      </div>
 
-    <!-- 分页区 -->
-    <div style="margin-top: 15px; float: right">
-      <a-pagination
-        v-model:current="pagination.current"
-        :total="pagination.total"
-        :show-total="(total) => `共 ${total} 条数据`"
-        @change="onPaginationChange"
-      />
+      <!-- 分页区 -->
+      <div class="pagination-wrapper">
+        <a-pagination
+          v-model:current="pagination.current"
+          :total="pagination.total"
+          :show-total="(total) => `共 ${total} 条数据`"
+          @change="onPaginationChange"
+        />
+      </div>
     </div>
-    <!-- 分页区 -->
     <!-- 中间内容区域 -->
   </div>
 </template>

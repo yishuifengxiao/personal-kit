@@ -33,8 +33,6 @@
       </a-form-item>
     </a-form>
 
-    <!-- 上部搜索条件区域 -->
-    <a-divider dashed />
     <!-- 中间内容区域 -->
     <!-- 表格区 -->
     <a-table :columns="columns" :data-source="tableData" :pagination="false" :scroll="{ x: 1500 }">

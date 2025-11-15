@@ -1,6 +1,7 @@
 <template>
-  <div>
+  <div class="page-content-wrapper">
     <!-- 上部搜索条件区域 -->
+    <div class="search-area">
     <a-form layout="inline" name="basic" autocomplete="off" :model="formState" @finish="handleFinish"
       :label-col="labelCol">
       <a-form-item label="角色名称" name="name" class="input">
@@ -18,10 +19,10 @@
         <a-button type="primary" @click="showCreateModal"> 增加角色 </a-button>
       </a-space>
     </a-form>
+    </div>
 
-    <!-- 上部搜索条件区域 -->
-    <a-divider dashed />
     <!-- 中间内容区域 -->
+    <div class="content-min-height">
     <!-- 表格区 -->
     <a-table :columns="columns" :data-source="tableData" :pagination="false" :scroll="{ x: 1500 }">
       <template #bodyCell="{ column, record }">
@@ -44,12 +45,12 @@
     </a-table>
     <!-- 表格区 -->
 
-    <!-- 分页区 -->
-    <div style="margin-top: 15px; float: right">
-      <a-pagination v-model:current="pagination.current" :total="pagination.total"
-        :show-total="(total) => `共 ${total} 条数据`" @change="onPaginationChange" />
+      <!-- 分页区 -->
+      <div class="pagination-wrapper">
+        <a-pagination v-model:current="pagination.current" :total="pagination.total"
+          :show-total="(total) => `共 ${total} 条数据`" @change="onPaginationChange" />
+      </div>
     </div>
-    <!-- 分页区 -->
     <!-- 中间内容区域 -->
 
     <!-- 增加角色模态框 -->

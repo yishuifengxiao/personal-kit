@@ -82,7 +82,7 @@
         <!-- 面包屑导航 -->
         <div class="content-area">
           <!-- 内容区 -->
-          <RouterView />
+          <RouterView class="router-view-content" />
           <!-- 内容区 -->
         </div>
       </div>
@@ -762,6 +762,7 @@ export default defineComponent({
   min-height: calc(100vh - 64px);
   margin-top: 64px;
   position: relative;
+  width: 100%;
 }
 
 .sider {
@@ -784,20 +785,316 @@ export default defineComponent({
   background: #f0f2f5;
   min-height: calc(100vh - 64px);
   overflow: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .content-area {
   background: #fff;
   padding: 24px;
   margin: 0;
-  min-height: 280px;
+  min-height: calc(100vh - 64px - 48px - 48px); /* 视口高度 - header - padding - breadcrumb */
+  max-height: calc(100vh - 64px - 48px - 48px); /* 添加最大高度限制 */
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* 防止内容溢出 */
 }
 
 /* 移除旧的content样式，使用新的content-area */
 .content {
   /* 保留为空，避免影响现有代码 */
+}
+
+/* 页面内容布局优化 */
+.page-container {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-table {
+  flex: 1;
+  overflow: auto;
+}
+
+.page-pagination {
+  margin-top: auto;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: flex-end;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  min-height: 60px;
+  align-items: center;
+}
+
+/* 表格宽度自适应 */
+.ant-table {
+  width: 100% !important;
+}
+
+.ant-table-content {
+  overflow-x: auto !important;
+}
+
+/* 表格列宽优化 */
+.ant-table-thead > tr > th {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ant-table-tbody > tr > td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+/* 表格列宽自动分配 */
+.ant-table-thead > tr > th:last-child,
+.ant-table-tbody > tr > td:last-child {
+  min-width: 120px;
+}
+
+/* 当表格列较少时，让表格填满可用宽度 */
+.ant-table-wrapper {
+  width: 100%;
+}
+
+.ant-table table {
+  width: 100% !important;
+}
+
+/* 当表格列很少时，让表格填满整个容器 */
+.ant-table-thead > tr > th,
+.ant-table-tbody > tr > td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 表格列很少时的特殊处理 */
+.ant-table-thead > tr > th:first-child,
+.ant-table-tbody > tr > td:first-child {
+  min-width: 80px;
+}
+
+.ant-table-thead > tr > th:nth-child(2),
+.ant-table-tbody > tr > td:nth-child(2) {
+  min-width: 100px;
+}
+
+/* 表格内容区域最大高度限制 */
+.ant-table-wrapper {
+  max-height: calc(100vh - 400px);
+  overflow: auto;
+}
+
+/* 表格滚动优化 */
+.ant-table-body {
+  max-height: calc(100vh - 500px) !important;
+  overflow-y: auto !important;
+}
+
+/* 表格最小高度确保 */
+.ant-table {
+  min-height: 200px;
+}
+
+/* 表格内容自适应 */
+.ant-table-tbody {
+  max-height: calc(100vh - 550px);
+  overflow-y: auto;
+}
+
+/* 表格内容过多时的处理 */
+.ant-table-content {
+  max-height: calc(100vh - 450px);
+  overflow: auto;
+}
+
+/* 直接表格高度控制 - 针对数据量大的页面 */
+.ant-table {
+  max-height: calc(100vh - 500px) !important;
+  overflow: hidden;
+}
+
+/* 表格body高度控制 */
+.ant-table-body {
+  max-height: calc(100vh - 550px) !important;
+  overflow-y: auto !important;
+}
+
+/* 当表格数据很少时的最小高度 */
+.ant-table-placeholder {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 表格页面内容优化 */
+.table-page-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 100%; /* 确保不会超出父容器 */
+  overflow: hidden; /* 防止内容溢出 */
+}
+
+.table-container {
+  flex: 1;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
+  max-height: calc(100vh - 350px); /* 调整最大高度 */
+}
+
+/* 表格wrapper */
+.table-wrapper {
+  flex: 1;
+  overflow: auto;
+  padding: 0 24px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 400px); /* 限制最大高度 */
+}
+
+/* 表格自适应布局 */
+.ant-table-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: calc(100vh - 350px); /* 默认最大高度 */
+}
+
+/* 针对内容区域的表格高度控制 */
+.content-area .ant-table-wrapper {
+  max-height: calc(100vh - 450px); /* 在content-area中的最大高度 */
+}
+
+/* 针对搜索区域后的表格高度调整 */
+.search-area + .content-min-height .ant-table-wrapper {
+  max-height: calc(100vh - 500px); /* 减去搜索区域的高度 */
+}
+
+/* 针对分页区域的表格高度调整 */
+.ant-table-wrapper:has(+ .pagination-wrapper) {
+  max-height: calc(100vh - 480px); /* 减去分页区域的高度 */
+}
+
+.ant-table {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.ant-table-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ant-table-body {
+  flex: 1;
+  overflow: auto !important;
+  max-height: none !important;
+}
+
+/* 针对数据量大的页面的特殊处理 */
+.high-data-table .ant-table-body {
+  max-height: calc(100vh - 600px) !important;
+}
+
+/* 针对数据量中等的页面的特殊处理 */
+.medium-data-table .ant-table-body {
+  max-height: calc(100vh - 500px) !important;
+}
+
+/* 分页区域样式 */
+.pagination-wrapper {
+  padding: 12px 24px;
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 50px;
+  flex-shrink: 0;
+  margin-top: auto; /* 确保分页始终在底部 */
+}
+
+/* RouterView 内容样式 */
+.router-view-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%; /* 确保不会超出父容器 */
+  overflow: auto;
+}
+
+/* 页面内容容器 */
+.router-view-content > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+}
+
+/* 默认页面内容样式 */
+.page-content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 搜索区域样式 */
+.search-area {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  margin-bottom: 0;
+}
+
+/* 搜索区域下方的内容区域样式 */
+.search-area + .content-min-height {
+  margin-top: 0;
+}
+
+.search-area + .content-min-height > .table-container,
+.search-area + .content-min-height > div:first-child {
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* 内容区域最小高度确保 */
+.content-min-height {
+  flex: 1;
+  min-height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 /* 用户详情弹窗样式 */
@@ -904,11 +1201,21 @@ export default defineComponent({
   
   .content-area {
     padding: 16px;
+    min-height: calc(100vh - 56px - 32px - 32px); /* 移动端调整 */
   }
   
   .user-detail-header {
     flex-direction: column;
     text-align: center;
+  }
+  
+  /* 移动端表格布局优化 */
+  .table-wrapper {
+    padding: 0 16px;
+  }
+  
+  .pagination-wrapper {
+    padding: 12px 16px;
   }
   
   /* 移动端密码表单适配 */
