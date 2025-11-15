@@ -84,14 +84,19 @@
         </template>
         <template v-if="column.dataIndex === 'action'">
           <a-space>
-              <a-button
-                type="link"
-                @click="showDetail(record)"
-                :disabled="record.stat != 2 || record.actualTotalNum === 0"
-                >详情</a-button
-              >
               <a-button type="link" @click="showEditModal(record)">编辑</a-button>
-              <a-button type="link" @click="handleDelete(record)" style="color: #ff4d4f;">删除</a-button>
+              <a-dropdown>
+                <template #overlay>
+                  <a-menu @click="({ key }) => handleOperationMenu(record, key)">
+                    <a-menu-item key="resetPassword">重置密码</a-menu-item>
+                    <a-menu-item key="detail">详情</a-menu-item>
+                    <a-menu-item key="delete" style="color: #ff4d4f;">删除</a-menu-item>
+                  </a-menu>
+                </template>
+                <a-button type="link">
+                  操作 <DownOutlined />
+                </a-button>
+              </a-dropdown>
               <a-dropdown>
                 <template #overlay>
                   <a-menu @click="({ key }) => handleStatusChange(record, key)">
@@ -165,6 +170,54 @@
       </a-form-item>
     </a-form>
   </a-modal>
+
+  <!-- 重置密码弹窗 -->
+  <a-modal
+    v-model:open="resetPasswordVisible"
+    title="重置密码"
+    @ok="handleResetPassword"
+    @cancel="handleResetPasswordCancel"
+    width="400px"
+  >
+    <a-form
+      ref="resetPasswordFormRef"
+      :model="resetPasswordForm"
+      :label-col="{ span: 6 }"
+      :wrapper-col="{ span: 16 }"
+      :rules="resetPasswordRules"
+    >
+      <a-form-item label="用户名">
+        <a-input v-model:value="resetPasswordForm.username" disabled />
+      </a-form-item>
+      <a-form-item label="新密码" name="newPassword">
+        <a-input-password v-model:value="resetPasswordForm.newPassword" placeholder="请输入新密码" />
+      </a-form-item>
+      <a-form-item label="确认密码" name="confirmPassword">
+        <a-input-password v-model:value="resetPasswordForm.confirmPassword" placeholder="请确认新密码" />
+      </a-form-item>
+    </a-form>
+  </a-modal>
+
+  <!-- 用户详情弹窗 -->
+  <a-modal
+    v-model:open="userDetailVisible"
+    title="用户详情"
+    @cancel="userDetailVisible = false"
+    width="500px"
+    :footer="null"
+  >
+    <a-descriptions :column="1" bordered>
+      <a-descriptions-item label="账号">{{ userDetail.username }}</a-descriptions-item>
+      <a-descriptions-item label="昵称">{{ userDetail.nickname }}</a-descriptions-item>
+      <a-descriptions-item label="手机号">{{ userDetail.phone || '-' }}</a-descriptions-item>
+      <a-descriptions-item label="邮箱">{{ userDetail.email || '-' }}</a-descriptions-item>
+      <a-descriptions-item label="证件号码">{{ userDetail.certNo || '-' }}</a-descriptions-item>
+      <a-descriptions-item label="状态">{{ userDetail.stat }}</a-descriptions-item>
+      <a-descriptions-item label="角色">{{ userDetail.roleName }}</a-descriptions-item>
+      <a-descriptions-item label="创建时间">{{ userDetail.createTime }}</a-descriptions-item>
+      <a-descriptions-item label="最后更新时间">{{ userDetail.lastUpdateTime }}</a-descriptions-item>
+    </a-descriptions>
+  </a-modal>
 </template>
 
 <script>
@@ -217,6 +270,29 @@ export default defineComponent({
     })
     const roleOptions = reactive([])
     
+    // 重置密码弹窗数据
+    const resetPasswordVisible = ref(false)
+    const resetPasswordForm = reactive({
+      id: '',
+      username: '',
+      newPassword: '',
+      confirmPassword: ''
+    })
+    
+    // 用户详情弹窗数据
+    const userDetailVisible = ref(false)
+    const userDetail = reactive({
+      username: '',
+      nickname: '',
+      phone: '',
+      email: '',
+      certNo: '',
+      stat: '',
+      createTime: '',
+      roleName: '',
+      lastUpdateTime: ''
+    })
+    
     // 表单验证规则
     const userFormRules = {
       username: [{ required: true, message: '请输入账号', trigger: 'blur' }],
@@ -260,6 +336,26 @@ export default defineComponent({
       roleIds: [{ required: true, message: '请选择角色', trigger: 'change' }]
     }
     
+    // 重置密码表单验证规则
+    const resetPasswordRules = {
+      newPassword: [
+        { required: true, message: '请输入新密码', trigger: 'blur' },
+        { min: 6, message: '密码长度至少6位', trigger: 'blur' }
+      ],
+      confirmPassword: [
+        { required: true, message: '请确认新密码', trigger: 'blur' },
+        {
+          validator: (rule, value) => {
+            if (value !== this.resetPasswordForm.newPassword) {
+              return Promise.reject('两次输入的密码不一致')
+            }
+            return Promise.resolve()
+          },
+          trigger: 'blur'
+        }
+      ]
+    }
+    
     return { 
       formState, 
       data, 
@@ -270,7 +366,12 @@ export default defineComponent({
       currentUserId,
       userForm,
       roleOptions,
-      userFormRules
+      userFormRules,
+      resetPasswordVisible,
+      resetPasswordForm,
+      resetPasswordRules,
+      userDetailVisible,
+      userDetail
     }
   },
   computed: {
@@ -501,6 +602,105 @@ export default defineComponent({
     handleModalCancel() {
       this.modalVisible = false
       this.resetUserForm()
+    },
+
+    /**
+     * 处理操作菜单
+     */
+    handleOperationMenu(record, key) {
+      switch (key) {
+        case 'resetPassword':
+          this.showResetPasswordModal(record)
+          break
+        case 'detail':
+          this.showDetailModal(record)
+          break
+        case 'delete':
+          this.handleDelete(record)
+          break
+      }
+    },
+
+    /**
+     * 显示重置密码弹窗
+     */
+    showResetPasswordModal(record) {
+      this.resetPasswordForm.id = record.id
+      this.resetPasswordForm.username = record.username
+      this.resetPasswordForm.newPassword = ''
+      this.resetPasswordForm.confirmPassword = ''
+      this.resetPasswordVisible = true
+    },
+
+    /**
+     * 处理重置密码
+     */
+    handleResetPassword() {
+      this.$refs.resetPasswordFormRef.validate().then(() => {
+        this.$http
+          .request({
+            url: '/personkit/sys/user/resetPassword',
+            data: {
+              id: this.resetPasswordForm.id,
+              password: this.resetPasswordForm.newPassword
+            }
+          })
+          .then((res) => {
+            this.$msg.success('密码重置成功')
+            this.resetPasswordVisible = false
+            this.resetPasswordForm.id = ''
+            this.resetPasswordForm.username = ''
+            this.resetPasswordForm.newPassword = ''
+            this.resetPasswordForm.confirmPassword = ''
+          })
+          .catch((err) => {
+            this.$msg.error('密码重置失败')
+            console.log(err)
+          })
+      }).catch(() => {
+        // 表单验证失败
+      })
+    },
+
+    /**
+     * 处理重置密码弹窗取消
+     */
+    handleResetPasswordCancel() {
+      this.resetPasswordVisible = false
+      this.resetPasswordForm.id = ''
+      this.resetPasswordForm.username = ''
+      this.resetPasswordForm.newPassword = ''
+      this.resetPasswordForm.confirmPassword = ''
+    },
+
+    /**
+     * 显示用户详情弹窗
+     */
+    showDetailModal(record) {
+      this.userDetail.username = record.username
+      this.userDetail.nickname = record.nickname
+      this.userDetail.phone = record.phone
+      this.userDetail.email = record.email
+      this.userDetail.certNo = record.certNo
+      this.userDetail.stat = this.getStatusName(record.stat)
+      this.userDetail.createTime = record.createTime
+      this.userDetail.roleName = record.roleName
+      this.userDetail.lastUpdateTime = record.lastUpdateTime
+      this.userDetailVisible = true
+    },
+
+    /**
+     * 获取状态名称
+     */
+    getStatusName(status) {
+      const statusNames = {
+        0: '账号正常',
+        1: '账号禁用',
+        2: '账号过期',
+        3: '密码过期',
+        4: '账号锁定'
+      }
+      return statusNames[status] || '未知状态'
     },
 
     /**
