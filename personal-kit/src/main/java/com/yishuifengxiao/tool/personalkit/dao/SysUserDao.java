@@ -67,11 +67,12 @@ public class SysUserDao {
     }
 
     public Page<SysUser> findPage(PageQuery<UserQuery> query, List<String> roleIds) {
+        List<String> roles = null == roleIds ? null : roleIds.stream().filter(StringUtils::isNotBlank).toList();
         UserQuery userQuery = query.query().orElse(new UserQuery());
         UserStat userStat = UserStat.code(userQuery.getStat()).orElse(null);
         Page<SysUser> page = JdbcUtil.jdbcHelper().findPage(SysUser.class, query, params -> {
             String sql = """
-                    SELECT u.* from sys_user u LEFT JOIN sys_user_role r ON u.id=r.user_id and u.ver=0 
+                    SELECT u.* from sys_user u  where u.ver=0
                     """;
             if (StringUtils.isNotBlank(userQuery.getUsername())) {
                 sql += " AND u.username LIKE  concat('%', :username, '%')";
@@ -110,10 +111,11 @@ public class SysUserDao {
                 params.put("endLockTime", userQuery.getEndLockTime());
             }
 
-            if (CollUtil.isNotEmpty(roleIds)) {
-                sql += " AND r.role_id IN (:roleIds)";
-                params.put("roleIds", roleIds);
+            if (CollUtil.isNotEmpty(roles)) {
+                sql += " and u.id in (SELECT r.user_id from sys_user_role r where r.role_id in (:roleIds))";
+                params.put("roleIds", roles);
             }
+
 
             return sql;
         });
