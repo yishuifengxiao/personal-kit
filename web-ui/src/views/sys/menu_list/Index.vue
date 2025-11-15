@@ -27,7 +27,7 @@
     <!-- 表格容器，添加固定高度和滚动 -->
     <div class="table-container">
       <!-- 表格区 -->
-      <a-table :columns="columns" :data-source="tableData" :pagination="false" :scroll="{ x: 1500, y: tableHeight }"
+      <a-table :columns="columns" :data-source="tableData" :pagination="false" :scroll="{ x: 1500 }"
         size="small"  :expandable="expandable" :row-key="(record) => record.id"
         :row-class-name="getRowClassName">
         <template #bodyCell="{ column, record }">

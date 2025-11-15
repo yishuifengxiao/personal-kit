@@ -48,7 +48,7 @@
         :columns="columns"
         :data-source="tableData"
         :pagination="false"
-        :scroll="{ x: 1500, y: tableHeight }"
+        :scroll="{ x: 1500 }"
         size="small"
 
       >
