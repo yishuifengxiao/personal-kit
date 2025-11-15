@@ -86,6 +86,6 @@ public class UserController {
 
     @PostMapping("/update")
     public void update(@Validated(Group.Create.class) @RequestBody UserCreateReq user) {
-        userService.create(user);
+        userService.update(user);
     }
 }

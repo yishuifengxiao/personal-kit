@@ -39,6 +39,7 @@ import com.yishuifengxiao.tool.personalkit.security.SimpleUserDetailsService;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,7 @@ import java.util.stream.Collectors;
  * @date 2023/11/9-18:50
  * @since 1.0.0
  */
+@Transactional
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -73,23 +75,18 @@ public class UserService {
     @Autowired
     private EventPublisher eventPublisher;
 
-    public SecurityToken login(HttpServletRequest request, HttpServletResponse response,
-                               LoginQuery query) throws CustomException {
+    public SecurityToken login(HttpServletRequest request, HttpServletResponse response, LoginQuery query) throws CustomException {
 
         try {
             UserDetails details = userDetailsService.loadUserByUsername(query.getUsername().trim());
-            Assert.isTrue("密码错误", passwordEncoder.matches(query.getPassword(),
-                    details.getPassword()));
+            Assert.isTrue("密码错误", passwordEncoder.matches(query.getPassword(), details.getPassword()));
             //获取token
             SecurityToken token = TokenUtil.createUnsafe(request, query.getUsername().trim());
             TokenUtil.setToken(token);
-            SpringContext.publishEvent(new SecurityEvent(this, request, response,
-                    Strategy.AUTHENTICATION_SUCCESS, token, null));
+            SpringContext.publishEvent(new SecurityEvent(this, request, response, Strategy.AUTHENTICATION_SUCCESS, token, null));
             return token;
         } catch (Exception e) {
-            SpringContext.publishEvent(new SecurityEvent(this, request, response,
-                    Strategy.AUTHENTICATION_FAILURE, new SecurityToken(query.getUsername(), null,
-                    null, null), e));
+            SpringContext.publishEvent(new SecurityEvent(this, request, response, Strategy.AUTHENTICATION_FAILURE, new SecurityToken(query.getUsername(), null, null, null), e));
             throw e;
         }
 
@@ -97,16 +94,13 @@ public class UserService {
     }
 
     public SysUser userInfo(String id) {
-        SysUser sysUser = sysUserRepository.findById(id).orElseThrow(() -> UncheckedException.of(
-                "记录不存在"));
+        SysUser sysUser = sysUserRepository.findById(id).orElseThrow(() -> UncheckedException.of("记录不存在"));
         return sysUser;
     }
 
     public void updatePwd(HttpServletRequest request, UpdatePwdReq req) {
-        SysUser sysUser =
-                sysUserRepository.findById(req.getId().trim()).orElseThrow(() -> UncheckedException.of("记录不存在"));
-        Assert.isTrue("旧密码不正确", StringUtils.equals(DES.encrypt(sysUser.getSalt(),
-                req.getOldPwd().trim()), sysUser.getPwd()));
+        SysUser sysUser = sysUserRepository.findById(req.getId().trim()).orElseThrow(() -> UncheckedException.of("记录不存在"));
+        Assert.isTrue("旧密码不正确", StringUtils.equals(DES.encrypt(sysUser.getSalt(), req.getOldPwd().trim()), sysUser.getPwd()));
         sysUser.setPwd(DES.encrypt(sysUser.getSalt(), req.getNewPwd().trim())).setLastUpdateTime(LocalDateTime.now());
         sysUserRepository.saveAndFlush(sysUser);
         // 删除所有的token
@@ -114,8 +108,7 @@ public class UserService {
     }
 
     public void updateUser(SysUser sysUser) {
-        SysUser user =
-                sysUserRepository.findById(sysUser.getId().trim()).orElseThrow(ValidateUtils.orElseThrow("记录不存在"));
+        SysUser user = sysUserRepository.findById(sysUser.getId().trim()).orElseThrow(ValidateUtils.orElseThrow("记录不存在"));
         if (StringUtils.isNotBlank(sysUser.getNickname())) {
             user.setNickname(sysUser.getNickname().trim());
         }
@@ -137,8 +130,7 @@ public class UserService {
     }
 
     public void updateResetPwd(HttpServletRequest request, ResetPwdReq req) {
-        SysUser sysUser =
-                sysUserDao.findActiveSysUser(req.getUsername().trim()).orElseThrow(() -> new UsernameNotFoundException(String.format("用户名%s不存在", req.getUsername().trim())));
+        SysUser sysUser = sysUserDao.findActiveSysUser(req.getUsername().trim()).orElseThrow(() -> new UsernameNotFoundException(String.format("用户名%s不存在", req.getUsername().trim())));
         Assert.isTrue("邮箱不匹配", StringUtils.equalsIgnoreCase(sysUser.getEmail(), req.getEmail()));
         sysUser.setPwd(DES.encrypt(sysUser.getSalt(), Constant.DEFAULT_PWD)).setLastUpdateTime(LocalDateTime.now());
         sysUserRepository.saveAndFlush(sysUser);
@@ -148,15 +140,12 @@ public class UserService {
 
 
     public Page<PageUser> findPage(PageQuery<UserQuery> query) {
-        SysRole role =
-                ContextCache.getRole(ContextCache.currentUser().map(v -> v.getUsername()).orElse(
-                        "")).orElse(null);
+        SysRole role = ContextCache.getRole(ContextCache.currentUser().map(v -> v.getUsername()).orElse("")).orElse(null);
         Page<SysUser> page = sysUserDao.findPage(query, Arrays.asList(query.getQuery().getRoleId()));
         return page.map(s -> {
             PageUser pageUser = BeanUtil.copy(s, new PageUser());
-            List<StringKeyValue> roles =
-                    roleDao.findRoleByUser(s.getId()).stream().map(r -> new StringKeyValue<>(String.valueOf(r.getId()), r.getName())).collect(Collectors.toList());
-            pageUser.setRoleName(roles.stream().map(v->v.getVal().toString()).collect(Collectors.joining(",")));
+            List<StringKeyValue> roles = roleDao.findRoleByUser(s.getId()).stream().map(r -> new StringKeyValue<>(String.valueOf(r.getId()), r.getName())).collect(Collectors.toList());
+            pageUser.setRoleName(roles.stream().map(v -> v.getVal().toString()).collect(Collectors.joining(",")));
             pageUser.setRoles(roles);
             pageUser.setStatName(UserStat.code(s.getStat()).map(UserStat::enumName).orElse(""));
             return pageUser;
@@ -165,8 +154,7 @@ public class UserService {
     }
 
     public CurrentUser findCurrentUser() {
-        SysUser sysUser = ContextCache.currentUser().orElseThrow(ValidateUtils.orElseThrow(
-                "当前用户还未登录"));
+        SysUser sysUser = ContextCache.currentUser().orElseThrow(ValidateUtils.orElseThrow("当前用户还未登录"));
 
         CurrentUser currentUser = BeanUtil.copy(sysUser, new CurrentUser());
 
@@ -178,35 +166,48 @@ public class UserService {
     }
 
     public void updateUserRoleReq(UserRoleReq req) {
-        SysUser sysUser =
-                Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysUser.class,
-                        req.getId())).orElseThrow(ValidateUtils.orElseThrow("记录不存在"));
-        JdbcUtil.jdbcHelper().jdbcTemplate().update("DELETE from sys_user_role where user_id=?",
-                req.getId());
-        req.getRoleIds().stream().map(v -> new SysUserRole(IdWorker.snowflakeStringId(),
-                req.getId(), v)).forEach(JdbcUtil.jdbcHelper()::insert);
+        SysUser sysUser = Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysUser.class, req.getId())).orElseThrow(ValidateUtils.orElseThrow("记录不存在"));
+        JdbcUtil.jdbcHelper().jdbcTemplate().update("DELETE from sys_user_role where user_id=?", req.getId());
+        req.getRoleIds().stream().map(v -> new SysUserRole(IdWorker.snowflakeStringId(), req.getId(), v)).forEach(JdbcUtil.jdbcHelper()::insert);
     }
 
     public void create(UserCreateReq user) {
-        Long count =
-                JdbcUtil.jdbcHelper().countAll(new SysUser().setUsername(user.getUsername()).setVer(0), false);
+        Long count = JdbcUtil.jdbcHelper().countAll(new SysUser().setUsername(user.getUsername()).setVer(0), false);
         ValidateUtils.isTrue(null == count || count == 0, "账号已存在");
-        Set<String> roles =
-                user.getRoleIds().stream().filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toSet());
+        Set<String> roles = user.getRoleIds().stream().filter(StringUtils::isNotBlank).map(String::trim).collect(Collectors.toSet());
         ValidateUtils.isTrue(!roles.isEmpty(), "角色不能为空");
         for (String roleId : user.getRoleIds()) {
             Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, roleId)).orElseThrow(ValidateUtils.orElseThrow("角色不存在"));
         }
         String salt = Md5.md5Short(IdWorker.snowflakeStringId());
         String encrypt = DES.encrypt(salt, Constant.DEFAULT_PWD);
-        SysUser sysUser = new SysUser(IdWorker.snowflakeStringId(), user.getUsername(),
-                user.getNickname(), user.getPhone(), user.getEmail(), user.getCertNo(), salt,
-                encrypt, UserStat.ACCOUNT_ENABLE.code(), LocalDateTime.now(), null, 0,
-                LocalDateTime.now());
+        SysUser sysUser = new SysUser(IdWorker.snowflakeStringId(), user.getUsername(), user.getNickname(), user.getPhone(), user.getEmail(), user.getCertNo(), salt, encrypt, UserStat.ACCOUNT_ENABLE.code(), LocalDateTime.now(), null, 0, LocalDateTime.now());
         JdbcUtil.jdbcHelper().insert(sysUser);
 
         eventPublisher.post(new UserCreateEvent(sysUser));
     }
 
 
+    public void update(UserCreateReq user) {
+        SysUser exist = JdbcUtil.jdbcHelper().findByPrimaryKey(SysUser.class, user.getId());
+        ValidateUtils.isTrue(null != exist, "记录不存在");
+        if (!StringUtils.equalsIgnoreCase(user.getUsername(), exist.getUsername())) {
+            //账号发生了变化
+            Long count = JdbcUtil.jdbcHelper().countAll(new SysUser().setUsername(user.getUsername()).setVer(0), false);
+            ValidateUtils.isTrue(null == count || count == 0, "账号已存在");
+        }
+        exist.setUsername(user.getUsername().trim());
+        exist.setNickname(user.getNickname().trim());
+        exist.setPhone(user.getPhone().trim());
+        exist.setEmail(user.getEmail().trim());
+        exist.setCertNo(user.getCertNo().trim());
+        exist.setLastUpdateTime(LocalDateTime.now());
+        JdbcUtil.jdbcHelper().updateByPrimaryKey(exist);
+        //删除所有的角色
+        JdbcUtil.jdbcHelper().jdbcTemplate().update("DELETE from sys_user_role where user_id=?", user.getId());
+        for (String roleId : user.getRoleIds()) {
+            Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(SysRole.class, roleId)).orElseThrow(ValidateUtils.orElseThrow("角色不存在"));
+            JdbcUtil.jdbcHelper().insert(new SysUserRole(IdWorker.snowflakeStringId(), user.getId(), roleId));
+        }
+    }
 }

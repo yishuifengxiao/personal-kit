@@ -192,6 +192,7 @@ export default defineComponent({
     const modalVisible = ref(false)
     const modalTitle = ref('')
     const isEdit = ref(false)
+    const currentUserId = ref('')  // 当前编辑的用户ID
     const userForm = reactive({
       username: '',
       nickname: '',
@@ -252,6 +253,7 @@ export default defineComponent({
       modalVisible,
       modalTitle,
       isEdit,
+      currentUserId,
       userForm,
       roleOptions,
       userFormRules
@@ -383,6 +385,8 @@ export default defineComponent({
       this.modalTitle = '编辑账号'
       this.resetUserForm()
       this.loadRoleOptions()
+      // 保存当前编辑的用户ID（在reset之后设置，避免被清空）
+      this.currentUserId = record.id
       // 填充编辑数据
       this.userForm.username = record.username
       this.userForm.nickname = record.nickname
@@ -404,6 +408,7 @@ export default defineComponent({
       this.userForm.email = ''
       this.userForm.certNo = ''
       this.userForm.roleIds = []
+      this.currentUserId = ''  // 重置当前用户ID
     },
 
     /**
@@ -441,6 +446,11 @@ export default defineComponent({
           nickname: this.userForm.nickname,
           email: this.userForm.email,
           roleIds: this.userForm.roleIds
+        }
+        
+        // 编辑时需要添加用户ID
+        if (this.isEdit) {
+          requestData.id = this.currentUserId
         }
         
         // 手机号和证件号码为选填项，只在有值时添加

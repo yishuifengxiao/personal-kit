@@ -13,6 +13,8 @@ import java.util.List;
 @Valid
 @Data
 public class UserCreateReq implements Serializable {
+    @NotBlank(groups = {Group.Update.class}, message = "账号不能为空")
+    private String id;
     @NotBlank(groups = {Group.Create.class}, message = "账号不能为空")
     private String username;
     private String nickname;
