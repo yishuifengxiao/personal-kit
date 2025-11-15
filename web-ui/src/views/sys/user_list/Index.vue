@@ -512,22 +512,45 @@ export default defineComponent({
         return
       }
 
-      this.$http
-        .request({
-          url: '/personkit/sys/user/updateStat',
-          data: {
-            id: record.id,
-            stat: parseInt(status)
-          }
-        })
-        .then((res) => {
-          this.$msg.success('状态修改成功')
-          this.query() // 重新查询数据刷新列表
-        })
-        .catch((err) => {
-          this.$msg.error('状态修改失败')
-          console.log(err)
-        })
+      // 获取状态名称
+      const statusNames = {
+        0: '账号正常',
+        1: '账号禁用',
+        2: '账号过期',
+        3: '密码过期',
+        4: '账号锁定'
+      }
+      const targetStatusName = statusNames[status]
+      const currentStatusName = statusNames[record.stat]
+
+      // 二次确认
+      this.$confirm({
+        title: '确认修改状态',
+        content: `确定要将用户【${record.username}】的状态从【${currentStatusName}】修改为【${targetStatusName}】吗？`,
+        okText: '确认',
+        cancelText: '取消',
+        onOk: () => {
+          return this.$http
+            .request({
+              url: '/personkit/sys/user/updateStat',
+              data: {
+                id: record.id,
+                stat: parseInt(status)
+              }
+            })
+            .then((res) => {
+              this.$msg.success('状态修改成功')
+              this.query() // 重新查询数据刷新列表
+            })
+            .catch((err) => {
+              this.$msg.error('状态修改失败')
+              console.log(err)
+            })
+        },
+        onCancel: () => {
+          // 用户取消操作，不执行任何操作
+        }
+      })
     }
   },
   components: {
