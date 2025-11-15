@@ -51,7 +51,7 @@ public class UserController {
     }
 
     @Operation(summary = "更新密码", description = "根据主键更新密码")
-    @PostMapping("/pwd/update")
+    @PostMapping("/updatePassword")
     public void updatePwd(HttpServletRequest request,
                           @Validated(Group.Update.class) @RequestBody UpdatePwdReq req) {
         userService.updatePwd(request, req);

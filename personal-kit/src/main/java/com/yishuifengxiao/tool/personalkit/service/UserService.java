@@ -99,11 +99,11 @@ public class UserService {
 
     public void updatePwd(HttpServletRequest request, UpdatePwdReq req) {
         SysUser sysUser = sysUserRepository.findById(req.getId().trim()).orElseThrow(() -> UncheckedException.of("记录不存在"));
-        Assert.isTrue("旧密码不正确", StringUtils.equals(DES.encrypt(sysUser.getSalt(), req.getOldPwd().trim()), sysUser.getPwd()));
-        sysUser.setPwd(DES.encrypt(sysUser.getSalt(), req.getNewPwd().trim())).setLastUpdateTime(LocalDateTime.now());
-        sysUserRepository.saveAndFlush(sysUser);
+//        Assert.isTrue("旧密码不正确", StringUtils.equals(DES.encrypt(sysUser.getSalt(), req.getOldPwd().trim()), sysUser.getPwd()));
+        sysUser.setPwd(DES.encrypt(sysUser.getSalt(), req.getPassword().trim())).setLastUpdateTime(LocalDateTime.now());
+        JdbcUtil.jdbcHelper().saveOrUpdate(sysUser);
         // 删除所有的token
-        TokenUtil.clearAllAuthentication();
+//        TokenUtil.clearAllAuthentication();
     }
 
     public void updateUser(SysUser sysUser) {

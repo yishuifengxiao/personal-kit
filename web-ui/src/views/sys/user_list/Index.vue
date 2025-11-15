@@ -88,7 +88,7 @@
               <a-dropdown>
                 <template #overlay>
                   <a-menu @click="({ key }) => handleOperationMenu(record, key)">
-                    <a-menu-item key="resetPassword">重置密码</a-menu-item>
+                    <a-menu-item key="updatePassword">修改密码</a-menu-item>
                     <a-menu-item key="detail">详情</a-menu-item>
                     <a-menu-item key="delete" style="color: #ff4d4f;">删除</a-menu-item>
                   </a-menu>
@@ -174,7 +174,7 @@
   <!-- 重置密码弹窗 -->
   <a-modal
     v-model:open="resetPasswordVisible"
-    title="重置密码"
+    title="修改密码"
     @ok="handleResetPassword"
     @cancel="handleResetPasswordCancel"
     width="400px"
@@ -609,7 +609,7 @@ export default defineComponent({
      */
     handleOperationMenu(record, key) {
       switch (key) {
-        case 'resetPassword':
+        case 'updatePassword':
           this.showResetPasswordModal(record)
           break
         case 'detail':
@@ -639,7 +639,7 @@ export default defineComponent({
       this.$refs.resetPasswordFormRef.validate().then(() => {
         this.$http
           .request({
-            url: '/personkit/sys/user/resetPassword',
+            url: '/personkit/sys/user/updatePassword',
             data: {
               id: this.resetPasswordForm.id,
               password: this.resetPasswordForm.newPassword

@@ -21,11 +21,11 @@ public class UpdatePwdReq implements Serializable {
     @NotBlank(message = "用户id不能为空", groups = {Group.Update.class})
     private String id;
 
-    @NotBlank(message = "旧密码不能为空", groups = {Group.Update.class})
+//    @NotBlank(message = "旧密码不能为空", groups = {Group.Update.class})
 
     private String oldPwd;
 
     @NotBlank(message = "新密码不能为空", groups = {Group.Update.class})
     @Size(message = "密码长度在6到20位之间", min = 6, max = 20, groups = {Group.Update.class})
-    private String newPwd;
+    private String password;
 }
