@@ -569,13 +569,26 @@ export default defineComponent({
       this.$confirm({
         title: '确认退出',
         content: '确定要退出登录吗？',
-        onOk: () => {
-          this.clearUser()
-          // 清除所有缓存
-          localStorage.clear()
-          sessionStorage.clear()
-          this.$message.success('已退出登录')
-          this.$router.push('/')
+        onOk: async () => {
+          try {
+            // 先清除用户存储
+            this.clearUser()
+            // 清除所有缓存
+            localStorage.clear()
+            sessionStorage.clear()
+            
+            this.$message.success('已退出登录')
+            
+            // 使用延迟确保消息显示和存储清除后再跳转
+            setTimeout(() => {
+              // 强制刷新页面，确保所有状态都被清除
+              window.location.href = '/'
+            }, 500)
+          } catch (error) {
+            console.error('退出登录失败:', error)
+            // 即使出错也要确保跳转到登录页
+            window.location.href = '/'
+          }
         },
         onCancel() {
           console.log('取消退出')

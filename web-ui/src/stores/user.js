@@ -44,6 +44,14 @@ export const useUserStore = defineStore('useUserStore', {
     },
     setLeftMenuId(leftMenuId) {
       this.leftMenuId = leftMenuId
+    },
+    clearUser() {
+      this.token = ''
+      this.userId = ''
+      this.role = { id: '' }
+      this.user = {}
+      this.topMenuId = ''
+      this.leftMenuId = ''
     }
   },
   persist: true
