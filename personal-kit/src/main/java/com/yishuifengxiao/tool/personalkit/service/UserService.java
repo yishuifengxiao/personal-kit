@@ -2,6 +2,7 @@ package com.yishuifengxiao.tool.personalkit.service;
 
 import com.yishuifengxiao.common.guava.EventPublisher;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
+import com.yishuifengxiao.common.jdbc.util.SimpleRowMapper;
 import com.yishuifengxiao.common.security.support.SecurityEvent;
 import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.security.token.SecurityToken;
@@ -37,6 +38,7 @@ import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,7 +143,9 @@ public class UserService {
         Page<SysUser> page = sysUserDao.findPage(query, Arrays.asList(query.getQuery().getRoleId()));
         return page.map(s -> {
             PageUser pageUser = BeanUtil.copy(s, new PageUser());
-            List<StringKeyValue> roles = roleDao.findRoleByUser(s.getId()).stream().map(r -> new StringKeyValue<>(String.valueOf(r.getId()), r.getName())).collect(Collectors.toList());
+            String sql = "select r.id,r.name from sys_user_role ur left join sys_role r on ur.role_id=r.id where ur.user_id=" + s.getId();
+            List<SysRole> roleList = JdbcUtil.jdbcHelper().jdbcTemplate().query(sql, new SimpleRowMapper<>(SysRole.class));
+            List<StringKeyValue> roles = roleList.stream().map(v -> new StringKeyValue(v.getId(), v.getName())).collect(Collectors.toList());
             pageUser.setRoleName(roles.stream().map(v -> v.getVal().toString()).collect(Collectors.joining(",")));
             pageUser.setRoles(roles);
             pageUser.setStatName(UserStat.code(s.getStat()).map(UserStat::enumName).orElse(""));
@@ -193,11 +197,12 @@ public class UserService {
             Long count = JdbcUtil.jdbcHelper().countAll(new SysUser().setUsername(user.getUsername()).setVer(0), false);
             ValidateUtils.isTrue(null == count || count == 0, "账号已存在");
         }
-        exist.setUsername(user.getUsername().trim());
-        exist.setNickname(user.getNickname().trim());
-        exist.setPhone(user.getPhone().trim());
-        exist.setEmail(user.getEmail().trim());
-        exist.setCertNo(user.getCertNo().trim());
+        exist.setUsername(Optional.ofNullable(user.getUsername()).orElse("").trim());
+        exist.setNickname(Optional.ofNullable(user.getNickname()).orElse("").trim());
+        exist.setPhone(Optional.ofNullable(user.getPhone()).orElse("").trim());
+        exist.setEmail(Optional.ofNullable(user.getEmail()).orElse("").trim());
+        exist.setCertNo(Optional.ofNullable(user.getCertNo()).orElse("").trim());
+
         exist.setLastUpdateTime(LocalDateTime.now());
         JdbcUtil.jdbcHelper().updateByPrimaryKey(exist);
         //删除所有的角色
@@ -212,6 +217,17 @@ public class UserService {
         SysUser exist = JdbcUtil.jdbcHelper().findByPrimaryKey(SysUser.class, req.getId());
         ValidateUtils.isTrue(null != exist, "记录不存在");
         exist.setStat(UserStat.code(req.getStat()).orElseThrow(ValidateUtils.orElseThrow("状态不存在")).code());
+        exist.setLastUpdateTime(LocalDateTime.now());
+        JdbcUtil.jdbcHelper().updateByPrimaryKey(exist);
+    }
+
+    public void delete(@NotBlank(message = "请选择一个记录") String id) {
+        SysUser exist = JdbcUtil.jdbcHelper().findByPrimaryKey(SysUser.class, id);
+        ValidateUtils.isTrue(null != exist, "记录不存在");
+        if (exist.getId().equalsIgnoreCase("1")) {
+            throw new UncheckedException("不能删除超级管理员");
+        }
+        exist.setVer(1);
         exist.setLastUpdateTime(LocalDateTime.now());
         JdbcUtil.jdbcHelper().updateByPrimaryKey(exist);
     }

@@ -91,7 +91,7 @@
                 >详情</a-button
               >
               <a-button type="link" @click="showEditModal(record)">编辑</a-button>
-              <a>删除</a>
+              <a-button type="link" @click="handleDelete(record)" style="color: #ff4d4f;">删除</a-button>
               <a-dropdown>
                 <template #overlay>
                   <a-menu @click="({ key }) => handleStatusChange(record, key)">
@@ -501,6 +501,43 @@ export default defineComponent({
     handleModalCancel() {
       this.modalVisible = false
       this.resetUserForm()
+    },
+
+    /**
+     * 处理删除用户
+     */
+    handleDelete(record) {
+      // 二次确认
+      this.$confirm({
+        title: '确认删除用户',
+        content: `确定要删除用户【${record.username}】吗？此操作不可恢复。`,
+        okText: '确认删除',
+        cancelText: '取消',
+        okButtonProps: {
+          type: 'primary',
+          danger: true
+        },
+        onOk: () => {
+          return this.$http
+            .request({
+              url: '/personkit/sys/user/delete',
+              data: {
+                id: record.id
+              }
+            })
+            .then((res) => {
+              this.$msg.success('用户删除成功')
+              this.query() // 重新查询数据刷新列表
+            })
+            .catch((err) => {
+              this.$msg.error('用户删除失败')
+              console.log(err)
+            })
+        },
+        onCancel: () => {
+          // 用户取消操作，不执行任何操作
+        }
+      })
     },
 
     /**

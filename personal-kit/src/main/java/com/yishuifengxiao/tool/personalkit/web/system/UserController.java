@@ -6,10 +6,7 @@ import com.yishuifengxiao.common.tool.validate.Group;
 import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.query.UserQuery;
-import com.yishuifengxiao.tool.personalkit.domain.request.ResetPwdReq;
-import com.yishuifengxiao.tool.personalkit.domain.request.UpdatePwdReq;
-import com.yishuifengxiao.tool.personalkit.domain.request.UpdateStatReq;
-import com.yishuifengxiao.tool.personalkit.domain.request.UserCreateReq;
+import com.yishuifengxiao.tool.personalkit.domain.request.*;
 import com.yishuifengxiao.tool.personalkit.domain.vo.PageUser;
 import com.yishuifengxiao.tool.personalkit.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -93,5 +90,10 @@ public class UserController {
     @PostMapping("/updateStat")
     public void updateStat(@Validated(Group.Create.class) @RequestBody UpdateStatReq req) {
         userService.updateStat(req);
+    }
+
+    @PostMapping("/delete")
+    public void delete(@Validated(Group.Create.class) @RequestBody IdReq req) {
+        userService.delete(req.getId());
     }
 }
