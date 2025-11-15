@@ -24,6 +24,26 @@
         </a-input>
       </a-form-item>
 
+      <a-form-item label="起始时间" name="startTime" class="input">
+        <a-date-picker 
+          v-model:value="formState.startTime" 
+          placeholder="选择起始时间"
+          show-time
+          format="YYYY-MM-DD HH:mm:ss"
+          style="width: 200px"
+        />
+      </a-form-item>
+
+      <a-form-item label="结束时间" name="endTime" class="input">
+        <a-date-picker 
+          v-model:value="formState.endTime" 
+          placeholder="选择结束时间"
+          show-time
+          format="YYYY-MM-DD HH:mm:ss"
+          style="width: 200px"
+        />
+      </a-form-item>
+
 
 
     
@@ -75,10 +95,16 @@ import { reactive, defineComponent, ref } from 'vue'
 import { UserOutlined } from '@ant-design/icons-vue'
 import { mapState } from 'pinia'
 import { useUserStore } from '@/stores/user'
-import { message, Modal } from 'ant-design-vue'
+import { message, Modal, DatePicker } from 'ant-design-vue'
 export default defineComponent({
   data() {
-    const formState = reactive({})
+    const formState = reactive({
+      uri: undefined,
+      method: undefined,
+      userName: undefined,
+      startTime: undefined,
+      endTime: undefined
+    })
     const data = reactive([])
     const roleSource = reactive([])
     return { formState, data, roleSource }
@@ -97,14 +123,45 @@ export default defineComponent({
   },
   methods: {
     handleFinish() {
-      this.query()
+      try {
+        this.query()
+      } catch (error) {
+        console.error('表单提交处理错误:', error)
+        message.error('搜索操作失败: ' + (error.message || '未知错误'))
+      }
+    },
+
+    /**
+     * 将Date对象转换为北京时间字符串格式
+     * @param {Date} date - Date对象
+     * @returns {string} - 北京时间字符串 (YYYY-MM-DD HH:mm:ss)
+     */
+    formatBeijingTime(date) {
+      if (!date) return undefined
+      try {
+        // 确保date是有效的Date对象
+        const validDate = date instanceof Date ? date : new Date(date)
+        if (isNaN(validDate.getTime())) return undefined
+        
+        const beijingTime = new Date(validDate.getTime() - validDate.getTimezoneOffset() * 60000)
+        return beijingTime.toISOString().slice(0, 19).replace('T', ' ')
+      } catch (error) {
+        console.error('时间格式转换错误:', error)
+        return undefined
+      }
     },
 
     /**
      * 重置搜索条件
      */
     handleReset() {
-      this.formState = reactive({})
+      this.formState = reactive({
+        uri: undefined,
+        method: undefined,
+        userName: undefined,
+        startTime: undefined,
+        endTime: undefined
+      })
       this.pagination.current = 1
       this.query()
     },
@@ -141,21 +198,36 @@ export default defineComponent({
      * 查询数据
      */
     query() {
-      this.$http
-        .request({
-          url: '/personkit/record/personal/visit/page',
-          data: {
-            num: this.pagination.current,
-            query: this.formState,
-            size: this.pagination.pageSize
-          }
-        })
-        .then((res) => {
-          this.pagination.current = res.num
-          this.pagination.total = res.total
-          this.data = reactive(res.data)
-        })
-        .catch((err) => console.log(err))
+      try {
+        // 处理时间格式转换，将Date对象转换为北京时间字符串格式
+        const processedQuery = { 
+          ...this.formState,
+          startTime: this.formatBeijingTime(this.formState.startTime),
+          endTime: this.formatBeijingTime(this.formState.endTime)
+        }
+
+        this.$http
+          .request({
+            url: '/personkit/record/personal/visit/page',
+            data: {
+              num: this.pagination.current,
+              query: processedQuery,
+              size: this.pagination.pageSize
+            }
+          })
+          .then((res) => {
+            this.pagination.current = res.num
+            this.pagination.total = res.total
+            this.data = reactive(res.data)
+          })
+          .catch((err) => {
+            console.error('查询数据失败:', err)
+            message.error('查询数据失败: ' + (err.message || '未知错误'))
+          })
+      } catch (error) {
+        console.error('查询方法执行错误:', error)
+        message.error('查询数据时发生错误')
+      }
     },
 
     handleChange(info) {
@@ -182,7 +254,8 @@ export default defineComponent({
     }
   },
   components: {
-    UserOutlined
+    UserOutlined,
+    ADatePicker: DatePicker
   },
   mounted() {
 

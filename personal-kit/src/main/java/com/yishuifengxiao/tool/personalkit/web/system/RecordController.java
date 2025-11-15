@@ -4,6 +4,7 @@ import com.yishuifengxiao.common.security.support.Strategy;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.entity.HttpLog;
+import com.yishuifengxiao.tool.personalkit.domain.request.HttpLogReq;
 import com.yishuifengxiao.tool.personalkit.domain.request.RecordReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.SysSecurityRecordVo;
 import com.yishuifengxiao.tool.personalkit.service.RecordService;
@@ -61,7 +62,7 @@ public class RecordController {
 
 
     @PostMapping("/personal/visit/page")
-    public Page<HttpLog> visitRecord(@RequestBody PageQuery<HttpLog> param) {
+    public Page<HttpLog> visitRecord(@RequestBody PageQuery<HttpLogReq> param) {
 
 
         return recordService.findPageVisitRecord(param);

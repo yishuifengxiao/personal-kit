@@ -70,7 +70,7 @@ public class SysUserDao {
         List<String> roles = null == roleIds ? null : roleIds.stream().filter(StringUtils::isNotBlank).toList();
         UserQuery userQuery = query.query().orElse(new UserQuery());
         UserStat userStat = UserStat.code(userQuery.getStat()).orElse(null);
-        Page<SysUser> page = JdbcUtil.jdbcHelper().findPage(SysUser.class, query, params -> {
+        Page<SysUser> page = JdbcUtil.jdbcHelper().find(SysUser.class, query, params -> {
             String sql = """
                     SELECT u.* from sys_user u  where u.ver=0
                     """;
@@ -89,6 +89,10 @@ public class SysUserDao {
             if (StringUtils.isNotBlank(userQuery.getEmail())) {
                 sql += " AND u.email LIKE  concat('%', :email, '%')";
                 params.put("email", userQuery.getEmail());
+            }
+            if (StringUtils.isNotBlank(userQuery.getCertNo())) {
+                sql += " AND u.cert_no LIKE  concat('%', :certNo, '%')";
+                params.put("certNo", userQuery.getCertNo());
             }
             if (null != userStat) {
                 sql += " AND u.stat = " + userStat.code();

@@ -24,7 +24,7 @@ spring:
     #    password: "Yishui@36"
     #    url: jdbc:mysql://47.97.30.247:3306/personkit?useUnicode=true&characterEncoding=UTF-8&pinGlobalTxToPhysicalConnection=true&useSSL=false&createDatabaseIfNotExist=true
     #    password: "123456ss"
-    url: jdbc:mysql://localhost:3306/personkit?useUnicode=true&characterEncoding=UTF-8&pinGlobalTxToPhysicalConnection=true&useSSL=false&createDatabaseIfNotExist=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/personkit?useUnicode=true&characterEncoding=UTF-8&pinGlobalTxToPhysicalConnection=true&useSSL=false&createDatabaseIfNotExist=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&useServerPrepStmts=false&cachePrepStmts=false
     username: root
     password: "123456"
     #https://cloud.tencent.com/developer/article/1707872
