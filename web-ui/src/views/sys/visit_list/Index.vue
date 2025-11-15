@@ -23,10 +23,6 @@
         </a-input>
       </a-form-item>
 
-      <a-form-item label="结果" name="phone">
-        <a-input allowClear v-model:value="formState.phone" placeholder="手机号，模糊查询">
-        </a-input>
-      </a-form-item>
 
       <a-form-item>
         <a-button type="primary" html-type="submit"> 搜索 </a-button>

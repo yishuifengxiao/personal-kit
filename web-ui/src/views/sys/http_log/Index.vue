@@ -24,23 +24,9 @@
         </a-input>
       </a-form-item>
 
-      <a-form-item label="最小耗时" name="email" class="input">
-        <a-input-number allowClear v-model:value="formState.email" placeholder="最小耗时，单位毫秒">
-        </a-input-number>
-      </a-form-item>
-      <a-form-item label="最大耗时" name="email" class="input">
-        <a-input-number allowClear v-model:value="formState.email" placeholder="最大耗时，单位毫秒">
-        </a-input-number>
-      </a-form-item>
 
-      <a-form-item label="状态" name="stat" class="input">
-        <a-select
-          allowClear
-          placeholder="状态"
-          v-model:value="formState.stat"
-          :options="userStatusOptions"
-        ></a-select>
-      </a-form-item>
+
+    
 
       <a-space class="input">
         <a-button type="primary" html-type="submit"> 搜索 </a-button>
