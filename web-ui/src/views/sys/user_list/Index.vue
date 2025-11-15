@@ -296,7 +296,10 @@ export default defineComponent({
           }
         })
         .then((res) => {
-          this.roleSource = reactive(res.data)
+          this.roleSource = res.data.map(role => ({
+            label: role.name,
+            value: role.id
+          }))
         })
         .catch((err) => {
           console.error(err)
@@ -465,7 +468,8 @@ export default defineComponent({
     UserOutlined
   },
   mounted() {
-   
+    // 初始化角色数据
+    this.handleRoleSearch('')
     this.query()
   },
   setup() {
