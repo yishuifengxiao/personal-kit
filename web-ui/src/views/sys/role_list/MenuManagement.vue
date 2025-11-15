@@ -91,7 +91,7 @@
             onSelectAll: onSelectAll,
             checkStrictly: true
           }" :row-class-name="getRowClassName" :scroll="{ x: 1000, y: 'calc(100vh - 380px)' }" :loading="loading"
-            :row-key="(record) => record.id" bordered class="menu-table">
+            :row-key="(record) => record.id" class="menu-table">
             <template #bodyCell="{ column, record }">
               <template v-if="column.dataIndex === 'selectionStatus'">
                 <a-tag v-if="isSelected(record)" color="blue">已选中</a-tag>

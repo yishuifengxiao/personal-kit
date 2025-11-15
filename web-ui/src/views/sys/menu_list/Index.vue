@@ -28,7 +28,7 @@
     <div class="table-container">
       <!-- 表格区 -->
       <a-table :columns="columns" :data-source="tableData" :pagination="false" :scroll="{ x: 1500, y: tableHeight }"
-        size="small" :row-selection="rowSelection" :expandable="expandable" :row-key="(record) => record.id"
+        size="small"  :expandable="expandable" :row-key="(record) => record.id"
         :row-class-name="getRowClassName">
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'action'">
@@ -802,27 +802,27 @@ export default defineComponent({
 }
 
 .table-container {
-  // 添加边框和圆角
-  border: 1px solid #f0f0f0;
-  border-radius: 6px;
-  // 添加内边距
-  padding: 8px;
-  // 设置背景色
-  background-color: #fff;
-  // 添加阴影效果
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.03),
-    0 1px 6px -1px rgba(0, 0, 0, 0.02),
-    0 2px 4px rgba(0, 0, 0, 0.02);
+  // // 添加边框和圆角
+  // border: 1px solid #f0f0f0;
+  // border-radius: 6px;
+  // // 添加内边距
+  // padding: 8px;
+  // // 设置背景色
+  // background-color: #fff;
+  // // 添加阴影效果
+  // box-shadow:
+  //   0 1px 2px rgba(0, 0, 0, 0.03),
+  //   0 1px 6px -1px rgba(0, 0, 0, 0.02),
+  //   0 2px 4px rgba(0, 0, 0, 0.02);
 
-  // 确保表格在容器内正确显示
-  :deep(.ant-table) {
-    border-radius: 4px;
-  }
+  // // 确保表格在容器内正确显示
+  // :deep(.ant-table) {
+  //   border-radius: 4px;
+  // }
 
-  :deep(.ant-table-container) {
-    border-radius: 4px;
-  }
+  // :deep(.ant-table-container) {
+  //   border-radius: 4px;
+  // }
 
   // 所需权限列样式
   :deep(.permission-urls) {

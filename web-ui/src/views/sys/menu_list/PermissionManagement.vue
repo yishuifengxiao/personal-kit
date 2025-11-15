@@ -104,7 +104,6 @@
             :scroll="{ x: 1000, y: 'calc(100vh - 380px)' }"
             :loading="loading"
             :row-key="(record) => record.id"
-            bordered
             class="permission-table"
           >
             <template #bodyCell="{ column, record }">
