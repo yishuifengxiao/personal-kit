@@ -42,7 +42,13 @@
             </template>
             <!-- 非叶子节点不显示操作按钮 -->
             <template v-else>
-              <span style="color: #999">-</span>
+            <a-space>
+                <a-button type="link" @click="showEditModal(record)">编辑</a-button>
+      
+                <a-button v-if="record.stat === 1" type="link" danger
+                  @click="handleToggleStatus(record, 0)">禁用</a-button>
+                <a-button v-else type="link" @click="handleToggleStatus(record, 1)">启用</a-button>
+              </a-space>
             </template>
           </template>
 
