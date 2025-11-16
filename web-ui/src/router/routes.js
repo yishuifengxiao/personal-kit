@@ -191,6 +191,15 @@ const routes = [
         }
       },
       {
+        path: 'personal_cloud',
+        name: 'personal_cloud',
+        component: () => import('@/views/personal_cloud/Index.vue'),
+        meta: {
+          label: '个人云',
+          breadcrumbName: ['在线网盘','个人云', '文件管理']
+        }
+      },
+      {
         path: 'http_log',
         name: 'http_log',
         component: () => import('@/views/sys/http_log/Index.vue'),
