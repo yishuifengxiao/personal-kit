@@ -76,17 +76,26 @@
               <h3>深入了解</h3>
             </div>
             <div class="insight-content">
-              <div class="insight-item">
-                <h4><a href="https://developer.mozilla.org/zh-CN/docs/Web" target="_blank" rel="noopener noreferrer">相关技术</a></h4>
-                <p>基于您的搜索结果，推荐了解更多相关技术栈和工具。</p>
+              <div class="insight-item" v-for="item in insightData.items" :key="item.id">
+                <h4><a :href="item.url" target="_blank" rel="noopener noreferrer">{{ item.icon }} {{ item.title }}</a></h4>
+                <p>{{ item.description }}</p>
               </div>
-              <div class="insight-item">
-                <h4><a href="https://roadmap.sh/" target="_blank" rel="noopener noreferrer">学习路径</a></h4>
-                <p>探索系统化的学习路径，从基础到高级逐步掌握核心概念。</p>
-              </div>
-              <div class="insight-item">
-                <h4><a href="https://github.com/" target="_blank" rel="noopener noreferrer">最佳实践</a></h4>
-                <p>了解行业最佳实践，提升开发效率和代码质量。</p>
+            </div>
+          </div>
+          
+          <!-- 事件脉络区域 -->
+          <div class="timeline-section">
+            <div class="timeline-header">
+              <h3>事件脉络</h3>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-item" v-for="event in timelineData.events" :key="event.id" :class="'timeline-item--' + event.type">
+                <div class="timeline-date">{{ event.date }}</div>
+                <div class="timeline-dot"></div>
+                <div class="timeline-info">
+                  <h4>{{ event.title }}</h4>
+                  <p>{{ event.description }}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -141,6 +150,74 @@ export default defineComponent({
     const searchTime = ref(0)
     const currentPage = ref(1)
     const pageSize = ref(10)
+
+    // 深入了解区域数据
+    const insightData = ref({
+      items: [
+        {
+          id: 1,
+          title: '相关技术',
+          description: '基于您的搜索结果，推荐了解更多相关技术栈和工具。',
+          url: 'https://developer.mozilla.org/zh-CN/docs/Web',
+          icon: '🔧'
+        },
+        {
+          id: 2,
+          title: '学习路径',
+          description: '探索系统化的学习路径，从基础到高级逐步掌握核心概念。',
+          url: 'https://roadmap.sh/',
+          icon: '📚'
+        },
+        {
+          id: 3,
+          title: '最佳实践',
+          description: '了解行业最佳实践，提升开发效率和代码质量。',
+          url: 'https://github.com/',
+          icon: '⭐'
+        }
+      ]
+    })
+
+    // 时间脉络数据
+    const timelineData = ref({
+      events: [
+        {
+          id: 1,
+          date: '2024-01',
+          title: 'Vue 3.4 发布',
+          description: 'Vue 3.4 版本发布，带来更好的性能和开发体验',
+          type: 'release'
+        },
+        {
+          id: 2,
+          date: '2023-12',
+          title: 'Vite 5.0 发布',
+          description: 'Vite 5.0 带来更快的构建速度和更好的开发体验',
+          type: 'release'
+        },
+        {
+          id: 3,
+          date: '2023-11',
+          title: 'React 18 普及',
+          description: 'React 18 的新特性被更多项目采用',
+          type: 'trend'
+        },
+        {
+          id: 4,
+          date: '2023-10',
+          title: 'TypeScript 5.0',
+          description: 'TypeScript 5.0 发布，带来装饰器和更好的类型推断',
+          type: 'release'
+        },
+        {
+          id: 5,
+          date: '2023-09',
+          title: 'AI 编程工具兴起',
+          description: 'GitHub Copilot 等 AI 编程工具开始普及',
+          type: 'trend'
+        }
+      ]
+    })
 
     // 模拟搜索结果数据
     const mockResults = [
@@ -351,6 +428,8 @@ export default defineComponent({
       searchTime,
       currentPage,
       pageSize,
+      insightData,
+      timelineData,
       handleSearch,
       handlePageChange,
       openResult,
@@ -911,6 +990,111 @@ export default defineComponent({
 .loading-container {
   text-align: center;
   padding: 80px 20px;
+}
+
+/* 事件脉络区域样式 */
+.timeline-section {
+  margin-top: 16px;
+}
+
+.timeline-header {
+  margin-bottom: 12px;
+}
+
+.timeline-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.timeline-content {
+  position: relative;
+  padding-left: 16px;
+}
+
+.timeline-content::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #e0e0e0;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.timeline-item:last-child::after {
+  display: none;
+}
+
+.timeline-item::after {
+  content: '';
+  position: absolute;
+  left: -12px;
+  bottom: 0;
+  width: 1px;
+  height: 12px;
+  background: #e0e0e0;
+}
+
+.timeline-date {
+  font-size: 11px;
+  color: #999;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -16px;
+  top: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1890ff;
+  border: 1px solid #ffffff;
+  box-shadow: 0 0 0 1px #e0e0e0;
+  z-index: 2;
+}
+
+.timeline-item--milestone .timeline-dot {
+  background: #52c41a;
+  box-shadow: 0 0 0 1px #b7eb8f;
+}
+
+.timeline-item--update .timeline-dot {
+  background: #fa8c16;
+  box-shadow: 0 0 0 1px #ffd591;
+}
+
+.timeline-item--release .timeline-dot {
+  background: #722ed1;
+  box-shadow: 0 0 0 1px #d3adf7;
+}
+
+.timeline-info h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.timeline-info p {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.4;
+  margin: 0;
 }
 
 /* 响应式设计 */
