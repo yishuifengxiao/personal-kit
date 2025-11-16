@@ -509,7 +509,6 @@ export default {
 
 <style scoped>
 .transport-list-container {
-  padding: 24px;
   background: #fff;
   min-height: 100%;
 }
@@ -518,10 +517,9 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  padding: 16px;
-  background: #f5f5f5;
-  border-radius: 6px;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  background-color: #fafafa;
 }
 
 .toolbar-left {
@@ -587,15 +585,11 @@ export default {
 
 .transport-list {
   background: #fff;
-  border-radius: 6px;
+  padding: 24px;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .transport-list-container {
-    padding: 16px;
-  }
-  
   .toolbar {
     flex-direction: column;
     gap: 12px;
