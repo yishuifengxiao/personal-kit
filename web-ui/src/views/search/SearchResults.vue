@@ -32,7 +32,7 @@
             </a-form-item>
           </a-form>
         </div>
-      </div>
+        </div>
       </div>
 
       <div class="results-container">
@@ -341,7 +341,7 @@ export default defineComponent({
   padding: 0 20px;
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 20px;
 }
 
 .logo-section {
@@ -355,6 +355,8 @@ export default defineComponent({
   margin: 0;
   cursor: pointer;
   transition: color 0.3s ease;
+  height: 44px;
+  line-height: 44px;
 }
 
 .logo:hover {
@@ -362,15 +364,17 @@ export default defineComponent({
 }
 
 .search-form-container {
-  margin-bottom: 30px;
+  flex: 1;
+  margin-bottom: 0;
 }
 
 .search-form {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: 0;
   width: 100%;
+  max-width: 700px;
 }
 
 .search-form .ant-form-item {
@@ -378,7 +382,7 @@ export default defineComponent({
 }
 
 .search-input {
-  width: 600px;
+  width: 500px;
   height: 44px;
   border: 2px solid #c4c7ce;
   border-right: none;
@@ -390,7 +394,6 @@ export default defineComponent({
   outline: none;
   box-shadow: none;
   color: #222222;
-  margin: 0 auto;
 }
 
 .search-input:focus {
@@ -608,11 +611,23 @@ export default defineComponent({
     flex-direction: column;
     gap: 8px;
   }
+  
+  .logo {
+    height: auto;
+    line-height: normal;
+  }
 }
 
 @media (max-width: 480px) {
+  .search-bar-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
   .logo {
     font-size: 1.5rem;
+    height: auto;
+    line-height: normal;
   }
   
   .search-content {
