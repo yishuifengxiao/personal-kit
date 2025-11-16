@@ -378,7 +378,6 @@ export default defineComponent({
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .search-header-content {
@@ -458,13 +457,12 @@ export default defineComponent({
 .results-stats-container {
   background: #ffffff;
   padding: 16px 0;
-  border-bottom: 1px solid #f0f0f0;
 }
 
 .results-stats-content {
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 32px;
   font-size: 14px;
   color: #666;
 }
@@ -482,11 +480,11 @@ export default defineComponent({
 }
 
 .main-content-wrapper {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 32px;
   display: flex;
-  gap: 24px;
+  gap: 60px;
   align-items: flex-start;
 }
 
@@ -503,14 +501,6 @@ export default defineComponent({
   padding: 20px;
   margin-bottom: 16px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-}
-
-.result-item:hover {
-  border-color: #1890ff;
-  box-shadow: 0 4px 16px rgba(24, 144, 255, 0.15);
-  transform: translateY(-2px);
 }
 
 .result-title {
@@ -564,18 +554,18 @@ export default defineComponent({
 
 /* 右侧深入了解区域 */
  .deep-insight-section {
-   width: 320px;
+   width: 380px;
    flex-shrink: 0;
    position: sticky;
    top: 120px;
  }
  
  .deep-insight {
-   background: #ffffff;
-   border: 1px solid #f0f0f0;
-   border-radius: 8px;
-   padding: 24px;
-   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+   background: transparent;
+   border: none;
+   border-radius: 0;
+   padding: 0;
+   box-shadow: none;
  }
  
  .insight-header h3 {
@@ -583,8 +573,8 @@ export default defineComponent({
    font-weight: 600;
    color: #333;
    margin-bottom: 20px;
-   padding-bottom: 12px;
-   border-bottom: 2px solid #1890ff;
+   padding-bottom: 0;
+   border-bottom: none;
  }
  
  .insight-content {
@@ -791,14 +781,14 @@ export default defineComponent({
   margin-bottom: 20px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+ 
   backdrop-filter: blur(10px);
 }
 
 .result-item:hover {
   background: rgba(255, 255, 255, 1);
   border-color: rgba(74, 144, 226, 0.3);
-  box-shadow: 0 8px 32px rgba(74, 144, 226, 0.15);
+
   transform: translateY(-4px) scale(1.01);
 }
 
@@ -861,15 +851,16 @@ export default defineComponent({
 }
 
 .results-pagination {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: transparent;
-  padding: 0;
-  border-radius: 0;
-  box-shadow: none;
-}
+   position: fixed;
+   bottom: 30px;
+   left: 50%;
+   transform: translateX(-50%);
+   background: transparent;
+   padding: 0;
+   border-radius: 0;
+   box-shadow: none;
+   z-index: 100;
+ }
 
 .no-results {
   text-align: center;
