@@ -209,6 +209,15 @@ const routes = [
         }
       },
       {
+        path: 'my_share',
+        name: 'my_share',
+        component: () => import('@/views/personal_cloud/MyShare.vue'),
+        meta: {
+          label: '我的分享',
+          breadcrumbName: ['在线网盘','个人云', '我的分享']
+        }
+      },
+      {
         path: 'http_log',
         name: 'http_log',
         component: () => import('@/views/sys/http_log/Index.vue'),

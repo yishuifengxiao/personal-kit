@@ -28,6 +28,10 @@
             <template #icon><SwapOutlined /></template>
             传输列表
           </a-button>
+          <a-button @click="$router.push({ name: 'my_share' })">
+            <template #icon><ShareAltOutlined /></template>
+            我的分享
+          </a-button>
         </div>
       </div>
       
@@ -188,6 +192,7 @@ import {
   FolderAddOutlined,
   ReloadOutlined,
   SwapOutlined,
+  ShareAltOutlined,
   FolderTwoTone,
   FileTwoTone,
   FileImageTwoTone,
@@ -210,6 +215,7 @@ export default {
     FolderAddOutlined,
     ReloadOutlined,
     SwapOutlined,
+    ShareAltOutlined,
     FolderTwoTone,
     FileTwoTone,
     FileImageTwoTone,
