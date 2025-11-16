@@ -54,11 +54,11 @@
         >
           <!-- 文件缩略图 -->
           <div class="file-thumbnail">
-            <FolderOutlined v-if="file.type === 'folder'" class="file-icon folder-icon" />
-            <FileImageOutlined v-else-if="isImage(file.name)" class="file-icon image-icon" />
-            <FileTextOutlined v-else-if="isText(file.name)" class="file-icon text-icon" />
-            <FilePdfOutlined v-else-if="isPDF(file.name)" class="file-icon pdf-icon" />
-            <FileOutlined v-else class="file-icon file-icon" />
+            <FolderTwoTone v-if="file.type === 'folder'" class="file-icon folder-icon" two-tone-color="#1890ff" />
+            <FileImageTwoTone v-else-if="isImage(file.name)" class="file-icon image-icon" two-tone-color="#52c41a" />
+            <FileTextTwoTone v-else-if="isText(file.name)" class="file-icon text-icon" two-tone-color="#722ed1" />
+            <FilePdfTwoTone v-else-if="isPDF(file.name)" class="file-icon pdf-icon" two-tone-color="#ff4d4f" />
+            <FileTwoTone v-else class="file-icon file-icon" two-tone-color="#fa8c16" />
           </div>
           
           <!-- 文件信息 -->
@@ -183,11 +183,11 @@ import {
   UploadOutlined,
   FolderAddOutlined,
   ReloadOutlined,
-  FolderOutlined,
-  FileOutlined,
-  FileImageOutlined,
-  FileTextOutlined,
-  FilePdfOutlined,
+  FolderTwoTone,
+  FileTwoTone,
+  FileImageTwoTone,
+  FileTextTwoTone,
+  FilePdfTwoTone,
   FolderOpenOutlined,
   DownloadOutlined,
   CopyOutlined,
@@ -204,11 +204,11 @@ export default {
     UploadOutlined,
     FolderAddOutlined,
     ReloadOutlined,
-    FolderOutlined,
-    FileOutlined,
-    FileImageOutlined,
-    FileTextOutlined,
-    FilePdfOutlined,
+    FolderTwoTone,
+    FileTwoTone,
+    FileImageTwoTone,
+    FileTextTwoTone,
+    FilePdfTwoTone,
     FolderOpenOutlined,
     DownloadOutlined,
     CopyOutlined,
@@ -734,7 +734,7 @@ export default {
 }
 
 .file-icon {
-  color: #8c8c8c;
+  color: #fa8c16;
 }
 
 /* 文件信息 */
