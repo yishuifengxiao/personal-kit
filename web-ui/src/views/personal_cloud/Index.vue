@@ -64,10 +64,13 @@
           <!-- 文件信息 -->
           <div class="file-info">
             <div class="file-name" :title="file.name">{{ file.name }}</div>
-            <div class="file-meta">
-              <div v-if="file.type !== 'folder'">{{ formatFileSize(file.size) }}</div>
-              <div>{{ formatDate(file.updatedAt) }}</div>
-            </div>
+          </div>
+          
+          <!-- 悬停时显示的详细信息 -->
+          <div class="file-hover-info">
+            <div class="hover-file-name">{{ file.name }}</div>
+            <div v-if="file.type !== 'folder'" class="hover-file-size">{{ formatFileSize(file.size) }}</div>
+            <div class="hover-file-date">{{ formatDate(file.updatedAt) }}</div>
           </div>
         </div>
       </div>
@@ -250,7 +253,7 @@ export default {
       },
       {
         id: 4,
-        name: '会议记录.txt',
+        name: '会议记录AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.txt',
         type: 'file',
         size: 10240,
         updatedAt: '2024-01-12 14:30:00',
@@ -674,44 +677,44 @@ export default {
 /* 文件项样式 */
 .file-grid-item {
   background: #fff;
-  border: 1px solid #e8e8e8;
+  border: none;
   border-radius: 8px;
-  padding: 16px;
+  padding: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  min-height: 140px;
+  min-height: 120px;
+  position: relative;
 }
 
 .file-grid-item:hover {
-  border-color: #1890ff;
-  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
+  background-color: #f5f5f5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
 
 .file-grid-item.selected {
-  border-color: #1890ff;
   background-color: #e6f7ff;
   box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
 }
 
 /* 文件缩略图 */
 .file-thumbnail {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 64px;
-  width: 64px;
-  border-radius: 8px;
+  height: 48px;
+  width: 48px;
+  border-radius: 6px;
   background-color: #f5f5f5;
 }
 
 .file-icon {
-  font-size: 32px;
+  font-size: 24px;
 }
 
 .folder-icon {
@@ -740,17 +743,56 @@ export default {
 }
 
 .file-name {
-  font-size: 14px;
+  font-size: 13px;
   color: #262626;
-  margin-bottom: 4px;
-  word-break: break-all;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  margin-bottom: 0;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.4;
-  max-height: 2.8em;
+  max-width: 100%;
+}
+
+/* 悬停时显示的详细信息 */
+.file-hover-info {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 8px;
+  border-radius: 6px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+  pointer-events: none;
+  max-width: 100%;
+}
+
+.file-grid-item:hover .file-hover-info {
+  opacity: 1;
+  visibility: visible;
+}
+
+.hover-file-name {
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hover-file-size,
+.hover-file-date {
+  font-size: 11px;
+  opacity: 0.9;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .file-meta {
@@ -818,34 +860,47 @@ export default {
   }
   
   .file-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 12px;
   }
   
   .file-grid-item {
-    padding: 12px;
-    min-height: 120px;
+    padding: 10px;
+    min-height: 100px;
   }
   
   .file-thumbnail {
-    height: 48px;
-    width: 48px;
+    height: 40px;
+    width: 40px;
   }
   
   .file-icon {
-    font-size: 24px;
+    font-size: 20px;
+  }
+  
+  .file-name {
+    font-size: 12px;
   }
 }
 
 @media (max-width: 480px) {
   .file-grid {
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
     gap: 8px;
   }
   
   .file-grid-item {
     padding: 8px;
-    min-height: 100px;
+    min-height: 90px;
+  }
+  
+  .file-thumbnail {
+    height: 36px;
+    width: 36px;
+  }
+  
+  .file-icon {
+    font-size: 18px;
   }
 }
 </style>
