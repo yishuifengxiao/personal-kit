@@ -102,6 +102,15 @@ const routes = [
         meta: { title: '抓取数据详情' }
       },
       {
+        path: 'spider_task',
+        name: 'spider_task',
+        component: () => import('@/views/spider_task/SpiderTask.vue'),
+        meta: {
+          label: '任务总览',
+          breadcrumbName: ['知识图谱', '任务总览']
+        }
+      },
+      {
         path: 'spider_data',
         name: 'spider_data',
         component: () => import('@/views/spider_data/SpiderData.vue'),
