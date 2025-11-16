@@ -1,5 +1,5 @@
 <template>
-  <div class="search-results" :style="{ backgroundImage: 'url(' + backgroundImage + ')' }">
+  <div class="search-results">
     <div class="results-content">
       <div class="results-header">
         <div class="search-bar-container">
@@ -9,7 +9,7 @@
           <div class="search-bar">
             <a-input 
               v-model:value="searchQuery" 
-              placeholder="请输入搜索关键词..."
+              placeholder="请输入搜索关键词"
               size="large"
               allowClear
               @pressEnter="handleSearch"
@@ -26,8 +26,7 @@
               class="search-btn"
               :loading="searchLoading"
             >
-              <SearchOutlined />
-              搜索
+              拾光一下
             </a-button>
           </div>
         </div>
@@ -89,7 +88,6 @@
 import { defineComponent, ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { SearchOutlined } from '@ant-design/icons-vue'
-import backgroundImage from '@/assets/backgroup/login-bg.png'
 
 export default defineComponent({
   name: 'SearchResults',
@@ -254,7 +252,6 @@ export default defineComponent({
     })
 
     return {
-      backgroundImage,
       searchQuery,
       searchLoading,
       searchResults,
@@ -273,21 +270,18 @@ export default defineComponent({
 
 <style scoped>
 .search-results {
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
   min-height: 100vh;
-  background-attachment: fixed;
+  background: #ffffff;
 }
 
 .results-content {
-  background: rgba(255, 255, 255, 0.95);
   min-height: 100vh;
+  background: #ffffff;
 }
 
 .results-header {
   background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #f0f0f0;
   padding: 20px 0;
   position: sticky;
   top: 0;
@@ -332,42 +326,49 @@ export default defineComponent({
 }
 
 .search-input :deep(.ant-input) {
-  border-radius: 25px;
+  border-radius: 10px;
   padding-left: 45px;
   padding-right: 20px;
   font-size: 16px;
-  border: 2px solid #e8e8e8;
+  border: 2px solid #e0e0e0;
   transition: all 0.3s ease;
+  height: 50px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .search-input :deep(.ant-input:focus) {
   border-color: #1890ff;
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  box-shadow: 0 2px 15px rgba(24, 144, 255, 0.3);
+  outline: none;
 }
 
 .search-input :deep(.ant-input-prefix) {
-  color: #1890ff;
+  color: #999;
   font-size: 18px;
   left: 15px;
 }
 
 .search-btn {
-  border-radius: 25px;
-  padding: 0 25px;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+  border-radius: 10px;
+  padding: 0 30px;
+  font-weight: 500;
+  height: 50px;
+  background: #1890ff;
+  border: none;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(24, 144, 255, 0.3);
 }
 
 .search-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(24, 144, 255, 0.4);
+  background: #40a9ff;
+  box-shadow: 0 4px 15px rgba(24, 144, 255, 0.4);
+  transform: translateY(-1px);
 }
 
 .results-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 30px 20px;
+  padding: 20px 20px;
 }
 
 .results-stats {
@@ -387,25 +388,23 @@ export default defineComponent({
 
 .result-item {
   background: white;
-  border: 1px solid #e8e8e8;
+  border: 1px solid #f0f0f0;
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .result-item:hover {
-  border-color: #1890ff;
-  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
-  transform: translateY(-2px);
+  background: #fafafa;
+  border-color: #e0e0e0;
 }
 
 .result-title {
   font-size: 18px;
-  font-weight: 600;
-  color: #1890ff;
+  font-weight: 400;
+  color: #1a0dab;
   margin-bottom: 8px;
   display: flex;
   align-items: center;
@@ -414,12 +413,12 @@ export default defineComponent({
 
 .result-icon {
   font-size: 14px;
-  color: #52c41a;
+  color: #006621;
 }
 
 .result-url {
   font-size: 14px;
-  color: #52c41a;
+  color: #006621;
   margin-bottom: 8px;
   word-break: break-all;
 }

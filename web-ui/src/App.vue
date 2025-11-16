@@ -16,5 +16,12 @@ body,
   max-height: 100vh !important;
   margin: 0px;
   padding: 0px;
+  overflow-x: hidden;
+}
+
+#app {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 </style>
