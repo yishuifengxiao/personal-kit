@@ -200,6 +200,15 @@ const routes = [
         }
       },
       {
+        path: 'transport_list',
+        name: 'transport_list',
+        component: () => import('@/views/personal_cloud/TransportList.vue'),
+        meta: {
+          label: '传输列表',
+          breadcrumbName: ['在线网盘','个人云', '传输列表']
+        }
+      },
+      {
         path: 'http_log',
         name: 'http_log',
         component: () => import('@/views/sys/http_log/Index.vue'),

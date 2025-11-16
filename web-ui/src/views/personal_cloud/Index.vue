@@ -24,6 +24,10 @@
             <template #icon><ReloadOutlined /></template>
             刷新
           </a-button>
+          <a-button @click="$router.push({ name: 'transport_list' })">
+            <template #icon><SwapOutlined /></template>
+            传输列表
+          </a-button>
         </div>
       </div>
       
@@ -183,6 +187,7 @@ import {
   UploadOutlined,
   FolderAddOutlined,
   ReloadOutlined,
+  SwapOutlined,
   FolderTwoTone,
   FileTwoTone,
   FileImageTwoTone,
@@ -204,6 +209,7 @@ export default {
     UploadOutlined,
     FolderAddOutlined,
     ReloadOutlined,
+    SwapOutlined,
     FolderTwoTone,
     FileTwoTone,
     FileImageTwoTone,
