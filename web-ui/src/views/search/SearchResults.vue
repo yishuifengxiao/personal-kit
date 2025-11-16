@@ -410,7 +410,7 @@ export default defineComponent({
       
       // 更新URL参数
       router.push({
-        name: 'search_results',
+        name: 'result',
         query: { q: searchQuery.value.trim(), page: 1 }
       })
     }
@@ -418,7 +418,7 @@ export default defineComponent({
     const handlePageChange = (page, pageSize) => {
       currentPage.value = page
       router.push({
-        name: 'search_results',
+        name: 'result',
         query: { q: searchQuery.value.trim(), page: page }
       })
       // 只更新搜索结果，不重新加载整个页面

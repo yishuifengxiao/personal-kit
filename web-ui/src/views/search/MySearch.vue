@@ -79,7 +79,7 @@ export default defineComponent({
       setTimeout(() => {
         searchLoading.value = false
         router.push({
-          name: 'search_results',
+          name: 'result',
           query: { q: searchQuery.value.trim() }
         })
       }, 500)
