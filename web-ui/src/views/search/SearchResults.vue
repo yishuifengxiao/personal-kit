@@ -79,8 +79,8 @@
           </div>
         </div>
 
-        <!-- 右侧深入了解区域 -->
-        <div class="deep-insight-section">
+        <!-- 右侧深入了解区域 - 只在有结果时显示 -->
+        <div class="deep-insight-section" v-if="searchResults.length > 0">
           <div class="deep-insight">
             <div class="insight-header">
               <h3>深入了解</h3>
@@ -633,6 +633,13 @@ export default defineComponent({
 /* 左侧搜索结果列表 */
   .results-list-section {
     flex: 1;
+  }
+  
+  /* 无结果时左侧区域全宽显示 */
+  .no-results {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
   }
 
 .result-item {
