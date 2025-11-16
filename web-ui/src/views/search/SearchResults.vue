@@ -624,6 +624,7 @@ export default defineComponent({
   display: flex;
         gap: 60px;
         align-items: flex-start;
+        margin-bottom: 20px;
 }
 
 /* 左侧搜索结果列表 */
@@ -744,17 +745,16 @@ export default defineComponent({
 
 /* 分页区域 */
 .pagination-container {
-  position: fixed;
+  position: sticky;
   bottom: 0;
-  left: 0;
-  right: 0;
   background: #ffffff;
   padding: 16px 0;
   display: flex;
   justify-content: center;
   align-items: center;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
-  z-index: 100;
+  z-index: 10;
+  margin-top: 40px;
 }
 
 /* 无结果提示 */
