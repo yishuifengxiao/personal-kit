@@ -102,6 +102,15 @@ const routes = [
         meta: { title: '抓取数据详情' }
       },
       {
+        path: 'spider_data',
+        name: 'spider_data',
+        component: () => import('@/views/spider_data/SpiderData.vue'),
+        meta: {
+          label: '数据仓库',
+          breadcrumbName: ['知识图谱', '数据仓库']
+        }
+      },
+      {
         path: 'add_spider',
         name: 'add_spider',
         component: () => import('@/views/spider/AddSpider.vue'),
