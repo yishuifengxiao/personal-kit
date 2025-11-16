@@ -77,15 +77,15 @@
             </div>
             <div class="insight-content">
               <div class="insight-item">
-                <h4>相关技术</h4>
+                <h4><a href="https://developer.mozilla.org/zh-CN/docs/Web" target="_blank" rel="noopener noreferrer">相关技术</a></h4>
                 <p>基于您的搜索结果，推荐了解更多相关技术栈和工具。</p>
               </div>
               <div class="insight-item">
-                <h4>学习路径</h4>
+                <h4><a href="https://roadmap.sh/" target="_blank" rel="noopener noreferrer">学习路径</a></h4>
                 <p>探索系统化的学习路径，从基础到高级逐步掌握核心概念。</p>
               </div>
               <div class="insight-item">
-                <h4>最佳实践</h4>
+                <h4><a href="https://github.com/" target="_blank" rel="noopener noreferrer">最佳实践</a></h4>
                 <p>了解行业最佳实践，提升开发效率和代码质量。</p>
               </div>
             </div>
@@ -678,6 +678,17 @@ export default defineComponent({
    text-align: left;
  }
 
+.insight-header h3 a {
+   color: #333;
+   text-decoration: none;
+   transition: color 0.3s ease;
+ }
+
+.insight-header h3 a:hover {
+   color: #4a90e2;
+   text-decoration: underline;
+ }
+
 .insight-content {
   display: flex;
   flex-direction: column;
@@ -689,6 +700,17 @@ export default defineComponent({
    font-weight: 600;
    color: #333;
    margin-bottom: 8px;
+ }
+
+.insight-item h4 a {
+   color: #333;
+   text-decoration: none;
+   transition: color 0.3s ease;
+ }
+
+.insight-item h4 a:hover {
+   color: #4a90e2;
+   text-decoration: underline;
  }
  
  .insight-item p {
