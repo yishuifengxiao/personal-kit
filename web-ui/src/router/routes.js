@@ -351,7 +351,7 @@ const routes = [
       {
         path: 'search_source',
         name: 'search_source',
-        component: () => import('@/views/sys/search_source/Index.vue'),
+        component: () => import('@/views/search_source/Index.vue'),
         meta: {
           label: '搜索数据源管理',
           breadcrumbName: ['系统管理', '时光搜索', '数据源管理']
@@ -360,7 +360,7 @@ const routes = [
       {
         path: 'my_search',
         name: 'my_search',
-        component: () => import('@/views/sys/search_source/Index.vue'),
+        component: () => import('@/views/search_source/Index.vue'),
         meta: {
           label: '时光搜索',
           breadcrumbName: ['系统管理', '时光搜索']
