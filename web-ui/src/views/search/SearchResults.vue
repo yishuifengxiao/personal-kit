@@ -48,13 +48,12 @@
             v-for="result in searchResults" 
             :key="result.id"
             class="result-item"
-            @click="openResult(result.url)"
           >
             <div class="result-title">
               <a-icon type="link" class="result-icon" />
               {{ result.title }}
             </div>
-            <div class="result-url">{{ result.url }}</div>
+            <div class="result-url" @click="openResult(result.url)" style="cursor: pointer; color: #006621;">{{ result.url }}</div>
             <div class="result-description">{{ result.description }}</div>
             <div class="result-meta">
               <span class="result-date">{{ result.date }}</span>
@@ -500,7 +499,6 @@ export default defineComponent({
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 16px;
-  cursor: pointer;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
 }
@@ -526,6 +524,13 @@ export default defineComponent({
   color: #006621;
   margin-bottom: 8px;
   word-break: break-all;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.result-url:hover {
+  color: #1a0dab;
 }
 
 .result-description {
@@ -601,11 +606,17 @@ export default defineComponent({
 
 /* 分页区域 */
 .pagination-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background: #ffffff;
-  padding: 32px 0;
+  padding: 16px 0;
   display: flex;
   justify-content: center;
   align-items: center;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+  z-index: 100;
 }
 
 /* 无结果提示 */
@@ -741,7 +752,7 @@ export default defineComponent({
 .results-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 0 80px;
+  padding: 20px 0 120px;
 }
 
 .results-content {
