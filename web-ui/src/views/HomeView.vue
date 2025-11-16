@@ -83,7 +83,8 @@
       <a-layout-sider width="200" style="background: #fff" class="sider">
         <!-- 左侧菜单 -->
         <a-menu v-model:selectedKeys="selectedLeftKeysSource" v-model:openKeys="openKeysSource" mode="inline"
-          :items="leftMenuSource" @select="onLeftMenuSelect" :style="{ height: '100%', borderRight: 0 }">
+          :items="leftMenuSource" @select="onLeftMenuSelect" :style="{ height: '100%', borderRight: 0 }"
+          :inlineCollapsed="false" :tooltip="false" :key="menuKey">
         </a-menu>
         <!-- 左侧菜单 -->
       </a-layout-sider>
@@ -212,12 +213,14 @@ export default defineComponent({
     const selectedTopKeys = 'knowledge_graph'
     const selectedLeftKeys = ''
     const openKeys = ''
+    const menuKey = Date.now() // 用于强制重新渲染菜单的key
     return {
       user,
       menu,
       selectedTopKeys,
       selectedLeftKeys,
       openKeys,
+      menuKey,
       userDetailVisible: false,
       userDetail: {},
       passwordModalVisible: false,
@@ -632,7 +635,8 @@ export default defineComponent({
     UserOutlined,
     DownOutlined,
     VerticalRightOutlined,
-    LogoutOutlined
+    LogoutOutlined,
+    SearchOutlined
   }
 })
 </script>

@@ -26,7 +26,7 @@ const routes = [
   },
   {
     path: '/my_search',
-    name: 'my_search',
+    name: 'root_my_search',
     component: () => import('@/views/search/MySearch.vue'),
     meta: {
       requiresAuth: false,
@@ -364,6 +364,15 @@ const routes = [
         meta: {
           label: '时光搜索',
           breadcrumbName: ['系统管理', '时光搜索']
+        }
+      },
+      {
+        path: 'search_analyze',
+        name: 'search_analyze',
+        component: () => import('@/views/sys/search_analyze/Index.vue'),
+        meta: {
+          label: '搜索分析',
+          breadcrumbName: ['系统管理', '搜索分析']
         }
       }
     ]

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>路由测试</title>
+</head>
+<body>
+    <h1>搜索分析页面路由测试</h1>
+    <p>请通过以下链接测试新页面：</p>
+    <ul>
+        <li><a href="http://localhost:3001/#/sys/search_analyze" target="_blank">搜索分析页面</a></li>
+        <li><a href="http://localhost:3001/sys/search_analyze" target="_blank">搜索分析页面（直接路径）</a></li>
+    </ul>
+    
+    <script>
+        // 简单的路由测试
+        function testRoute() {
+            const routes = [
+                'http://localhost:3001/#/sys/search_analyze',
+                'http://localhost:3001/sys/search_analyze'
+            ];
+            
+            routes.forEach(url => {
+                fetch(url, { method: 'HEAD' })
+                    .then(response => {
+                        console.log(`${url}: ${response.status}`);
+                    })
+                    .catch(error => {
+                        console.error(`${url}: ${error}`);
+                    });
+            });
+        }
+        
+        // 页面加载完成后测试
+        window.addEventListener('load', testRoute);
+    </script>
+</body>
+</html>
