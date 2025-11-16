@@ -1,1 +1,5 @@
 export { default as AllSpider } from './AllSpider.vue'
+export { default as SpiderRecords } from './SpiderRecords.vue'
+export { default as CrawlRecords } from './CrawlRecords.vue'
+export { default as AddSpider } from './AddSpider.vue'
+export { default as EditSpider } from './EditSpider.vue'

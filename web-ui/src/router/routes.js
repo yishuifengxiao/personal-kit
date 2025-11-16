@@ -73,6 +73,56 @@ const routes = [
         }
       },
       {
+        path: 'spider_records',
+        name: 'spider_records',
+        component: () => import('@/views/spider/SpiderRecords.vue'),
+        meta: {
+          label: '爬虫记录',
+          breadcrumbName: ['知识图谱', '爬虫记录']
+        }
+      },
+      {
+        path: 'crawl_records/:spiderId',
+        name: 'crawl_records',
+        component: () => import('@/views/spider/CrawlRecords.vue'),
+        meta: { title: '抓取记录' }
+      },
+      {
+        path: 'crawl_data/:spiderId',
+        name: 'crawl_data',
+        component: () => import('@/views/spider/CrawlData.vue'),
+        props: true,
+        meta: { title: '抓取数据' }
+      },
+      {
+        path: 'crawl_data/:spiderId/:recordId',
+        name: 'crawl_data_detail',
+        component: () => import('@/views/spider/CrawlDataDetail.vue'),
+        props: true,
+        meta: { title: '抓取数据详情' }
+      },
+      {
+        path: 'add_spider',
+        name: 'add_spider',
+        component: () => import('@/views/spider/AddSpider.vue'),
+        meta: {
+          label: '新增爬虫',
+          breadcrumbName: ['知识图谱', '新增爬虫']
+        }
+      },
+      {
+        path: 'edit_spider',
+        name: 'edit_spider',
+        component: () => import('@/views/spider/EditSpider.vue'),
+        props: (route) => ({
+          id: route.query.id
+        }),
+        meta: {
+          label: '编辑爬虫',
+          breadcrumbName: ['知识图谱', '编辑爬虫']
+        }
+      },
+      {
         path: 'ont',
         name: 'ontology_management',
         component: () => import('@/views/kg/ont/Ont.vue'),

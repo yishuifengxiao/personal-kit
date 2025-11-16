@@ -72,6 +72,10 @@
                           <history-outlined />
                           操作记录
                         </a-menu-item>
+                        <a-menu-item key="crawlRecords">
+                          <file-text-outlined />
+                          抓取记录
+                        </a-menu-item>
                         <a-menu-item key="logs">
                           <file-text-outlined />
                           运行日志
@@ -136,120 +140,15 @@
         class="pagination-compact" />
     </div>
 
-    <!-- 添加爬虫弹窗 -->
-    <a-modal v-model:open="showAddSpiderModal" title="添加爬虫" @ok="handleAddSpider" @cancel="showAddSpiderModal = false">
-      <a-form :model="addSpiderForm" layout="vertical">
-        <a-form-item label="爬虫名称" required>
-          <a-input v-model:value="addSpiderForm.name" placeholder="请输入爬虫名称" />
-        </a-form-item>
-        <a-form-item label="爬虫描述">
-          <a-textarea v-model:value="addSpiderForm.description" placeholder="请输入爬虫描述" :rows="3" />
-        </a-form-item>
-        <a-form-item label="爬虫类型">
-          <a-select v-model:value="addSpiderForm.type" placeholder="请选择爬虫类型">
-            <a-select-option value="web">网页爬虫</a-select-option>
-            <a-select-option value="api">API爬虫</a-select-option>
-            <a-select-option value="file">文件爬虫</a-select-option>
-          </a-select>
-        </a-form-item>
-      </a-form>
-    </a-modal>
+    <!-- 操作记录、抓取记录、添加爬虫、编辑功能已改为独立页面 -->
 
-    <!-- 操作记录弹窗 -->
-    <a-modal v-model:open="showRecordsModal" title="操作记录" width="800px" @cancel="showRecordsModal = false">
-      <a-table :columns="recordColumns" :data-source="operationRecords" :pagination="false" size="small">
-        <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'result'">
-            <a-tag :color="record.result === '成功' ? 'success' : 'error'">
-              {{ record.result }}
-            </a-tag>
-          </template>
-        </template>
-      </a-table>
-    </a-modal>
 
-    <!-- 编辑爬虫弹窗 -->
-    <a-modal v-model:open="showEditModal" title="编辑爬虫" @ok="handleEditSpider" @cancel="showEditModal = false">
-      <a-form :model="editSpiderForm" layout="vertical">
-        <a-form-item label="爬虫名称" required>
-          <a-input v-model:value="editSpiderForm.name" placeholder="请输入爬虫名称" />
-        </a-form-item>
-        <a-form-item label="爬虫描述">
-          <a-textarea v-model:value="editSpiderForm.description" placeholder="请输入爬虫描述" :rows="3" />
-        </a-form-item>
-        <a-form-item label="爬虫配置">
-          <a-textarea v-model:value="editSpiderForm.config" placeholder="请输入爬虫配置（JSON格式）" :rows="6" />
-        </a-form-item>
-      </a-form>
-    </a-modal>
-
-    <!-- 抓取数据弹窗 -->
-    <a-modal v-model:open="showDataModal" title="抓取数据" width="900px" @cancel="showDataModal = false">
-      <div class="data-modal-header">
-        <a-space>
-          <a-button type="primary" size="small" @click="exportData">
-            <download-outlined />
-            导出数据
-          </a-button>
-          <a-popconfirm title="确定要清空所有数据吗？" @confirm="clearAllData" okText="确定" cancelText="取消">
-            <a-button danger size="small">
-              <delete-outlined />
-              清空数据
-            </a-button>
-          </a-popconfirm>
-        </a-space>
-      </div>
-      <a-table :columns="dataColumns" :data-source="spiderDataList" :pagination="dataPagination" size="small">
-        <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'status'">
-            <a-tag :color="getDataStatusColor(record.status)">
-              {{ getDataStatusText(record.status) }}
-            </a-tag>
-          </template>
-          <template v-else-if="column.key === 'action'">
-            <a-space>
-              <a-button type="link" size="small" @click="viewDataDetail(record)">
-                查看详情
-              </a-button>
-              <a-popconfirm title="确定要删除这条数据吗？" @confirm="deleteData(record)" okText="确定" cancelText="取消">
-                <a-button type="link" danger size="small">
-                  删除
-                </a-button>
-              </a-popconfirm>
-            </a-space>
-          </template>
-        </template>
-      </a-table>
-    </a-modal>
-
-    <!-- 数据详情弹窗 -->
-    <a-modal v-model:open="showDataDetailModal" title="数据详情" width="600px" @cancel="showDataDetailModal = false">
-      <div class="data-detail-content">
-        <a-descriptions :column="1" size="small" bordered>
-          <a-descriptions-item label="数据ID">{{ currentDataDetail.id }}</a-descriptions-item>
-          <a-descriptions-item label="抓取时间">{{ formatTime(currentDataDetail.crawlTime) }}</a-descriptions-item>
-          <a-descriptions-item label="来源地址">
-            <a :href="currentDataDetail.sourceUrl" target="_blank">{{ currentDataDetail.sourceUrl }}</a>
-          </a-descriptions-item>
-          <a-descriptions-item label="数据状态">
-            <a-tag :color="getDataStatusColor(currentDataDetail.status)">
-              {{ getDataStatusText(currentDataDetail.status) }}
-            </a-tag>
-          </a-descriptions-item>
-        </a-descriptions>
-        <div class="data-content-section">
-          <div class="section-title">数据内容：</div>
-          <div class="data-content">
-            <pre>{{ JSON.stringify(currentDataDetail.content, null, 2) }}</pre>
-          </div>
-        </div>
-      </div>
-    </a-modal>
   </div>
 </template>
 
 <script>
 import { defineComponent, reactive, ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { message, Modal } from 'ant-design-vue'
 import {
   PlusOutlined,
@@ -289,6 +188,9 @@ export default defineComponent({
     DownloadOutlined
   },
   setup() {
+    // 路由
+    const router = useRouter()
+    
     // 搜索表单
     const searchForm = reactive({
       name: '',
@@ -302,27 +204,9 @@ export default defineComponent({
       pageSize: 12
     })
 
-    // 添加爬虫表单
-    const addSpiderForm = reactive({
-      name: '',
-      description: '',
-      type: 'web'
-    })
+    // 表单数据 - 已移除，改为独立页面
 
-    // 编辑爬虫表单
-    const editSpiderForm = reactive({
-      id: '',
-      name: '',
-      description: '',
-      config: ''
-    })
-
-    // 弹窗状态
-    const showAddSpiderModal = ref(false)
-    const showRecordsModal = ref(false)
-    const showEditModal = ref(false)
-    const showDataModal = ref(false)
-    const showDataDetailModal = ref(false)
+    // 弹窗状态 - 已移除，改为独立页面
 
     // 当前操作的数据
     const currentSpider = ref(null)
@@ -538,20 +422,31 @@ export default defineComponent({
           message.success(`爬虫 ${spider.name} 已重启`)
           break
         case 'records':
-          showRecordsModal.value = true
-          break
+            router.push({
+              path: '/view/spider_records',
+              query: { spiderId: spider.id, spiderName: spider.name }
+            })
+            break
+          case 'crawlRecords':
+            router.push({
+              path: `/view/crawl_records/${spider.id}`,
+              query: { spiderName: spider.name }
+            })
+            break
         case 'logs':
           message.info('运行日志功能开发中')
           break
         case 'data':
-          showDataModal.value = true
+          router.push({
+            path: `/view/crawl_data/${spider.id}`,
+            query: { spiderName: spider.name }
+          })
           break
         case 'edit':
-          editSpiderForm.id = spider.id
-          editSpiderForm.name = spider.name
-          editSpiderForm.description = spider.description
-          editSpiderForm.config = JSON.stringify({ url: 'https://example.com', timeout: 30 }, null, 2)
-          showEditModal.value = true
+          router.push({
+            path: '/view/edit_spider',
+            query: { id: spider.id }
+          })
           break
         case 'delete':
           Modal.confirm({
@@ -569,146 +464,30 @@ export default defineComponent({
       }
     }
 
-    // 添加爬虫
+    // 添加爬虫 - 已改为独立页面
     const handleAddSpider = () => {
-      if (!addSpiderForm.name) {
-        message.error('请输入爬虫名称')
-        return
-      }
-      const newSpider = {
-        id: Date.now(),
-        name: addSpiderForm.name,
-        description: addSpiderForm.description,
-        status: 'stopped',
-        lastRunTime: new Date().toLocaleString(),
-        dataCount: 0
-      }
-      spiderData.value.unshift(newSpider)
-      showAddSpiderModal.value = false
-      message.success('爬虫添加成功')
-      // 重置表单
-      addSpiderForm.name = ''
-      addSpiderForm.description = ''
-      addSpiderForm.type = 'web'
+      router.push('/view/add_spider')
     }
 
-    // 编辑爬虫
-    const handleEditSpider = () => {
-      if (!editSpiderForm.name) {
-        message.error('请输入爬虫名称')
-        return
-      }
-      const spider = spiderData.value.find(item => item.id === editSpiderForm.id)
-      if (spider) {
-        spider.name = editSpiderForm.name
-        spider.description = editSpiderForm.description
-      }
-      showEditModal.value = false
-      message.success('爬虫编辑成功')
-    }
+    // 编辑爬虫 - 已改为独立页面，通过路由跳转实现
 
-    // 查看数据详情
-    const viewDataDetail = (record) => {
-      currentDataDetail.value = record
-      showDataDetailModal.value = true
-    }
+    // 查看数据详情 - 已改为独立页面
 
-    // 删除数据
-    const deleteData = (record) => {
-      const index = spiderDataList.value.findIndex(item => item.id === record.id)
-      if (index > -1) {
-        spiderDataList.value.splice(index, 1)
-        message.success('数据删除成功')
-      }
-    }
-
-    // 导出数据
-    const exportData = () => {
-      message.success('数据导出成功')
-    }
-
-    // 清空数据
-    const clearAllData = () => {
-      spiderDataList.value = []
-      message.success('数据已清空')
-    }
+    // 数据操作相关 - 已改为独立页面
 
     // 分页变化
     const onPaginationChange = (page) => {
       pagination.current = page
     }
 
-    // 表格列配置
-    const recordColumns = [
-      {
-        title: '操作时间',
-        dataIndex: 'time',
-        key: 'time',
-        width: 160
-      },
-      {
-        title: '操作人',
-        dataIndex: 'operator',
-        key: 'operator',
-        width: 100
-      },
-      {
-        title: '操作内容',
-        dataIndex: 'action',
-        key: 'action',
-        width: 120
-      },
-      {
-        title: '操作结果',
-        dataIndex: 'result',
-        key: 'result',
-        width: 80
-      }
-    ]
-
-    const dataColumns = [
-      {
-        title: '数据ID',
-        dataIndex: 'id',
-        key: 'id',
-        width: 100
-      },
-      {
-        title: '抓取时间',
-        dataIndex: 'crawlTime',
-        key: 'crawlTime',
-        width: 160
-      },
-      {
-        title: '来源地址',
-        dataIndex: 'sourceUrl',
-        key: 'sourceUrl',
-        ellipsis: true
-      },
-      {
-        title: '数据状态',
-        dataIndex: 'status',
-        key: 'status',
-        width: 80
-      },
-      {
-        title: '操作',
-        key: 'action',
-        width: 120,
-        fixed: 'right'
-      }
-    ]
+    // 表格列配置 - 已移除，改为独立页面
 
     return {
+      router,
       searchForm,
       pagination,
-      addSpiderForm,
-      editSpiderForm,
-      showAddSpiderModal,
-      showRecordsModal,
-      showEditModal,
-      showDataModal,
-      showDataDetailModal,
+
+
       spiderData,
       operationRecords,
       spiderDataList,
@@ -724,14 +503,7 @@ export default defineComponent({
       handleReset,
       handleSpiderAction,
       handleAddSpider,
-      handleEditSpider,
-      viewDataDetail,
-      deleteData,
-      exportData,
-      clearAllData,
       onPaginationChange,
-      recordColumns,
-      dataColumns
     }
   }
 })
