@@ -418,7 +418,7 @@ export default defineComponent({
 
 .search-input {
   width: 100%;
-  height: 40px;
+  height: 44px;
   border: 1px solid #d9d9d9;
   border-right: none;
   border-radius: 6px 0 0 6px;
@@ -501,6 +501,8 @@ export default defineComponent({
   padding: 20px;
   margin-bottom: 16px;
   cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
 }
 
 .result-title {
@@ -645,28 +647,25 @@ export default defineComponent({
 }
 
 .deep-insight {
-  width: 300px;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 20px;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-}
+   width: 300px;
+   background: #ffffff;
+   border: none;
+   border-radius: 0;
+   padding: 0;
+   box-shadow: none;
+   position: sticky;
+   top: 20px;
+ }
 
 .insight-header h3 {
-  font-size: 18px;
-  font-weight: 700;
-  color: #2c5aa0;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid #4a90e2;
-  text-align: center;
-  letter-spacing: -0.5px;
-}
+   font-size: 18px;
+   font-weight: 600;
+   color: #333;
+   margin-bottom: 20px;
+   padding-bottom: 0;
+   border-bottom: none;
+   text-align: left;
+ }
 
 .insight-content {
   display: flex;
@@ -675,18 +674,18 @@ export default defineComponent({
 }
 
 .insight-item h4 {
-  font-size: 14px;
-  font-weight: 600;
-  color: #4a90e2;
-  margin-bottom: 8px;
-}
-
-.insight-item p {
-  font-size: 13px;
-  color: #666;
-  line-height: 1.5;
-  margin: 0;
-}
+   font-size: 14px;
+   font-weight: 600;
+   color: #333;
+   margin-bottom: 8px;
+ }
+ 
+ .insight-item p {
+   font-size: 13px;
+   color: #666;
+   line-height: 1.5;
+   margin: 0;
+ }
 
 .search-input :deep(.ant-input) {
   border: none;
@@ -785,12 +784,7 @@ export default defineComponent({
   backdrop-filter: blur(10px);
 }
 
-.result-item:hover {
-  background: rgba(255, 255, 255, 1);
-  border-color: rgba(74, 144, 226, 0.3);
 
-  transform: translateY(-4px) scale(1.01);
-}
 
 .result-title {
   font-size: 20px;
@@ -807,10 +801,7 @@ export default defineComponent({
   letter-spacing: -0.2px;
 }
 
-.result-item:hover .result-title {
-  color: #1e40af;
-  transform: translateX(2px);
-}
+
 
 .result-icon {
   font-size: 14px;
