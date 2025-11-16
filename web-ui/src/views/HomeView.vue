@@ -22,6 +22,21 @@
         </a-menu>
       </div>
 
+      <!-- 时光搜索按钮 - 强制显示在顶部最后一个 -->
+      <div class="search-button-container">
+        <a-button 
+          type="text" 
+          class="search-button"
+          @click="goToSearch"
+          :style="{ color: '#fff', fontSize: '16px' }"
+        >
+          <template #icon>
+            <SearchOutlined />
+          </template>
+          时光搜索
+        </a-button>
+      </div>
+
       <!-- 用户信息区域 -->
       <div class="user-info-container">
         <span class="user-nickname">{{ user.nickname }}</span>
@@ -186,7 +201,7 @@
 import { ref, reactive, defineComponent } from 'vue'
 import { mapState, mapActions } from 'pinia'
 import { useUserStore } from '@/stores/user'
-import { UserOutlined, DownOutlined, VerticalRightOutlined, LogoutOutlined } from '@ant-design/icons-vue'
+import { UserOutlined, DownOutlined, VerticalRightOutlined, LogoutOutlined, SearchOutlined } from '@ant-design/icons-vue'
 export default defineComponent({
   data() {
     const user = reactive({})
@@ -475,6 +490,16 @@ export default defineComponent({
       this.$router.push({
         name: key
       })
+    },
+    /**
+     * 跳转到时光搜索页面（新开页面）
+     */
+    goToSearch() {
+      // 使用路由的resolve方法获取完整URL，然后在新页面打开
+      const route = this.$router.resolve({
+        name: 'search'
+      })
+      window.open(route.href, '_blank')
     },
     /**
      * 退出登陆
@@ -1148,6 +1173,33 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+/* 搜索按钮样式 */
+.search-button-container {
+  margin-left: auto;
+  margin-right: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.search-button {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-button:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  transform: translateY(-1px);
+}
+
+.search-button:active {
+  transform: translateY(0);
 }
 
 /* 用户详情弹窗样式 */
