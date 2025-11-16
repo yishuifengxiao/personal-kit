@@ -10,10 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -36,12 +33,14 @@ public class OntologyController {
     private OntologyService ontologyService;
 
     @PostMapping("/page")
+    @ResponseBody
     public Page<Ontology> findPage(@RequestBody PageQuery<Ontology> pageQuery) {
 
         return ontologyService.findPage(pageQuery);
     }
 
     @PostMapping(value = "/save", produces = {"application/json;charset=utf-8"})
+    @ResponseBody
     public String add(@RequestBody Map<String, Object> param) {
 
 
@@ -50,18 +49,21 @@ public class OntologyController {
     }
 
     @PostMapping("/update")
+    @ResponseBody
     public void update(@RequestBody Map<String, Object> param) {
 
         ontologyService.update(param);
     }
 
     @PostMapping("/delete")
+    @ResponseBody
     public void delete(@Valid @RequestBody IdReq param) {
 
         ontologyService.delete(param);
     }
 
     @PostMapping("/detail")
+    @ResponseBody
     public Object detail(@Valid @RequestBody IdReq param) {
 
         return ontologyService.detail(param.getId());

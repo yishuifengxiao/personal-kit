@@ -88,6 +88,6 @@ public class OntologyService {
 
     public Object detail(String id) {
         Ontology ontology = ontologyRepository.findById(id).orElseThrow(() -> UncheckedException.of("记录不存在"));
-        return ontology.getText();
+        return ontology;
     }
 }

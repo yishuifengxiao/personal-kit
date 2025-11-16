@@ -22,10 +22,10 @@
                   @mouseover="nodeSlotOver(node, $event)"
                   @mouseout="nodeSlotOut(node, $event)"
                 >
-                  {{ node.text.charAt(0) }}
+                  {{ node.text ? node.text.charAt(0) : '' }}
                 </div>
                 <div class="node-label">
-                  {{ node.text }}
+                  {{ node.text || '' }}
                 </div>
               </div>
             </template>
@@ -322,7 +322,7 @@ export default {
     },
     //可选的关系目标节点
     relationNodes: function () {
-      return this.graph_json_data.nodes.filter((v) => v.text.length > 0)
+      return this.graph_json_data.nodes.filter((v) => v.text && v.text.length > 0)
     },
     ontId: function () {
       const ontId = sessionStorage.getItem('ontId')
@@ -436,7 +436,7 @@ export default {
       if ('deleteNode' === actionName) {
         alert('删除当前节点')
         const nodes = this.graph_json_data.nodes
-        const results = nodes.filter((v) => v.text !== currentNode.text)
+        const results = nodes.filter((v) => v.text !== (currentNode.text || ''))
         this.graph_json_data.nodes = results
         this.render()
       } else if ('editNode' === actionName) {
@@ -525,7 +525,7 @@ export default {
       if (!currentNode.id) {
         currentNode.id = new Date().getTime() + ''
       }
-      const nodes = this.graph_json_data.nodes.filter((v) => v.text != currentNode.text)
+      const nodes = this.graph_json_data.nodes.filter((v) => v.text != (currentNode.text || ''))
       nodes.push(currentNode)
       this.graph_json_data.nodes = nodes
       this.render()
@@ -571,7 +571,9 @@ export default {
             data: { id: this.ontId }
           })
           .then((res) => {
-            this.graph_json_data = JSON.parse(res)
+            const define=JSON.parse(res.text)
+            debugger
+            this.graph_json_data = define
             this.render()
           })
           .catch((err) => console.log(err))
