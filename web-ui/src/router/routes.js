@@ -54,13 +54,22 @@ const routes = [
         }
       },
       {
-        path: 'dataSet',
+        path: 'dataset_management',
         name: 'dataset_management',
         component: () => import('@/views/kg/data_set/DataSet.vue'),
 
         meta: {
           label: '数据集管理',
           breadcrumbName: ['知识图谱', '数据中心', '数据集管理']
+        }
+      },
+      {
+        path: 'all_spider',
+        name: 'all_spider',
+        component: () => import('@/views/spider/AllSpider.vue'),
+        meta: {
+          label: '爬虫总览',
+          breadcrumbName: ['知识图谱', '爬虫总览']
         }
       },
       {

@@ -1,0 +1,1 @@
+export { default as AllSpider } from './AllSpider.vue'
