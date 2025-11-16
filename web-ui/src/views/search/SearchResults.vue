@@ -87,13 +87,20 @@
           <div class="timeline-section">
             <div class="timeline-header">
               <h3>事件脉络</h3>
+              <button v-if="timelineData.events.length > 3" @click="toggleTimeline" class="expand-btn">
+                {{ timelineExpanded ? '收起' : '展开全部' }}
+                <span class="expand-icon" :class="{ 'expanded': timelineExpanded }">▼</span>
+              </button>
             </div>
             <div class="timeline-content">
-              <div class="timeline-item" v-for="event in timelineData.events" :key="event.id" :class="'timeline-item--' + event.type">
+              <div class="timeline-item" 
+                   v-for="(event, index) in getDisplayEvents()" 
+                   :key="event.id" 
+                   :class="'timeline-item--' + event.type">
                 <div class="timeline-date">{{ event.date }}</div>
                 <div class="timeline-dot"></div>
                 <div class="timeline-info">
-                  <h4>{{ event.title }}</h4>
+                  <h4><a :href="event.url" target="_blank" rel="noopener noreferrer">{{ event.title }}</a></h4>
                   <p>{{ event.description }}</p>
                 </div>
               </div>
@@ -186,38 +193,70 @@ export default defineComponent({
           date: '2024-01',
           title: 'Vue 3.4 发布',
           description: 'Vue 3.4 版本发布，带来更好的性能和开发体验',
-          type: 'release'
+          type: 'release',
+          url: 'https://vuejs.org/'
         },
         {
           id: 2,
           date: '2023-12',
           title: 'Vite 5.0 发布',
           description: 'Vite 5.0 带来更快的构建速度和更好的开发体验',
-          type: 'release'
+          type: 'release',
+          url: 'https://vitejs.dev/'
         },
         {
           id: 3,
           date: '2023-11',
           title: 'React 18 普及',
           description: 'React 18 的新特性被更多项目采用',
-          type: 'trend'
+          type: 'trend',
+          url: 'https://react.dev/'
         },
         {
           id: 4,
           date: '2023-10',
           title: 'TypeScript 5.0',
           description: 'TypeScript 5.0 发布，带来装饰器和更好的类型推断',
-          type: 'release'
+          type: 'release',
+          url: 'https://www.typescriptlang.org/'
         },
         {
           id: 5,
           date: '2023-09',
           title: 'AI 编程工具兴起',
           description: 'GitHub Copilot 等 AI 编程工具开始普及',
-          type: 'trend'
+          type: 'trend',
+          url: 'https://github.com/features/copilot'
+        },
+        {
+          id: 6,
+          date: '2023-08',
+          title: 'Next.js 14 发布',
+          description: 'Next.js 14 带来 Turbopack 和 App Router 改进',
+          type: 'release',
+          url: 'https://nextjs.org/'
+        },
+        {
+          id: 7,
+          date: '2023-07',
+          title: 'Tailwind CSS v3.3',
+          description: 'Tailwind CSS 3.3 版本发布，新增 ESM/TS 支持',
+          type: 'release',
+          url: 'https://tailwindcss.com/'
+        },
+        {
+          id: 8,
+          date: '2023-06',
+          title: 'Web Components 标准化',
+          description: 'Web Components 标准在各个浏览器中得到更好的支持',
+          type: 'trend',
+          url: 'https://developer.mozilla.org/zh-CN/docs/Web/Web_Components'
         }
       ]
     })
+
+    // 时间脉络展开状态
+    const timelineExpanded = ref(false)
 
     // 模拟搜索结果数据
     const mockResults = [
@@ -404,6 +443,24 @@ export default defineComponent({
       console.log('Search failed:', errorInfo)
     }
 
+    // 时间脉络展开/收起方法
+    const toggleTimeline = () => {
+      timelineExpanded.value = !timelineExpanded.value
+    }
+
+    // 获取显示的事件列表
+    const getDisplayEvents = () => {
+      const events = timelineData.value.events
+      if (timelineExpanded.value) {
+        return events
+      } else if (events.length <= 3) {
+        return events
+      } else {
+        // 显示前3个事件
+        return events.slice(0, 3)
+      }
+    }
+
     onMounted(() => {
       // 从URL参数获取搜索词
       if (route.query.q) {
@@ -430,12 +487,15 @@ export default defineComponent({
       pageSize,
       insightData,
       timelineData,
+      timelineExpanded,
       handleSearch,
       handlePageChange,
       openResult,
       goToSearch,
       onSearch,
-      onSearchFailed
+      onSearchFailed,
+      toggleTimeline,
+      getDisplayEvents
     }
   }
 })
@@ -562,15 +622,14 @@ export default defineComponent({
   margin: 0 auto;
   padding: 0 32px;
   display: flex;
-  gap: 60px;
-  align-items: flex-start;
+        gap: 60px;
+        align-items: flex-start;
 }
 
 /* 左侧搜索结果列表 */
-.results-list-section {
-  flex: 1;
-  min-width: 0;
-}
+  .results-list-section {
+    flex: 1;
+  }
 
 .result-item {
   background: #ffffff;
@@ -639,12 +698,12 @@ export default defineComponent({
 }
 
 /* 右侧深入了解区域 */
- .deep-insight-section {
-   width: 380px;
-   flex-shrink: 0;
-   position: sticky;
-   top: 120px;
- }
+  .deep-insight-section {
+    width: 380px;
+    flex-shrink: 0;
+    border-left: 1px solid #f0f0f0;
+    padding-left: 40px;
+  }
  
  .deep-insight {
    background: transparent;
@@ -737,15 +796,12 @@ export default defineComponent({
 }
 
 .deep-insight {
-   width: 300px;
-   background: #ffffff;
-   border: none;
-   border-radius: 0;
-   padding: 0;
-   box-shadow: none;
-   position: sticky;
-   top: 20px;
- }
+     width: 100%;
+     background: #ffffff;
+     border: 1px solid #f0f0f0;
+     border-radius: 8px;
+     padding: 16px;
+   }
 
 .insight-header h3 {
    font-size: 18px;
@@ -999,6 +1055,9 @@ export default defineComponent({
 
 .timeline-header {
   margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .timeline-header h3 {
@@ -1095,6 +1154,48 @@ export default defineComponent({
   color: #666;
   line-height: 1.4;
   margin: 0;
+}
+
+/* 展开/收起按钮样式 */
+.timeline-header .expand-btn {
+  background: none;
+  border: none;
+  color: #1890ff;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 6px;
+  transition: color 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  outline: none;
+  margin-left: auto;
+}
+
+.timeline-header .expand-btn:hover {
+  color: #40a9ff;
+}
+
+.timeline-header .expand-icon {
+  font-size: 8px;
+  transition: transform 0.3s ease;
+  display: inline-block;
+}
+
+.timeline-header .expand-icon.expanded {
+  transform: rotate(180deg);
+}
+
+/* 时间脉络标题超链接样式 */
+.timeline-info h4 a {
+  color: #333;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.timeline-info h4 a:hover {
+  color: #4a90e2;
+  text-decoration: underline;
 }
 
 /* 响应式设计 */
