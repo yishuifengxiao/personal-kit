@@ -107,13 +107,11 @@ export default defineComponent({
 <style scoped>
 .my-search {
   width: 100vw;
-  min-height: 100vh;
+  height: 100vh;
   background-color: #ffffff;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 80px 20px 20px;
+  position: relative;
   margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
@@ -121,10 +119,14 @@ export default defineComponent({
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
-  transform: translateY(-50px);
+  transform: translateY(0);
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: absolute;
+  top: 16.67vh;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .search-container {
@@ -136,7 +138,7 @@ export default defineComponent({
 }
 
 .search-header {
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 }
 
 .search-title {
@@ -157,7 +159,7 @@ export default defineComponent({
 }
 
 .search-form-container {
-  margin-bottom: 80px;
+  margin-bottom: 30px;
 }
 
 .search-form {
@@ -243,8 +245,8 @@ export default defineComponent({
 .search-features {
   display: flex;
   justify-content: center;
-  gap: 60px;
-  margin-top: 60px;
+  gap: 40px;
+  margin-top: 20px;
 }
 
 .feature-item {
@@ -266,8 +268,8 @@ export default defineComponent({
 }
 
 @media (max-width: 768px) {
-  .my-search {
-    padding-top: 80px;
+  .search-content {
+    top: 80px;
   }
   
   .search-title {
@@ -288,8 +290,8 @@ export default defineComponent({
 }
 
 @media (max-width: 480px) {
-  .my-search {
-    padding-top: 60px;
+  .search-content {
+    top: 60px;
   }
   
   .search-title {

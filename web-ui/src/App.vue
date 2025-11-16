@@ -17,11 +17,11 @@ body,
   margin: 0px;
   padding: 0px;
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 #app {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  display: block;
+  position: relative;
 }
 </style>
