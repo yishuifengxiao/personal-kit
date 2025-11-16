@@ -15,6 +15,36 @@ const routes = [
     }
   },
   {
+    path: '/search',
+    name: 'search',
+    component: () => import('@/views/search/MySearch.vue'),
+    meta: {
+      requiresAuth: false,
+      label: '时光搜索',
+      breadcrumbName: ['时光搜索']
+    }
+  },
+  {
+    path: '/my_search',
+    name: 'my_search',
+    component: () => import('@/views/search/MySearch.vue'),
+    meta: {
+      requiresAuth: false,
+      label: '时光搜索',
+      breadcrumbName: ['时光搜索']
+    }
+  },
+  {
+    path: '/search_results',
+    name: 'search_results',
+    component: () => import('@/views/search/SearchResults.vue'),
+    meta: {
+      requiresAuth: false,
+      label: '搜索结果',
+      breadcrumbName: ['拾光搜索', '搜索结果']
+    }
+  },
+  {
     path: '/view',
     name: 'home',
     component: () => import('@/views/HomeView.vue'),
@@ -316,6 +346,24 @@ const routes = [
         meta: {
           label: '角色菜单管理',
           breadcrumbName: ['系统管理', '角色管理', '菜单配置']
+        }
+      },
+      {
+        path: 'search_source',
+        name: 'search_source',
+        component: () => import('@/views/sys/search_source/Index.vue'),
+        meta: {
+          label: '搜索数据源管理',
+          breadcrumbName: ['系统管理', '时光搜索', '数据源管理']
+        }
+      },
+      {
+        path: 'my_search',
+        name: 'my_search',
+        component: () => import('@/views/sys/search_source/Index.vue'),
+        meta: {
+          label: '时光搜索',
+          breadcrumbName: ['系统管理', '时光搜索']
         }
       }
     ]
