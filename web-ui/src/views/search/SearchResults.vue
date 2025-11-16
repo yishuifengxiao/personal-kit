@@ -549,7 +549,7 @@ export default defineComponent({
   display: flex;
   align-items: center;
   gap: 0;
-  max-width: 600px;
+  max-width: 900px;
 }
 
 .search-form .ant-form-item {
