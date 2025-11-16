@@ -44,28 +44,38 @@
       <div class="main-content-wrapper">
         <!-- 左侧搜索结果列表 -->
         <div class="results-list-section">
-          <div 
-            v-for="result in searchResults" 
-            :key="result.id"
-            class="result-item"
-          >
-            <div class="result-title">
-              <a-icon type="link" class="result-icon" />
-              {{ result.title }}
-            </div>
-            <div class="result-url" @click="openResult(result.url)" style="cursor: pointer; color: #006621;">{{ result.url }}</div>
-            <div class="result-description">{{ result.description }}</div>
-            <div class="result-meta">
-              <span class="result-date">{{ result.date }}</span>
-              <span class="result-category">
-                <span v-if="Array.isArray(result.category)">
-                  <a-tag v-for="cat in result.category" :key="cat" size="small" style="margin-right: 4px; border: none; background: transparent; color: #666;">
-                    {{ cat }}
-                  </a-tag>
+          <!-- 搜索结果列表 -->
+          <div v-if="searchResults.length > 0">
+            <div 
+              v-for="result in searchResults" 
+              :key="result.id"
+              class="result-item"
+            >
+              <div class="result-title">
+                <a-icon type="link" class="result-icon" />
+                {{ result.title }}
+              </div>
+              <div class="result-url" @click="openResult(result.url)" style="cursor: pointer; color: #006621;">{{ result.url }}</div>
+              <div class="result-description">{{ result.description }}</div>
+              <div class="result-meta">
+                <span class="result-date">{{ result.date }}</span>
+                <span class="result-category">
+                  <span v-if="Array.isArray(result.category)">
+                    <a-tag v-for="cat in result.category" :key="cat" size="small" style="margin-right: 4px; border: none; background: transparent; color: #666;">
+                      {{ cat }}
+                    </a-tag>
+                  </span>
+                  <span v-else>{{ result.category }}</span>
                 </span>
-                <span v-else>{{ result.category }}</span>
-              </span>
+              </div>
             </div>
+          </div>
+          
+          <!-- 无结果提示 -->
+          <div class="no-results" v-if="searchResults.length === 0 && !searchLoading">
+            <div class="no-results-icon">🔍</div>
+            <div class="no-results-text">未找到相关结果</div>
+            <div class="no-results-suggestion">建议：检查关键词拼写或尝试其他关键词</div>
           </div>
         </div>
 
@@ -110,8 +120,8 @@
       </div>
     </div>
 
-    <!-- 分页区域 -->
-    <div class="pagination-container">
+    <!-- 分页区域 - 只在有结果时显示 -->
+    <div class="pagination-container" v-if="searchResults.length > 0">
       <a-pagination
         v-model:current="currentPage"
         v-model:pageSize="pageSize"
@@ -121,13 +131,6 @@
         :showTotal="total => `共 ${total} 条结果`"
         @change="handlePageChange"
       />
-    </div>
-
-    <!-- 无结果提示 -->
-    <div class="no-results" v-if="searchResults.length === 0 && !searchLoading">
-      <div class="no-results-icon">🔍</div>
-      <div class="no-results-text">未找到相关结果</div>
-      <div class="no-results-suggestion">建议：检查关键词拼写或尝试其他关键词</div>
     </div>
 
     <!-- 加载状态 -->
