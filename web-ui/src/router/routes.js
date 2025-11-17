@@ -99,7 +99,7 @@ const routes = [
         component: () => import('@/views/spider/AllSpider.vue'),
         meta: {
           label: '爬虫总览',
-          breadcrumbName: ['知识图谱', '爬虫总览']
+          breadcrumbName: ['数据爬虫', '爬虫总览']
         }
       },
       {
@@ -108,7 +108,7 @@ const routes = [
         component: () => import('@/views/spider/SpiderRecords.vue'),
         meta: {
           label: '爬虫记录',
-          breadcrumbName: ['知识图谱', '爬虫记录']
+          breadcrumbName: ['数据爬虫', '爬虫记录']
         }
       },
       {
@@ -137,7 +137,7 @@ const routes = [
         component: () => import('@/views/spider_task/SpiderTask.vue'),
         meta: {
           label: '任务总览',
-          breadcrumbName: ['知识图谱', '任务总览']
+          breadcrumbName: ['数据爬虫', '任务总览']
         }
       },
       {
@@ -146,7 +146,7 @@ const routes = [
         component: () => import('@/views/spider_data/SpiderData.vue'),
         meta: {
           label: '数据仓库',
-          breadcrumbName: ['知识图谱', '数据仓库']
+          breadcrumbName: ['数据爬虫', '数据仓库']
         }
       },
       {
@@ -155,7 +155,7 @@ const routes = [
         component: () => import('@/views/spider/AddSpider.vue'),
         meta: {
           label: '新增爬虫',
-          breadcrumbName: ['知识图谱', '新增爬虫']
+          breadcrumbName: ['数据爬虫', '新增爬虫']
         }
       },
       {
@@ -167,7 +167,7 @@ const routes = [
         }),
         meta: {
           label: '编辑爬虫',
-          breadcrumbName: ['知识图谱', '编辑爬虫']
+          breadcrumbName: ['数据爬虫', '编辑爬虫']
         }
       },
       {
@@ -303,7 +303,7 @@ const routes = [
         component: () => import('@/views/personal_cloud/Index.vue'),
         meta: {
           label: '个人云',
-          breadcrumbName: ['在线网盘','个人云', '文件管理']
+          breadcrumbName: ['在线网盘','个人云']
         }
       },
       {
@@ -312,7 +312,7 @@ const routes = [
         component: () => import('@/views/personal_cloud/TransportList.vue'),
         meta: {
           label: '传输列表',
-          breadcrumbName: ['在线网盘','个人云', '传输列表']
+          breadcrumbName: ['在线网盘', '传输列表']
         }
       },
       {
@@ -321,7 +321,7 @@ const routes = [
         component: () => import('@/views/personal_cloud/MyShare.vue'),
         meta: {
           label: '我的分享',
-          breadcrumbName: ['在线网盘','个人云', '我的分享']
+          breadcrumbName: ['在线网盘', '我的分享']
         }
       },
       {
@@ -363,7 +363,7 @@ const routes = [
         component: () => import('@/views/search_source/Index.vue'),
         meta: {
           label: '时光搜索',
-          breadcrumbName: ['系统管理', '时光搜索']
+          breadcrumbName: ['垂直搜索', '时光搜索']
         }
       },
       {
@@ -372,7 +372,7 @@ const routes = [
         component: () => import('@/views/sys/search_analyze/Index.vue'),
         meta: {
           label: '搜索分析',
-          breadcrumbName: ['系统管理', '搜索分析']
+          breadcrumbName: ['垂直搜索', '搜索分析']
         }
       }
     ]
