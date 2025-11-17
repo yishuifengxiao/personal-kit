@@ -23,30 +23,19 @@
           </div>
         </div>
         
-        <!-- 下部：数据详情 -->
-        <div class="details-section">
-          <h3>数据详情</h3>
-          <a-descriptions :column="1" bordered>
-            <a-descriptions-item label="标题">{{ record.title }}</a-descriptions-item>
-            <a-descriptions-item label="URL">
-              <a :href="record.url" target="_blank">{{ record.url }}</a>
-            </a-descriptions-item>
-            <a-descriptions-item label="描述">{{ record.description }}</a-descriptions-item>
-            <a-descriptions-item label="数据来源">
-              <a-tag :color="getDataSourceColor(record.dataSource)">
-                {{ getDataSourceLabel(record.dataSource) }}
-              </a-tag>
-            </a-descriptions-item>
-            <a-descriptions-item label="数据状态">
-              <a-tag :color="getDataStatusColor(record.dataStatus)">
-                {{ getDataStatusText(record.dataStatus) }}
-              </a-tag>
-            </a-descriptions-item>
-            <a-descriptions-item label="同步状态">
-              <a-badge :status="getSyncStatusStatus(record.syncStatus)" :text="getSyncStatusLabel(record.syncStatus)" />
-            </a-descriptions-item>
-            <a-descriptions-item label="同步时间">{{ record.syncTime }}</a-descriptions-item>
-          </a-descriptions>
+        <!-- 下部：数据源网页内容 -->
+        <div class="web-content-section">
+          <h3>数据源内容</h3>
+          <div class="web-content-container">
+            <iframe 
+              v-if="record.url" 
+              :src="record.url" 
+              frameborder="0"
+              style="width: 100%; height: 600px; border: 1px solid #d9d9d9; border-radius: 4px;"
+              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+            ></iframe>
+            <a-empty v-else description="暂无网页内容" />
+          </div>
         </div>
       </div>
       
@@ -54,20 +43,43 @@
       <div class="right-section">
         <!-- 上部：操作按钮 -->
         <div class="action-buttons">
-          <a-space direction="vertical" style="width: 100%">
-            <a-button type="primary" block @click="handleEdit">编辑</a-button>
-            <a-button block @click="handleSync">同步</a-button>
-            <a-button block @click="showModifyTagsModal">修改标签</a-button>
-            <a-button block @click="showModifyStatusModal">修改状态</a-button>
-            <a-button block danger @click="handleDelete">删除</a-button>
-          </a-space>
+          <div class="compact-actions">
+            <a-button type="primary" size="small" @click="handleEdit">编辑</a-button>
+            <a-button size="small" @click="handleSync">同步</a-button>
+            <a-button size="small" @click="showModifyTagsModal">标签</a-button>
+            <a-button size="small" @click="showModifyStatusModal">状态</a-button>
+            <a-button size="small" danger @click="handleDelete">删除</a-button>
+          </div>
         </div>
         
-        <!-- 中部：页面描述 -->
-        <div class="description-section">
-          <h3>页面描述</h3>
-          <div class="description-content">
-            {{ record.description || '暂无描述信息' }}
+        <!-- 中部：基本信息 -->
+        <div class="info-section">
+          <h3>基本信息</h3>
+          <div class="info-content">
+            <div class="info-item">
+              <span class="info-label">标题：</span>
+              <span class="info-value">{{ record.title }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">数据来源：</span>
+              <a-tag :color="getDataSourceColor(record.dataSource)" size="small">
+                {{ getDataSourceLabel(record.dataSource) }}
+              </a-tag>
+            </div>
+            <div class="info-item">
+              <span class="info-label">数据状态：</span>
+              <a-tag :color="getDataStatusColor(record.dataStatus)" size="small">
+                {{ getDataStatusText(record.dataStatus) }}
+              </a-tag>
+            </div>
+            <div class="info-item">
+              <span class="info-label">同步状态：</span>
+              <a-badge :status="getSyncStatusStatus(record.syncStatus)" :text="getSyncStatusLabel(record.syncStatus)" />
+            </div>
+            <div class="info-item">
+              <span class="info-label">同步时间：</span>
+              <span class="info-value">{{ record.syncTime }}</span>
+            </div>
           </div>
         </div>
         
@@ -78,41 +90,53 @@
             <a-empty description="数据图谱区域" />
           </div>
         </div>
-        
-        <!-- 底部：事件脉络 -->
-        <div class="timeline-section">
-          <h3>事件脉络</h3>
-          <div class="timeline-placeholder">
-            <a-empty description="事件脉络区域" />
-          </div>
-        </div>
       </div>
     </div>
     
-    <!-- 修改标签弹窗 -->
+    <!-- 修改标签弹窗 - 复制Index.vue风格 -->
     <a-modal
       v-model:open="modifyTagsModalVisible"
       title="修改标签"
-      @ok="handleModifyTags"
+      @ok="handleModifyTagsOk"
       @cancel="handleModifyTagsCancel"
+      width="600px"
     >
-      <a-form>
-        <a-form-item label="标签">
-          <a-select
-            mode="tags"
-            v-model:value="modifyTagsValue"
-            placeholder="请输入标签"
-            style="width: 100%"
-          />
-        </a-form-item>
-      </a-form>
+      <div class="modify-tags-content">
+        <div class="current-tags">
+          <h4>当前标签</h4>
+          <div class="tags-display">
+            <a-tag
+              v-for="(tag, index) in currentRecord.tags"
+              :key="index"
+              :color="getTagColor(tag)"
+              closable
+              @close="removeTag(index)"
+            >
+              {{ tag }}
+            </a-tag>
+          </div>
+        </div>
+        
+        <div class="add-tag-section">
+          <h4>添加标签</h4>
+          <div class="tag-input-group">
+            <a-input
+              v-model:value="newTag"
+              placeholder="请输入标签名称"
+              @pressEnter="addTag"
+              style="width: 200px"
+            />
+            <a-button type="primary" @click="addTag">添加</a-button>
+          </div>
+        </div>
+      </div>
     </a-modal>
     
     <!-- 修改状态弹窗 -->
     <a-modal
       v-model:open="modifyStatusModalVisible"
       title="修改数据状态"
-      @ok="handleModifyStatus"
+      @ok="handleModifyStatusOk"
       @cancel="handleModifyStatusCancel"
     >
       <a-form>
@@ -147,8 +171,9 @@ export default {
         syncStatus: 'normal',
         syncTime: '2024-01-01 12:00:00'
       },
+      currentRecord: null, // 用于修改标签的临时记录
       modifyTagsModalVisible: false,
-      modifyTagsValue: [],
+      newTag: '', // 新增标签输入
       modifyStatusModalVisible: false,
       modifyStatusValue: 'published'
     }
@@ -187,22 +212,42 @@ export default {
       })
     },
     showModifyTagsModal() {
-      this.modifyTagsValue = [...this.record.tags]
+      this.currentRecord = { ...this.record }
+      this.newTag = ''
       this.modifyTagsModalVisible = true
     },
-    handleModifyTags() {
-      this.record.tags = [...this.modifyTagsValue]
+    handleModifyTagsOk() {
+      this.record.tags = [...this.currentRecord.tags]
       this.modifyTagsModalVisible = false
+      this.currentRecord = null
       message.success('标签修改成功')
     },
     handleModifyTagsCancel() {
       this.modifyTagsModalVisible = false
+      this.currentRecord = null
+      this.newTag = ''
+    },
+    addTag() {
+      if (this.newTag.trim() && this.currentRecord) {
+        if (!this.currentRecord.tags) {
+          this.currentRecord.tags = []
+        }
+        if (!this.currentRecord.tags.includes(this.newTag.trim())) {
+          this.currentRecord.tags.push(this.newTag.trim())
+        }
+        this.newTag = ''
+      }
+    },
+    removeTag(index) {
+      if (this.currentRecord && this.currentRecord.tags) {
+        this.currentRecord.tags.splice(index, 1)
+      }
     },
     showModifyStatusModal() {
       this.modifyStatusValue = this.record.dataStatus
       this.modifyStatusModalVisible = true
     },
-    handleModifyStatus() {
+    handleModifyStatusOk() {
       this.record.dataStatus = this.modifyStatusValue
       this.modifyStatusModalVisible = false
       message.success('状态修改成功')
@@ -300,7 +345,7 @@ export default {
   gap: 16px;
 }
 
-.tags-section, .details-section, .action-buttons, .description-section, .graph-section, .timeline-section {
+.tags-section, .web-content-section, .action-buttons, .info-section, .graph-section {
   background: white;
   padding: 16px;
   border-radius: 6px;
@@ -322,12 +367,69 @@ export default {
   padding: 16px;
 }
 
-.description-content {
+.compact-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.compact-actions .ant-btn {
+  flex: 1;
+  min-width: 60px;
+}
+
+.info-content {
   margin-top: 12px;
-  padding: 12px;
-  background-color: #f5f5f5;
-  border-radius: 4px;
-  min-height: 80px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.info-label {
+  font-weight: 500;
+  color: #666;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.info-value {
+  flex: 1;
+  color: #333;
+}
+
+.web-content-container {
+  margin-top: 12px;
+}
+
+.modify-tags-content {
+  padding: 16px 0;
+}
+
+.current-tags, .add-tag-section {
+  margin-bottom: 24px;
+}
+
+.current-tags h4, .add-tag-section h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.tags-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .graph-placeholder, .timeline-placeholder {

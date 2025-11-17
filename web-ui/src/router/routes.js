@@ -369,7 +369,7 @@ const routes = [
       {
         path: 'my_search/detail/:id',
         name: 'search_source_detail',
-        component: () => import('@/views/search_source/Edit.vue'),
+        component: () => import('@/views/search_source/Detail.vue'),
         props: true,
         meta: {
           label: '数据详情',
@@ -379,7 +379,7 @@ const routes = [
       {
         path: 'my_search/add',
         name: 'search_source_add',
-        component: () => import('@/views/search_source/Edit.vue'),
+        component: () => import('@/views/search_source/Detail.vue'),
         meta: {
           label: '新增数据',
           breadcrumbName: ['垂直搜索', '时光搜索', '新增数据']
@@ -388,7 +388,7 @@ const routes = [
       {
         path: 'my_search/edit/:id',
         name: 'search_source_edit',
-        component: () => import('@/views/search_source/Edit.vue'),
+        component: () => import('@/views/search_source/Detail.vue'),
         props: true,
         meta: {
           label: '编辑数据',
