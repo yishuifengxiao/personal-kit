@@ -360,7 +360,7 @@ export default defineComponent({
   },
   setup() {
     // 工具选择
-    const selectedTool = ref('')
+    const selectedTool = ref('properties-yaml')
     
     // Properties ↔ YAML 转换
     const propertiesYamlInput = ref('')
