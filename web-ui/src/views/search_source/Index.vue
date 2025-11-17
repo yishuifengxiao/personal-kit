@@ -2,57 +2,129 @@
   <div class="page-content-wrapper">
     <!-- 上部搜索条件区域 -->
     <div class="search-area">
-      <a-form
-        layout="inline"
-        name="basic"
-        autocomplete="off"
-        :model="searchForm"
-        @finish="handleFinish"
-      >
-        <a-form-item label="数据源名称" name="name" class="input">
-          <a-input allowClear v-model:value="searchForm.name" placeholder="数据源名称，模糊查询"> </a-input>
-        </a-form-item>
+      <div class="search-container">
+        <a-form
+          layout="inline"
+          name="basic"
+          autocomplete="off"
+          :model="searchForm"
+          @finish="handleFinish"
+          class="search-form"
+        >
+          <a-form-item label="标题" name="title" class="input">
+            <a-input allowClear v-model:value="searchForm.title" placeholder="请输入标题，模糊查询"> </a-input>
+          </a-form-item>
 
-        <a-form-item label="数据源类型" name="type" class="input">
-          <a-select allowClear
-            style="width: 180px"
-            v-model:value="searchForm.type"
-            placeholder="请选择类型"
-          >
-            <a-select-option value="file">文件</a-select-option>
-            <a-select-option value="database">数据库</a-select-option>
-            <a-select-option value="api">API接口</a-select-option>
-          </a-select>
-        </a-form-item>
+          <a-form-item label="描述" name="description" class="input">
+            <a-input allowClear v-model:value="searchForm.description" placeholder="请输入描述，模糊查询"> </a-input>
+          </a-form-item>
 
-        <a-space>
-          <a-button type="primary" html-type="submit"> 搜索 </a-button>
-          <a-button @click="handleReset"> 重置 </a-button>
-          <a-button type="primary" @click="showAddModal"> 新增数据源 </a-button>
-        </a-space>
-      </a-form>
+          <a-form-item label="垂直搜索" name="verticalSearch" class="input">
+            <a-select allowClear
+              style="width: 180px"
+              v-model:value="searchForm.verticalSearch"
+              placeholder="请选择垂直搜索"
+            >
+              <a-select-option value="web">网页搜索</a-select-option>
+              <a-select-option value="image">图片搜索</a-select-option>
+              <a-select-option value="video">视频搜索</a-select-option>
+              <a-select-option value="news">新闻搜索</a-select-option>
+            </a-select>
+          </a-form-item>
+
+          <a-form-item>
+            <a-space>
+              <a-button type="primary" html-type="submit"> 搜索 </a-button>
+              <a-button @click="handleReset"> 重置 </a-button>
+            </a-space>
+          </a-form-item>
+        </a-form>
+        
+        <div class="action-buttons">
+          <a-space>
+            <a-button type="primary" @click="showAddModal">
+              <PlusOutlined />
+              新增数据
+            </a-button>
+            <a-button @click="handleBatchEdit">
+              <EditOutlined />
+              批量编辑
+            </a-button>
+            <a-button @click="handleBatchDelete">
+              <DeleteOutlined />
+              批量删除
+            </a-button>
+            <a-dropdown>
+              <template #overlay>
+                <a-menu @click="handleBatchOperation">
+                  <a-menu-item key="batchSync">批量同步</a-menu-item>
+                  <a-menu-item key="syncRecords">同步记录</a-menu-item>
+                  <a-menu-item key="batchDelete">批量删除</a-menu-item>
+                  <a-menu-item key="batchModifyTags">批量修改标签</a-menu-item>
+                  <a-menu-item key="batchModifyStatus">批量修改数据状态</a-menu-item>
+                </a-menu>
+              </template>
+              <a-button>
+                批量操作 <DownOutlined />
+              </a-button>
+            </a-dropdown>
+          </a-space>
+        </div>
+      </div>
     </div>
 
     <!-- 中间内容区域 -->
     <div class="content-min-height">
       <!-- 表格区 -->
-      <a-table :columns="columns" :data-source="dataSource" :pagination="false" :scroll="{ x: 1000 }" size="small">
+      <a-table 
+        :columns="columns" 
+        :data-source="dataSource" 
+        :pagination="pagination"
+        :scroll="{ x: 1200 }" 
+        size="small"
+        :row-selection="rowSelection"
+        :loading="loading"
+        @change="handleTableChange"
+        row-key="id"
+        class="table-container"
+      >
         <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'type'">
-            <a-tag :color="getTypeColor(record.type)">
-              {{ getTypeLabel(record.type) }}
+          <template v-if="column.key === 'dataSource'">
+            <a-tag :color="getDataSourceColor(record.dataSource)">
+              {{ getDataSourceLabel(record.dataSource) }}
             </a-tag>
           </template>
-          <template v-else-if="column.key === 'status'">
-            <a-badge :status="record.status === 1 ? 'success' : 'error'" :text="record.status === 1 ? '启用' : '禁用'" />
+          <template v-else-if="column.key === 'tags'">
+            <div class="tags-container" @mouseenter="showAllTags(record)" @mouseleave="hideAllTags(record)">
+              <a-tag v-for="(tag, index) in getDisplayTags(record.tags)" :key="index" class="tag-item">
+                {{ tag }}
+              </a-tag>
+              <span v-if="record.tags && record.tags.length > 3" class="tag-more">...</span>
+              <div v-if="record.showAllTags" class="tag-tooltip">
+                <a-tag v-for="(tag, index) in record.tags" :key="index">
+                  {{ tag }}
+                </a-tag>
+              </div>
+            </div>
+          </template>
+          <template v-else-if="column.key === 'dataStatus'">
+            <a-tag :color="getDataStatusColor(record.dataStatus)">
+              {{ getDataStatusText(record.dataStatus) }}
+            </a-tag>
+          </template>
+          <template v-else-if="column.key === 'syncStatus'">
+            <a-badge :status="getSyncStatusStatus(record.syncStatus)" :text="getSyncStatusLabel(record.syncStatus)" />
           </template>
           <template v-else-if="column.key === 'action'">
             <a-space :size="2">
-              <a-button type="link" size="small" @click="showEditModal(record)">编辑</a-button>
+              <a-button type="link" size="small" @click="showDetailsModal(record)">详情</a-button>
+              <a-button type="link" size="small" @click="handleSync(record)">同步</a-button>
               <a-dropdown>
                 <template #overlay>
                   <a-menu @click="({ key }) => handleOperationMenu(record, key)">
-                    <a-menu-item key="test">测试连接</a-menu-item>
+                    <a-menu-item key="edit">编辑</a-menu-item>
+                    <a-menu-item key="modifyTags">修改标签</a-menu-item>
+                    <a-menu-item key="modifyStatus">修改数据状态</a-menu-item>
                     <a-menu-item key="delete" style="color: #ff4d4f;">删除</a-menu-item>
                   </a-menu>
                 </template>
@@ -152,6 +224,8 @@
 import { message } from 'ant-design-vue'
 import {
   PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
   ReloadOutlined,
   SearchOutlined,
   ClearOutlined,
@@ -162,6 +236,8 @@ export default {
   name: 'SearchSourceManagement',
   components: {
     PlusOutlined,
+    EditOutlined,
+    DeleteOutlined,
     ReloadOutlined,
     SearchOutlined,
     ClearOutlined,
@@ -179,8 +255,9 @@ export default {
       testRecord: null,
       testResult: null,
       searchForm: {
-        name: '',
-        type: undefined
+        title: '',
+        description: '',
+        verticalSearch: undefined
       },
       formData: {
         name: '',
@@ -198,6 +275,7 @@ export default {
         ]
       },
       dataSource: [],
+      selectedRows: [],
       pagination: {
         current: 1,
         pageSize: 10,
@@ -212,41 +290,77 @@ export default {
       columns() {
         return [
           {
-            title: '数据源名称',
-            dataIndex: 'name',
-            key: 'name',
-            width: '20%'
+            title: '标题',
+            dataIndex: 'title',
+            key: 'title',
+            width: '20%',
+            ellipsis: true
           },
           {
-            title: '数据源类型',
-            dataIndex: 'type',
-            key: 'type',
-            width: '15%'
+            title: 'URL',
+            dataIndex: 'url',
+            key: 'url',
+            width: '20%',
+            ellipsis: true
           },
           {
             title: '描述',
             dataIndex: 'description',
             key: 'description',
+            width: '25%',
             ellipsis: true
           },
           {
-            title: '状态',
-            dataIndex: 'status',
-            key: 'status',
-            width: '10%'
+            title: '数据来源',
+            dataIndex: 'dataSource',
+            key: 'dataSource',
+            width: '12%'
           },
           {
-            title: '创建时间',
-            dataIndex: 'createTime',
-            key: 'createTime',
+            title: '标签',
+            dataIndex: 'tags',
+            key: 'tags',
             width: '15%'
+          },
+          {
+            title: '数据状态',
+            dataIndex: 'dataStatus',
+            key: 'dataStatus',
+            width: '8%'
+          },
+          {
+            title: '同步状态',
+            dataIndex: 'syncStatus',
+            key: 'syncStatus',
+            width: '8%'
+          },
+          {
+            title: '同步时间',
+            dataIndex: 'syncTime',
+            key: 'syncTime',
+            width: '12%'
           },
           {
             title: '操作',
             key: 'action',
-            width: '20%'
+            width: '15%',
+            fixed: 'right'
           }
         ]
+      },
+      rowSelection() {
+        return {
+          selectedRowKeys: this.selectedRows.map(row => row.id),
+          onChange: (selectedRowKeys, selectedRows) => {
+            this.selectedRows = selectedRows
+          },
+          getCheckboxProps: record => ({
+            disabled: record.dataStatus === 'deleted',
+            name: record.title,
+          }),
+          hideDefaultSelections: true,
+          selections: false
+        }
       }
     },
     mounted() {
@@ -292,6 +406,83 @@ export default {
         return labels[type] || type
       },
 
+      // 数据来源映射
+      getDataSourceColor(dataSource) {
+        const colors = {
+          'api-import': 'blue',
+          'manual': 'green',
+          'third-party': 'orange',
+          'crawler': 'purple'
+        }
+        return colors[dataSource] || 'default'
+      },
+
+      getDataSourceLabel(dataSource) {
+        const labels = {
+          'api-import': 'API导入',
+          'manual': '手动创建',
+          'third-party': '第三方链接',
+          'crawler': '数据爬虫'
+        }
+        return labels[dataSource] || dataSource
+      },
+
+      // 数据状态映射
+      getDataStatusColor(dataStatus) {
+        const colorMap = {
+          'published': 'success',
+          'unpublished': 'warning',
+          'deleted': 'default',
+          'abnormal': 'error'
+        }
+        return colorMap[dataStatus] || 'default'
+      },
+
+      getDataStatusText(dataStatus) {
+        const textMap = {
+          'published': '已发布',
+          'unpublished': '未发布',
+          'deleted': '已删除',
+          'abnormal': '异常'
+        }
+        return textMap[dataStatus] || dataStatus
+      },
+
+      // 同步状态映射
+      getSyncStatusStatus(syncStatus) {
+        const statusMap = {
+          'normal': 'success',
+          'abnormal': 'error',
+          'not-synced': 'warning',
+          'syncing': 'processing'
+        }
+        return statusMap[syncStatus] || 'default'
+      },
+
+      getSyncStatusLabel(syncStatus) {
+        const labelMap = {
+          'normal': '正常',
+          'abnormal': '异常',
+          'not-synced': '未同步',
+          'syncing': '同步中'
+        }
+        return labelMap[syncStatus] || syncStatus
+      },
+
+      // 标签处理
+      getDisplayTags(tags) {
+        if (!tags || tags.length === 0) return []
+        return tags.slice(0, 3)
+      },
+
+      showAllTags(record) {
+        record.showAllTags = true
+      },
+
+      hideAllTags(record) {
+        record.showAllTags = false
+      },
+
       handleFinish() {
         this.pagination.current = 1
         this.loadData()
@@ -307,6 +498,15 @@ export default {
       onPaginationChange(page, pageSize) {
         this.pagination.current = page
         this.pagination.pageSize = pageSize
+        this.loadData()
+      },
+
+      handleTableChange(pagination, filters, sorter) {
+        // 处理表格变化事件
+        if (pagination) {
+          this.pagination.current = pagination.current
+          this.pagination.pageSize = pagination.pageSize
+        }
         this.loadData()
       },
 
@@ -336,6 +536,12 @@ export default {
         this.testRecord = record
         this.testResult = null
         this.testModalVisible = true
+      },
+
+      showDetailsModal(record) {
+        this.$msg.info(`查看详情: ${record.title}`)
+        // 这里可以打开详情弹窗或跳转到详情页面
+        // 例如: this.$router.push({ name: 'search_source_detail', params: { id: record.id } })
       },
 
       resetForm() {
@@ -393,11 +599,177 @@ export default {
       },
 
       handleDelete(record) {
-        // 模拟删除
-        const index = this.dataSource.findIndex(item => item.id === record.id)
-        if (index > -1) {
-          this.dataSource.splice(index, 1)
-          message.success('删除成功')
+        this.$msg.confirm({
+          title: '确认删除',
+          content: `确定要删除数据"${record.title}"吗？`,
+          onOk: () => {
+            const index = this.dataSource.findIndex(item => item.id === record.id)
+            if (index !== -1) {
+              this.dataSource.splice(index, 1)
+              this.pagination.total--
+              this.$msg.success('删除成功')
+            }
+          }
+        })
+      },
+
+      handleDetails(record) {
+        this.$msg.info(`查看详情: ${record.title}`)
+        // 这里可以打开详情弹窗或跳转到详情页面
+      },
+
+      handleSync(record) {
+        this.$msg.loading(`正在同步: ${record.title}`, 0)
+        // 模拟同步操作
+        setTimeout(() => {
+          this.$msg.destroy()
+          this.$msg.success(`同步成功: ${record.title}`)
+          // 更新同步状态
+          record.syncStatus = 'normal'
+          record.syncTime = new Date().toISOString()
+        }, 2000)
+      },
+
+      handleModifyTags(record) {
+        this.$msg.info(`修改标签: ${record.title}`)
+        // 这里可以打开标签编辑弹窗
+      },
+
+      handleModifyDataStatus(record) {
+        this.$msg.info(`修改数据状态: ${record.title}`)
+        // 这里可以打开数据状态修改弹窗
+      },
+
+      // 页面导航方法
+      handleViewDetail(record) {
+        this.$router.push({
+          name: 'search_source_detail',
+          params: { id: record.id }
+        })
+      },
+      
+      handleEdit(record) {
+        this.$router.push({
+          name: 'search_source_edit',
+          params: { id: record.id }
+        })
+      },
+      
+      handleAdd() {
+        this.$router.push({
+          name: 'search_source_add'
+        })
+      },
+
+      // 批量操作
+      handleBatchSync() {
+        if (this.selectedRows.length === 0) {
+          this.$msg.warning('请选择要同步的数据')
+          return
+        }
+        this.$msg.loading(`正在批量同步 ${this.selectedRows.length} 条数据`, 0)
+        setTimeout(() => {
+          this.$msg.destroy()
+          this.$msg.success(`批量同步成功 ${this.selectedRows.length} 条数据`)
+          // 更新选中数据的同步状态
+          this.selectedRows.forEach(row => {
+            row.syncStatus = 'normal'
+            row.syncTime = new Date().toISOString()
+          })
+        }, 3000)
+      },
+
+      handleBatchEdit() {
+        if (this.selectedRows.length === 0) {
+          this.$msg.warning('请选择要编辑的数据')
+          return
+        }
+        if (this.selectedRows.length > 1) {
+          this.$msg.warning('批量编辑功能暂不支持多选')
+          return
+        }
+        this.showEditModal(this.selectedRows[0])
+      },
+
+      handleBatchDelete() {
+        if (this.selectedRows.length === 0) {
+          this.$msg.warning('请选择要删除的数据')
+          return
+        }
+        this.$msg.confirm({
+          title: '确认批量删除',
+          content: `确定要删除选中的 ${this.selectedRows.length} 条数据吗？`,
+          onOk: () => {
+            this.selectedRows.forEach(row => {
+              const index = this.dataSource.findIndex(item => item.id === row.id)
+              if (index !== -1) {
+                this.dataSource.splice(index, 1)
+                this.pagination.total--
+              }
+            })
+            this.$msg.success(`批量删除成功 ${this.selectedRows.length} 条数据`)
+            this.selectedRows = []
+          }
+        })
+      },
+
+      handleBatchModifyTags() {
+        if (this.selectedRows.length === 0) {
+          this.$msg.warning('请选择要修改标签的数据')
+          return
+        }
+        this.$msg.info(`批量修改标签: ${this.selectedRows.length} 条数据`)
+        // 这里可以打开批量标签编辑弹窗
+      },
+
+      handleBatchModifyDataStatus() {
+        if (this.selectedRows.length === 0) {
+          this.$msg.warning('请选择要修改数据状态的数据')
+          return
+        }
+        this.$msg.info(`批量修改数据状态: ${this.selectedRows.length} 条数据`)
+        // 这里可以打开批量数据状态修改弹窗
+      },
+
+      handleSyncRecords() {
+        this.$msg.info('查看同步记录')
+        // 这里可以打开同步记录弹窗或页面
+      },
+
+      handleBatchOperation({ key }) {
+        switch (key) {
+          case 'batchSync':
+            this.handleBatchSync()
+            break
+          case 'syncRecords':
+            this.handleSyncRecords()
+            break
+          case 'batchDelete':
+            this.handleBatchDelete()
+            break
+          case 'batchModifyTags':
+            this.handleBatchModifyTags()
+            break
+          case 'batchModifyStatus':
+            this.handleBatchModifyDataStatus()
+            break
+        }
+      },
+
+      handleOperationMenu(record, key) {
+        switch (key) {
+          case 'edit':
+            this.showEditModal(record)
+            break
+          case 'modifyTags':
+            this.handleModifyTags(record)
+            break
+          case 'modifyStatus':
+            this.handleModifyDataStatus(record)
+            break
+          case 'delete':
+            this.handleDelete(record)
+            break
         }
       },
 
@@ -405,35 +777,24 @@ export default {
         this.loading = true
         // 模拟数据
         setTimeout(() => {
-          const mockData = [
-            {
-              id: 1,
-              name: '本地文档库',
-              type: 'file',
-              description: '本地文档文件搜索数据源',
-              config: '{"path": "/data/documents", "extensions": [".txt", ".pdf", ".doc", ".docx"]}',
-              status: 1,
-              createTime: '2024-01-15 10:30:00'
-            },
-            {
-              id: 2,
-              name: '知识库数据库',
-              type: 'database',
-              description: '知识图谱数据库搜索数据源',
-              config: '{"host": "localhost", "port": 3306, "database": "knowledge_base", "username": "root"}',
-              status: 1,
-              createTime: '2024-01-16 14:20:00'
-            },
-            {
-              id: 3,
-              name: '外部API接口',
-              type: 'api',
-              description: '外部系统API搜索数据源',
-              config: '{"url": "https://api.example.com/search", "method": "POST", "headers": {"Authorization": "Bearer token"}}',
-              status: 0,
-              createTime: '2024-01-17 09:15:00'
-            }
-          ]
+          const mockData = Array.from({ length: 50 }, (_, i) => ({
+            id: i + 1,
+            title: `数据标题${i + 1}`,
+            url: `https://example.com/data/${i + 1}`,
+            description: `这是数据${i + 1}的描述信息，包含详细的说明内容`,
+            dataSource: ['api-import', 'manual', 'third-party', 'crawler'][i % 4],
+            sourceDataId: `SD${1000 + i}`,
+            dataIdentifier: `DI${2000 + i}`,
+            tags: i % 3 === 0 ? ['标签1', '标签2', '标签3', '标签4'] : i % 2 === 0 ? ['标签1', '标签2'] : ['标签1'],
+            dataStatus: i % 6 === 0 ? 'deleted' : i % 4 === 0 ? 'abnormal' : i % 3 === 0 ? 'unpublished' : 'published',
+            syncStatus: i % 5 === 0 ? 'syncing' : i % 3 === 0 ? 'abnormal' : i % 2 === 0 ? 'not-synced' : 'normal',
+            createTime: new Date(Date.now() - Math.random() * 86400000 * 30).toISOString(),
+            syncTime: new Date(Date.now() - Math.random() * 86400000 * 7).toISOString(),
+            config: JSON.stringify({ host: 'localhost', port: 3306, database: `db${i + 1}` }, null, 2),
+            status: i % 5 === 0 ? 'disabled' : 'enabled',
+            name: `数据源${i + 1}`,
+            type: ['file', 'database', 'api'][i % 3]
+          }))
 
           // 搜索过滤
           let filteredData = mockData
@@ -512,5 +873,112 @@ export default {
   background-color: #fff2f0;
   border: 1px solid #ffccc7;
   color: #ff4d4f;
+}
+
+/* 标签容器样式 */
+.tags-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tag-more {
+  color: #999;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.tag-tooltip {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  background: white;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-width: 200px;
+  margin-top: 4px;
+}
+
+/* 按钮组右侧浮动 */
+.button-group-right {
+  margin-left: auto;
+}
+
+/* 搜索区域样式 */
+.search-area {
+  background: #fff;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  flex-wrap: nowrap;
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  margin-left: 16px;
+  flex-shrink: 0;
+}
+
+/* Tag item styles - remove borders */
+.tag-item {
+  border: none !important;
+  background-color: #f0f2f5;
+  margin-right: 4px;
+  margin-bottom: 2px;
+}
+
+/* Enhanced tag container for hover functionality */
+.tags-container {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  max-height: 24px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.tags-container:hover {
+  max-height: none;
+  overflow: visible;
+  z-index: 10;
+}
+
+.tags-container:hover .tag-item {
+  margin-bottom: 4px;
+}
+
+.tag-more, .tag-tooltip {
+  color: #8c8c8c;
+  font-size: 12px;
+  margin-left: 4px;
+  cursor: pointer;
+}
+
+.tags-container:hover .tag-more,
+.tags-container:hover .tag-tooltip {
+  display: none;
 }
 </style>
