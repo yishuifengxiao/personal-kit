@@ -374,6 +374,15 @@ const routes = [
           label: '搜索分析',
           breadcrumbName: ['垂直搜索', '搜索分析']
         }
+      },
+      {
+        path: 'tool_box',
+        name: 'tool_box',
+        component: () => import('@/views/tool_box/Index.vue'),
+        meta: {
+          label: '工具箱',
+          breadcrumbName: ['工具箱', '在线工具']
+        }
       }
     ]
   }
