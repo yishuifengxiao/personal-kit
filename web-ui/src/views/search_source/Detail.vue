@@ -48,11 +48,7 @@
             <a-select-option value="syncing">同步中</a-select-option>
           </a-select>
         </div>
-        <div class="info-item">
-          <span class="info-label">同步时间：</span>
-          <span v-if="!isEditMode" class="info-value">{{ record.syncTime ? record.syncTime.format('YYYY-MM-DD HH:mm:ss') : '' }}</span>
-          <a-date-picker v-else v-model:value="record.syncTime" show-time placeholder="选择同步时间" style="width: 200px" />
-        </div>
+
       </div>
     </div>
     
@@ -391,48 +387,7 @@ export default {
     timelineEvents() {
       const events = []
       
-      // 基础时间事件
-      if (this.record.createTime) {
-        events.push({
-          title: '数据创建',
-          field: 'createTime',
-          time: this.record.createTime,
-          defaultTime: '2024-01-01 10:00:00',
-          color: 'green'
-        })
-      }
-      
-      if (this.record.syncTime) {
-        events.push({
-          title: '数据同步',
-          field: 'syncTime',
-          time: this.record.syncTime,
-          defaultTime: '2024-01-01 12:00:00',
-          color: 'blue'
-        })
-      }
-      
-      if (this.record.updateTime) {
-        events.push({
-          title: '状态更新',
-          field: 'updateTime',
-          time: this.record.updateTime,
-          defaultTime: '2024-01-01 15:00:00',
-          color: 'orange'
-        })
-      }
-      
-      if (this.record.publishTime && this.record.dataStatus === 'published') {
-        events.push({
-          title: '数据发布',
-          field: 'publishTime',
-          time: this.record.publishTime,
-          defaultTime: '2024-01-01 16:00:00',
-          color: 'green'
-        })
-      }
-      
-      // 添加自定义时间轴事件
+      // 只显示自定义时间轴事件，移除固定的四个时间点
       if (this.record.timelineEvents && this.record.timelineEvents.length > 0) {
         this.record.timelineEvents.forEach((event, index) => {
           events.push({
@@ -456,28 +411,28 @@ export default {
   methods: {
     initPage() {
       const id = this.$route.params.id
-      const mode = this.$route.query.mode || 'detail'
+      const routeName = this.$route.name
       
-      if (mode === 'add') {
+      if (routeName === 'search_source_add') {
         // 新增模式：初始化空数据并直接进入编辑状态
         this.mode = 'edit'
         this.initEmptyRecord()
-      } else if (id) {
-        // 编辑或详情模式：加载数据
+      } else if (routeName === 'search_source_edit' && id) {
+        // 编辑模式：加载数据并进入编辑状态
         this.loadRecord(id)
-        this.mode = mode
-        if (mode === 'edit') {
-          // 编辑模式：保存原始数据用于取消恢复
-          this.originalRecord = { ...this.record }
-        }
+        this.mode = 'edit'
+        // 编辑模式：保存原始数据用于取消恢复
+        this.originalRecord = { ...this.record }
+      } else if (id) {
+        // 详情模式：加载数据
+        this.loadRecord(id)
+        this.mode = 'detail'
       } else {
         // 默认详情模式
         this.mode = 'detail'
       }
     },
     initEmptyRecord() {
-      const now = dayjs()
-      
       this.record = {
         id: null,
         title: '',
@@ -491,10 +446,7 @@ export default {
         tags: [],
         dataStatus: 'unpublished',
         syncStatus: 'not-synced',
-        syncTime: now,
-        createTime: now,
-        updateTime: now,
-        publishTime: ''
+        timelineEvents: []
       }
     },
     loadRecord(id) {
@@ -515,10 +467,7 @@ export default {
         tags: ['标签1', '标签2', '标签3'],
         dataStatus: 'published',
         syncStatus: 'normal',
-        syncTime: dayjs('2024-01-01 12:00:00'),
-        createTime: dayjs('2024-01-01 10:00:00'),
-        updateTime: dayjs('2024-01-01 15:00:00'),
-        publishTime: dayjs('2024-01-01 16:00:00')
+        // 移除了固定的四个时间点字段
       }
       
       this.record = { ...mockData }
@@ -530,10 +479,6 @@ export default {
     switchToEditMode() {
       this.mode = 'edit'
       this.originalRecord = { ...this.record }
-      // 进入编辑状态时，同步时间轴时间点
-      const now = dayjs()
-      if (!this.record.createTime) this.record.createTime = now
-      if (!this.record.updateTime) this.record.updateTime = now
     },
     handleSave() {
       if (!this.validateForm()) {
@@ -549,8 +494,7 @@ export default {
         }
       }
       
-      // 更新时间
-      this.record.updateTime = dayjs()
+      // 移除了固定的更新时间逻辑
       
       // 保存逻辑
       if (this.mode === 'add' || !this.record.id) {
