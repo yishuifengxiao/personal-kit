@@ -67,6 +67,21 @@
               <a-button v-if="mode === 'detail'" size="small" @click="showModifyTagsModal">标签</a-button>
               <a-button v-if="mode === 'detail'" size="small" @click="showModifyStatusModal">状态</a-button>
               <a-button v-if="mode === 'detail'" size="small" danger @click="handleDelete">删除</a-button>
+              <a-button 
+                v-if="mode === 'detail' && record.dataStatus === 'published'" 
+                size="small" 
+                @click="handleUnpublish"
+              >
+                下架
+              </a-button>
+              <a-button 
+                v-if="mode === 'detail' && record.dataStatus !== 'published'" 
+                type="primary" 
+                size="small" 
+                @click="handlePublish"
+              >
+                发布
+              </a-button>
             </div>
           </div>
           <div class="tags-container">
@@ -330,7 +345,7 @@
 </template>
 
 <script>
-import { message } from 'ant-design-vue'
+import { message, Modal } from 'ant-design-vue'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
 
@@ -535,14 +550,78 @@ export default {
     handleSync() {
       message.success('同步操作已触发')
     },
+    handlePublish() {
+      Modal.confirm({
+        title: '确认发布',
+        content: '确定要发布这条数据吗？发布后将在前台展示。',
+        okText: '确定',
+        cancelText: '取消',
+        onOk: () => {
+          this.publishArticle()
+        },
+        onCancel() {
+          console.log('取消发布')
+        }
+      })
+    },
+    handleUnpublish() {
+      Modal.confirm({
+        title: '确认下架',
+        content: '确定要下架这条数据吗？下架后将在前台隐藏。',
+        okText: '确定',
+        cancelText: '取消',
+        onOk: () => {
+          this.unpublishArticle()
+        },
+        onCancel() {
+          console.log('取消下架')
+        }
+      })
+    },
+    publishArticle() {
+      // 模拟发布API调用
+      console.log('调用发布API，文章ID:', this.record.id)
+      
+      // 模拟异步操作
+      setTimeout(() => {
+        this.record.dataStatus = 'published'
+        message.success('发布成功')
+      }, 1000)
+      
+      // 实际项目中应该调用真实的API
+      // this.$api.publishArticle(this.record.id).then(() => {
+      //   this.record.dataStatus = 'published'
+      //   this.$msg.success('发布成功')
+      // }).catch(() => {
+      //   this.$msg.error('发布失败')
+      // })
+    },
+    unpublishArticle() {
+      // 模拟下架API调用
+      console.log('调用下架API，文章ID:', this.record.id)
+      
+      // 模拟异步操作
+      setTimeout(() => {
+        this.record.dataStatus = 'unpublished'
+        message.success('下架成功')
+      }, 1000)
+      
+      // 实际项目中应该调用真实的API
+      // this.$api.unpublishArticle(this.record.id).then(() => {
+      //   this.record.dataStatus = 'unpublished'
+      //   this.$msg.success('下架成功')
+      // }).catch(() => {
+      //   this.$msg.error('下架失败')
+      // })
+    },
     handleDelete() {
-      this.$msg.confirm({
+      Modal.confirm({
         title: '确认删除',
         content: '确定要删除这条数据吗？删除后无法恢复！',
         okText: '确定',
         cancelText: '取消',
         onOk: () => {
-          this.$msg.success('删除成功')
+          message.success('删除成功')
           this.goBack()
           // 这里应该调用API删除数据
         },
@@ -604,7 +683,7 @@ export default {
     },
     generateGraphData() {
       // 生成图谱数据的逻辑
-      this.$msg.success('图谱数据生成成功')
+      message.success('图谱数据生成成功')
     },
     addTimelineEvent() {
       if (!this.record.timelineEvents) {
