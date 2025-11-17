@@ -102,7 +102,7 @@
             <a-textarea
               v-model:value="jsonInput"
               placeholder="请输入 JSON 字符串..."
-              :rows="25"
+              :rows="20"
               class="code-textarea"
             />
           </div>
@@ -774,14 +774,12 @@ export default defineComponent({
 .tool-content {
   background: #fafafa;
   border-radius: 8px;
-  padding: 24px;
 }
 
 .tool-panel {
   background: #fff;
   border-radius: 6px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .tool-title {
