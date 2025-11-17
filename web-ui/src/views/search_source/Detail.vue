@@ -2,7 +2,7 @@
   <div class="detail-page">
     <a-page-header
       class="compact-header"
-      title="数据详情"
+      :title="pageTitle"
       @back="goBack"
     />
     
@@ -11,27 +11,47 @@
       <div class="info-content">
         <div class="info-item">
           <span class="info-label">标题：</span>
-          <span class="info-value">{{ record.title }}</span>
+          <span v-if="!isEditMode" class="info-value">{{ record.title }}</span>
+          <a-input v-else v-model:value="record.title" placeholder="请输入标题" style="width: 300px" />
         </div>
         <div class="info-item">
           <span class="info-label">数据来源：</span>
-          <a-tag :color="getDataSourceColor(record.dataSource)" size="small">
+          <a-tag v-if="!isEditMode" :color="getDataSourceColor(record.dataSource)" size="small">
             {{ getDataSourceLabel(record.dataSource) }}
           </a-tag>
+          <a-select v-else v-model:value="record.dataSource" style="width: 120px">
+            <a-select-option value="api-import">API导入</a-select-option>
+            <a-select-option value="manual">手动创建</a-select-option>
+            <a-select-option value="third-party">第三方链接</a-select-option>
+            <a-select-option value="crawler">数据爬虫</a-select-option>
+          </a-select>
         </div>
         <div class="info-item">
           <span class="info-label">数据状态：</span>
-          <a-tag :color="getDataStatusColor(record.dataStatus)" size="small">
+          <a-tag v-if="!isEditMode" :color="getDataStatusColor(record.dataStatus)" size="small">
             {{ getDataStatusText(record.dataStatus) }}
           </a-tag>
+          <a-select v-else v-model:value="record.dataStatus" style="width: 120px">
+            <a-select-option value="published">已发布</a-select-option>
+            <a-select-option value="unpublished">未发布</a-select-option>
+            <a-select-option value="deleted">已删除</a-select-option>
+            <a-select-option value="abnormal">异常</a-select-option>
+          </a-select>
         </div>
         <div class="info-item">
           <span class="info-label">同步状态：</span>
-          <a-badge :status="getSyncStatusStatus(record.syncStatus)" :text="getSyncStatusLabel(record.syncStatus)" />
+          <a-badge v-if="!isEditMode" :status="getSyncStatusStatus(record.syncStatus)" :text="getSyncStatusLabel(record.syncStatus)" />
+          <a-select v-else v-model:value="record.syncStatus" style="width: 120px">
+            <a-select-option value="normal">正常</a-select-option>
+            <a-select-option value="abnormal">异常</a-select-option>
+            <a-select-option value="not-synced">未同步</a-select-option>
+            <a-select-option value="syncing">同步中</a-select-option>
+          </a-select>
         </div>
         <div class="info-item">
           <span class="info-label">同步时间：</span>
-          <span class="info-value">{{ record.syncTime }}</span>
+          <span v-if="!isEditMode" class="info-value">{{ record.syncTime ? record.syncTime.format('YYYY-MM-DD HH:mm:ss') : '' }}</span>
+          <a-date-picker v-else v-model:value="record.syncTime" show-time placeholder="选择同步时间" style="width: 200px" />
         </div>
       </div>
     </div>
@@ -44,15 +64,18 @@
           <div class="tags-header">
             <h3>数据标签</h3>
             <div class="action-buttons">
-              <a-button type="primary" size="small" @click="handleEdit">编辑</a-button>
-              <a-button size="small" @click="handleSync">同步</a-button>
-              <a-button size="small" @click="showModifyTagsModal">标签</a-button>
-              <a-button size="small" @click="showModifyStatusModal">状态</a-button>
-              <a-button size="small" danger @click="handleDelete">删除</a-button>
+              <a-button v-if="mode === 'detail'" type="primary" size="small" @click="switchToEditMode">编辑</a-button>
+              <a-button v-if="isEditMode" type="primary" size="small" @click="handleSave">保存</a-button>
+              <a-button v-if="isEditMode" size="small" @click="handleCancel">取消</a-button>
+              <a-button v-if="mode === 'detail'" size="small" @click="handleSync">同步</a-button>
+              <a-button v-if="mode === 'detail'" size="small" @click="showModifyTagsModal">标签</a-button>
+              <a-button v-if="mode === 'detail'" size="small" @click="showModifyStatusModal">状态</a-button>
+              <a-button v-if="mode === 'detail'" size="small" danger @click="handleDelete">删除</a-button>
             </div>
           </div>
           <div class="tags-container">
             <a-tag
+              v-if="!isEditMode"
               v-for="(tag, index) in record.tags"
               :key="index"
               :color="getTagColor(tag)"
@@ -60,6 +83,32 @@
             >
               {{ tag }}
             </a-tag>
+            <div v-else class="edit-tags-container">
+              <a-tag
+                v-for="(tag, index) in record.tags"
+                :key="index"
+                :color="getTagColor(tag)"
+                closable
+                @close="removeTagFromRecord(index)"
+                class="tag-item"
+              >
+                {{ tag }}
+              </a-tag>
+              <a-input
+                v-if="inputVisible"
+                ref="inputRef"
+                v-model:value="inputValue"
+                type="text"
+                size="small"
+                style="width: 78px"
+                @blur="handleInputConfirm"
+                @keyup.enter="handleInputConfirm"
+              />
+              <a-tag v-else style="background: #fff; borderStyle: dashed;" @click="showInput">
+                <plus-outlined />
+                新标签
+              </a-tag>
+            </div>
           </div>
         </div>
         
@@ -69,23 +118,28 @@
           <div class="summary-content">
             <div class="summary-item">
               <span class="summary-label">网页标题：</span>
-              <span class="summary-value">{{ record.title }}</span>
+              <span v-if="!isEditMode" class="summary-value">{{ record.title }}</span>
+              <a-input v-else v-model:value="record.title" placeholder="请输入网页标题" />
             </div>
             <div class="summary-item">
               <span class="summary-label">网页URL：</span>
-              <a :href="record.url" target="_blank" class="summary-link">{{ record.url }}</a>
+              <a v-if="!isEditMode" :href="record.url" target="_blank" class="summary-link">{{ record.url }}</a>
+              <a-input v-else v-model:value="record.url" placeholder="请输入网页URL" />
             </div>
             <div class="summary-item">
               <span class="summary-label">描述：</span>
-              <span class="summary-value">{{ record.description || '暂无描述信息' }}</span>
+              <span v-if="!isEditMode" class="summary-value">{{ record.description || '暂无描述信息' }}</span>
+              <a-textarea v-else v-model:value="record.description" placeholder="请输入描述信息" :rows="3" />
             </div>
             <div class="summary-item">
               <span class="summary-label">关键词：</span>
-              <span class="summary-value">{{ record.keywords || '暂无关键词' }}</span>
+              <span v-if="!isEditMode" class="summary-value">{{ record.keywords || '暂无关键词' }}</span>
+              <a-input v-else v-model:value="record.keywords" placeholder="请输入关键词，用逗号分隔" />
             </div>
             <div class="summary-item">
               <span class="summary-label">摘要：</span>
-              <span class="summary-value">{{ record.summary || '暂无摘要信息' }}</span>
+              <span v-if="!isEditMode" class="summary-value">{{ record.summary || '暂无摘要信息' }}</span>
+              <a-textarea v-else v-model:value="record.summary" placeholder="请输入摘要信息" :rows="4" />
             </div>
           </div>
         </div>
@@ -94,14 +148,24 @@
         <div class="web-content-section">
           <h3>数据源内容</h3>
           <div class="web-content-container">
-            <iframe 
-              v-if="record.url" 
-              :src="record.url" 
-              frameborder="0"
-              style="width: 100%; height: 600px; border: 1px solid #d9d9d9; border-radius: 4px;"
-              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-            ></iframe>
-            <a-empty v-else description="暂无网页内容" />
+            <div v-if="isEditMode" style="margin-bottom: 12px;">
+              <a-textarea 
+                v-model:value="record.content" 
+                placeholder="请输入数据源内容" 
+                :rows="20"
+                style="width: 100%; border: 1px solid #d9d9d9; border-radius: 4px;"
+              />
+            </div>
+            <div v-else>
+              <iframe 
+                v-if="record.url" 
+                :src="record.url" 
+                frameborder="0"
+                style="width: 100%; height: 600px; border: 1px solid #d9d9d9; border-radius: 4px;"
+                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+              ></iframe>
+              <a-empty v-else description="暂无网页内容" />
+            </div>
           </div>
         </div>
       </div>
@@ -112,7 +176,16 @@
         <div class="graph-section">
           <h3>数据图谱</h3>
           <div class="graph-placeholder">
-            <a-empty description="数据图谱区域" />
+            <a-empty v-if="!isEditMode" description="数据图谱区域" />
+            <div v-else class="edit-graph-section">
+              <a-textarea 
+                v-model:value="record.graphData" 
+                placeholder="请输入数据图谱信息（JSON格式）"
+                :rows="10"
+                style="width: 100%; margin-bottom: 8px;"
+              />
+              <a-button size="small" @click="generateGraphData">生成图谱</a-button>
+            </div>
           </div>
         </div>
         
@@ -120,24 +193,42 @@
         <div class="timeline-section">
           <h3>数据脉络</h3>
           <div class="timeline-placeholder">
-            <a-timeline>
+            <a-timeline v-if="!isEditMode">
               <a-timeline-item color="green">
                 <p>数据创建</p>
-                <p>{{ record.createTime || '2024-01-01 10:00:00' }}</p>
+                <p>{{ record.createTime ? record.createTime.format('YYYY-MM-DD HH:mm:ss') : '2024-01-01 10:00:00' }}</p>
               </a-timeline-item>
               <a-timeline-item color="blue">
                 <p>数据同步</p>
-                <p>{{ record.syncTime || '2024-01-01 12:00:00' }}</p>
+                <p>{{ record.syncTime ? record.syncTime.format('YYYY-MM-DD HH:mm:ss') : '2024-01-01 12:00:00' }}</p>
               </a-timeline-item>
               <a-timeline-item color="orange">
                 <p>状态更新</p>
-                <p>{{ record.updateTime || '2024-01-01 15:00:00' }}</p>
+                <p>{{ record.updateTime ? record.updateTime.format('YYYY-MM-DD HH:mm:ss') : '2024-01-01 15:00:00' }}</p>
               </a-timeline-item>
               <a-timeline-item v-if="record.dataStatus === 'published'" color="green">
                 <p>数据发布</p>
-                <p>{{ record.publishTime || '2024-01-01 16:00:00' }}</p>
+                <p>{{ record.publishTime ? record.publishTime.format('YYYY-MM-DD HH:mm:ss') : '2024-01-01 16:00:00' }}</p>
               </a-timeline-item>
             </a-timeline>
+            <div v-else class="edit-timeline-section">
+              <div class="timeline-edit-item">
+                <span class="timeline-label">创建时间：</span>
+                <a-date-picker v-model:value="record.createTime" show-time placeholder="选择创建时间" style="width: 100%; margin-bottom: 8px;" />
+              </div>
+              <div class="timeline-edit-item">
+                <span class="timeline-label">同步时间：</span>
+                <a-date-picker v-model:value="record.syncTime" show-time placeholder="选择同步时间" style="width: 100%; margin-bottom: 8px;" />
+              </div>
+              <div class="timeline-edit-item">
+                <span class="timeline-label">更新时间：</span>
+                <a-date-picker v-model:value="record.updateTime" show-time placeholder="选择更新时间" style="width: 100%; margin-bottom: 8px;" />
+              </div>
+              <div class="timeline-edit-item">
+                <span class="timeline-label">发布时间：</span>
+                <a-date-picker v-model:value="record.publishTime" show-time placeholder="选择发布时间" style="width: 100%;" />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -198,53 +289,173 @@
 
 <script>
 import { message } from 'ant-design-vue'
+import { PlusOutlined } from '@ant-design/icons-vue'
+import dayjs from 'dayjs'
 
 export default {
   name: 'SearchSourceDetail',
+  components: {
+    PlusOutlined
+  },
   data() {
     return {
+      mode: 'detail', // detail, add, edit
+      originalRecord: null, // 用于取消时恢复数据
       record: {
-        id: 1,
-        title: '示例数据标题',
-        url: 'https://example.com',
-        description: '这是一个示例数据的描述信息',
-        keywords: '示例, 数据, 关键词',
-        summary: '这是网页内容的摘要信息，包含了页面的主要内容和关键信息点，帮助用户快速了解网页的核心内容。',
-        dataSource: 'api-import',
-        tags: ['标签1', '标签2', '标签3'],
-        dataStatus: 'published',
-        syncStatus: 'normal',
-        syncTime: '2024-01-01 12:00:00',
-        createTime: '2024-01-01 10:00:00',
-        updateTime: '2024-01-01 15:00:00',
-        publishTime: '2024-01-01 16:00:00'
+        id: null,
+        title: '',
+        url: '',
+        description: '',
+        keywords: '',
+        summary: '',
+        content: '',
+        graphData: '',
+        dataSource: 'manual',
+        tags: [],
+        dataStatus: 'unpublished',
+        syncStatus: 'not-synced',
+        syncTime: null,
+        createTime: null,
+        updateTime: null,
+        publishTime: null
       },
       currentRecord: null, // 用于修改标签的临时记录
       modifyTagsModalVisible: false,
       newTag: '', // 新增标签输入
       modifyStatusModalVisible: false,
-      modifyStatusValue: 'published'
+      modifyStatusValue: 'published',
+      // 标签编辑相关
+      inputVisible: false,
+      inputValue: ''
+    }
+  },
+  computed: {
+    pageTitle() {
+      switch (this.mode) {
+        case 'add': return '新增数据'
+        case 'edit': return '编辑数据'
+        case 'detail': return '数据详情'
+        default: return '数据详情'
+      }
+    },
+    isEditMode() {
+      return this.mode === 'add' || this.mode === 'edit'
     }
   },
   mounted() {
-    // 从路由参数获取数据ID并加载数据
-    const id = this.$route.params.id
-    if (id) {
-      this.loadRecord(id)
-    }
+    this.initPage()
   },
   methods: {
+    initPage() {
+      const id = this.$route.params.id
+      const mode = this.$route.query.mode || 'detail'
+      
+      this.mode = mode
+      
+      if (mode === 'add') {
+        // 新增模式：初始化空数据
+        this.initEmptyRecord()
+      } else if (id) {
+        // 编辑或详情模式：加载数据
+        this.loadRecord(id)
+      }
+    },
+    initEmptyRecord() {
+      const now = dayjs()
+      
+      this.record = {
+        id: null,
+        title: '',
+        url: '',
+        description: '',
+        keywords: '',
+        summary: '',
+        content: '',
+        graphData: '',
+        dataSource: 'manual',
+        tags: [],
+        dataStatus: 'unpublished',
+        syncStatus: 'not-synced',
+        syncTime: now,
+        createTime: now,
+        updateTime: now,
+        publishTime: ''
+      }
+    },
     loadRecord(id) {
-      // 模拟加载数据
-      // 实际项目中这里应该调用API获取数据
+      // 模拟加载数据 - 实际项目中这里应该调用API获取数据
       console.log('Loading record with ID:', id)
+      
+      // 模拟数据加载
+      const mockData = {
+        id: parseInt(id),
+        title: '示例数据标题',
+        url: 'https://example.com',
+        description: '这是一个示例数据的描述信息',
+        keywords: '示例, 数据, 关键词',
+        summary: '这是网页内容的摘要信息，包含了页面的主要内容和关键信息点，帮助用户快速了解网页的核心内容。',
+        content: '',
+        graphData: '',
+        dataSource: 'api-import',
+        tags: ['标签1', '标签2', '标签3'],
+        dataStatus: 'published',
+        syncStatus: 'normal',
+        syncTime: dayjs('2024-01-01 12:00:00'),
+        createTime: dayjs('2024-01-01 10:00:00'),
+        updateTime: dayjs('2024-01-01 15:00:00'),
+        publishTime: dayjs('2024-01-01 16:00:00')
+      }
+      
+      this.record = { ...mockData }
+      this.originalRecord = { ...mockData }
     },
     goBack() {
       this.$router.push('/view/my_search')
     },
-    handleEdit() {
-      // 跳转到编辑页面
-      this.$router.push(`/view/my_search/edit/${this.record.id}`)
+    switchToEditMode() {
+      this.mode = 'edit'
+      this.originalRecord = { ...this.record }
+    },
+    handleSave() {
+      if (!this.validateForm()) {
+        return
+      }
+      
+      // 保存逻辑
+      if (this.mode === 'add') {
+        // 新增保存
+        this.$msg.success('新增成功')
+        this.mode = 'detail'
+        // 这里应该调用API保存数据
+      } else {
+        // 编辑保存
+        this.$msg.success('保存成功')
+        this.mode = 'detail'
+        // 这里应该调用API更新数据
+      }
+      
+      this.originalRecord = { ...this.record }
+    },
+    handleCancel() {
+      if (this.mode === 'add') {
+        // 新增模式下取消，返回列表页
+        this.goBack()
+      } else {
+        // 编辑模式下取消，恢复数据并返回详情模式
+        this.record = { ...this.originalRecord }
+        this.mode = 'detail'
+      }
+    },
+    validateForm() {
+      if (!this.record.title.trim()) {
+        this.$msg.error('请输入标题')
+        return false
+      }
+      if (!this.record.url.trim()) {
+        this.$msg.error('请输入网页URL')
+        return false
+      }
+      return true
     },
     handleSync() {
       message.success('同步操作已触发')
@@ -252,10 +463,16 @@ export default {
     handleDelete() {
       this.$msg.confirm({
         title: '确认删除',
-        content: '确定要删除这条数据吗？',
+        content: '确定要删除这条数据吗？删除后无法恢复！',
+        okText: '确定',
+        cancelText: '取消',
         onOk: () => {
           this.$msg.success('删除成功')
           this.goBack()
+          // 这里应该调用API删除数据
+        },
+        onCancel() {
+          console.log('取消删除')
         }
       })
     },
@@ -290,6 +507,29 @@ export default {
       if (this.currentRecord && this.currentRecord.tags) {
         this.currentRecord.tags.splice(index, 1)
       }
+    },
+    removeTagFromRecord(index) {
+      if (this.record.tags) {
+        this.record.tags.splice(index, 1)
+      }
+    },
+    showInput() {
+      this.inputVisible = true
+      this.$nextTick(() => {
+        this.$refs.inputRef.focus()
+      })
+    },
+    handleInputConfirm() {
+      const inputValue = this.inputValue
+      if (inputValue && !this.record.tags.includes(inputValue)) {
+        this.record.tags.push(inputValue)
+      }
+      this.inputVisible = false
+      this.inputValue = ''
+    },
+    generateGraphData() {
+      // 生成图谱数据的逻辑
+      this.$msg.success('图谱数据生成成功')
     },
     showModifyStatusModal() {
       this.modifyStatusValue = this.record.dataStatus
@@ -505,6 +745,32 @@ export default {
 
 .summary-link:hover {
   text-decoration: underline;
+}
+
+/* 编辑模式下的输入框样式 */
+.edit-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.edit-graph-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-edit-item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.timeline-label {
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 4px;
+  font-size: 14px;
 }
 
 .web-content-container {

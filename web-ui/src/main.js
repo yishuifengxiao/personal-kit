@@ -9,6 +9,11 @@ import {
 // 安装ant-design-vue
 import Antd from 'ant-design-vue';
 
+// 引入dayjs并配置中文
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn'
+dayjs.locale('zh-cn')
+
 import App from './App.vue'
 import router from './router'
 
