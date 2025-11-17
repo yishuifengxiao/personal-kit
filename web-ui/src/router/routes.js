@@ -369,7 +369,7 @@ const routes = [
       {
         path: 'my_search/detail/:id',
         name: 'search_source_detail',
-        component: () => import('@/views/search_source/Detail.vue'),
+        component: () => import('@/views/search_source/Edit.vue'),
         props: true,
         meta: {
           label: '数据详情',
@@ -393,6 +393,15 @@ const routes = [
         meta: {
           label: '编辑数据',
           breadcrumbName: ['垂直搜索', '时光搜索', '编辑数据']
+        }
+      },
+      {
+        path: 'my_search/sync-records',
+        name: 'search_sync_records',
+        component: () => import('@/views/search_source/SyncRecords.vue'),
+        meta: {
+          label: '同步记录',
+          breadcrumbName: ['垂直搜索', '时光搜索', '同步记录']
         }
       },
       {

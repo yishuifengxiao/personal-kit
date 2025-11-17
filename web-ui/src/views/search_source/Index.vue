@@ -42,26 +42,18 @@
         
         <div class="action-buttons">
           <a-space>
-            <a-button type="primary" @click="showAddModal">
+            <a-button type="primary" @click="handleAdd">
               <PlusOutlined />
               新增数据
-            </a-button>
-            <a-button @click="handleBatchEdit">
-              <EditOutlined />
-              批量编辑
-            </a-button>
-            <a-button @click="handleBatchDelete">
-              <DeleteOutlined />
-              批量删除
             </a-button>
             <a-dropdown>
               <template #overlay>
                 <a-menu @click="handleBatchOperation">
                   <a-menu-item key="batchSync">批量同步</a-menu-item>
                   <a-menu-item key="syncRecords">同步记录</a-menu-item>
+                  <a-menu-item key="batchModifyTags">修改标签</a-menu-item>
+                  <a-menu-item key="batchModifyStatus">修改状态</a-menu-item>
                   <a-menu-item key="batchDelete">批量删除</a-menu-item>
-                  <a-menu-item key="batchModifyTags">批量修改标签</a-menu-item>
-                  <a-menu-item key="batchModifyStatus">批量修改数据状态</a-menu-item>
                 </a-menu>
               </template>
               <a-button>
@@ -117,7 +109,7 @@
           </template>
           <template v-else-if="column.key === 'action'">
             <a-space :size="2">
-              <a-button type="link" size="small" @click="showDetailsModal(record)">详情</a-button>
+              <a-button type="link" size="small" @click="handleViewDetail(record)">详情</a-button>
               <a-button type="link" size="small" @click="handleSync(record)">同步</a-button>
               <a-dropdown>
                 <template #overlay>
@@ -217,6 +209,51 @@
         </div>
       </div>
     </a-modal>
+
+    <!-- 修改标签模态框 -->
+    <a-modal
+      v-model:open="modifyTagsModalVisible"
+      title="修改标签"
+      @ok="handleModifyTagsOk"
+      @cancel="handleModifyTagsCancel"
+      width="500px"
+    >
+      <div class="modify-tags-content">
+        <p>当前标签：</p>
+        <div class="current-tags">
+          <a-tag v-for="(tag, index) in currentRecord?.tags" :key="index" closable @close="removeTag(index)">
+            {{ tag }}
+          </a-tag>
+        </div>
+        <div style="margin-top: 16px;">
+          <p>添加新标签：</p>
+          <a-input
+            v-model:value="newTag"
+            placeholder="请输入标签名称，按回车添加"
+            @pressEnter="addTag"
+          />
+        </div>
+      </div>
+    </a-modal>
+
+    <!-- 修改状态模态框 -->
+    <a-modal
+      v-model:open="modifyStatusModalVisible"
+      title="修改状态"
+      @ok="handleModifyStatusOk"
+      @cancel="handleModifyStatusCancel"
+      width="400px"
+    >
+      <div class="modify-status-content">
+        <p>选择数据状态：</p>
+        <a-radio-group v-model:value="modifyStatusValue">
+          <a-radio value="published">已发布</a-radio>
+          <a-radio value="unpublished">未发布</a-radio>
+          <a-radio value="abnormal">异常</a-radio>
+          <a-radio value="deleted">已删除</a-radio>
+        </a-radio-group>
+      </div>
+    </a-modal>
   </div>
 </template>
 
@@ -254,6 +291,11 @@ export default {
       isEditMode: false,
       testRecord: null,
       testResult: null,
+      modifyTagsModalVisible: false,
+      modifyStatusModalVisible: false,
+      currentRecord: null,
+      newTag: '',
+      modifyStatusValue: 'published',
       searchForm: {
         title: '',
         description: '',
@@ -538,11 +580,10 @@ export default {
         this.testModalVisible = true
       },
 
-      showDetailsModal(record) {
-        this.$msg.info(`查看详情: ${record.title}`)
-        // 这里可以打开详情弹窗或跳转到详情页面
-        // 例如: this.$router.push({ name: 'search_source_detail', params: { id: record.id } })
-      },
+      handleViewDetail(record) {
+      // 跳转到详情页面
+      this.$router.push(`/view/my_search/detail/${record.id}`)
+    },
 
       resetForm() {
         this.formData.name = ''
@@ -631,13 +672,15 @@ export default {
       },
 
       handleModifyTags(record) {
-        this.$msg.info(`修改标签: ${record.title}`)
-        // 这里可以打开标签编辑弹窗
+        this.currentRecord = { ...record }
+        this.newTag = ''
+        this.modifyTagsModalVisible = true
       },
 
       handleModifyDataStatus(record) {
-        this.$msg.info(`修改数据状态: ${record.title}`)
-        // 这里可以打开数据状态修改弹窗
+        this.currentRecord = { ...record }
+        this.modifyStatusValue = record.dataStatus
+        this.modifyStatusModalVisible = true
       },
 
       // 页面导航方法
@@ -718,8 +761,68 @@ export default {
           this.$msg.warning('请选择要修改标签的数据')
           return
         }
-        this.$msg.info(`批量修改标签: ${this.selectedRows.length} 条数据`)
-        // 这里可以打开批量标签编辑弹窗
+        this.currentRecord = { tags: [] }
+        this.newTag = ''
+        this.modifyTagsModalVisible = true
+      },
+
+      handleModifyTagsOk() {
+        if (this.selectedRows.length > 0) {
+          // 批量修改标签
+          this.selectedRows.forEach(row => {
+            row.tags = [...this.currentRecord.tags]
+          })
+          this.$msg.success(`批量修改标签成功 ${this.selectedRows.length} 条数据`)
+          this.selectedRows = []
+        } else if (this.currentRecord && this.currentRecord.id) {
+          // 单个修改标签
+          const index = this.dataSource.findIndex(item => item.id === this.currentRecord.id)
+          if (index !== -1) {
+            this.dataSource[index].tags = [...this.currentRecord.tags]
+            this.$msg.success('标签修改成功')
+          }
+        }
+        this.modifyTagsModalVisible = false
+      },
+
+      handleModifyTagsCancel() {
+        this.modifyTagsModalVisible = false
+        this.currentRecord = null
+        this.newTag = ''
+      },
+
+      handleModifyStatusOk() {
+        if (this.currentRecord && this.currentRecord.id) {
+          const index = this.dataSource.findIndex(item => item.id === this.currentRecord.id)
+          if (index !== -1) {
+            this.dataSource[index].dataStatus = this.modifyStatusValue
+            this.$msg.success('状态修改成功')
+          }
+        }
+        this.modifyStatusModalVisible = false
+      },
+
+      handleModifyStatusCancel() {
+        this.modifyStatusModalVisible = false
+        this.currentRecord = null
+      },
+
+      addTag() {
+        if (this.newTag.trim() && this.currentRecord) {
+          if (!this.currentRecord.tags) {
+            this.currentRecord.tags = []
+          }
+          if (!this.currentRecord.tags.includes(this.newTag.trim())) {
+            this.currentRecord.tags.push(this.newTag.trim())
+          }
+          this.newTag = ''
+        }
+      },
+
+      removeTag(index) {
+        if (this.currentRecord && this.currentRecord.tags) {
+          this.currentRecord.tags.splice(index, 1)
+        }
       },
 
       handleBatchModifyDataStatus() {
@@ -729,6 +832,11 @@ export default {
         }
         this.$msg.info(`批量修改数据状态: ${this.selectedRows.length} 条数据`)
         // 这里可以打开批量数据状态修改弹窗
+      },
+
+      handleSyncRecords() {
+        // 跳转到同步记录页面
+        this.$router.push('/view/my_search/sync-records')
       },
 
       handleSyncRecords() {
@@ -742,7 +850,7 @@ export default {
             this.handleBatchSync()
             break
           case 'syncRecords':
-            this.handleSyncRecords()
+            this.$router.push('/view/my_search/sync-records')
             break
           case 'batchDelete':
             this.handleBatchDelete()
@@ -759,7 +867,7 @@ export default {
       handleOperationMenu(record, key) {
         switch (key) {
           case 'edit':
-            this.showEditModal(record)
+            this.handleEdit(record)
             break
           case 'modifyTags':
             this.handleModifyTags(record)
@@ -939,6 +1047,26 @@ export default {
   align-items: center;
   margin-left: 16px;
   flex-shrink: 0;
+}
+
+/* 修改标签弹窗样式 */
+.modify-tags-content {
+  padding: 16px 0;
+}
+
+.current-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  min-height: 32px;
+  padding: 8px;
+  background-color: #fafafa;
+  border-radius: 4px;
+}
+
+.modify-status-content {
+  padding: 16px 0;
 }
 
 /* Tag item styles - remove borders */
