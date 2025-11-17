@@ -194,39 +194,85 @@
           <h3>数据脉络</h3>
           <div class="timeline-placeholder">
             <a-timeline v-if="!isEditMode">
-              <a-timeline-item color="green">
-                <p>数据创建</p>
-                <p>{{ record.createTime ? record.createTime.format('YYYY-MM-DD HH:mm:ss') : '2024-01-01 10:00:00' }}</p>
-              </a-timeline-item>
-              <a-timeline-item color="blue">
-                <p>数据同步</p>
-                <p>{{ record.syncTime ? record.syncTime.format('YYYY-MM-DD HH:mm:ss') : '2024-01-01 12:00:00' }}</p>
-              </a-timeline-item>
-              <a-timeline-item color="orange">
-                <p>状态更新</p>
-                <p>{{ record.updateTime ? record.updateTime.format('YYYY-MM-DD HH:mm:ss') : '2024-01-01 15:00:00' }}</p>
-              </a-timeline-item>
-              <a-timeline-item v-if="record.dataStatus === 'published'" color="green">
-                <p>数据发布</p>
-                <p>{{ record.publishTime ? record.publishTime.format('YYYY-MM-DD HH:mm:ss') : '2024-01-01 16:00:00' }}</p>
+              <a-timeline-item v-for="(event, index) in timelineEvents" :key="index" :color="event.color">
+                <div class="timeline-content">
+                  <div class="timeline-title">
+                    <p style="font-weight: 500; margin: 0;">{{ event.title }}</p>
+                    <p style="margin: 4px 0; color: #666;">{{ event.time ? event.time.format('YYYY-MM-DD HH:mm:ss') : event.defaultTime }}</p>
+                  </div>
+                  <div v-if="event.url || event.description" class="timeline-details" style="margin-top: 8px;">
+                    <div v-if="event.url" class="timeline-url">
+                      <a :href="event.url" target="_blank" rel="noopener noreferrer" style="font-size: 12px;">
+                        {{ event.url }}
+                      </a>
+                    </div>
+                    <div v-if="event.description" class="timeline-description" style="font-size: 12px; color: #666; margin-top: 4px;">
+                      {{ event.description }}
+                    </div>
+                  </div>
+                </div>
               </a-timeline-item>
             </a-timeline>
             <div v-else class="edit-timeline-section">
-              <div class="timeline-edit-item">
-                <span class="timeline-label">创建时间：</span>
-                <a-date-picker v-model:value="record.createTime" show-time placeholder="选择创建时间" style="width: 100%; margin-bottom: 8px;" />
+              <div v-for="(event, index) in timelineEvents" :key="index" class="timeline-edit-card">
+                <div v-if="event.isCustom" class="custom-event-editor">
+                  <div class="event-form-item">
+                    <span class="required-label">标题：</span>
+                    <a-input 
+                      v-model:value="record.timelineEvents[event.index].title" 
+                      placeholder="请输入时间点标题"
+                      style="flex: 1;"
+                    />
+                  </div>
+                  <div class="event-form-item">
+                    <span class="timeline-label">时间：</span>
+                    <a-date-picker 
+                      v-model:value="record.timelineEvents[event.index].time" 
+                      show-time 
+                      placeholder="选择时间"
+                      style="flex: 1;"
+                    />
+                  </div>
+                  <div class="event-form-item">
+                    <span class="timeline-label">URL：</span>
+                    <a-input 
+                      v-model:value="record.timelineEvents[event.index].url" 
+                      placeholder="请输入URL（可选）"
+                      style="flex: 1;"
+                    />
+                  </div>
+                  <div class="event-form-item">
+                    <span class="timeline-label">描述：</span>
+                    <a-textarea 
+                      v-model:value="record.timelineEvents[event.index].description" 
+                      placeholder="请输入描述（可选）"
+                      :rows="2"
+                      style="flex: 1;"
+                    />
+                  </div>
+                  <div class="event-actions">
+                    <a-button size="small" danger @click="removeTimelineEvent(event.index)">
+                      删除时间点
+                    </a-button>
+                  </div>
+                </div>
+                <div v-else class="builtin-event-editor">
+                  <div class="event-form-item">
+                    <span class="timeline-label">{{ event.title }}：</span>
+                    <a-date-picker 
+                      v-model:value="record[event.field]" 
+                      show-time 
+                      :placeholder="'选择' + event.title"
+                      style="flex: 1;" 
+                    />
+                  </div>
+                </div>
               </div>
-              <div class="timeline-edit-item">
-                <span class="timeline-label">同步时间：</span>
-                <a-date-picker v-model:value="record.syncTime" show-time placeholder="选择同步时间" style="width: 100%; margin-bottom: 8px;" />
-              </div>
-              <div class="timeline-edit-item">
-                <span class="timeline-label">更新时间：</span>
-                <a-date-picker v-model:value="record.updateTime" show-time placeholder="选择更新时间" style="width: 100%; margin-bottom: 8px;" />
-              </div>
-              <div class="timeline-edit-item">
-                <span class="timeline-label">发布时间：</span>
-                <a-date-picker v-model:value="record.publishTime" show-time placeholder="选择发布时间" style="width: 100%;" />
+              <div class="add-timeline-item">
+                <a-button size="small" @click="addTimelineEvent">
+                  <PlusOutlined />
+                  添加时间点
+                </a-button>
               </div>
             </div>
           </div>
@@ -317,7 +363,8 @@ export default {
         syncTime: null,
         createTime: null,
         updateTime: null,
-        publishTime: null
+        publishTime: null,
+        timelineEvents: [] // 动态时间轴事件
       },
       currentRecord: null, // 用于修改标签的临时记录
       modifyTagsModalVisible: false,
@@ -340,6 +387,67 @@ export default {
     },
     isEditMode() {
       return this.mode === 'add' || this.mode === 'edit'
+    },
+    timelineEvents() {
+      const events = []
+      
+      // 基础时间事件
+      if (this.record.createTime) {
+        events.push({
+          title: '数据创建',
+          field: 'createTime',
+          time: this.record.createTime,
+          defaultTime: '2024-01-01 10:00:00',
+          color: 'green'
+        })
+      }
+      
+      if (this.record.syncTime) {
+        events.push({
+          title: '数据同步',
+          field: 'syncTime',
+          time: this.record.syncTime,
+          defaultTime: '2024-01-01 12:00:00',
+          color: 'blue'
+        })
+      }
+      
+      if (this.record.updateTime) {
+        events.push({
+          title: '状态更新',
+          field: 'updateTime',
+          time: this.record.updateTime,
+          defaultTime: '2024-01-01 15:00:00',
+          color: 'orange'
+        })
+      }
+      
+      if (this.record.publishTime && this.record.dataStatus === 'published') {
+        events.push({
+          title: '数据发布',
+          field: 'publishTime',
+          time: this.record.publishTime,
+          defaultTime: '2024-01-01 16:00:00',
+          color: 'green'
+        })
+      }
+      
+      // 添加自定义时间轴事件
+      if (this.record.timelineEvents && this.record.timelineEvents.length > 0) {
+        this.record.timelineEvents.forEach((event, index) => {
+          events.push({
+            title: event.title,
+            field: `timelineEvents[${index}].time`,
+            time: event.time,
+            defaultTime: '2024-01-01 00:00:00',
+            color: event.color || 'gray',
+            isCustom: true,
+            index: index
+          })
+        })
+      }
+      
+      return events
     }
   },
   mounted() {
@@ -350,14 +458,21 @@ export default {
       const id = this.$route.params.id
       const mode = this.$route.query.mode || 'detail'
       
-      this.mode = mode
-      
       if (mode === 'add') {
-        // 新增模式：初始化空数据
+        // 新增模式：初始化空数据并直接进入编辑状态
+        this.mode = 'edit'
         this.initEmptyRecord()
       } else if (id) {
         // 编辑或详情模式：加载数据
         this.loadRecord(id)
+        this.mode = mode
+        if (mode === 'edit') {
+          // 编辑模式：保存原始数据用于取消恢复
+          this.originalRecord = { ...this.record }
+        }
+      } else {
+        // 默认详情模式
+        this.mode = 'detail'
       }
     },
     initEmptyRecord() {
@@ -415,14 +530,30 @@ export default {
     switchToEditMode() {
       this.mode = 'edit'
       this.originalRecord = { ...this.record }
+      // 进入编辑状态时，同步时间轴时间点
+      const now = dayjs()
+      if (!this.record.createTime) this.record.createTime = now
+      if (!this.record.updateTime) this.record.updateTime = now
     },
     handleSave() {
       if (!this.validateForm()) {
         return
       }
       
+      // 验证自定义时间轴事件标题
+      if (this.record.timelineEvents && this.record.timelineEvents.length > 0) {
+        const emptyTitleEvents = this.record.timelineEvents.filter(event => !event.title || event.title.trim() === '')
+        if (emptyTitleEvents.length > 0) {
+          message.error('存在未填写标题的时间点，请填写完整')
+          return
+        }
+      }
+      
+      // 更新时间
+      this.record.updateTime = dayjs()
+      
       // 保存逻辑
-      if (this.mode === 'add') {
+      if (this.mode === 'add' || !this.record.id) {
         // 新增保存
         this.$msg.success('新增成功')
         this.mode = 'detail'
@@ -531,6 +662,28 @@ export default {
       // 生成图谱数据的逻辑
       this.$msg.success('图谱数据生成成功')
     },
+    addTimelineEvent() {
+      if (!this.record.timelineEvents) {
+        this.record.timelineEvents = []
+      }
+      
+      const newEvent = {
+        title: '', // 必填项，空字符串待用户填写
+        time: dayjs(),
+        url: '', // 选填项
+        description: '', // 选填项
+        color: 'gray'
+      }
+      
+      this.record.timelineEvents.push(newEvent)
+      message.success('已添加新的时间点，请填写标题信息')
+    },
+    removeTimelineEvent(index) {
+      if (this.record.timelineEvents && this.record.timelineEvents.length > index) {
+        this.record.timelineEvents.splice(index, 1)
+        message.success('已删除时间点')
+      }
+    },
     showModifyStatusModal() {
       this.modifyStatusValue = this.record.dataStatus
       this.modifyStatusModalVisible = true
@@ -607,6 +760,7 @@ export default {
 </script>
 
 <style scoped>
+
 .detail-page {
   height: 100%;
   background-color: #f5f5f5;
@@ -810,5 +964,83 @@ h3 {
   margin: 0 0 12px 0;
   font-size: 16px;
   font-weight: 500;
+}
+
+/* 时间轴编辑卡片样式 */
+.timeline-edit-card {
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 12px;
+  background: #fafafa;
+}
+
+.custom-event-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.builtin-event-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.event-form-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.event-form-item .required-label {
+  font-weight: 500;
+  color: #ff4d4f;
+  min-width: 60px;
+}
+
+.event-form-item .required-label::before {
+  content: '*';
+  margin-right: 4px;
+}
+
+.event-form-item .timeline-label {
+  font-weight: 500;
+  min-width: 60px;
+}
+
+.event-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.timeline-content {
+  padding: 4px 0;
+}
+
+.timeline-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.timeline-details {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.timeline-url a {
+  color: #1890ff;
+  text-decoration: none;
+}
+
+.timeline-url a:hover {
+  text-decoration: underline;
+}
+
+.timeline-description {
+  line-height: 1.4;
 }
 </style>
