@@ -765,7 +765,7 @@ export default defineComponent({
       profileName: '',
       phoneNumber: '',
       serviceProvider: '',
-      notificationEvent: [],
+      notificationEvent: undefined,
       notificationAddress: '',
       profileIcon: '',
       // 码号信息字段
@@ -886,7 +886,7 @@ export default defineComponent({
           profileName: '测试Profile',
           phoneNumber: '13800138000',
           serviceProvider: 'provider1',
-          notificationEvent: [],
+          notificationEvent: undefined,
           notificationAddress: 'http://example.com',
           profileIcon: 'icon1',
           imsi: '460001234567890',
@@ -940,6 +940,8 @@ export default defineComponent({
             formData[key] = []
           } else if (key === 'nonEnterpriseProfileCount') {
             formData[key] = 0
+          } else if (key === 'notificationEvent') {
+            formData[key] = undefined
           } else {
             formData[key] = ''
           }
