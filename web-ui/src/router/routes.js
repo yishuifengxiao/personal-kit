@@ -430,6 +430,19 @@ const routes = [
           label: '码号数据',
           breadcrumbName: ['码号数据', '码号管理']
         }
+      },
+      {
+        path: 'profile_form',
+        name: 'profile_form',
+        component: () => import('@/views/profile/ProfileForm.vue'),
+        props: (route) => ({
+          id: route.query.id,
+          type: route.query.type
+        }),
+        meta: {
+          label: 'Profile管理',
+          breadcrumbName: ['码号数据', 'Profile管理']
+        }
       }
     ]
   }

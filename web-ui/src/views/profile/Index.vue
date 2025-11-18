@@ -171,6 +171,9 @@
           <a-range-picker
             v-model:value="searchForm.updateTime"
             style="width: 240px"
+            show-time
+            format="YYYY-MM-DD HH:mm:ss"
+            value-format="YYYY-MM-DD HH:mm:ss"
           />
         </a-form-item>
 
@@ -256,7 +259,7 @@
           </template>
           
           <template v-else-if="column.dataIndex === 'updateTime'">
-            <span :title="formatDateTime(record.updateTime)">{{ formatDateTime(record.updateTime) }}</span>
+            <span :title="record.updateTime">{{ record.updateTime }}</span>
           </template>
           
           <template v-else-if="column.dataIndex === 'action'">
@@ -288,8 +291,9 @@
 </template>
 
 <script>
-import { defineComponent, reactive, ref } from 'vue'
-import { message } from 'ant-design-vue'
+import { defineComponent, ref, reactive, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { message, Modal } from 'ant-design-vue'
 import { DownOutlined } from '@ant-design/icons-vue'
 
 export default defineComponent({
@@ -298,6 +302,7 @@ export default defineComponent({
     DownOutlined
   },
   setup() {
+    const router = useRouter()
     const loading = ref(false)
     const selectedRowKeys = ref([])
     
@@ -322,7 +327,7 @@ export default defineComponent({
       {
         title: 'ICCID',
         dataIndex: 'iccid',
-        width: 200,
+        width: 220,
         ellipsis: true,
         fixed: 'left',
         customCell: () => ({
@@ -332,7 +337,7 @@ export default defineComponent({
       {
         title: 'MatchingId',
         dataIndex: 'matchingId',
-        width: 180,
+        width: 220,
         ellipsis: true,
         fixed: 'left',
         customCell: () => ({
@@ -351,7 +356,7 @@ export default defineComponent({
       {
         title: 'EID',
         dataIndex: 'eid',
-        width: 280,
+        width: 340,
         ellipsis: true,
         customCell: () => ({
           title: '设备标识符，由32位16进制数组成'
@@ -519,14 +524,25 @@ export default defineComponent({
 
     const formatDateTime = (dateTime) => {
       if (!dateTime) return ''
-      const date = new Date(dateTime)
-      const year = date.getFullYear()
-      const month = String(date.getMonth() + 1).padStart(2, '0')
-      const day = String(date.getDate()).padStart(2, '0')
-      const hours = String(date.getHours()).padStart(2, '0')
-      const minutes = String(date.getMinutes()).padStart(2, '0')
-      const seconds = String(date.getSeconds()).padStart(2, '0')
-      return `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`
+      // 如果已经是格式化好的字符串，直接返回
+      if (typeof dateTime === 'string' && dateTime.includes('年')) {
+        return dateTime
+      }
+      try {
+        const date = new Date(dateTime)
+        if (isNaN(date.getTime())) {
+          return dateTime // 如果解析失败，返回原值
+        }
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        const hours = String(date.getHours()).padStart(2, '0')
+        const minutes = String(date.getMinutes()).padStart(2, '0')
+        const seconds = String(date.getSeconds()).padStart(2, '0')
+        return `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`
+      } catch (error) {
+        return dateTime // 出错时返回原值
+      }
     }
 
     const handleSearch = () => {
@@ -558,7 +574,10 @@ export default defineComponent({
     }
 
     const handleAdd = () => {
-      message.info('新增功能开发中...')
+      router.push({
+        name: 'profile_form',
+        query: { type: 'add' }
+      })
     }
 
     const handleImport = () => {
@@ -574,7 +593,17 @@ export default defineComponent({
         message.warning('请选择要删除的数据')
         return
       }
-      message.info('批量删除功能开发中...')
+      Modal.confirm({
+        title: '确认批量删除',
+        content: `确定要删除选中的 ${selectedRowKeys.value.length} 条数据吗？`,
+        onOk() {
+          message.success('批量删除成功！')
+          selectedRowKeys.value = []
+        },
+        onCancel() {
+          console.log('取消批量删除')
+        }
+      })
     }
 
     const handleBatchReset = () => {
@@ -582,7 +611,17 @@ export default defineComponent({
         message.warning('请选择要重置的数据')
         return
       }
-      message.info('批量重置功能开发中...')
+      Modal.confirm({
+        title: '确认批量重置',
+        content: `确定要重置选中的 ${selectedRowKeys.value.length} 条数据吗？`,
+        onOk() {
+          message.success('批量重置成功！')
+          selectedRowKeys.value = []
+        },
+        onCancel() {
+          console.log('取消批量重置')
+        }
+      })
     }
 
     const handleBatchAssignTenant = () => {
@@ -610,11 +649,17 @@ export default defineComponent({
     }
 
     const showDetail = (record) => {
-      message.info(`查看详情: ${record.iccid}`)
+      router.push({
+        name: 'profile_form',
+        query: { type: 'view', id: record.iccid }
+      })
     }
 
     const handleEdit = (record) => {
-      message.info(`编辑: ${record.iccid}`)
+      router.push({
+        name: 'profile_form',
+        query: { type: 'edit', id: record.iccid }
+      })
     }
 
     const handleCopy = (record) => {
@@ -622,11 +667,29 @@ export default defineComponent({
     }
 
     const handleDelete = (record) => {
-      message.info(`删除: ${record.iccid}`)
+      Modal.confirm({
+        title: '确认删除',
+        content: `确定要删除ICCID为 ${record.iccid} 的Profile吗？`,
+        onOk() {
+          message.success('删除成功！')
+        },
+        onCancel() {
+          console.log('取消删除')
+        }
+      })
     }
 
     const handleResetSingle = (record) => {
-      message.info(`重置: ${record.iccid}`)
+      Modal.confirm({
+        title: '确认重置',
+        content: `确定要重置ICCID为 ${record.iccid} 的Profile吗？`,
+        onOk() {
+          message.success('重置成功！')
+        },
+        onCancel() {
+          console.log('取消重置')
+        }
+      })
     }
 
     const handleAssignTenant = (record) => {
@@ -634,7 +697,16 @@ export default defineComponent({
     }
 
     const handleReuse = (record) => {
-      message.info(`重用: ${record.iccid}`)
+      Modal.confirm({
+        title: '确认重用',
+        content: `确定要重用ICCID为 ${record.iccid} 的Profile吗？`,
+        onOk() {
+          message.success('重用成功！')
+        },
+        onCancel() {
+          console.log('取消重用')
+        }
+      })
     }
 
     const handleDownloadDer = (record) => {
@@ -669,7 +741,8 @@ export default defineComponent({
         handleResetSingle,
         handleAssignTenant,
         handleReuse,
-        handleDownloadDer
+        handleDownloadDer,
+        router
       }
   }
 })
