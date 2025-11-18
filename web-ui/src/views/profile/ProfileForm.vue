@@ -31,20 +31,36 @@
           <a-input v-else-if="isAdd" v-model:value="formData.eid" placeholder="请输入32位16进制EID" :maxlength="32" style="width: 200px" />
           <span v-else class="info-value">{{ formData.eid }}</span>
         </div>
-        <div class="info-item" v-if="!isAdd">
-          <span class="info-label">MatchingId：</span>
-          <span class="info-value">{{ formData.matchingId }}</span>
+        <div class="info-item">
+          <span class="info-label">Profile名称：</span>
+          <span v-if="isView" class="info-value">{{ formData.profileName }}</span>
+          <a-input v-else v-model:value="formData.profileName" placeholder="请输入Profile名称" allow-clear style="width: 200px" />
         </div>
         <div class="info-item">
           <span class="info-label">所属租户：</span>
-          <span v-if="isView" class="info-value">{{ formData.tenant || '未设置' }}</span>
-          <a-select v-else v-model:value="formData.tenant" placeholder="请选择租户" style="width: 150px" allow-clear>
+          <span v-if="isView" class="info-value">{{ formData.tenant }}</span>
+          <a-select v-else v-model:value="formData.tenant" placeholder="请选择租户" allow-clear style="width: 200px" :rules="[{ required: true, message: '请选择所属租户' }]">
             <a-select-option value="租户A">租户A</a-select-option>
             <a-select-option value="租户B">租户B</a-select-option>
             <a-select-option value="租户C">租户C</a-select-option>
             <a-select-option value="系统租户">系统租户</a-select-option>
           </a-select>
         </div>
+        <div class="info-item">
+          <span class="info-label">ASN模版：</span>
+          <span v-if="isView" class="info-value">{{ formData.asnTemplate }}</span>
+          <a-select v-else v-model:value="formData.asnTemplate" placeholder="请选择ASN模版" allow-clear style="width: 200px" :rules="[{ required: true, message: '请选择ASN模版' }]">
+            <a-select-option value="template1">标准模版</a-select-option>
+            <a-select-option value="template2">企业模版</a-select-option>
+            <a-select-option value="template3">自定义模版</a-select-option>
+          </a-select>
+        </div>
+        <div class="info-item" v-if="!isAdd">
+          <span class="info-label">MatchingId：</span>
+          <span class="info-value">{{ formData.matchingId }}</span>
+        </div>
+     
+
       </div>
     </div>
     
@@ -73,45 +89,6 @@
             <a-row :gutter="16">
               <a-col :span="8">
                 <a-form-item
-                  label="所属租户"
-                  name="tenant"
-                  :rules="[{ required: true, message: '请选择所属租户' }]"
-                >
-                  <a-select
-                    v-model:value="formData.tenant"
-                    placeholder="请选择租户"
-                    allow-clear
-                  >
-                    <a-select-option value="租户A">租户A</a-select-option>
-                    <a-select-option value="租户B">租户B</a-select-option>
-                    <a-select-option value="租户C">租户C</a-select-option>
-                    <a-select-option value="系统租户">系统租户</a-select-option>
-                  </a-select>
-                </a-form-item>
-              </a-col>
-              
-              <a-col :span="8">
-                <a-form-item
-                  label="ASN模版"
-                  name="asnTemplate"
-                  :rules="[{ required: true, message: '请选择ASN模版' }]"
-                >
-                  <a-tooltip :title="formData.asnTemplate && formData.asnTemplate.length > 0 ? formData.asnTemplate.join(', ') : '暂无选择'" placement="top">
-                    <a-select
-                      v-model:value="formData.asnTemplate"
-                      placeholder="请选择ASN模版"
-                      allow-clear
-                    >
-                      <a-select-option value="template1">标准模版</a-select-option>
-                      <a-select-option value="template2">企业模版</a-select-option>
-                      <a-select-option value="template3">自定义模版</a-select-option>
-                    </a-select>
-                  </a-tooltip>
-                </a-form-item>
-              </a-col>
-              
-              <a-col :span="8">
-                <a-form-item
                   label="确认码"
                   name="confirmationCode"
                 >
@@ -122,9 +99,7 @@
                   />
                 </a-form-item>
               </a-col>
-            </a-row>
-            
-            <a-row :gutter="16">
+              
               <a-col :span="8">
                 <a-form-item
                   label="电话号码"
@@ -150,91 +125,9 @@
                   />
                 </a-form-item>
               </a-col>
-              
-              <a-col :span="8">
-                <a-form-item
-                  label="下载方式"
-                  name="downloadMethod"
-                >
-                  <a-select
-                    v-model:value="formData.downloadMethod"
-                    placeholder="请选择下载方式"
-                    allow-clear
-                  >
-                    <a-select-option value="default">默认SM-DP+</a-select-option>
-                    <a-select-option value="activation">激活码</a-select-option>
-                    <a-select-option value="alt-smds">ALT-SM-DS</a-select-option>
-                    <a-select-option value="root-smds">ROOT-SM-DS</a-select-option>
-                  </a-select>
-                </a-form-item>
-              </a-col>
             </a-row>
 
             <a-row :gutter="16">
-              <a-col :span="8">
-                <a-form-item
-                  label="服务提供商"
-                  name="serviceProvider"
-                  :rules="[{ required: true, message: '请选择服务提供商' }]"
-                >
-                  <a-select
-                    v-model:value="formData.serviceProvider"
-                    placeholder="请选择服务提供商"
-                    allow-clear
-                  >
-                    <a-select-option value="provider1">提供商1</a-select-option>
-                    <a-select-option value="provider2">提供商2</a-select-option>
-                    <a-select-option value="provider3">提供商3</a-select-option>
-                  </a-select>
-                </a-form-item>
-              </a-col>
-              
-              <a-col :span="8">
-                <a-form-item
-                  label="通知事件"
-                  name="notificationEvent"
-                >
-                  <a-select
-                    v-model:value="formData.notificationEvent"
-                    placeholder="请选择通知事件"
-                    allow-clear
-                  >
-                    <a-select-option value="event1">事件1</a-select-option>
-                    <a-select-option value="event2">事件2</a-select-option>
-                    <a-select-option value="event3">事件3</a-select-option>
-                  </a-select>
-                </a-form-item>
-              </a-col>
-              
-              <a-col :span="8">
-                <a-form-item
-                  label="通知地址"
-                  name="notificationAddress"
-                  :rules="[{ required: true, message: '请输入通知地址' }]"
-                >
-                  <a-input
-                    v-model:value="formData.notificationAddress"
-                    placeholder="请输入通知地址"
-                    allow-clear
-                  />
-                </a-form-item>
-              </a-col>
-            </a-row>
-
-            <a-row :gutter="16">
-              <a-col :span="8">
-                <a-form-item
-                  label="Profile图标"
-                  name="profileIcon"
-                >
-                  <a-input
-                    v-model:value="formData.profileIcon"
-                    placeholder="请输入Profile图标"
-                    allow-clear
-                  />
-                </a-form-item>
-              </a-col>
-              
               <a-col :span="8">
                 <a-form-item
                   label="下载方式"
@@ -268,6 +161,66 @@
                     <a-select-option value="中国电信">中国电信</a-select-option>
                     <a-select-option value="中国广电">中国广电</a-select-option>
                   </a-select>
+                </a-form-item>
+              </a-col>
+            </a-row>
+
+            <a-row :gutter="16">
+              <a-col :span="8">
+                <a-form-item
+                  label="服务提供商"
+                  name="serviceProvider"
+                >
+                  <a-select
+                    v-model:value="formData.serviceProvider"
+                    placeholder="请选择服务提供商"
+                    allow-clear
+                  >
+                    <a-select-option value="provider1">提供商1</a-select-option>
+                    <a-select-option value="provider2">提供商2</a-select-option>
+                    <a-select-option value="provider3">提供商3</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              
+              <a-col :span="8">
+                <a-form-item
+                  label="通知事件"
+                  name="notificationEvent"
+                >
+                  <a-tooltip :title="formData.notificationEvent && formData.notificationEvent.length > 0 ? formData.notificationEvent.join(', ') : '暂无选择'" placement="top">
+                    <a-select
+                      v-model:value="formData.notificationEvent"
+                      mode="multiple"
+                      placeholder="请选择通知事件"
+                      allow-clear
+                      :maxTagCount="2"
+                      :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
+                    >
+                      <a-select-option value="下载">下载</a-select-option>
+                      <a-select-option value="启用">启用</a-select-option>
+                      <a-select-option value="禁用">禁用</a-select-option>
+                      <a-select-option value="删除">删除</a-select-option>
+                      <a-select-option value="RPM启用">RPM启用</a-select-option>
+                      <a-select-option value="RPM禁用">RPM禁用</a-select-option>
+                      <a-select-option value="RPM删除">RPM删除</a-select-option>
+                      <a-select-option value="RPM结果">RPM结果</a-select-option>
+                    </a-select>
+                  </a-tooltip>
+                </a-form-item>
+              </a-col>
+              
+              <a-col :span="8">
+                <a-form-item
+                  label="通知地址"
+                  name="notificationAddress"
+                  :rules="[{ required: true, message: '请输入通知地址' }]"
+                >
+                  <a-input
+                    v-model:value="formData.notificationAddress"
+                    placeholder="请输入通知地址"
+                    allow-clear
+                  />
                 </a-form-item>
               </a-col>
             </a-row>
