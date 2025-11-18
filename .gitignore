@@ -12,3 +12,4 @@ ui/yarn.lock
 web-ui/node_modules/
 desk-gui/node_modules/
 web-ui/yarn.lock
+web-ui/dist

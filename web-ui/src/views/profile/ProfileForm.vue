@@ -75,6 +75,7 @@
                 <a-form-item
                   label="所属租户"
                   name="tenant"
+                  :rules="[{ required: true, message: '请选择所属租户' }]"
                 >
                   <a-select
                     v-model:value="formData.tenant"
@@ -91,25 +92,30 @@
               
               <a-col :span="8">
                 <a-form-item
+                  label="ASN模版"
+                  name="asnTemplate"
+                  :rules="[{ required: true, message: '请选择ASN模版' }]"
+                >
+                  <a-select
+                    v-model:value="formData.asnTemplate"
+                    placeholder="请选择ASN模版"
+                    allow-clear
+                  >
+                    <a-select-option value="template1">标准模版</a-select-option>
+                    <a-select-option value="template2">企业模版</a-select-option>
+                    <a-select-option value="template3">自定义模版</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              
+              <a-col :span="8">
+                <a-form-item
                   label="确认码"
                   name="confirmationCode"
                 >
                   <a-input
                     v-model:value="formData.confirmationCode"
                     placeholder="请输入确认码"
-                    allow-clear
-                  />
-                </a-form-item>
-              </a-col>
-              
-              <a-col :span="8">
-                <a-form-item
-                  label="Profile名称"
-                  name="profileName"
-                >
-                  <a-input
-                    v-model:value="formData.profileName"
-                    placeholder="请输入Profile名称"
                     allow-clear
                   />
                 </a-form-item>
@@ -491,47 +497,27 @@
       
       <!-- 右侧区域 - 2/5 -->
       <div class="right-section">
-        <!-- V3功能支持 - 两列布局 -->
+        <!-- V3功能支持 - 整行布局 -->
         <div class="v3-features-section">
-          <h3>V3功能支持</h3>
-          <a-row :gutter="16">
-            <a-col :span="12">
-              <a-form-item label="选择功能" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-                <a-select
-                  v-model:value="formData.v3Features"
-                  mode="multiple"
-                  placeholder="请选择功能"
-                  :disabled="isView"
-                  allow-clear
-                  style="width: 100%"
-                >
-                  <a-select-option value="rpmData">RPM数据</a-select-option>
-                  <a-select-option value="deviceSwitchData">设备切换数据</a-select-option>
-                  <a-select-option value="enterpriseProfileData">企业Profile数据</a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
-            <a-col :span="12">
-              <a-form-item label="ASN模版" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-                <a-select
-                  v-model:value="formData.asnTemplate"
-                  placeholder="请选择ASN模版"
-                  :disabled="isView"
-                  allow-clear
-                  style="width: 100%"
-                >
-                  <a-select-option value="template1">标准模版</a-select-option>
-                  <a-select-option value="template2">企业模版</a-select-option>
-                  <a-select-option value="template3">自定义模版</a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
-          </a-row>
+          <a-form-item label="v3功能支持" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
+            <a-select
+              v-model:value="formData.v3Features"
+              mode="multiple"
+              placeholder="请选择功能"
+              :disabled="isView"
+              allow-clear
+              style="width: 100%"
+            >
+              <a-select-option value="rpmData">RPM数据</a-select-option>
+              <a-select-option value="deviceSwitchData">设备切换数据</a-select-option>
+              <a-select-option value="enterpriseProfileData">企业Profile数据</a-select-option>
+            </a-select>
+          </a-form-item>
         </div>
 
         <!-- RPM数据配置 -->
         <div class="rpm-config-section" v-if="formData.v3Features && formData.v3Features.includes('rpmData')">
-          <h3>RPM数据配置</h3>
+          <a-divider dashed orientation="center">RPM数据配置</a-divider>
           <a-row :gutter="16">
             <a-col :span="12">
               <a-form-item label="RPM类型" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
@@ -542,6 +528,8 @@
                   :disabled="isView"
                   allow-clear
                   style="width: 100%"
+                  :maxTagCount="2"
+                  :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
                 >
                   <a-select-option value="Enable">Enable</a-select-option>
                   <a-select-option value="Disable">Disable</a-select-option>
@@ -585,13 +573,18 @@
             </a-col>
             <a-col :span="12" v-if="formData.rpmDownloadMethod">
               <a-form-item label="RPM轮询地址" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-                <a-input
-                  v-model:value="formData.rpmPollingAddress"
-                  placeholder="请输入RPM轮询地址"
+                <a-select
+                  v-model:value="formData.rpmPollAddress"
+                  placeholder="请选择RPM轮询地址"
                   :disabled="isView"
                   allow-clear
                   style="width: 100%"
-                />
+                >
+                  <a-select-option value="https://api.example.com/rpm1">https://api.example.com/rpm1</a-select-option>
+                  <a-select-option value="https://api.example.com/rpm2">https://api.example.com/rpm2</a-select-option>
+                  <a-select-option value="https://api.example.com/rpm3">https://api.example.com/rpm3</a-select-option>
+                  <a-select-option value="custom">自定义地址</a-select-option>
+                </a-select>
               </a-form-item>
             </a-col>
           </a-row>
@@ -605,6 +598,8 @@
               :disabled="isView"
               allow-clear
               style="width: 100%"
+              :maxTagCount="3"
+              :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
             >
               <a-select-option value="Service provider name">Service provider name</a-select-option>
               <a-select-option value="Profile name">Profile name</a-select-option>
@@ -623,7 +618,7 @@
 
         <!-- 设备切换数据 -->
         <div class="device-switch-section" v-if="formData.v3Features && formData.v3Features.includes('deviceSwitchData')">
-          <h3>设备切换数据</h3>
+          <a-divider dashed orientation="center">设备切换数据</a-divider>
           <a-row :gutter="16">
             <a-col :span="12">
               <a-form-item label="设备切换方式" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
@@ -672,7 +667,7 @@
 
         <!-- 企业Profile数据 -->
         <div class="enterprise-profile-section" v-if="formData.v3Features && formData.v3Features.includes('enterpriseProfileData')">
-          <h3>企业Profile数据</h3>
+          <a-divider dashed orientation="center">企业Profile数据</a-divider>
           <a-row :gutter="16">
             <a-col :span="12">
               <a-form-item label="企业名称" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
@@ -983,6 +978,8 @@ export default defineComponent({
   padding: 0;
   background-color: #f5f5f5;
   min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* 紧凑的页面头部 */
@@ -1033,9 +1030,14 @@ export default defineComponent({
 /* 详情容器 - 左右布局 */
 .detail-container {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   width: 100%;
   box-sizing: border-box;
+  padding-bottom: 32px;
+  min-height: calc(100vh - 100px);
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  overflow-x: hidden; /* 防止水平滚动 */
 }
 
 /* 左侧区域 */
@@ -1045,11 +1047,16 @@ export default defineComponent({
   border-radius: 6px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   min-width: 0;
+  overflow: visible;
+  max-height: calc(100vh - 124px); /* 添加最大高度限制 */
+  overflow-y: auto; /* 允许垂直滚动 */
 }
 
 /* 基本信息编辑区域 */
 .basic-info-section {
   padding: 16px;
+  overflow: visible;
+  padding-bottom: 30px; /* 增加底部内边距防止内容被遮挡 */
 }
 
 .section-header {
@@ -1078,43 +1085,36 @@ export default defineComponent({
   flex: 2;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 0;
+  overflow-y: auto;
+  max-height: calc(100vh - 124px);
   min-width: 0;
+  padding-bottom: 20px; /* 添加底部内边距防止内容被遮挡 */
+  background: #fff; /* 默认白色背景 */
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
 }
 
 /* V3功能支持 */
 .v3-features-section {
-  background: #fff;
-  border: 1px solid #e8e8e8;
-  border-radius: 6px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-.v3-features-section h3 {
-  margin: 0 0 12px 0;
-  color: #333;
-  font-size: 14px;
-  font-weight: 600;
+  padding: 12px;
+  margin-bottom: 0;
+  border-bottom: 1px solid #e8e8e8;
 }
 
 .rpm-config-section,
 .device-switch-section,
 .enterprise-profile-section {
-  background: #fff;
-  border: 1px solid #e8e8e8;
-  border-radius: 6px;
-  padding: 16px;
-  margin-bottom: 16px;
+  padding: 12px;
+  margin-bottom: 0;
+  overflow: visible;
+  min-height: auto; /* 移除最小高度限制 */
+  border-bottom: 1px solid #e8e8e8;
 }
 
-.rpm-config-section h3,
-.device-switch-section h3,
-.enterprise-profile-section h3 {
-  margin: 0 0 12px 0;
-  color: #333;
-  font-size: 14px;
-  font-weight: 600;
+.enterprise-profile-section {
+  margin-bottom: 20px; /* 确保底部有足够的间距 */
+  border-bottom: none; /* 最后一个section不需要底部边框 */
 }
 
 .readonly-value {
@@ -1130,7 +1130,38 @@ export default defineComponent({
 }
 
 :deep(.ant-form-item) {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+}
+
+/* 优化多选下拉框的显示 */
+:deep(.ant-select-selection-item) {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:deep(.ant-select-selection-overflow) {
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 2px 0;
+}
+
+/* 多选下拉框悬浮时显示所有选项 */
+:deep(.ant-select-multiple:hover .ant-select-selector) {
+  height: auto !important;
+  min-height: 32px;
+}
+
+:deep(.ant-select-multiple:hover .ant-select-selection-overflow) {
+  flex-wrap: wrap;
+}
+
+:deep(.ant-select-multiple:hover .ant-select-selection-item) {
+  max-width: none;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
 }
 
 :deep(.ant-form-item-label) {
@@ -1174,9 +1205,32 @@ export default defineComponent({
 }
 
 :deep(.ant-divider) {
-  margin: 16px 0;
+  margin: 8px 0;
   font-size: 13px;
   font-weight: 500;
+}
+
+/* 确保表单区域有足够的间距 */
+:deep(.ant-form-item-control) {
+  min-height: 32px; /* 确保控件有足够高度 */
+}
+
+:deep(.ant-select-multiple .ant-select-selector) {
+  min-height: 32px; /* 多选框最小高度 */
+  padding: 2px 4px;
+}
+
+:deep(.ant-divider-dashed) {
+  border-color: #d9d9d9;
+  border-style: dashed;
+  border-width: 1px 0 0 0;
+}
+
+:deep(.ant-divider-with-text) {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 8px 0;
 }
 
 :deep(.ant-row) {
@@ -1197,6 +1251,11 @@ export default defineComponent({
   
   .right-section {
     width: 100%;
+    max-height: none;
+  }
+  
+  .left-section {
+    max-height: none; /* 在小屏幕上移除高度限制 */
   }
 }
 
