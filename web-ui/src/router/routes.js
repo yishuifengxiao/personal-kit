@@ -421,6 +421,15 @@ const routes = [
           label: '工具箱',
           breadcrumbName: ['工具箱', '在线工具']
         }
+      },
+      {
+        path: 'profile_manage',
+        name: 'profile_manage',
+        component: () => import('@/views/profile/Index.vue'),
+        meta: {
+          label: '码号数据',
+          breadcrumbName: ['码号数据', '码号管理']
+        }
       }
     ]
   }
