@@ -8,10 +8,10 @@
     >
       <template #extra>
         <div class="header-actions">
-          <a-button v-if="!isView" type="primary" size="small" @click="handleSubmit">保存</a-button>
-          <a-button v-if="!isView" size="small" @click="handleCancel">取消</a-button>
-          <a-button v-if="isView" type="primary" size="small" @click="switchToEditMode">编辑</a-button>
-          <a-button v-if="isView" size="small" @click="handleCancel">关闭</a-button>
+          <a-button v-if="!isView" type="primary" size="large" @click="handleSubmit">保存</a-button>
+          <a-button v-if="!isView" size="large" @click="handleCancel">取消</a-button>
+          <a-button v-if="isView" type="primary" size="large" @click="switchToEditMode">编辑</a-button>
+          <a-button v-if="isView" size="large" @click="handleCancel">关闭</a-button>
         </div>
       </template>
     </a-page-header>
@@ -31,14 +31,19 @@
           <a-input v-else-if="isAdd" v-model:value="formData.eid" placeholder="请输入32位16进制EID" :maxlength="32" style="width: 200px" />
           <span v-else class="info-value">{{ formData.eid }}</span>
         </div>
-        <div class="info-item">
+        <div class="info-item" v-if="!isAdd">
           <span class="info-label">MatchingId：</span>
           <span class="info-value">{{ formData.matchingId }}</span>
         </div>
         <div class="info-item">
           <span class="info-label">所属租户：</span>
           <span v-if="isView" class="info-value">{{ formData.tenant || '未设置' }}</span>
-          <a-input v-else v-model:value="formData.tenant" placeholder="请输入租户" style="width: 150px" />
+          <a-select v-else v-model:value="formData.tenant" placeholder="请选择租户" style="width: 150px" allow-clear>
+            <a-select-option value="租户A">租户A</a-select-option>
+            <a-select-option value="租户B">租户B</a-select-option>
+            <a-select-option value="租户C">租户C</a-select-option>
+            <a-select-option value="系统租户">系统租户</a-select-option>
+          </a-select>
         </div>
       </div>
     </div>
@@ -68,6 +73,24 @@
             <a-row :gutter="16">
               <a-col :span="8">
                 <a-form-item
+                  label="所属租户"
+                  name="tenant"
+                >
+                  <a-select
+                    v-model:value="formData.tenant"
+                    placeholder="请选择租户"
+                    allow-clear
+                  >
+                    <a-select-option value="租户A">租户A</a-select-option>
+                    <a-select-option value="租户B">租户B</a-select-option>
+                    <a-select-option value="租户C">租户C</a-select-option>
+                    <a-select-option value="系统租户">系统租户</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              
+              <a-col :span="8">
+                <a-form-item
                   label="确认码"
                   name="confirmationCode"
                 >
@@ -91,7 +114,9 @@
                   />
                 </a-form-item>
               </a-col>
-              
+            </a-row>
+            
+            <a-row :gutter="16">
               <a-col :span="8">
                 <a-form-item
                   label="电话号码"
@@ -102,6 +127,37 @@
                     placeholder="请输入电话号码"
                     allow-clear
                   />
+                </a-form-item>
+              </a-col>
+              
+              <a-col :span="8">
+                <a-form-item
+                  label="Profile图标"
+                  name="profileIcon"
+                >
+                  <a-input
+                    v-model:value="formData.profileIcon"
+                    placeholder="请输入Profile图标"
+                    allow-clear
+                  />
+                </a-form-item>
+              </a-col>
+              
+              <a-col :span="8">
+                <a-form-item
+                  label="下载方式"
+                  name="downloadMethod"
+                >
+                  <a-select
+                    v-model:value="formData.downloadMethod"
+                    placeholder="请选择下载方式"
+                    allow-clear
+                  >
+                    <a-select-option value="default">默认SM-DP+</a-select-option>
+                    <a-select-option value="activation">激活码</a-select-option>
+                    <a-select-option value="alt-smds">ALT-SM-DS</a-select-option>
+                    <a-select-option value="root-smds">ROOT-SM-DS</a-select-option>
+                  </a-select>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -194,11 +250,16 @@
                   label="运营商"
                   name="carrier"
                 >
-                  <a-input
+                  <a-select
                     v-model:value="formData.carrier"
-                    placeholder="请输入运营商"
+                    placeholder="请选择运营商"
                     allow-clear
-                  />
+                  >
+                    <a-select-option value="中国移动">中国移动</a-select-option>
+                    <a-select-option value="中国联通">中国联通</a-select-option>
+                    <a-select-option value="中国电信">中国电信</a-select-option>
+                    <a-select-option value="中国广电">中国广电</a-select-option>
+                  </a-select>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -430,99 +491,120 @@
       
       <!-- 右侧区域 - 2/5 -->
       <div class="right-section">
-        <!-- V3功能支持 -->
+        <!-- V3功能支持 - 两列布局 -->
         <div class="v3-features-section">
           <h3>V3功能支持</h3>
-          <a-checkbox-group 
-            v-model:value="formData.v3Features" 
-            :disabled="isView"
-            style="width: 100%"
-          >
-            <a-row>
-              <a-col :span="24">
-                <a-checkbox value="rpmData">RPM数据</a-checkbox>
-              </a-col>
-              <a-col :span="24">
-                <a-checkbox value="deviceSwitchData">设备切换数据</a-checkbox>
-              </a-col>
-              <a-col :span="24">
-                <a-checkbox value="enterpriseProfileData">企业Profile数据</a-checkbox>
-              </a-col>
-            </a-row>
-          </a-checkbox-group>
+          <a-row :gutter="16">
+            <a-col :span="12">
+              <a-form-item label="选择功能" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-select
+                  v-model:value="formData.v3Features"
+                  mode="multiple"
+                  placeholder="请选择功能"
+                  :disabled="isView"
+                  allow-clear
+                  style="width: 100%"
+                >
+                  <a-select-option value="rpmData">RPM数据</a-select-option>
+                  <a-select-option value="deviceSwitchData">设备切换数据</a-select-option>
+                  <a-select-option value="enterpriseProfileData">企业Profile数据</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :span="12">
+              <a-form-item label="ASN模版" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-select
+                  v-model:value="formData.asnTemplate"
+                  placeholder="请选择ASN模版"
+                  :disabled="isView"
+                  allow-clear
+                  style="width: 100%"
+                >
+                  <a-select-option value="template1">标准模版</a-select-option>
+                  <a-select-option value="template2">企业模版</a-select-option>
+                  <a-select-option value="template3">自定义模版</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+          </a-row>
         </div>
 
         <!-- RPM数据配置 -->
         <div class="rpm-config-section" v-if="formData.v3Features && formData.v3Features.includes('rpmData')">
           <h3>RPM数据配置</h3>
+          <a-row :gutter="16">
+            <a-col :span="12">
+              <a-form-item label="RPM类型" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-select
+                  v-model:value="formData.rpmType"
+                  mode="multiple"
+                  placeholder="请选择RPM类型"
+                  :disabled="isView"
+                  allow-clear
+                  style="width: 100%"
+                >
+                  <a-select-option value="Enable">Enable</a-select-option>
+                  <a-select-option value="Disable">Disable</a-select-option>
+                  <a-select-option value="Delete">Delete</a-select-option>
+                  <a-select-option value="ListProfileInfo">ListProfileInfo</a-select-option>
+                  <a-select-option value="ContactPcmp">ContactPcmp</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :span="12">
+              <a-form-item label="RPM下载方式" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-select
+                  v-model:value="formData.rpmDownloadMethod"
+                  placeholder="请选择RPM下载方式"
+                  :disabled="isView"
+                  allow-clear
+                  style="width: 100%"
+                >
+                  <a-select-option value="SM-DP+">SM-DP+</a-select-option>
+                  <a-select-option value="SM-DS">SM-DS</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+          </a-row>
           
-          <!-- RPM类型 -->
-          <a-form-item label="RPM类型" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
-            <a-select
-              v-model:value="formData.rpmType"
-              mode="multiple"
-              placeholder="请选择RPM类型"
-              :disabled="isView"
-              allow-clear
-            >
-              <a-select-option value="Enable">Enable</a-select-option>
-              <a-select-option value="Disable">Disable</a-select-option>
-              <a-select-option value="Delete">Delete</a-select-option>
-              <a-select-option value="ListProfileInfo">ListProfileInfo</a-select-option>
-              <a-select-option value="ContactPcmp">ContactPcmp</a-select-option>
-            </a-select>
-          </a-form-item>
-
-          <!-- RPM下载方式 -->
-          <a-form-item label="RPM下载方式" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
-            <a-select
-              v-model:value="formData.rpmDownloadMethod"
-              placeholder="请选择RPM下载方式"
-              :disabled="isView"
-              allow-clear
-            >
-              <a-select-option value="SM-DP+">SM-DP+</a-select-option>
-              <a-select-option value="SM-DS">SM-DS</a-select-option>
-            </a-select>
-          </a-form-item>
-
-          <!-- RPM轮询地址 -->
-          <a-form-item 
-            v-if="formData.rpmDownloadMethod" 
-            label="RPM轮询地址" 
-            :label-col="{ span: 8 }" 
-            :wrapper-col="{ span: 16 }"
-          >
-            <a-input
-              v-model:value="formData.rpmPollingAddress"
-              placeholder="请输入RPM轮询地址"
-              :disabled="isView"
-              allow-clear
-            />
-          </a-form-item>
-
-          <!-- 允许的CA -->
-          <a-form-item label="允许的CA" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
-            <a-select
-              v-model:value="formData.allowedCA"
-              placeholder="请选择允许的CA"
-              :disabled="isView"
-              allow-clear
-            >
-              <a-select-option value="CA1">CA1</a-select-option>
-              <a-select-option value="CA2">CA2</a-select-option>
-              <a-select-option value="CA3">CA3</a-select-option>
-            </a-select>
-          </a-form-item>
+          <a-row :gutter="16">
+            <a-col :span="12">
+              <a-form-item label="允许的CA" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-select
+                  v-model:value="formData.allowedCA"
+                  placeholder="请选择允许的CA"
+                  :disabled="isView"
+                  allow-clear
+                  style="width: 100%"
+                >
+                  <a-select-option value="CA1">CA1</a-select-option>
+                  <a-select-option value="CA2">CA2</a-select-option>
+                  <a-select-option value="CA3">CA3</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :span="12" v-if="formData.rpmDownloadMethod">
+              <a-form-item label="RPM轮询地址" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-input
+                  v-model:value="formData.rpmPollingAddress"
+                  placeholder="请输入RPM轮询地址"
+                  :disabled="isView"
+                  allow-clear
+                  style="width: 100%"
+                />
+              </a-form-item>
+            </a-col>
+          </a-row>
 
           <!-- 允许的Tags -->
-          <a-form-item label="允许的Tags" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
+          <a-form-item label="允许的Tags" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
             <a-select
               v-model:value="formData.allowedTags"
               mode="multiple"
               placeholder="请选择允许的Tags"
               :disabled="isView"
               allow-clear
+              style="width: 100%"
             >
               <a-select-option value="Service provider name">Service provider name</a-select-option>
               <a-select-option value="Profile name">Profile name</a-select-option>
@@ -542,93 +624,98 @@
         <!-- 设备切换数据 -->
         <div class="device-switch-section" v-if="formData.v3Features && formData.v3Features.includes('deviceSwitchData')">
           <h3>设备切换数据</h3>
+          <a-row :gutter="16">
+            <a-col :span="12">
+              <a-form-item label="设备切换方式" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-radio-group v-model:value="formData.deviceSwitchMethod" :disabled="isView">
+                  <a-radio value="requestPlatform">请求平台</a-radio>
+                  <a-radio value="useStoredCode">使用存储的激活码</a-radio>
+                </a-radio-group>
+              </a-form-item>
+            </a-col>
+            <a-col :span="12">
+              <a-form-item label="允许的CA" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-select
+                  v-model:value="formData.deviceSwitchAllowedCA"
+                  placeholder="请选择允许的CA"
+                  :disabled="isView"
+                  allow-clear
+                  style="width: 100%"
+                >
+                  <a-select-option value="CA1">CA1</a-select-option>
+                  <a-select-option value="CA2">CA2</a-select-option>
+                  <a-select-option value="CA3">CA3</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+          </a-row>
           
-          <!-- 设备切换方式 -->
-          <a-form-item label="设备切换方式" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
-            <a-radio-group v-model:value="formData.deviceSwitchMethod" :disabled="isView">
-              <a-radio value="requestPlatform">请求平台</a-radio>
-              <a-radio value="useStoredCode">使用存储的激活码</a-radio>
-            </a-radio-group>
-          </a-form-item>
-
-          <!-- 是否需要新设备EID -->
-          <a-form-item label="是否需要新设备EID" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
-            <a-radio-group v-model:value="formData.needNewEID" :disabled="isView">
-              <a-radio value="yes">是</a-radio>
-              <a-radio value="no">否</a-radio>
-            </a-radio-group>
-          </a-form-item>
-
-          <!-- 是否需要新设备TAC -->
-          <a-form-item label="是否需要新设备TAC" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
-            <a-radio-group v-model:value="formData.needNewTAC" :disabled="isView">
-              <a-radio value="yes">是</a-radio>
-              <a-radio value="no">否</a-radio>
-            </a-radio-group>
-          </a-form-item>
-
-          <!-- 允许的CA -->
-          <a-form-item label="允许的CA" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
-            <a-select
-              v-model:value="formData.deviceSwitchAllowedCA"
-              placeholder="请选择允许的CA"
-              :disabled="isView"
-              allow-clear
-            >
-              <a-select-option value="CA1">CA1</a-select-option>
-              <a-select-option value="CA2">CA2</a-select-option>
-              <a-select-option value="CA3">CA3</a-select-option>
-            </a-select>
-          </a-form-item>
+          <a-row :gutter="16">
+            <a-col :span="12">
+              <a-form-item label="是否需要新设备EID" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-radio-group v-model:value="formData.needNewEID" :disabled="isView">
+                  <a-radio value="yes">是</a-radio>
+                  <a-radio value="no">否</a-radio>
+                </a-radio-group>
+              </a-form-item>
+            </a-col>
+            <a-col :span="12">
+              <a-form-item label="是否需要新设备TAC" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-radio-group v-model:value="formData.needNewTAC" :disabled="isView">
+                  <a-radio value="yes">是</a-radio>
+                  <a-radio value="no">否</a-radio>
+                </a-radio-group>
+              </a-form-item>
+            </a-col>
+          </a-row>
         </div>
 
         <!-- 企业Profile数据 -->
         <div class="enterprise-profile-section" v-if="formData.v3Features && formData.v3Features.includes('enterpriseProfileData')">
           <h3>企业Profile数据</h3>
+          <a-row :gutter="16">
+            <a-col :span="12">
+              <a-form-item label="企业名称" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-select
+                  v-model:value="formData.enterpriseName"
+                  placeholder="请选择企业名称"
+                  :disabled="isView"
+                  allow-clear
+                  style="width: 100%"
+                >
+                  <a-select-option value="enterprise1">企业1</a-select-option>
+                  <a-select-option value="enterprise2">企业2</a-select-option>
+                  <a-select-option value="enterprise3">企业3</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :span="12" v-if="formData.enterpriseRules && formData.enterpriseRules.length > 0">
+              <a-form-item label="非企业Profile数量" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-input-number
+                  v-model:value="formData.nonEnterpriseProfileCount"
+                  :min="0"
+                  :max="10"
+                  placeholder="请输入数量"
+                  :disabled="isView"
+                  style="width: 100%"
+                />
+              </a-form-item>
+            </a-col>
+          </a-row>
           
-          <!-- 企业名称 -->
-          <a-form-item label="企业名称" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
-            <a-select
-              v-model:value="formData.enterpriseName"
-              placeholder="请选择企业名称"
-              :disabled="isView"
-              allow-clear
-            >
-              <a-select-option value="enterprise1">企业1</a-select-option>
-              <a-select-option value="enterprise2">企业2</a-select-option>
-              <a-select-option value="enterprise3">企业3</a-select-option>
-            </a-select>
-          </a-form-item>
-
           <!-- 规则 -->
-          <a-form-item label="规则" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
+          <a-form-item label="规则" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
             <a-select
               v-model:value="formData.enterpriseRules"
               mode="multiple"
               placeholder="请选择规则"
               :disabled="isView"
               allow-clear
+              style="width: 100%"
             >
               <a-select-option value="priorityEnterpriseProfile">优先级企业Profile</a-select-option>
               <a-select-option value="onlyInstallEnterpriseProfile">只能安装企业Profile</a-select-option>
             </a-select>
-          </a-form-item>
-
-          <!-- 非企业Profile数量 -->
-          <a-form-item 
-            v-if="formData.enterpriseRules && formData.enterpriseRules.length > 0" 
-            label="非企业Profile数量" 
-            :label-col="{ span: 8 }" 
-            :wrapper-col="{ span: 16 }"
-          >
-            <a-input-number
-              v-model:value="formData.nonEnterpriseProfileCount"
-              :min="0"
-              :max="10"
-              placeholder="请输入非企业Profile数量"
-              :disabled="isView"
-              style="width: 100%"
-            />
           </a-form-item>
         </div>
       </div>
@@ -847,14 +934,14 @@ export default defineComponent({
       try {
         await formRef.value.validate()
         message.success('保存成功')
-        router.push('/profile_manage')
+        router.push('/view/profile_manage')
       } catch (error) {
         console.error('表单验证失败:', error)
       }
     }
     
     const handleCancel = () => {
-      router.push('/profile_manage')
+      router.push('/view/profile_manage')
     }
     
     // 切换到编辑模式
