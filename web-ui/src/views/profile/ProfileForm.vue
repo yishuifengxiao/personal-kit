@@ -96,15 +96,17 @@
                   name="asnTemplate"
                   :rules="[{ required: true, message: '请选择ASN模版' }]"
                 >
-                  <a-select
-                    v-model:value="formData.asnTemplate"
-                    placeholder="请选择ASN模版"
-                    allow-clear
-                  >
-                    <a-select-option value="template1">标准模版</a-select-option>
-                    <a-select-option value="template2">企业模版</a-select-option>
-                    <a-select-option value="template3">自定义模版</a-select-option>
-                  </a-select>
+                  <a-tooltip :title="formData.asnTemplate && formData.asnTemplate.length > 0 ? formData.asnTemplate.join(', ') : '暂无选择'" placement="top">
+                    <a-select
+                      v-model:value="formData.asnTemplate"
+                      placeholder="请选择ASN模版"
+                      allow-clear
+                    >
+                      <a-select-option value="template1">标准模版</a-select-option>
+                      <a-select-option value="template2">企业模版</a-select-option>
+                      <a-select-option value="template3">自定义模版</a-select-option>
+                    </a-select>
+                  </a-tooltip>
                 </a-form-item>
               </a-col>
               
@@ -500,18 +502,20 @@
         <!-- V3功能支持 - 整行布局 -->
         <div class="v3-features-section">
           <a-form-item label="v3功能支持" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
-            <a-select
-              v-model:value="formData.v3Features"
-              mode="multiple"
-              placeholder="请选择功能"
-              :disabled="isView"
-              allow-clear
-              style="width: 100%"
-            >
-              <a-select-option value="rpmData">RPM数据</a-select-option>
-              <a-select-option value="deviceSwitchData">设备切换数据</a-select-option>
-              <a-select-option value="enterpriseProfileData">企业Profile数据</a-select-option>
-            </a-select>
+            <a-tooltip :title="formData.v3Features && formData.v3Features.length > 0 ? formData.v3Features.join(', ') : '暂无选择'" placement="top">
+              <a-select
+                v-model:value="formData.v3Features"
+                mode="multiple"
+                placeholder="请选择功能"
+                :disabled="isView"
+                allow-clear
+                style="width: 100%"
+              >
+                <a-select-option value="rpmData">RPM数据</a-select-option>
+                <a-select-option value="deviceSwitchData">设备切换数据</a-select-option>
+                <a-select-option value="enterpriseProfileData">企业Profile数据</a-select-option>
+              </a-select>
+            </a-tooltip>
           </a-form-item>
         </div>
 
@@ -521,22 +525,24 @@
           <a-row :gutter="16">
             <a-col :span="12">
               <a-form-item label="RPM类型" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-                <a-select
-                  v-model:value="formData.rpmType"
-                  mode="multiple"
-                  placeholder="请选择RPM类型"
-                  :disabled="isView"
-                  allow-clear
-                  style="width: 100%"
-                  :maxTagCount="2"
-                  :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
-                >
-                  <a-select-option value="Enable">Enable</a-select-option>
-                  <a-select-option value="Disable">Disable</a-select-option>
-                  <a-select-option value="Delete">Delete</a-select-option>
-                  <a-select-option value="ListProfileInfo">ListProfileInfo</a-select-option>
-                  <a-select-option value="ContactPcmp">ContactPcmp</a-select-option>
-                </a-select>
+                <a-tooltip :title="formData.rpmType && formData.rpmType.length > 0 ? formData.rpmType.join(', ') : '暂无选择'" placement="top">
+                  <a-select
+                    v-model:value="formData.rpmType"
+                    mode="multiple"
+                    placeholder="请选择RPM类型"
+                    :disabled="isView"
+                    allow-clear
+                    style="width: 100%"
+                    :maxTagCount="2"
+                    :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
+                  >
+                    <a-select-option value="Enable">Enable</a-select-option>
+                    <a-select-option value="Disable">Disable</a-select-option>
+                    <a-select-option value="Delete">Delete</a-select-option>
+                    <a-select-option value="ListProfileInfo">ListProfileInfo</a-select-option>
+                    <a-select-option value="ContactPcmp">ContactPcmp</a-select-option>
+                  </a-select>
+                </a-tooltip>
               </a-form-item>
             </a-col>
             <a-col :span="12">
@@ -591,28 +597,30 @@
 
           <!-- 允许的Tags -->
           <a-form-item label="允许的Tags" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
-            <a-select
-              v-model:value="formData.allowedTags"
-              mode="multiple"
-              placeholder="请选择允许的Tags"
-              :disabled="isView"
-              allow-clear
-              style="width: 100%"
-              :maxTagCount="3"
-              :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
-            >
-              <a-select-option value="Service provider name">Service provider name</a-select-option>
-              <a-select-option value="Profile name">Profile name</a-select-option>
-              <a-select-option value="Notification Configuration Info">Notification Configuration Info</a-select-option>
-              <a-select-option value="Icon type and Icon">Icon type and Icon</a-select-option>
-              <a-select-option value="Profile Policy Rules">Profile Policy Rules</a-select-option>
-              <a-select-option value="Service Specific Data stored in eUICC">Service Specific Data stored in eUICC</a-select-option>
-              <a-select-option value="RPM Configuration">RPM Configuration</a-select-option>
-              <a-select-option value="HRI Server address">HRI Server address</a-select-option>
-              <a-select-option value="LPR Configuration">LPR Configuration</a-select-option>
-              <a-select-option value="Enterprise Configuration">Enterprise Configuration</a-select-option>
-              <a-select-option value="Device Change configuration">Device Change configuration</a-select-option>
-            </a-select>
+            <a-tooltip :title="formData.allowedTags && formData.allowedTags.length > 0 ? formData.allowedTags.join(', ') : '暂无选择'" placement="top">
+              <a-select
+                v-model:value="formData.allowedTags"
+                mode="multiple"
+                placeholder="请选择允许的Tags"
+                :disabled="isView"
+                allow-clear
+                style="width: 100%"
+                :maxTagCount="3"
+                :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
+              >
+                <a-select-option value="Service provider name">Service provider name</a-select-option>
+                <a-select-option value="Profile name">Profile name</a-select-option>
+                <a-select-option value="Notification Configuration Info">Notification Configuration Info</a-select-option>
+                <a-select-option value="Icon type and Icon">Icon type and Icon</a-select-option>
+                <a-select-option value="Profile Policy Rules">Profile Policy Rules</a-select-option>
+                <a-select-option value="Service Specific Data stored in eUICC">Service Specific Data stored in eUICC</a-select-option>
+                <a-select-option value="RPM Configuration">RPM Configuration</a-select-option>
+                <a-select-option value="HRI Server address">HRI Server address</a-select-option>
+                <a-select-option value="LPR Configuration">LPR Configuration</a-select-option>
+                <a-select-option value="Enterprise Configuration">Enterprise Configuration</a-select-option>
+                <a-select-option value="Device Change configuration">Device Change configuration</a-select-option>
+              </a-select>
+            </a-tooltip>
           </a-form-item>
         </div>
 
@@ -700,17 +708,19 @@
           
           <!-- 规则 -->
           <a-form-item label="规则" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
-            <a-select
-              v-model:value="formData.enterpriseRules"
-              mode="multiple"
-              placeholder="请选择规则"
-              :disabled="isView"
-              allow-clear
-              style="width: 100%"
-            >
-              <a-select-option value="priorityEnterpriseProfile">优先级企业Profile</a-select-option>
-              <a-select-option value="onlyInstallEnterpriseProfile">只能安装企业Profile</a-select-option>
-            </a-select>
+            <a-tooltip :title="formData.enterpriseRules && formData.enterpriseRules.length > 0 ? formData.enterpriseRules.join(', ') : '暂无选择'" placement="top">
+              <a-select
+                v-model:value="formData.enterpriseRules"
+                mode="multiple"
+                placeholder="请选择规则"
+                :disabled="isView"
+                allow-clear
+                style="width: 100%"
+              >
+                <a-select-option value="priorityEnterpriseProfile">优先级企业Profile</a-select-option>
+                <a-select-option value="onlyInstallEnterpriseProfile">只能安装企业Profile</a-select-option>
+              </a-select>
+            </a-tooltip>
           </a-form-item>
         </div>
       </div>
@@ -1054,17 +1064,17 @@ export default defineComponent({
 
 /* 基本信息编辑区域 */
 .basic-info-section {
-  padding: 16px;
+  padding: 8px; /* 减少内边距 */
   overflow: visible;
-  padding-bottom: 30px; /* 增加底部内边距防止内容被遮挡 */
+  padding-bottom: 15px; /* 减少底部内边距 */
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 8px;
+  margin-bottom: 8px; /* 减少底部间距 */
+  padding-bottom: 4px; /* 减少底部内边距 */
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -1089,7 +1099,7 @@ export default defineComponent({
   overflow-y: auto;
   max-height: calc(100vh - 124px);
   min-width: 0;
-  padding-bottom: 20px; /* 添加底部内边距防止内容被遮挡 */
+  padding-bottom: 10px; /* 减少底部内边距 */
   background: #fff; /* 默认白色背景 */
   border: 1px solid #e8e8e8;
   border-radius: 6px;
@@ -1097,7 +1107,7 @@ export default defineComponent({
 
 /* V3功能支持 */
 .v3-features-section {
-  padding: 12px;
+  padding: 8px; /* 减少内边距 */
   margin-bottom: 0;
   border-bottom: 1px solid #e8e8e8;
 }
@@ -1105,7 +1115,7 @@ export default defineComponent({
 .rpm-config-section,
 .device-switch-section,
 .enterprise-profile-section {
-  padding: 12px;
+  padding: 8px; /* 减少内边距 */
   margin-bottom: 0;
   overflow: visible;
   min-height: auto; /* 移除最小高度限制 */
@@ -1113,7 +1123,7 @@ export default defineComponent({
 }
 
 .enterprise-profile-section {
-  margin-bottom: 20px; /* 确保底部有足够的间距 */
+  margin-bottom: 10px; /* 减少底部间距 */
   border-bottom: none; /* 最后一个section不需要底部边框 */
 }
 
@@ -1130,7 +1140,7 @@ export default defineComponent({
 }
 
 :deep(.ant-form-item) {
-  margin-bottom: 8px;
+  margin-bottom: 4px; /* 减少表单项目间距 */
 }
 
 /* 优化多选下拉框的显示 */
@@ -1147,22 +1157,7 @@ export default defineComponent({
   padding: 2px 0;
 }
 
-/* 多选下拉框悬浮时显示所有选项 */
-:deep(.ant-select-multiple:hover .ant-select-selector) {
-  height: auto !important;
-  min-height: 32px;
-}
-
-:deep(.ant-select-multiple:hover .ant-select-selection-overflow) {
-  flex-wrap: wrap;
-}
-
-:deep(.ant-select-multiple:hover .ant-select-selection-item) {
-  max-width: none;
-  overflow: visible;
-  text-overflow: clip;
-  white-space: normal;
-}
+/* 多选下拉框样式优化 - 使用tooltip显示已选项 */
 
 :deep(.ant-form-item-label) {
   padding-bottom: 2px;
@@ -1205,7 +1200,7 @@ export default defineComponent({
 }
 
 :deep(.ant-divider) {
-  margin: 8px 0;
+  margin: 4px 0; /* 减少分割线间距 */
   font-size: 13px;
   font-weight: 500;
 }
