@@ -227,6 +227,7 @@
         :loading="loading"
         size="small"
         row-key="id"
+        :scroll="{ x: 1200 }"
       >
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'iccid'">
@@ -252,6 +253,10 @@
             <a-tag :color="getNotificationStatusColor(record.notificationStatus)">
               {{ record.notificationStatus }}
             </a-tag>
+          </template>
+          
+          <template v-else-if="column.dataIndex === 'updateTime'">
+            <span :title="formatDateTime(record.updateTime)">{{ formatDateTime(record.updateTime) }}</span>
           </template>
           
           <template v-else-if="column.dataIndex === 'action'">
@@ -319,6 +324,7 @@ export default defineComponent({
         dataIndex: 'iccid',
         width: 200,
         ellipsis: true,
+        fixed: 'left',
         customCell: () => ({
           title: '集成电路卡识别码，由20位16进制数组成'
         })
@@ -328,6 +334,7 @@ export default defineComponent({
         dataIndex: 'matchingId',
         width: 180,
         ellipsis: true,
+        fixed: 'left',
         customCell: () => ({
           title: '匹配标识符，用于标识Profile的唯一性'
         })
@@ -336,6 +343,7 @@ export default defineComponent({
         title: 'Profile状态',
         dataIndex: 'profileStatus',
         width: 120,
+        fixed: 'left',
         customCell: () => ({
           title: 'Profile的当前状态，包括Available、Allocated、Linked等'
         })
@@ -420,14 +428,17 @@ export default defineComponent({
         dataIndex: 'updateTime',
         width: 160,
         customCell: () => ({
-          title: 'Profile信息的最后更新时间'
+          title: '数据的最后更新时间'
         })
       },
       {
         title: '操作',
         dataIndex: 'action',
         width: 140,
-        fixed: 'right'
+        fixed: 'right',
+        customCell: () => ({
+          title: '对数据进行查看、修改、删除等操作'
+        })
       }
     ]
 
@@ -446,7 +457,7 @@ export default defineComponent({
         pprPolicy: 'PPR1',
         resetRule: '可重置',
         dsFlag: '标记1',
-        updateTime: '2024-01-15 10:30:00'
+        updateTime: '2024年01月15日 10:30:00'
       },
       {
         id: '2',
@@ -462,7 +473,7 @@ export default defineComponent({
         pprPolicy: 'PPR2',
         resetRule: '不可重置',
         dsFlag: '标记2',
-        updateTime: '2024-01-14 15:45:00'
+        updateTime: '2024年01月14日 15:45:00'
       }
     ])
 
@@ -504,6 +515,18 @@ export default defineComponent({
         'Deleted': 'red'
       }
       return colorMap[status] || 'default'
+    }
+
+    const formatDateTime = (dateTime) => {
+      if (!dateTime) return ''
+      const date = new Date(dateTime)
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      const seconds = String(date.getSeconds()).padStart(2, '0')
+      return `${year}年${month}月${day}日 ${hours}:${minutes}:${seconds}`
     }
 
     const handleSearch = () => {
@@ -619,47 +642,48 @@ export default defineComponent({
     }
 
     return {
-      loading,
-      searchForm,
-      columns,
-      tableData,
-      paginationConfig,
-      rowSelection,
-      selectedRowKeys,
-      getProfileStatusColor,
-      getNotificationStatusColor,
-      handleSearch,
-      handleReset,
-      handleAdd,
-      handleImport,
-      showImportHistory,
-      handleBatchDelete,
-      handleBatchReset,
-      handleBatchAssignTenant,
-      handleBatchReuse,
-      handleBatchExport,
-      showDetail,
-      handleEdit,
-      handleCopy,
-      handleDelete,
-      handleResetSingle,
-      handleAssignTenant,
-      handleReuse,
-      handleDownloadDer
-    }
+        loading,
+        searchForm,
+        columns,
+        tableData,
+        paginationConfig,
+        rowSelection,
+        selectedRowKeys,
+        getProfileStatusColor,
+        getNotificationStatusColor,
+        formatDateTime,
+        handleSearch,
+        handleReset,
+        handleAdd,
+        handleImport,
+        showImportHistory,
+        handleBatchDelete,
+        handleBatchReset,
+        handleBatchAssignTenant,
+        handleBatchReuse,
+        handleBatchExport,
+        showDetail,
+        handleEdit,
+        handleCopy,
+        handleDelete,
+        handleResetSingle,
+        handleAssignTenant,
+        handleReuse,
+        handleDownloadDer
+      }
   }
 })
 </script>
 
 <style scoped>
 .profile-manage-container {
-  padding: 16px;
+  padding: 12px;
   background: #fff;
 }
 
 .search-operation-area {
-  margin-bottom: 16px;
-  padding: 16px;
+  margin-bottom: 12px;
+  padding: 12px;
   background: #f5f5f5;
   border-radius: 6px;
 }
@@ -729,5 +753,35 @@ export default defineComponent({
     margin-bottom: 6px;
     margin-right: 6px;
   }
+}
+
+/* 表格区域样式优化 */
+.table-area {
+  background: #fff;
+  overflow-x: auto;
+}
+
+/* 表格列宽优化 */
+:deep(.ant-table-cell) {
+  max-width: 200px;
+  padding: 12px 8px !important;
+}
+
+:deep(.ant-table-thead > tr > th) {
+  padding: 12px 8px !important;
+  background: #fafafa;
+  font-weight: 600;
+}
+
+/* 固定列样式 */
+:deep(.ant-table-cell-fix-left),
+:deep(.ant-table-cell-fix-right) {
+  background: #fff;
+  z-index: 2;
+}
+
+:deep(.ant-table-cell-fix-left-last),
+:deep(.ant-table-cell-fix-right-first) {
+  box-shadow: none;
 }
 </style>
