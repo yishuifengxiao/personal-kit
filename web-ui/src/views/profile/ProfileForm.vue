@@ -5,7 +5,16 @@
       class="compact-header"
       :title="pageTitle"
       @back="handleCancel"
-    />
+    >
+      <template #extra>
+        <div class="header-actions">
+          <a-button v-if="!isView" type="primary" size="small" @click="handleSubmit">保存</a-button>
+          <a-button v-if="!isView" size="small" @click="handleCancel">取消</a-button>
+          <a-button v-if="isView" type="primary" size="small" @click="switchToEditMode">编辑</a-button>
+          <a-button v-if="isView" size="small" @click="handleCancel">关闭</a-button>
+        </div>
+      </template>
+    </a-page-header>
     
     <!-- 基本信息区域 -->
     <div class="info-section-header">
@@ -13,10 +22,19 @@
         <div class="info-item">
           <span class="info-label">ICCID：</span>
           <span v-if="isView" class="info-value">{{ formData.iccid }}</span>
-          <a-input v-else v-model:value="formData.iccid" placeholder="请输入20位16进制ICCID" :maxlength="20" style="width: 200px" />
+          <a-input v-else-if="isAdd" v-model:value="formData.iccid" placeholder="请输入20位16进制ICCID" :maxlength="20" style="width: 200px" />
+          <span v-else class="info-value">{{ formData.iccid }}</span>
         </div>
-   
-   
+        <div class="info-item">
+          <span class="info-label">EID：</span>
+          <span v-if="isView" class="info-value">{{ formData.eid }}</span>
+          <a-input v-else-if="isAdd" v-model:value="formData.eid" placeholder="请输入32位16进制EID" :maxlength="32" style="width: 200px" />
+          <span v-else class="info-value">{{ formData.eid }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">MatchingId：</span>
+          <span class="info-value">{{ formData.matchingId }}</span>
+        </div>
         <div class="info-item">
           <span class="info-label">所属租户：</span>
           <span v-if="isView" class="info-value">{{ formData.tenant || '未设置' }}</span>
@@ -26,20 +44,12 @@
     </div>
     
     <div class="detail-container">
-      <!-- 左侧区域 -->
+      <!-- 左侧区域 - 3/5 -->
       <div class="left-section">
         <!-- 基本信息编辑区域 -->
         <div class="basic-info-section">
           <div class="section-header">
             <h3>基本信息</h3>
-            <div class="action-buttons" v-if="!isView">
-              <a-button type="primary" size="small" @click="handleSubmit">保存</a-button>
-              <a-button size="small" @click="handleCancel">取消</a-button>
-            </div>
-            <div class="action-buttons" v-else>
-              <a-button type="primary" size="small" @click="switchToEditMode">编辑</a-button>
-              <a-button size="small" @click="handleCancel">关闭</a-button>
-            </div>
           </div>
           
           <a-form
@@ -50,39 +60,118 @@
             :disabled="isView"
             @finish="handleSubmit"
           >
-            <a-row :gutter="24">
-              <a-col :span="12">
+        
+              
+        
+
+            <!-- 新增的基本信息字段 -->
+            <a-row :gutter="16">
+              <a-col :span="8">
                 <a-form-item
-                  label="MatchingId"
-                  name="matchingId"
-                  :rules="[{ required: true, message: '请输入MatchingId' }]"
+                  label="确认码"
+                  name="confirmationCode"
                 >
                   <a-input
-                    v-model:value="formData.matchingId"
-                    placeholder="如：WTBIJ-EG8C0-C72NY-VNOPX"
+                    v-model:value="formData.confirmationCode"
+                    placeholder="请输入确认码"
                     allow-clear
                   />
                 </a-form-item>
               </a-col>
               
-              <a-col :span="12">
+              <a-col :span="8">
                 <a-form-item
-                  label="EID"
-                  name="eid"
-                  :rules="[{ required: true, message: '请输入EID' }]"
+                  label="Profile名称"
+                  name="profileName"
                 >
                   <a-input
-                    v-model:value="formData.eid"
-                    placeholder="请输入32位16进制EID"
-                    :maxlength="32"
+                    v-model:value="formData.profileName"
+                    placeholder="请输入Profile名称"
+                    allow-clear
+                  />
+                </a-form-item>
+              </a-col>
+              
+              <a-col :span="8">
+                <a-form-item
+                  label="电话号码"
+                  name="phoneNumber"
+                >
+                  <a-input
+                    v-model:value="formData.phoneNumber"
+                    placeholder="请输入电话号码"
                     allow-clear
                   />
                 </a-form-item>
               </a-col>
             </a-row>
 
-            <a-row :gutter="24">
-              <a-col :span="12">
+            <a-row :gutter="16">
+              <a-col :span="8">
+                <a-form-item
+                  label="服务提供商"
+                  name="serviceProvider"
+                  :rules="[{ required: true, message: '请选择服务提供商' }]"
+                >
+                  <a-select
+                    v-model:value="formData.serviceProvider"
+                    placeholder="请选择服务提供商"
+                    allow-clear
+                  >
+                    <a-select-option value="provider1">提供商1</a-select-option>
+                    <a-select-option value="provider2">提供商2</a-select-option>
+                    <a-select-option value="provider3">提供商3</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              
+              <a-col :span="8">
+                <a-form-item
+                  label="通知事件"
+                  name="notificationEvent"
+                >
+                  <a-select
+                    v-model:value="formData.notificationEvent"
+                    placeholder="请选择通知事件"
+                    allow-clear
+                  >
+                    <a-select-option value="event1">事件1</a-select-option>
+                    <a-select-option value="event2">事件2</a-select-option>
+                    <a-select-option value="event3">事件3</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              
+              <a-col :span="8">
+                <a-form-item
+                  label="通知地址"
+                  name="notificationAddress"
+                  :rules="[{ required: true, message: '请输入通知地址' }]"
+                >
+                  <a-input
+                    v-model:value="formData.notificationAddress"
+                    placeholder="请输入通知地址"
+                    allow-clear
+                  />
+                </a-form-item>
+              </a-col>
+            </a-row>
+
+            <a-row :gutter="16">
+              <a-col :span="8">
+                <a-form-item
+                  label="Profile图标"
+                  name="profileIcon"
+                >
+                  <a-input
+                    v-model:value="formData.profileIcon"
+                    placeholder="请输入Profile图标"
+                    allow-clear
+                  />
+                </a-form-item>
+              </a-col>
+              
+              <a-col :span="8">
                 <a-form-item
                   label="下载方式"
                   name="downloadMethod"
@@ -100,7 +189,7 @@
                 </a-form-item>
               </a-col>
               
-              <a-col :span="12">
+              <a-col :span="8">
                 <a-form-item
                   label="运营商"
                   name="carrier"
@@ -335,173 +424,212 @@
               </a-col>
             </a-row>
 
-            <a-row :gutter="24">
-              <a-col :span="24">
-                <a-form-item
-                  label="备注"
-                  name="remark"
-                  :label-col="{ span: 3 }"
-                  :wrapper-col="{ span: 20 }"
-                >
-                  <a-textarea
-                    v-model:value="formData.remark"
-                    placeholder="请输入备注信息"
-                    :rows="3"
-                    :maxlength="500"
-                    show-count
-                  />
-                </a-form-item>
-              </a-col>
-            </a-row>
           </a-form>
         </div>
       </div>
       
-      <!-- 右侧区域 -->
+      <!-- 右侧区域 - 2/5 -->
       <div class="right-section">
-        <!-- 码号信息区 -->
-        <div class="number-info-section">
-          <h3>码号信息</h3>
-          <div class="number-info-content">
-            <div class="info-item">
-              <span class="info-label">IMSI：</span>
-              <div class="info-value">
-                <span v-if="isView">{{ formData.imsi || '未设置' }}</span>
-                <a-input
-                  v-else
-                  v-model:value="formData.imsi"
-                  placeholder="请输入IMSI"
-                  allow-clear
-                  size="small"
-                />
-              </div>
-            </div>
-            <div class="info-item">
-              <span class="info-label">IMSI2：</span>
-              <div class="info-value">
-                <span v-if="isView">{{ formData.imsi2 || '未设置' }}</span>
-                <a-input
-                  v-else
-                  v-model:value="formData.imsi2"
-                  placeholder="请输入IMSI2（可选）"
-                  allow-clear
-                  size="small"
-                />
-              </div>
-            </div>
-            <div class="info-item">
-              <span class="info-label">PIN1：</span>
-              <div class="info-value">
-                <span v-if="isView">{{ formData.pin1 || '未设置' }}</span>
-                <a-input
-                  v-else
-                  v-model:value="formData.pin1"
-                  placeholder="请输入PIN1"
-                  allow-clear
-                  size="small"
-                />
-              </div>
-            </div>
-            <div class="info-item">
-              <span class="info-label">PIN2：</span>
-              <div class="info-value">
-                <span v-if="isView">{{ formData.pin2 || '未设置' }}</span>
-                <a-input
-                  v-else
-                  v-model:value="formData.pin2"
-                  placeholder="请输入PIN2"
-                  allow-clear
-                  size="small"
-                />
-              </div>
-            </div>
-            <div class="info-item">
-              <span class="info-label">PUK1：</span>
-              <div class="info-value">
-                <span v-if="isView">{{ formData.puk1 || '未设置' }}</span>
-                <a-input
-                  v-else
-                  v-model:value="formData.puk1"
-                  placeholder="请输入PUK1"
-                  allow-clear
-                  size="small"
-                />
-              </div>
-            </div>
-            <div class="info-item">
-              <span class="info-label">PUK2：</span>
-              <div class="info-value">
-                <span v-if="isView">{{ formData.puk2 || '未设置' }}</span>
-                <a-input
-                  v-else
-                  v-model:value="formData.puk2"
-                  placeholder="请输入PUK2"
-                  allow-clear
-                  size="small"
-                />
-              </div>
-            </div>
-            <div class="info-item">
-              <span class="info-label">ADM1：</span>
-              <div class="info-value">
-                <span v-if="isView">{{ formData.adm1 || '未设置' }}</span>
-                <a-input
-                  v-else
-                  v-model:value="formData.adm1"
-                  placeholder="请输入ADM1"
-                  allow-clear
-                  size="small"
-                />
-              </div>
-            </div>
-            <div class="info-item">
-              <span class="info-label">KI：</span>
-              <div class="info-value">
-                <span v-if="isView">{{ formData.ki || '未设置' }}</span>
-                <a-input
-                  v-else
-                  v-model:value="formData.ki"
-                  placeholder="请输入KI"
-                  allow-clear
-                  size="small"
-                />
-              </div>
-            </div>
-            <div class="info-item">
-              <span class="info-label">OPC：</span>
-              <div class="info-value">
-                <span v-if="isView">{{ formData.opc || '未设置' }}</span>
-                <a-input
-                  v-else
-                  v-model:value="formData.opc"
-                  placeholder="请输入OPC"
-                  allow-clear
-                  size="small"
-                />
-              </div>
-            </div>
-            <div class="info-item">
-              <span class="info-label">SMSP：</span>
-              <div class="info-value">
-                <span v-if="isView">{{ formData.smsp || '未设置' }}</span>
-                <a-input
-                  v-else
-                  v-model:value="formData.smsp"
-                  placeholder="请输入SMSP"
-                  allow-clear
-                  size="small"
-                />
-              </div>
-            </div>
-          </div>
+        <!-- V3功能支持 -->
+        <div class="v3-features-section">
+          <h3>V3功能支持</h3>
+          <a-checkbox-group 
+            v-model:value="formData.v3Features" 
+            :disabled="isView"
+            style="width: 100%"
+          >
+            <a-row>
+              <a-col :span="24">
+                <a-checkbox value="rpmData">RPM数据</a-checkbox>
+              </a-col>
+              <a-col :span="24">
+                <a-checkbox value="deviceSwitchData">设备切换数据</a-checkbox>
+              </a-col>
+              <a-col :span="24">
+                <a-checkbox value="enterpriseProfileData">企业Profile数据</a-checkbox>
+              </a-col>
+            </a-row>
+          </a-checkbox-group>
         </div>
-        
-        <!-- 操作记录 -->
-        <div class="timeline-section">
-          <h3>操作记录</h3>
-          <div class="timeline-placeholder">
-            <a-empty description="暂无操作记录" />
-          </div>
+
+        <!-- RPM数据配置 -->
+        <div class="rpm-config-section" v-if="formData.v3Features && formData.v3Features.includes('rpmData')">
+          <h3>RPM数据配置</h3>
+          
+          <!-- RPM类型 -->
+          <a-form-item label="RPM类型" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
+            <a-select
+              v-model:value="formData.rpmType"
+              mode="multiple"
+              placeholder="请选择RPM类型"
+              :disabled="isView"
+              allow-clear
+            >
+              <a-select-option value="Enable">Enable</a-select-option>
+              <a-select-option value="Disable">Disable</a-select-option>
+              <a-select-option value="Delete">Delete</a-select-option>
+              <a-select-option value="ListProfileInfo">ListProfileInfo</a-select-option>
+              <a-select-option value="ContactPcmp">ContactPcmp</a-select-option>
+            </a-select>
+          </a-form-item>
+
+          <!-- RPM下载方式 -->
+          <a-form-item label="RPM下载方式" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
+            <a-select
+              v-model:value="formData.rpmDownloadMethod"
+              placeholder="请选择RPM下载方式"
+              :disabled="isView"
+              allow-clear
+            >
+              <a-select-option value="SM-DP+">SM-DP+</a-select-option>
+              <a-select-option value="SM-DS">SM-DS</a-select-option>
+            </a-select>
+          </a-form-item>
+
+          <!-- RPM轮询地址 -->
+          <a-form-item 
+            v-if="formData.rpmDownloadMethod" 
+            label="RPM轮询地址" 
+            :label-col="{ span: 8 }" 
+            :wrapper-col="{ span: 16 }"
+          >
+            <a-input
+              v-model:value="formData.rpmPollingAddress"
+              placeholder="请输入RPM轮询地址"
+              :disabled="isView"
+              allow-clear
+            />
+          </a-form-item>
+
+          <!-- 允许的CA -->
+          <a-form-item label="允许的CA" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
+            <a-select
+              v-model:value="formData.allowedCA"
+              placeholder="请选择允许的CA"
+              :disabled="isView"
+              allow-clear
+            >
+              <a-select-option value="CA1">CA1</a-select-option>
+              <a-select-option value="CA2">CA2</a-select-option>
+              <a-select-option value="CA3">CA3</a-select-option>
+            </a-select>
+          </a-form-item>
+
+          <!-- 允许的Tags -->
+          <a-form-item label="允许的Tags" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
+            <a-select
+              v-model:value="formData.allowedTags"
+              mode="multiple"
+              placeholder="请选择允许的Tags"
+              :disabled="isView"
+              allow-clear
+            >
+              <a-select-option value="Service provider name">Service provider name</a-select-option>
+              <a-select-option value="Profile name">Profile name</a-select-option>
+              <a-select-option value="Notification Configuration Info">Notification Configuration Info</a-select-option>
+              <a-select-option value="Icon type and Icon">Icon type and Icon</a-select-option>
+              <a-select-option value="Profile Policy Rules">Profile Policy Rules</a-select-option>
+              <a-select-option value="Service Specific Data stored in eUICC">Service Specific Data stored in eUICC</a-select-option>
+              <a-select-option value="RPM Configuration">RPM Configuration</a-select-option>
+              <a-select-option value="HRI Server address">HRI Server address</a-select-option>
+              <a-select-option value="LPR Configuration">LPR Configuration</a-select-option>
+              <a-select-option value="Enterprise Configuration">Enterprise Configuration</a-select-option>
+              <a-select-option value="Device Change configuration">Device Change configuration</a-select-option>
+            </a-select>
+          </a-form-item>
+        </div>
+
+        <!-- 设备切换数据 -->
+        <div class="device-switch-section" v-if="formData.v3Features && formData.v3Features.includes('deviceSwitchData')">
+          <h3>设备切换数据</h3>
+          
+          <!-- 设备切换方式 -->
+          <a-form-item label="设备切换方式" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
+            <a-radio-group v-model:value="formData.deviceSwitchMethod" :disabled="isView">
+              <a-radio value="requestPlatform">请求平台</a-radio>
+              <a-radio value="useStoredCode">使用存储的激活码</a-radio>
+            </a-radio-group>
+          </a-form-item>
+
+          <!-- 是否需要新设备EID -->
+          <a-form-item label="是否需要新设备EID" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
+            <a-radio-group v-model:value="formData.needNewEID" :disabled="isView">
+              <a-radio value="yes">是</a-radio>
+              <a-radio value="no">否</a-radio>
+            </a-radio-group>
+          </a-form-item>
+
+          <!-- 是否需要新设备TAC -->
+          <a-form-item label="是否需要新设备TAC" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
+            <a-radio-group v-model:value="formData.needNewTAC" :disabled="isView">
+              <a-radio value="yes">是</a-radio>
+              <a-radio value="no">否</a-radio>
+            </a-radio-group>
+          </a-form-item>
+
+          <!-- 允许的CA -->
+          <a-form-item label="允许的CA" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
+            <a-select
+              v-model:value="formData.deviceSwitchAllowedCA"
+              placeholder="请选择允许的CA"
+              :disabled="isView"
+              allow-clear
+            >
+              <a-select-option value="CA1">CA1</a-select-option>
+              <a-select-option value="CA2">CA2</a-select-option>
+              <a-select-option value="CA3">CA3</a-select-option>
+            </a-select>
+          </a-form-item>
+        </div>
+
+        <!-- 企业Profile数据 -->
+        <div class="enterprise-profile-section" v-if="formData.v3Features && formData.v3Features.includes('enterpriseProfileData')">
+          <h3>企业Profile数据</h3>
+          
+          <!-- 企业名称 -->
+          <a-form-item label="企业名称" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
+            <a-select
+              v-model:value="formData.enterpriseName"
+              placeholder="请选择企业名称"
+              :disabled="isView"
+              allow-clear
+            >
+              <a-select-option value="enterprise1">企业1</a-select-option>
+              <a-select-option value="enterprise2">企业2</a-select-option>
+              <a-select-option value="enterprise3">企业3</a-select-option>
+            </a-select>
+          </a-form-item>
+
+          <!-- 规则 -->
+          <a-form-item label="规则" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }">
+            <a-select
+              v-model:value="formData.enterpriseRules"
+              mode="multiple"
+              placeholder="请选择规则"
+              :disabled="isView"
+              allow-clear
+            >
+              <a-select-option value="priorityEnterpriseProfile">优先级企业Profile</a-select-option>
+              <a-select-option value="onlyInstallEnterpriseProfile">只能安装企业Profile</a-select-option>
+            </a-select>
+          </a-form-item>
+
+          <!-- 非企业Profile数量 -->
+          <a-form-item 
+            v-if="formData.enterpriseRules && formData.enterpriseRules.length > 0" 
+            label="非企业Profile数量" 
+            :label-col="{ span: 8 }" 
+            :wrapper-col="{ span: 16 }"
+          >
+            <a-input-number
+              v-model:value="formData.nonEnterpriseProfileCount"
+              :min="0"
+              :max="10"
+              placeholder="请输入非企业Profile数量"
+              :disabled="isView"
+              style="width: 100%"
+            />
+          </a-form-item>
         </div>
       </div>
     </div>
@@ -537,6 +665,14 @@ export default defineComponent({
       resetRule: '',
       dsFlag: '',
       remark: '',
+      // 新增基本信息字段
+      confirmationCode: '',
+      profileName: '',
+      phoneNumber: '',
+      serviceProvider: '',
+      notificationEvent: '',
+      notificationAddress: '',
+      profileIcon: '',
       // 码号信息字段
       imsi: '',
       imsi2: '',
@@ -547,8 +683,28 @@ export default defineComponent({
       adm1: '',
       ki: '',
       opc: '',
-      smsp: ''
+      smsp: '',
+      // V3功能支持字段 - 初始化为数组避免类型错误
+      v3Features: [],
+      // RPM数据配置字段
+      rpmType: [],
+      rpmDownloadMethod: '',
+      rpmPollingAddress: '',
+      allowedCA: '',
+      allowedTags: [],
+      // 设备切换数据字段
+      deviceSwitchMethod: '',
+      needNewEID: '',
+      needNewTAC: '',
+      deviceSwitchAllowedCA: '',
+      // 企业Profile数据字段
+      enterpriseName: '',
+      enterpriseRules: [],
+      nonEnterpriseProfileCount: 0
     })
+
+    // 计算属性：是否为新增模式
+    const isAdd = computed(() => pageType.value === 'add')
 
     const pageTitle = computed(() => {
       switch (pageType.value) {
@@ -606,6 +762,60 @@ export default defineComponent({
       }
       return ruleMap[rule] || rule
     }
+
+    // 模拟获取Profile详情的API函数
+    const getProfileDetail = async (id) => {
+      // 这里应该是真实的API调用
+      // 现在返回模拟数据
+      return {
+        code: 200,
+        data: {
+          iccid: '12345678901234567890',
+          matchingId: 'matching-' + id,
+          profileStatus: 'Available',
+          eid: '12345678901234567890123456789012',
+          notificationStatus: 'Enabled',
+          downloadMethod: '1',
+          tenant: 'default-tenant',
+          carrier: '中国移动',
+          profileClass: 'operational',
+          pprPolicy: 'PPR1',
+          resetRule: '1',
+          dsFlag: 'flag1',
+          remark: '测试数据',
+          confirmationCode: 'code123',
+          profileName: '测试Profile',
+          phoneNumber: '13800138000',
+          serviceProvider: 'provider1',
+          notificationEvent: 'event1',
+          notificationAddress: 'http://example.com',
+          profileIcon: 'icon1',
+          imsi: '460001234567890',
+          imsi2: '',
+          pin1: '1234',
+          pin2: '5678',
+          puk1: '12345678',
+          puk2: '87654321',
+          adm1: 'adm1234',
+          ki: 'ki123456',
+          opc: 'opc123456',
+          smsp: 'smsp123',
+          v3Features: ['rpmData', 'deviceSwitchData'],
+          rpmType: ['Enable', 'Disable'],
+          rpmDownloadMethod: 'SM-DP+',
+          rpmPollingAddress: 'http://rpm.example.com',
+          allowedCA: 'CA1',
+          allowedTags: ['Service provider name', 'Profile name'],
+          deviceSwitchMethod: 'requestPlatform',
+          needNewEID: 'yes',
+          needNewTAC: 'no',
+          deviceSwitchAllowedCA: 'CA1',
+          enterpriseName: '',
+          enterpriseRules: [],
+          nonEnterpriseProfileCount: 0
+        }
+      }
+    }
     
     const loadDetail = async () => {
       if (recordId.value) {
@@ -622,7 +832,13 @@ export default defineComponent({
       } else if (pageType.value === 'add') {
         // 新增时清空表单数据
         Object.keys(formData).forEach(key => {
-          formData[key] = ''
+          if (key === 'v3Features' || key === 'rpmType' || key === 'allowedTags' || key === 'enterpriseRules') {
+            formData[key] = []
+          } else if (key === 'nonEnterpriseProfileCount') {
+            formData[key] = 0
+          } else {
+            formData[key] = ''
+          }
         })
       }
     }
@@ -662,6 +878,7 @@ export default defineComponent({
       formData,
       pageTitle,
       isView,
+      isAdd,
       getProfileStatusColor,
       getNotificationStatusStatus,
       getDownloadMethodText,
@@ -685,39 +902,44 @@ export default defineComponent({
 .compact-header {
   background: #fff;
   border-bottom: 1px solid #f0f0f0;
-  padding: 12px 24px;
+  padding: 8px 16px;
   margin-bottom: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
 }
 
 /* 基本信息区域 - 参考搜索源详情页风格 */
 .info-section-header {
   background: #fff;
   border-bottom: 1px solid #f0f0f0;
-  padding: 16px 24px;
+  padding: 12px 16px;
 }
 
 .info-content {
   display: flex;
   flex-wrap: wrap;
-  gap: 24px;
+  gap: 16px;
   align-items: center;
 }
 
 .info-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .info-label {
   color: #666;
-  font-size: 14px;
+  font-size: 13px;
   white-space: nowrap;
 }
 
 .info-value {
   color: #333;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
 }
 
@@ -731,10 +953,11 @@ export default defineComponent({
 
 /* 左侧区域 */
 .left-section {
-  flex: 1;
+  flex: 3;
   background: #fff;
   border-radius: 6px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  min-width: 0;
 }
 
 /* 基本信息编辑区域 */
@@ -747,14 +970,14 @@ export default defineComponent({
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
-  padding-bottom: 12px;
+  padding-bottom: 8px;
   border-bottom: 1px solid #f0f0f0;
 }
 
 .section-header h3 {
   margin: 0;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
   color: #333;
 }
 
@@ -765,90 +988,118 @@ export default defineComponent({
 
 /* 右侧区域 */
 .right-section {
-  width: 320px;
+  flex: 2;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
 }
 
-/* 码号信息区 */
-.number-info-section {
+/* V3功能支持 */
+.v3-features-section {
   background: #fff;
+  border: 1px solid #e8e8e8;
   border-radius: 6px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   padding: 16px;
+  margin-bottom: 16px;
 }
 
-.number-info-section h3 {
+.v3-features-section h3 {
   margin: 0 0 12px 0;
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
-}
-
-.number-info-content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.info-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-height: 32px;
-}
-
-.info-label {
-  color: #666;
-  font-size: 14px;
-  white-space: nowrap;
-  margin-right: 8px;
-  width: 60px;
-}
-
-.info-value {
   color: #333;
   font-size: 14px;
-  text-align: right;
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-weight: 600;
 }
 
-/* 右侧输入框样式 */
-.info-value .ant-input {
-  text-align: right;
+.rpm-config-section,
+.device-switch-section,
+.enterprise-profile-section {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.rpm-config-section h3,
+.device-switch-section h3,
+.enterprise-profile-section h3 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.readonly-value {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #f5f5f5;
   border: 1px solid #d9d9d9;
   border-radius: 4px;
-  padding: 4px 8px;
-  font-size: 14px;
+  color: #666;
+  font-size: 13px;
+  min-height: 22px;
+  line-height: 1.5;
 }
 
-.info-value .ant-input:focus {
-  border-color: #40a9ff;
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+:deep(.ant-form-item) {
+  margin-bottom: 12px;
 }
 
-/* 时间轴 */
-.timeline-section {
-  background: #fff;
-  border-radius: 6px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  padding: 16px;
+:deep(.ant-form-item-label) {
+  padding-bottom: 2px;
+  font-size: 13px;
 }
 
-.timeline-section h3 {
-  margin: 0 0 12px 0;
-  font-size: 16px;
+:deep(.ant-form-item-label > label) {
+  font-size: 13px;
+}
+
+:deep(.ant-input),
+:deep(.ant-select-selector),
+:deep(.ant-input-number-input) {
+  border-radius: 4px;
+  font-size: 13px;
+  min-height: 28px;
+}
+
+:deep(.ant-btn) {
+  border-radius: 4px;
+  font-size: 13px;
+  height: 28px;
+  padding: 4px 12px;
+}
+
+:deep(.ant-btn-sm) {
+  font-size: 12px;
+  height: 24px;
+  padding: 2px 8px;
+}
+
+:deep(.ant-checkbox-wrapper) {
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+:deep(.ant-radio-wrapper) {
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+:deep(.ant-divider) {
+  margin: 16px 0;
+  font-size: 13px;
   font-weight: 500;
-  color: #333;
 }
 
-.timeline-placeholder {
-  padding: 20px 0;
-  text-align: center;
+:deep(.ant-row) {
+  margin-left: -4px !important;
+  margin-right: -4px !important;
+}
+
+:deep(.ant-col) {
+  padding-left: 4px !important;
+  padding-right: 4px !important;
 }
 
 /* 响应式布局 */
