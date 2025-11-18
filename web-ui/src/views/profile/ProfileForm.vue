@@ -1,45 +1,58 @@
 <template>
   <div class="profile-form-container">
     <!-- 页面头部 - 参考搜索源详情页风格 -->
-    <a-page-header
-      class="compact-header"
-      :title="pageTitle"
-      @back="handleCancel"
-    >
+    <a-page-header class="compact-header" :title="pageTitle" @back="handleCancel">
       <template #extra>
         <div class="header-actions">
           <a-button v-if="!isView" type="primary" size="large" @click="handleSubmit">保存</a-button>
           <a-button v-if="!isView" size="large" @click="handleCancel">取消</a-button>
-          <a-button v-if="isView" type="primary" size="large" @click="switchToEditMode">编辑</a-button>
+          <a-button v-if="isView" type="primary" size="large" @click="switchToEditMode"
+            >编辑</a-button
+          >
           <a-button v-if="isView" size="large" @click="handleCancel">关闭</a-button>
         </div>
       </template>
     </a-page-header>
-    
+
     <!-- 基本信息区域 -->
     <div class="info-section-header">
       <div class="info-content">
         <div class="info-item">
           <span class="info-label">ICCID：</span>
           <span v-if="isView" class="info-value">{{ formData.iccid }}</span>
-          <a-input v-else-if="isAdd" v-model:value="formData.iccid" placeholder="请输入20位16进制ICCID" :maxlength="20" style="width: 200px" />
+          <a-input
+            v-else-if="isAdd"
+            v-model:value="formData.iccid"
+            placeholder="请输入20位16进制ICCID"
+            :maxlength="20"
+            style="width: 200px"
+          />
           <span v-else class="info-value">{{ formData.iccid }}</span>
         </div>
         <div class="info-item">
           <span class="info-label">EID：</span>
           <span v-if="isView" class="info-value">{{ formData.eid }}</span>
-          <a-input v-else-if="isAdd" v-model:value="formData.eid" placeholder="请输入32位16进制EID" :maxlength="32" style="width: 200px" />
+          <a-input
+            v-else-if="isAdd"
+            v-model:value="formData.eid"
+            placeholder="请输入32位16进制EID"
+            :maxlength="32"
+            style="width: 200px"
+          />
           <span v-else class="info-value">{{ formData.eid }}</span>
         </div>
-        <div class="info-item">
-          <span class="info-label">Profile名称：</span>
-          <span v-if="isView" class="info-value">{{ formData.profileName }}</span>
-          <a-input v-else v-model:value="formData.profileName" placeholder="请输入Profile名称" allow-clear style="width: 200px" />
-        </div>
+
         <div class="info-item">
           <span class="info-label">所属租户：</span>
           <span v-if="isView" class="info-value">{{ formData.tenant }}</span>
-          <a-select v-else v-model:value="formData.tenant" placeholder="请选择租户" allow-clear style="width: 200px" :rules="[{ required: true, message: '请选择所属租户' }]">
+          <a-select
+            v-else
+            v-model:value="formData.tenant"
+            placeholder="请选择租户"
+            allow-clear
+            style="width: 200px"
+            :rules="[{ required: true, message: '请选择所属租户' }]"
+          >
             <a-select-option value="租户A">租户A</a-select-option>
             <a-select-option value="租户B">租户B</a-select-option>
             <a-select-option value="租户C">租户C</a-select-option>
@@ -49,7 +62,14 @@
         <div class="info-item">
           <span class="info-label">ASN模版：</span>
           <span v-if="isView" class="info-value">{{ formData.asnTemplate }}</span>
-          <a-select v-else v-model:value="formData.asnTemplate" placeholder="请选择ASN模版" allow-clear style="width: 200px" :rules="[{ required: true, message: '请选择ASN模版' }]">
+          <a-select
+            v-else
+            v-model:value="formData.asnTemplate"
+            placeholder="请选择ASN模版"
+            allow-clear
+            style="width: 200px"
+            :rules="[{ required: true, message: '请选择ASN模版' }]"
+          >
             <a-select-option value="template1">标准模版</a-select-option>
             <a-select-option value="template2">企业模版</a-select-option>
             <a-select-option value="template3">自定义模版</a-select-option>
@@ -59,11 +79,9 @@
           <span class="info-label">MatchingId：</span>
           <span class="info-value">{{ formData.matchingId }}</span>
         </div>
-     
-
       </div>
     </div>
-    
+
     <div class="detail-container">
       <!-- 左侧区域 - 3/5 -->
       <div class="left-section">
@@ -72,7 +90,7 @@
           <div class="section-header">
             <h3>基本信息</h3>
           </div>
-          
+
           <a-form
             ref="formRef"
             :model="formData"
@@ -81,17 +99,11 @@
             :disabled="isView"
             @finish="handleSubmit"
           >
-        
-              
-        
-
-            <!-- 新增的基本信息字段 -->
+            <!-- 三列布局区域 - 严格按照要求包含13个字段 -->
             <a-row :gutter="16">
+              <!-- 第一行：确认码、电话号码、Profile图标 -->
               <a-col :span="8">
-                <a-form-item
-                  label="确认码"
-                  name="confirmationCode"
-                >
+                <a-form-item label="确认码" name="confirmationCode">
                   <a-input
                     v-model:value="formData.confirmationCode"
                     placeholder="请输入确认码"
@@ -99,12 +111,8 @@
                   />
                 </a-form-item>
               </a-col>
-              
               <a-col :span="8">
-                <a-form-item
-                  label="电话号码"
-                  name="phoneNumber"
-                >
+                <a-form-item label="电话号码" name="phoneNumber">
                   <a-input
                     v-model:value="formData.phoneNumber"
                     placeholder="请输入电话号码"
@@ -112,12 +120,8 @@
                   />
                 </a-form-item>
               </a-col>
-              
               <a-col :span="8">
-                <a-form-item
-                  label="Profile图标"
-                  name="profileIcon"
-                >
+                <a-form-item label="Profile图标" name="profileIcon">
                   <a-input
                     v-model:value="formData.profileIcon"
                     placeholder="请输入Profile图标"
@@ -128,11 +132,9 @@
             </a-row>
 
             <a-row :gutter="16">
+              <!-- 第二行：下载方式、运营商、Profile名称 -->
               <a-col :span="8">
-                <a-form-item
-                  label="下载方式"
-                  name="downloadMethod"
-                >
+                <a-form-item label="下载方式" name="downloadMethod">
                   <a-select
                     v-model:value="formData.downloadMethod"
                     placeholder="请选择下载方式"
@@ -145,17 +147,9 @@
                   </a-select>
                 </a-form-item>
               </a-col>
-              
               <a-col :span="8">
-                <a-form-item
-                  label="运营商"
-                  name="carrier"
-                >
-                  <a-select
-                    v-model:value="formData.carrier"
-                    placeholder="请选择运营商"
-                    allow-clear
-                  >
+                <a-form-item label="运营商" name="carrier">
+                  <a-select v-model:value="formData.carrier" placeholder="请选择运营商" allow-clear>
                     <a-select-option value="中国移动">中国移动</a-select-option>
                     <a-select-option value="中国联通">中国联通</a-select-option>
                     <a-select-option value="中国电信">中国电信</a-select-option>
@@ -163,14 +157,21 @@
                   </a-select>
                 </a-form-item>
               </a-col>
+              <a-col :span="8">
+                <a-form-item label="Profile名称" name="profileName">
+                  <a-input
+                    v-model:value="formData.profileName"
+                    placeholder="请输入Profile名称"
+                    allow-clear
+                  />
+                </a-form-item>
+              </a-col>
             </a-row>
 
             <a-row :gutter="16">
+              <!-- 第三行：服务提供商、通知事件、通知地址 -->
               <a-col :span="8">
-                <a-form-item
-                  label="服务提供商"
-                  name="serviceProvider"
-                >
+                <a-form-item label="服务提供商" name="serviceProvider">
                   <a-select
                     v-model:value="formData.serviceProvider"
                     placeholder="请选择服务提供商"
@@ -182,13 +183,74 @@
                   </a-select>
                 </a-form-item>
               </a-col>
-              
               <a-col :span="8">
-                <a-form-item
-                  label="通知事件"
-                  name="notificationEvent"
-                >
-                  <a-tooltip :title="formData.notificationEvent && formData.notificationEvent.length > 0 ? formData.notificationEvent.join(', ') : '暂无选择'" placement="top">
+                <a-form-item label="重置规则" name="resetRule">
+                  <a-select
+                    v-model:value="formData.resetRule"
+                    placeholder="请选择重置规则"
+                    allow-clear
+                  >
+                    <a-select-option value="no_reset">不可重置</a-select-option>
+                    <a-select-option value="resetable">可重置</a-select-option>
+                    <a-select-option value="auto_reset">自动重置</a-select-option>
+                    <a-select-option value="auto_recycle">自动回收</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+                    <a-col :span="8">
+                <a-form-item label="Profile类" name="profileClass">
+                  <a-select
+                    v-model:value="formData.profileClass"
+                    placeholder="请选择Profile类"
+                    allow-clear
+                  >
+                    <a-select-option value="test">test</a-select-option>
+                    <a-select-option value="provisioning">provisioning</a-select-option>
+                    <a-select-option value="operational">operational</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+            </a-row>
+
+            <a-row :gutter="16">
+              <!-- 第四行：Profile类、PPR策略、DS标记 -->
+        
+              <a-col :span="8">
+                <a-form-item label="PPR策略" name="pprPolicy">
+                  <a-select
+                    v-model:value="formData.pprPolicy"
+                    placeholder="请选择PPR策略"
+                    allow-clear
+                  >
+                    <a-select-option value="PPR1">PPR1</a-select-option>
+                    <a-select-option value="PPR2">PPR2</a-select-option>
+                    <a-select-option value="PPR1,PPR2">PPR1、PPR2</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item label="DS标记" name="dsFlag">
+                  <a-input v-model:value="formData.dsFlag" placeholder="请输入DS标记" allow-clear />
+                </a-form-item>
+              </a-col>
+            </a-row>
+
+            <a-row :gutter="16">
+        
+            </a-row>
+
+            <!-- 两列布局区域：通知事件和通知地址 -->
+            <a-row :gutter="24">
+              <a-col :span="12">
+                <a-form-item label="通知事件" name="notificationEvent">
+                  <a-tooltip
+                    :title="
+                      formData.notificationEvent && formData.notificationEvent.length > 0
+                        ? formData.notificationEvent.join(', ')
+                        : '暂无选择'
+                    "
+                    placement="top"
+                  >
                     <a-select
                       v-model:value="formData.notificationEvent"
                       mode="multiple"
@@ -209,94 +271,38 @@
                   </a-tooltip>
                 </a-form-item>
               </a-col>
-              
-              <a-col :span="8">
+
+              <a-col :span="12">
                 <a-form-item
                   label="通知地址"
                   name="notificationAddress"
-                  :rules="[{ required: true, message: '请输入通知地址' }]"
+                  :rules="[{ required: true, message: '请选择通知地址' }]"
                 >
-                  <a-input
+                  <a-select
                     v-model:value="formData.notificationAddress"
-                    placeholder="请输入通知地址"
-                    allow-clear
-                  />
-                </a-form-item>
-              </a-col>
-            </a-row>
-
-            <a-row :gutter="24">
-              <a-col :span="12">
-                <a-form-item
-                  label="Profile类"
-                  name="profileClass"
-                >
-                  <a-select
-                    v-model:value="formData.profileClass"
-                    placeholder="请选择Profile类"
+                    placeholder="请选择通知地址"
                     allow-clear
                   >
-                    <a-select-option value="test">test</a-select-option>
-                    <a-select-option value="provisioning">provisioning</a-select-option>
-                    <a-select-option value="operational">operational</a-select-option>
+                    <a-select-option value="http://localhost:8080/notification"
+                      >本地通知地址</a-select-option
+                    >
+                    <a-select-option value="http://api.example.com/notify"
+                      >示例API地址</a-select-option
+                    >
+                    <a-select-option value="https://notify.service.com/callback"
+                      >生产通知地址</a-select-option
+                    >
+                    <a-select-option value="http://test.notify.com/webhook"
+                      >测试通知地址</a-select-option
+                    >
                   </a-select>
-                </a-form-item>
-              </a-col>
-              
-              <a-col :span="12">
-                <a-form-item
-                  label="PPR策略"
-                  name="pprPolicy"
-                >
-                  <a-select
-                    v-model:value="formData.pprPolicy"
-                    placeholder="请选择PPR策略"
-                    allow-clear
-                  >
-                    <a-select-option value="PPR1">PPR1</a-select-option>
-                    <a-select-option value="PPR2">PPR2</a-select-option>
-                    <a-select-option value="PPR1,PPR2">PPR1、PPR2</a-select-option>
-                  </a-select>
-                </a-form-item>
-              </a-col>
-            </a-row>
-
-            <a-row :gutter="24">
-              <a-col :span="12">
-                <a-form-item
-                  label="重置规则"
-                  name="resetRule"
-                >
-                  <a-select
-                    v-model:value="formData.resetRule"
-                    placeholder="请选择重置规则"
-                    allow-clear
-                  >
-                    <a-select-option value="no_reset">不可重置</a-select-option>
-                    <a-select-option value="resetable">可重置</a-select-option>
-                    <a-select-option value="auto_reset">自动重置</a-select-option>
-                    <a-select-option value="auto_recycle">自动回收</a-select-option>
-                  </a-select>
-                </a-form-item>
-              </a-col>
-              
-              <a-col :span="12">
-                <a-form-item
-                  label="DS标记"
-                  name="dsFlag"
-                >
-                  <a-input
-                    v-model:value="formData.dsFlag"
-                    placeholder="请输入DS标记"
-                    allow-clear
-                  />
                 </a-form-item>
               </a-col>
             </a-row>
 
             <!-- 码号信息 - 必填字段 -->
             <a-divider>码号信息</a-divider>
-            
+
             <a-row :gutter="24">
               <a-col :span="12">
                 <a-form-item
@@ -304,19 +310,12 @@
                   name="imsi"
                   :rules="[{ required: true, message: '请输入IMSI' }]"
                 >
-                  <a-input
-                    v-model:value="formData.imsi"
-                    placeholder="请输入IMSI"
-                    allow-clear
-                  />
+                  <a-input v-model:value="formData.imsi" placeholder="请输入IMSI" allow-clear />
                 </a-form-item>
               </a-col>
-              
+
               <a-col :span="12">
-                <a-form-item
-                  label="IMSI2"
-                  name="imsi2"
-                >
+                <a-form-item label="IMSI2" name="imsi2">
                   <a-input
                     v-model:value="formData.imsi2"
                     placeholder="请输入IMSI2（可选）"
@@ -333,25 +332,17 @@
                   name="pin1"
                   :rules="[{ required: true, message: '请输入PIN1' }]"
                 >
-                  <a-input
-                    v-model:value="formData.pin1"
-                    placeholder="请输入PIN1"
-                    allow-clear
-                  />
+                  <a-input v-model:value="formData.pin1" placeholder="请输入PIN1" allow-clear />
                 </a-form-item>
               </a-col>
-              
+
               <a-col :span="12">
                 <a-form-item
                   label="PIN2"
                   name="pin2"
                   :rules="[{ required: true, message: '请输入PIN2' }]"
                 >
-                  <a-input
-                    v-model:value="formData.pin2"
-                    placeholder="请输入PIN2"
-                    allow-clear
-                  />
+                  <a-input v-model:value="formData.pin2" placeholder="请输入PIN2" allow-clear />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -363,53 +354,37 @@
                   name="puk1"
                   :rules="[{ required: true, message: '请输入PUK1' }]"
                 >
-                  <a-input
-                    v-model:value="formData.puk1"
-                    placeholder="请输入PUK1"
-                    allow-clear
-                  />
+                  <a-input v-model:value="formData.puk1" placeholder="请输入PUK1" allow-clear />
                 </a-form-item>
               </a-col>
-              
+
               <a-col :span="12">
                 <a-form-item
                   label="PUK2"
                   name="puk2"
                   :rules="[{ required: true, message: '请输入PUK2' }]"
                 >
-                  <a-input
-                    v-model:value="formData.puk2"
-                    placeholder="请输入PUK2"
-                    allow-clear
-                  />
+                  <a-input v-model:value="formData.puk2" placeholder="请输入PUK2" allow-clear />
                 </a-form-item>
               </a-col>
             </a-row>
 
             <a-row :gutter="24">
-              <a-col :span="12">
-                <a-form-item
-                  label="ADM1"
-                  name="adm1"
-                  :rules="[{ required: true, message: '请输入ADM1' }]"
-                >
-                  <a-input
-                    v-model:value="formData.adm1"
-                    placeholder="请输入ADM1"
-                    allow-clear
-                  />
-                </a-form-item>
-              </a-col>
-              
               <a-col :span="12">
                 <a-form-item
                   label="KI"
                   name="ki"
                   :rules="[{ required: true, message: '请输入KI' }]"
                 >
+                  <a-input v-model:value="formData.ki" placeholder="请输入KI" allow-clear />
+                </a-form-item>
+              </a-col>
+
+              <a-col :span="12">
+                <a-form-item label="OPC" name="opc">
                   <a-input
-                    v-model:value="formData.ki"
-                    placeholder="请输入KI"
+                    v-model:value="formData.opc"
+                    placeholder="请输入OPC（可选）"
                     allow-clear
                   />
                 </a-form-item>
@@ -419,43 +394,41 @@
             <a-row :gutter="24">
               <a-col :span="12">
                 <a-form-item
-                  label="OPC"
-                  name="opc"
-                  :rules="[{ required: true, message: '请输入OPC' }]"
-                >
-                  <a-input
-                    v-model:value="formData.opc"
-                    placeholder="请输入OPC"
-                    allow-clear
-                  />
-                </a-form-item>
-              </a-col>
-              
-              <a-col :span="12">
-                <a-form-item
                   label="SMSP"
                   name="smsp"
                   :rules="[{ required: true, message: '请输入SMSP' }]"
                 >
-                  <a-input
-                    v-model:value="formData.smsp"
-                    placeholder="请输入SMSP"
-                    allow-clear
-                  />
+                  <a-input v-model:value="formData.smsp" placeholder="请输入SMSP" allow-clear />
+                </a-form-item>
+              </a-col>
+
+              <a-col :span="12">
+                <a-form-item
+                  label="ADM1"
+                  name="adm1"
+                  :rules="[{ required: true, message: '请输入ADM1' }]"
+                >
+                  <a-input v-model:value="formData.adm1" placeholder="请输入ADM1" allow-clear />
                 </a-form-item>
               </a-col>
             </a-row>
-
           </a-form>
         </div>
       </div>
-      
+
       <!-- 右侧区域 - 2/5 -->
       <div class="right-section">
         <!-- V3功能支持 - 整行布局 -->
         <div class="v3-features-section">
           <a-form-item label="v3功能支持" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
-            <a-tooltip :title="formData.v3Features && formData.v3Features.length > 0 ? formData.v3Features.join(', ') : '暂无选择'" placement="top">
+            <a-tooltip
+              :title="
+                formData.v3Features && formData.v3Features.length > 0
+                  ? formData.v3Features.join(', ')
+                  : '暂无选择'
+              "
+              placement="top"
+            >
               <a-select
                 v-model:value="formData.v3Features"
                 mode="multiple"
@@ -473,12 +446,22 @@
         </div>
 
         <!-- RPM数据配置 -->
-        <div class="rpm-config-section" v-if="formData.v3Features && formData.v3Features.includes('rpmData')">
+        <div
+          class="rpm-config-section"
+          v-if="formData.v3Features && formData.v3Features.includes('rpmData')"
+        >
           <a-divider dashed orientation="center">RPM数据配置</a-divider>
           <a-row :gutter="16">
             <a-col :span="12">
               <a-form-item label="RPM类型" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-                <a-tooltip :title="formData.rpmType && formData.rpmType.length > 0 ? formData.rpmType.join(', ') : '暂无选择'" placement="top">
+                <a-tooltip
+                  :title="
+                    formData.rpmType && formData.rpmType.length > 0
+                      ? formData.rpmType.join(', ')
+                      : '暂无选择'
+                  "
+                  placement="top"
+                >
                   <a-select
                     v-model:value="formData.rpmType"
                     mode="multiple"
@@ -499,7 +482,11 @@
               </a-form-item>
             </a-col>
             <a-col :span="12">
-              <a-form-item label="RPM下载方式" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+              <a-form-item
+                label="RPM下载方式"
+                :label-col="{ span: 12 }"
+                :wrapper-col="{ span: 12 }"
+              >
                 <a-select
                   v-model:value="formData.rpmDownloadMethod"
                   placeholder="请选择RPM下载方式"
@@ -513,7 +500,7 @@
               </a-form-item>
             </a-col>
           </a-row>
-          
+
           <a-row :gutter="16">
             <a-col :span="12">
               <a-form-item label="允许的CA" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
@@ -531,7 +518,11 @@
               </a-form-item>
             </a-col>
             <a-col :span="12" v-if="formData.rpmDownloadMethod">
-              <a-form-item label="RPM轮询地址" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+              <a-form-item
+                label="RPM轮询地址"
+                :label-col="{ span: 12 }"
+                :wrapper-col="{ span: 12 }"
+              >
                 <a-select
                   v-model:value="formData.rpmPollAddress"
                   placeholder="请选择RPM轮询地址"
@@ -539,9 +530,15 @@
                   allow-clear
                   style="width: 100%"
                 >
-                  <a-select-option value="https://api.example.com/rpm1">https://api.example.com/rpm1</a-select-option>
-                  <a-select-option value="https://api.example.com/rpm2">https://api.example.com/rpm2</a-select-option>
-                  <a-select-option value="https://api.example.com/rpm3">https://api.example.com/rpm3</a-select-option>
+                  <a-select-option value="https://api.example.com/rpm1"
+                    >https://api.example.com/rpm1</a-select-option
+                  >
+                  <a-select-option value="https://api.example.com/rpm2"
+                    >https://api.example.com/rpm2</a-select-option
+                  >
+                  <a-select-option value="https://api.example.com/rpm3"
+                    >https://api.example.com/rpm3</a-select-option
+                  >
                   <a-select-option value="custom">自定义地址</a-select-option>
                 </a-select>
               </a-form-item>
@@ -550,7 +547,14 @@
 
           <!-- 允许的Tags -->
           <a-form-item label="允许的Tags" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
-            <a-tooltip :title="formData.allowedTags && formData.allowedTags.length > 0 ? formData.allowedTags.join(', ') : '暂无选择'" placement="top">
+            <a-tooltip
+              :title="
+                formData.allowedTags && formData.allowedTags.length > 0
+                  ? formData.allowedTags.join(', ')
+                  : '暂无选择'
+              "
+              placement="top"
+            >
               <a-select
                 v-model:value="formData.allowedTags"
                 mode="multiple"
@@ -561,28 +565,45 @@
                 :maxTagCount="3"
                 :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
               >
-                <a-select-option value="Service provider name">Service provider name</a-select-option>
+                <a-select-option value="Service provider name"
+                  >Service provider name</a-select-option
+                >
                 <a-select-option value="Profile name">Profile name</a-select-option>
-                <a-select-option value="Notification Configuration Info">Notification Configuration Info</a-select-option>
+                <a-select-option value="Notification Configuration Info"
+                  >Notification Configuration Info</a-select-option
+                >
                 <a-select-option value="Icon type and Icon">Icon type and Icon</a-select-option>
                 <a-select-option value="Profile Policy Rules">Profile Policy Rules</a-select-option>
-                <a-select-option value="Service Specific Data stored in eUICC">Service Specific Data stored in eUICC</a-select-option>
+                <a-select-option value="Service Specific Data stored in eUICC"
+                  >Service Specific Data stored in eUICC</a-select-option
+                >
                 <a-select-option value="RPM Configuration">RPM Configuration</a-select-option>
                 <a-select-option value="HRI Server address">HRI Server address</a-select-option>
                 <a-select-option value="LPR Configuration">LPR Configuration</a-select-option>
-                <a-select-option value="Enterprise Configuration">Enterprise Configuration</a-select-option>
-                <a-select-option value="Device Change configuration">Device Change configuration</a-select-option>
+                <a-select-option value="Enterprise Configuration"
+                  >Enterprise Configuration</a-select-option
+                >
+                <a-select-option value="Device Change configuration"
+                  >Device Change configuration</a-select-option
+                >
               </a-select>
             </a-tooltip>
           </a-form-item>
         </div>
 
         <!-- 设备切换数据 -->
-        <div class="device-switch-section" v-if="formData.v3Features && formData.v3Features.includes('deviceSwitchData')">
+        <div
+          class="device-switch-section"
+          v-if="formData.v3Features && formData.v3Features.includes('deviceSwitchData')"
+        >
           <a-divider dashed orientation="center">设备切换数据</a-divider>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="设备切换方式" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+              <a-form-item
+                label="设备切换方式"
+                :label-col="{ span: 12 }"
+                :wrapper-col="{ span: 12 }"
+              >
                 <a-radio-group v-model:value="formData.deviceSwitchMethod" :disabled="isView">
                   <a-radio value="requestPlatform">请求平台</a-radio>
                   <a-radio value="useStoredCode">使用存储的激活码</a-radio>
@@ -605,10 +626,14 @@
               </a-form-item>
             </a-col>
           </a-row>
-          
+
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item label="是否需要新设备EID" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+              <a-form-item
+                label="是否需要新设备EID"
+                :label-col="{ span: 12 }"
+                :wrapper-col="{ span: 12 }"
+              >
                 <a-radio-group v-model:value="formData.needNewEID" :disabled="isView">
                   <a-radio value="yes">是</a-radio>
                   <a-radio value="no">否</a-radio>
@@ -616,7 +641,11 @@
               </a-form-item>
             </a-col>
             <a-col :span="12">
-              <a-form-item label="是否需要新设备TAC" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+              <a-form-item
+                label="是否需要新设备TAC"
+                :label-col="{ span: 12 }"
+                :wrapper-col="{ span: 12 }"
+              >
                 <a-radio-group v-model:value="formData.needNewTAC" :disabled="isView">
                   <a-radio value="yes">是</a-radio>
                   <a-radio value="no">否</a-radio>
@@ -627,7 +656,10 @@
         </div>
 
         <!-- 企业Profile数据 -->
-        <div class="enterprise-profile-section" v-if="formData.v3Features && formData.v3Features.includes('enterpriseProfileData')">
+        <div
+          class="enterprise-profile-section"
+          v-if="formData.v3Features && formData.v3Features.includes('enterpriseProfileData')"
+        >
           <a-divider dashed orientation="center">企业Profile数据</a-divider>
           <a-row :gutter="16">
             <a-col :span="12">
@@ -645,8 +677,15 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :span="12" v-if="formData.enterpriseRules && formData.enterpriseRules.length > 0">
-              <a-form-item label="非企业Profile数量" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+            <a-col
+              :span="12"
+              v-if="formData.enterpriseRules && formData.enterpriseRules.length > 0"
+            >
+              <a-form-item
+                label="非企业Profile数量"
+                :label-col="{ span: 12 }"
+                :wrapper-col="{ span: 12 }"
+              >
                 <a-input-number
                   v-model:value="formData.nonEnterpriseProfileCount"
                   :min="0"
@@ -658,10 +697,17 @@
               </a-form-item>
             </a-col>
           </a-row>
-          
+
           <!-- 规则 -->
           <a-form-item label="规则" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
-            <a-tooltip :title="formData.enterpriseRules && formData.enterpriseRules.length > 0 ? formData.enterpriseRules.join(', ') : '暂无选择'" placement="top">
+            <a-tooltip
+              :title="
+                formData.enterpriseRules && formData.enterpriseRules.length > 0
+                  ? formData.enterpriseRules.join(', ')
+                  : '暂无选择'
+              "
+              placement="top"
+            >
               <a-select
                 v-model:value="formData.enterpriseRules"
                 mode="multiple"
@@ -670,8 +716,12 @@
                 allow-clear
                 style="width: 100%"
               >
-                <a-select-option value="priorityEnterpriseProfile">优先级企业Profile</a-select-option>
-                <a-select-option value="onlyInstallEnterpriseProfile">只能安装企业Profile</a-select-option>
+                <a-select-option value="priorityEnterpriseProfile"
+                  >优先级企业Profile</a-select-option
+                >
+                <a-select-option value="onlyInstallEnterpriseProfile"
+                  >只能安装企业Profile</a-select-option
+                >
               </a-select>
             </a-tooltip>
           </a-form-item>
@@ -692,10 +742,10 @@ export default defineComponent({
     const route = useRoute()
     const router = useRouter()
     const formRef = ref()
-    
+
     const pageType = ref('add') // add, edit, view
     const recordId = ref('')
-    
+
     const formData = reactive({
       iccid: '',
       matchingId: '',
@@ -715,7 +765,7 @@ export default defineComponent({
       profileName: '',
       phoneNumber: '',
       serviceProvider: '',
-      notificationEvent: '',
+      notificationEvent: [],
       notificationAddress: '',
       profileIcon: '',
       // 码号信息字段
@@ -753,10 +803,14 @@ export default defineComponent({
 
     const pageTitle = computed(() => {
       switch (pageType.value) {
-        case 'add': return '新增Profile'
-        case 'edit': return '编辑Profile'
-        case 'view': return 'Profile详情'
-        default: return 'Profile管理'
+        case 'add':
+          return '新增Profile'
+        case 'edit':
+          return '编辑Profile'
+        case 'view':
+          return 'Profile详情'
+        default:
+          return 'Profile管理'
       }
     })
 
@@ -765,15 +819,15 @@ export default defineComponent({
     // 获取Profile状态对应的颜色
     const getProfileStatusColor = (status) => {
       const colorMap = {
-        'Available': 'green',
-        'Allocated': 'blue',
-        'Linked': 'cyan',
-        'Confirmed': 'purple',
-        'Released': 'orange',
-        'Downloaded': 'geekblue',
-        'Installed': 'success',
-        'Error': 'red',
-        'Unavailable': 'default'
+        Available: 'green',
+        Allocated: 'blue',
+        Linked: 'cyan',
+        Confirmed: 'purple',
+        Released: 'orange',
+        Downloaded: 'geekblue',
+        Installed: 'success',
+        Error: 'red',
+        Unavailable: 'default'
       }
       return colorMap[status] || 'default'
     }
@@ -781,9 +835,9 @@ export default defineComponent({
     // 获取通知状态对应的badge状态
     const getNotificationStatusStatus = (status) => {
       const statusMap = {
-        'Enabled': 'success',
-        'Disabled': 'default',
-        'Deleted': 'error'
+        Enabled: 'success',
+        Disabled: 'default',
+        Deleted: 'error'
       }
       return statusMap[status] || 'default'
     }
@@ -791,9 +845,9 @@ export default defineComponent({
     // 获取下载方式文本
     const getDownloadMethodText = (method) => {
       const methodMap = {
-        '1': '标准下载',
-        '2': '快速下载',
-        '3': '批量下载'
+        1: '标准下载',
+        2: '快速下载',
+        3: '批量下载'
       }
       return methodMap[method] || method
     }
@@ -801,9 +855,9 @@ export default defineComponent({
     // 获取重置规则文本
     const getResetRuleText = (rule) => {
       const ruleMap = {
-        '1': '允许重置',
-        '2': '禁止重置',
-        '3': '条件重置'
+        1: '允许重置',
+        2: '禁止重置',
+        3: '条件重置'
       }
       return ruleMap[rule] || rule
     }
@@ -832,7 +886,7 @@ export default defineComponent({
           profileName: '测试Profile',
           phoneNumber: '13800138000',
           serviceProvider: 'provider1',
-          notificationEvent: 'event1',
+          notificationEvent: [],
           notificationAddress: 'http://example.com',
           profileIcon: 'icon1',
           imsi: '460001234567890',
@@ -861,7 +915,7 @@ export default defineComponent({
         }
       }
     }
-    
+
     const loadDetail = async () => {
       if (recordId.value) {
         try {
@@ -876,8 +930,13 @@ export default defineComponent({
         }
       } else if (pageType.value === 'add') {
         // 新增时清空表单数据
-        Object.keys(formData).forEach(key => {
-          if (key === 'v3Features' || key === 'rpmType' || key === 'allowedTags' || key === 'enterpriseRules') {
+        Object.keys(formData).forEach((key) => {
+          if (
+            key === 'v3Features' ||
+            key === 'rpmType' ||
+            key === 'allowedTags' ||
+            key === 'enterpriseRules'
+          ) {
             formData[key] = []
           } else if (key === 'nonEnterpriseProfileCount') {
             formData[key] = 0
@@ -887,7 +946,7 @@ export default defineComponent({
         })
       }
     }
-    
+
     const handleSubmit = async () => {
       try {
         await formRef.value.validate()
@@ -897,11 +956,11 @@ export default defineComponent({
         console.error('表单验证失败:', error)
       }
     }
-    
+
     const handleCancel = () => {
       router.push('/view/profile_manage')
     }
-    
+
     // 切换到编辑模式
     const switchToEditMode = () => {
       pageType.value = 'edit'
@@ -910,14 +969,14 @@ export default defineComponent({
         query: { type: 'edit', id: recordId.value }
       })
     }
-    
+
     onMounted(() => {
       const { type, id } = route.query
       pageType.value = type || 'add'
       recordId.value = id || ''
       loadDetail()
     })
-    
+
     return {
       formRef,
       formData,
@@ -1196,12 +1255,12 @@ export default defineComponent({
   .detail-container {
     flex-direction: column;
   }
-  
+
   .right-section {
     width: 100%;
     max-height: none;
   }
-  
+
   .left-section {
     max-height: none; /* 在小屏幕上移除高度限制 */
   }
@@ -1213,15 +1272,15 @@ export default defineComponent({
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .detail-container {
     padding: 12px;
   }
-  
+
   .compact-header {
     padding: 8px 16px;
   }
-  
+
   .info-section-header {
     padding: 12px 16px;
   }
