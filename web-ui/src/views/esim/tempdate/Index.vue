@@ -1,0 +1,377 @@
+<template>
+  <div>
+    <!-- 上部搜索条件区域 -->
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <a-form
+        layout="inline"
+        name="basic"
+        autocomplete="off"
+        :model="formState"
+        @finish="handleFinish"
+      >
+        <a-form-item label="模板名称" name="tempName">
+          <a-input v-model:value="formState.tempName" placeholder="模板名称，模糊查询"> </a-input>
+        </a-form-item>
+        <a-form-item label="Profile Type" name="profileType">
+          <a-input v-model:value="formState.profileType" placeholder="Profile Type，模糊查询"> </a-input>
+        </a-form-item>
+        <a-form-item label="所属运营商" name="monId">
+          <a-select v-model:value="formState.monId" placeholder="请选择运营商" allow-clear style="width: 150px">
+            <a-select-option v-for="mon in monList" :key="mon.id" :value="mon.id">
+              {{ mon.monName }}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" html-type="submit"> 搜索 </a-button>
+        </a-form-item>
+        <a-form-item>
+          <a-button @click="handleReset"> 重置 </a-button>
+        </a-form-item>
+      </a-form>
+
+      <a-space>
+        <a-button type="primary" @click="handleAdd">新增模板</a-button>
+      </a-space>
+    </div>
+
+    <!-- 上部搜索条件区域 -->
+    <a-divider dashed />
+    <!-- 中间内容区域 -->
+    <!-- 表格区 -->
+    <a-table :columns="columns" :data-source="tableData" size="small" :pagination="false">
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.dataIndex === 'monName'">
+          {{ getMonName(record.monId) }}
+        </template>
+        <template v-if="column.dataIndex === 'action'">
+          <a-space>
+            <a-button type="link" @click="handleView(record)">详情</a-button>
+            <a-button type="link" @click="handleEdit(record)">编辑</a-button>
+            <a-button 
+              type="link" 
+              danger 
+              @click="handleDelete(record)"
+            >
+              删除
+            </a-button>
+          </a-space>
+        </template>
+      </template>
+    </a-table>
+    <!-- 表格区 -->
+
+    <!-- 分页区 -->
+    <div style="margin-top: 15px; float: right">
+      <a-pagination
+        v-model:current="pagination.current"
+        :total="pagination.total"
+        :show-total="(total) => `共 ${total} 条数据`"
+        @change="onPaginationChange"
+      />
+    </div>
+    <!-- 分页区 -->
+    <!-- 中间内容区域 -->
+
+    <!-- 新增/编辑弹窗 -->
+    <a-modal
+      v-model:open="modalVisible"
+      :title="modalTitle"
+      @ok="handleModalOk"
+      @cancel="handleModalCancel"
+      width="800px"
+    >
+      <a-form
+        ref="modalFormRef"
+        :model="modalFormData"
+        :label-col="{ span: 4 }"
+        :wrapper-col="{ span: 18 }"
+        :rules="formRules"
+      >
+        <a-form-item label="模板名称" name="tempName">
+          <a-input
+            v-model:value="modalFormData.tempName"
+            placeholder="请输入模板名称"
+            allow-clear
+          />
+        </a-form-item>
+        <a-form-item label="Profile Type" name="profileType">
+          <a-input
+            v-model:value="modalFormData.profileType"
+            placeholder="请输入Profile Type"
+            allow-clear
+          />
+        </a-form-item>
+        <a-form-item label="所属运营商" name="monId">
+          <a-select v-model:value="modalFormData.monId" placeholder="请选择运营商" style="width: 100%">
+            <a-select-option v-for="mon in monList" :key="mon.id" :value="mon.id">
+              {{ mon.monName }}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="模板内容" name="tempContent">
+          <a-textarea
+            v-model:value="modalFormData.tempContent"
+            placeholder="请输入模板内容"
+            :rows="15"
+            allow-clear
+          />
+        </a-form-item>
+      </a-form>
+    </a-modal>
+
+    <!-- 详情弹窗 -->
+    <a-modal
+      v-model:open="detailVisible"
+      title="模板详情"
+      @cancel="handleDetailCancel"
+      width="800px"
+    >
+      <a-descriptions :column="2" bordered>
+        <a-descriptions-item label="模板名称">{{ detailData.tempName }}</a-descriptions-item>
+        <a-descriptions-item label="Profile Type">{{ detailData.profileType }}</a-descriptions-item>
+        <a-descriptions-item label="所属运营商">{{ getMonName(detailData.monId) }}</a-descriptions-item>
+        <a-descriptions-item label="创建时间">{{ detailData.createTime }}</a-descriptions-item>
+        <a-descriptions-item label="更新时间">{{ detailData.updateTime }}</a-descriptions-item>
+        <a-descriptions-item label="模板内容" :span="2">
+          <pre style="white-space: pre-wrap; word-break: break-all; max-height: 300px; overflow-y: auto;">
+            {{ detailData.tempContent }}
+          </pre>
+        </a-descriptions-item>
+      </a-descriptions>
+    </a-modal>
+  </div>
+</template>
+
+<script>
+import { message } from 'ant-design-vue'
+
+export default {
+  name: 'TempdateManage',
+  data() {
+    return {
+      formState: {
+        tempName: '',
+        profileType: '',
+        monId: undefined
+      },
+      data: [],
+      monList: [],
+      modalVisible: false,
+      modalTitle: '',
+      modalFormData: {
+        id: undefined,
+        tempName: '',
+        profileType: '',
+        monId: undefined,
+        tempContent: ''
+      },
+      detailVisible: false,
+      detailData: {
+        tempName: '',
+        profileType: '',
+        monId: undefined,
+        tempContent: '',
+        createTime: '',
+        updateTime: ''
+      },
+      pagination: {
+        current: 1,
+        total: 0,
+        pageSize: 10
+      }
+    }
+  },
+  computed: {
+    tableData() {
+      return this.data
+    },
+    columns() {
+      return [
+        {
+          title: '模板名称',
+          dataIndex: 'tempName',
+          key: 'tempName',
+          width: '30%'
+        },
+        {
+          title: 'Profile Type',
+          dataIndex: 'profileType',
+          key: 'profileType',
+          width: '25%'
+        },
+        {
+          title: '所属运营商',
+          dataIndex: 'monName',
+          key: 'monName',
+          width: '25%'
+        },
+        {
+          title: '操作',
+          dataIndex: 'action',
+          key: 'action',
+          width: '20%'
+        }
+      ]
+    },
+    formRules() {
+      return {
+        tempName: [
+          { required: true, message: '请输入模板名称', trigger: 'blur' },
+          { min: 2, max: 100, message: '模板名称长度在 2 到 100 个字符', trigger: 'blur' }
+        ],
+        profileType: [
+          { required: true, message: '请输入Profile Type', trigger: 'blur' },
+          { max: 50, message: 'Profile Type长度不能超过50个字符', trigger: 'blur' }
+        ],
+        monId: [
+          { required: true, message: '请选择所属运营商', trigger: 'change' }
+        ],
+        tempContent: [
+          { required: true, message: '请输入模板内容', trigger: 'blur' }
+        ]
+      }
+    }
+  },
+  methods: {
+    handleFinish(values) {
+      this.pagination.current = 1
+      this.query()
+    },
+    handleReset() {
+      this.formState = {
+        tempName: '',
+        profileType: '',
+        monId: undefined
+      }
+      this.pagination.current = 1
+      this.query()
+    },
+    onPaginationChange(page, pageSize) {
+      this.pagination.current = page
+      this.pagination.pageSize = pageSize
+      this.query()
+    },
+    query() {
+      const params = {
+        pageNum: this.pagination.current,
+        pageSize: this.pagination.pageSize,
+        ...this.formState
+      }
+      this.$http.request({
+        url: '/esim/tempdate/list',
+        method: 'post',
+        data: params
+      }).then(res => {
+        if (res.code === 200) {
+          this.data = res.data.list
+          this.pagination.total = res.data.total
+        } else {
+          message.error(res.msg)
+        }
+      })
+    },
+    loadMonList() {
+      this.$http.request({
+        url: '/esim/mon/list',
+        method: 'post',
+        data: { pageNum: 1, pageSize: 1000 }
+      }).then(res => {
+        if (res.code === 200) {
+          this.monList = res.data.list
+        } else {
+          message.error(res.msg)
+        }
+      })
+    },
+    getMonName(monId) {
+      const mon = this.monList.find(item => item.id === monId)
+      return mon ? mon.monName : ''
+    },
+    handleAdd() {
+      this.modalTitle = '新增模板'
+      this.modalFormData = {
+        id: undefined,
+        tempName: '',
+        profileType: '',
+        monId: undefined,
+        tempContent: ''
+      }
+      this.modalVisible = true
+    },
+    handleEdit(record) {
+      this.modalTitle = '编辑模板'
+      this.modalFormData = {
+        id: record.id,
+        tempName: record.tempName,
+        profileType: record.profileType,
+        monId: record.monId,
+        tempContent: record.tempContent
+      }
+      this.modalVisible = true
+    },
+    handleView(record) {
+      this.detailData = {
+        tempName: record.tempName,
+        profileType: record.profileType,
+        monId: record.monId,
+        tempContent: record.tempContent,
+        createTime: record.createTime,
+        updateTime: record.updateTime
+      }
+      this.detailVisible = true
+    },
+    handleDelete(record) {
+      this.$modal.confirm({
+        title: '确认删除',
+        content: `确定要删除模板"${record.tempName}"吗？`,
+        onOk: () => {
+          this.$http.request({
+            url: '/esim/tempdate/delete',
+            method: 'post',
+            data: { id: record.id }
+          }).then(res => {
+            if (res.code === 200) {
+              message.success('删除成功')
+              this.query()
+            } else {
+              message.error(res.msg)
+            }
+          })
+        }
+      })
+    },
+    handleModalOk() {
+      this.$refs.modalFormRef.validate().then(() => {
+        const url = this.modalFormData.id ? '/esim/tempdate/update' : '/esim/tempdate/add'
+        this.$http.request({
+          url: url,
+          method: 'post',
+          data: this.modalFormData
+        }).then(res => {
+          if (res.code === 200) {
+            message.success(this.modalFormData.id ? '更新成功' : '新增成功')
+            this.modalVisible = false
+            this.query()
+          } else {
+            message.error(res.msg)
+          }
+        })
+      }).catch(error => {
+        console.log('表单验证失败:', error)
+      })
+    },
+    handleModalCancel() {
+      this.modalVisible = false
+      this.$refs.modalFormRef.resetFields()
+    },
+    handleDetailCancel() {
+      this.detailVisible = false
+    }
+  },
+  created() {
+    this.loadMonList()
+    this.query()
+  }
+}
+</script>

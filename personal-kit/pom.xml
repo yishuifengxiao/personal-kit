@@ -25,6 +25,11 @@
         <mysql.version>8.0.33</mysql.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>com.yishuifengxiao.common</groupId>
+            <artifactId>common-tool</artifactId>
+            <version>BUILD-SNAPSHOT</version>
+        </dependency>
 
         <dependency>
             <groupId>com.yishuifengxiao.common</groupId>

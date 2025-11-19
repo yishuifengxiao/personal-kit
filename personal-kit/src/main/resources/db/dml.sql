@@ -30,3 +30,6 @@ INSERT ignore INTO `sys_menu` VALUES ('6006', 0, NULL, NULL, 6, 1, '访问记录
 INSERT ignore INTO `sys_menu` VALUES ('7', 0, NULL, NULL, 7, 1, 'eSIM', '0', 'eSIM', NULL, 0, 1);
 INSERT ignore INTO `sys_menu` VALUES ('7001', 0, NULL, NULL, 1, 1, '码号数据', '7', 'profile_manage', NULL, 1, 1);
 INSERT ignore INTO `sys_menu` VALUES ('8', 0, '撒打算', NULL, 8, 0, '默认菜单', '0', 'default_menu', NULL, 1, 0);
+
+--      为角色1分配所有菜单
+INSERT ignore INTO `sys_role_menu` (id,role_id,menu_id) select RAND(), 1,id from sys_menu;

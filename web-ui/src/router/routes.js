@@ -443,6 +443,33 @@ const routes = [
           label: 'Profile管理',
           breadcrumbName: ['码号数据', 'Profile管理']
         }
+      },
+      {
+        path: 'mon_manage',
+        name: 'mon_manage',
+        component: () => import('@/views/esim/mon/Index.vue'),
+        meta: {
+          label: '运营商管理',
+          breadcrumbName: ['码号数据', '运营商管理']
+        }
+      },
+      {
+        path: 'tempdate_manage',
+        name: 'tempdate_manage',
+        component: () => import('@/views/esim/tempdate/Index.vue'),
+        meta: {
+          label: '模板管理',
+          breadcrumbName: ['码号数据', '模板管理']
+        }
+      },
+      {
+        path: 'cert_manage',
+        name: 'cert_manage',
+        component: () => import('@/views/esim/cert/Index.vue'),
+        meta: {
+          label: '证书管理',
+          breadcrumbName: ['码号数据', '证书管理']
+        }
       }
     ]
   }
