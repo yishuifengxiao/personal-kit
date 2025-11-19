@@ -470,6 +470,15 @@ const routes = [
           label: '证书管理',
           breadcrumbName: ['码号数据', '证书管理']
         }
+      },
+      {
+        path: 'business_record',
+        name: 'business_record',
+        component: () => import('@/views/esim/business_record/Index.vue'),
+        meta: {
+          label: '业务记录',
+          breadcrumbName: ['码号数据', '业务记录']
+        }
       }
     ]
   }
