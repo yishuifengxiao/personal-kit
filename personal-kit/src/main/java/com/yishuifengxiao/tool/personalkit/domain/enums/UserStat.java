@@ -62,4 +62,9 @@ public enum UserStat implements RootEnum {
     public String enumName() {
         return this.name;
     }
+
+    @Override
+    public RootEnum of(Object code) {
+        return code(Integer.valueOf(String.valueOf(code))).orElse(null);
+    }
 }

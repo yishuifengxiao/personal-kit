@@ -16,7 +16,7 @@ public class EsimProfileService {
      
     public EsimProfile save(EsimProfile esimProfile) {
         KeyHolder keyHolder = JdbcUtil.jdbcHelper().saveOrUpdate(esimProfile);
-        esimProfile.setId(keyHolder.getKeyAs(Long.class));
+        esimProfile.setId(keyHolder.getKey().longValue());
         return esimProfile;
     }
     
@@ -38,7 +38,7 @@ public class EsimProfileService {
      
     public EsimProfile update(EsimProfile esimProfile) {
         KeyHolder keyHolder = JdbcUtil.jdbcHelper().saveOrUpdate(esimProfile);
-        esimProfile.setId(keyHolder.getKeyAs(Long.class));
+        esimProfile.setId(keyHolder.getKey().longValue());
         return esimProfile;
     }
 

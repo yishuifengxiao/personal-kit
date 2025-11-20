@@ -1,5 +1,5 @@
 -- 在dml.sql最后添加
-CREATE TABLE IF NOT EXISTS db_init_status (
+CREATE TABLE IF NOT EXISTS  db_init_status (
     id INT PRIMARY KEY,
     initialized BOOLEAN DEFAULT FALSE,
     init_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS db_init_status (
 -- Table structure for auto_table
 -- ----------------------------
 DROP TABLE IF EXISTS `auto_table`;
-CREATE TABLE `auto_table`  (
+CREATE TABLE IF NOT EXISTS  `auto_table`  (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'default_name' COMMENT '用户名',
   `age` int NULL DEFAULT 1 COMMENT '年龄',
@@ -39,8 +39,8 @@ CREATE TABLE `auto_table`  (
 -- ----------------------------
 -- Table structure for disk_file
 -- ----------------------------
-DROP TABLE IF EXISTS `disk_file`;
-CREATE TABLE `disk_file`  (
+
+CREATE TABLE IF NOT EXISTS  `disk_file`  (
   `id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `create_time` datetime(6) NOT NULL,
   `file_md5` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
@@ -65,8 +65,8 @@ CREATE TABLE `disk_file`  (
 -- ----------------------------
 -- Table structure for disk_folder
 -- ----------------------------
-DROP TABLE IF EXISTS `disk_folder`;
-CREATE TABLE `disk_folder`  (
+
+CREATE TABLE IF NOT EXISTS  `disk_folder`  (
   `id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `create_time` datetime(6) NOT NULL,
   `folder_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -81,8 +81,8 @@ CREATE TABLE `disk_folder`  (
 -- ----------------------------
 -- Table structure for disk_upload_record
 -- ----------------------------
-DROP TABLE IF EXISTS `disk_upload_record`;
-CREATE TABLE `disk_upload_record`  (
+
+CREATE TABLE IF NOT EXISTS  `disk_upload_record`  (
   `id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `create_time` datetime(6) NOT NULL,
   `file_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -98,8 +98,8 @@ CREATE TABLE `disk_upload_record`  (
 -- ----------------------------
 -- Table structure for esim_business_record
 -- ----------------------------
-DROP TABLE IF EXISTS `esim_business_record`;
-CREATE TABLE `esim_business_record`  (
+
+CREATE TABLE IF NOT EXISTS  `esim_business_record`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `iccid` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'ICCID',
   `eid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'EID',
@@ -127,8 +127,8 @@ CREATE TABLE `esim_business_record`  (
 -- ----------------------------
 -- Table structure for esim_cert
 -- ----------------------------
-DROP TABLE IF EXISTS `esim_cert`;
-CREATE TABLE `esim_cert`  (
+
+CREATE TABLE IF NOT EXISTS  `esim_cert`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `cert_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '证书名称',
   `ci_cert` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT 'CI证书内容',
@@ -152,8 +152,8 @@ CREATE TABLE `esim_cert`  (
 -- ----------------------------
 -- Table structure for esim_mon
 -- ----------------------------
-DROP TABLE IF EXISTS `esim_mon`;
-CREATE TABLE `esim_mon`  (
+
+CREATE TABLE IF NOT EXISTS  `esim_mon`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `mon_oid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '运营商OID，格式如：v1.v2.v3...vn',
   `mon_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '运营商名称',
@@ -171,8 +171,8 @@ CREATE TABLE `esim_mon`  (
 -- ----------------------------
 -- Table structure for esim_profile
 -- ----------------------------
-DROP TABLE IF EXISTS `esim_profile`;
-CREATE TABLE `esim_profile`  (
+
+CREATE TABLE IF NOT EXISTS  `esim_profile`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `iccid` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'ICCID，20位16进制字符串',
   `matching_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'Matching ID，最大长度50',
@@ -241,8 +241,8 @@ CREATE TABLE `esim_profile`  (
 -- ----------------------------
 -- Table structure for esim_tempdate
 -- ----------------------------
-DROP TABLE IF EXISTS `esim_tempdate`;
-CREATE TABLE `esim_tempdate`  (
+
+CREATE TABLE IF NOT EXISTS  `esim_tempdate`  (
     `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     `temp_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '模板名称',
     `profile_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT 'Profile Type',
@@ -259,8 +259,8 @@ CREATE TABLE `esim_tempdate`  (
 -- ----------------------------
 -- Table structure for http_log
 -- ----------------------------
-DROP TABLE IF EXISTS `http_log`;
-CREATE TABLE `http_log`  (
+
+CREATE TABLE IF NOT EXISTS  `http_log`  (
   `id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
     `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `header_param` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
@@ -281,8 +281,8 @@ CREATE TABLE `http_log`  (
 -- ----------------------------
 -- Table structure for sys_menu
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_menu`;
-CREATE TABLE `sys_menu`  (
+
+CREATE TABLE IF NOT EXISTS  `sys_menu`  (
   `id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `auth` tinyint(1) NULL DEFAULT 0,
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '是否需要鉴权，0:无需鉴权，1:需要鉴权',
@@ -303,8 +303,8 @@ CREATE TABLE `sys_menu`  (
 -- ----------------------------
 -- Table structure for sys_menu_permission
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_menu_permission`;
-CREATE TABLE `sys_menu_permission`  (
+
+CREATE TABLE IF NOT EXISTS  `sys_menu_permission`  (
   `id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `menu_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `permission_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -315,8 +315,8 @@ CREATE TABLE `sys_menu_permission`  (
 -- ----------------------------
 -- Table structure for sys_permission
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_permission`;
-CREATE TABLE `sys_permission`  (
+
+CREATE TABLE IF NOT EXISTS  `sys_permission`  (
   `id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `application_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `context_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
@@ -334,8 +334,8 @@ CREATE TABLE `sys_permission`  (
 -- ----------------------------
 -- Table structure for sys_role
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_role`;
-CREATE TABLE `sys_role`  (
+
+CREATE TABLE IF NOT EXISTS  `sys_role`  (
   `id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `create_time` datetime(6) NOT NULL,
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
@@ -351,8 +351,8 @@ CREATE TABLE `sys_role`  (
 -- ----------------------------
 -- Table structure for sys_role_menu
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_role_menu`;
-CREATE TABLE `sys_role_menu`  (
+
+CREATE TABLE IF NOT EXISTS  `sys_role_menu`  (
   `id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `menu_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `role_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -363,8 +363,8 @@ CREATE TABLE `sys_role_menu`  (
 -- ----------------------------
 -- Table structure for sys_security_record
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_security_record`;
-CREATE TABLE `sys_security_record`  (
+
+CREATE TABLE IF NOT EXISTS  `sys_security_record`  (
   `id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `content_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `create_time` datetime(6) NOT NULL,
@@ -381,8 +381,8 @@ CREATE TABLE `sys_security_record`  (
 -- ----------------------------
 -- Table structure for sys_user
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_user`;
-CREATE TABLE `sys_user`  (
+
+CREATE TABLE IF NOT EXISTS  `sys_user`  (
   `id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `cert_no` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `create_time` datetime(6) NOT NULL,
@@ -406,8 +406,8 @@ CREATE TABLE `sys_user`  (
 -- ----------------------------
 -- Table structure for sys_user_role
 -- ----------------------------
-DROP TABLE IF EXISTS `sys_user_role`;
-CREATE TABLE `sys_user_role`  (
+
+CREATE TABLE IF NOT EXISTS  `sys_user_role`  (
   `id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `role_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `user_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -418,8 +418,8 @@ CREATE TABLE `sys_user_role`  (
 -- ----------------------------
 -- Table structure for upload_record
 -- ----------------------------
-DROP TABLE IF EXISTS `upload_record`;
-CREATE TABLE `upload_record`  (
+
+CREATE TABLE IF NOT EXISTS  `upload_record`  (
   `id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `create_time` datetime(6) NOT NULL,
   `file_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -437,8 +437,7 @@ CREATE TABLE `upload_record`  (
 -- ----------------------------
 -- Table structure for user_token
 -- ----------------------------
-DROP TABLE IF EXISTS `user_token`;
-CREATE TABLE `user_token`  (
+CREATE TABLE IF NOT EXISTS  `user_token`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'token信息',
   `user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户',

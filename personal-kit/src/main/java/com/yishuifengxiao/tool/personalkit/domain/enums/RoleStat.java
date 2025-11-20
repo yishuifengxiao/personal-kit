@@ -51,6 +51,11 @@ public enum RoleStat implements RootEnum {
     }
 
     @Override
+    public RootEnum of(Object code) {
+        return code(Integer.valueOf(String.valueOf(code))).orElse(null);
+    }
+
+    @Override
     public String enumName() {
         return this.name;
     }

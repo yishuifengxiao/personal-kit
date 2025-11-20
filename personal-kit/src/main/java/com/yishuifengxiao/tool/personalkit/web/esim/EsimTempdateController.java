@@ -33,7 +33,7 @@ public class EsimTempdateController {
 
     @PostMapping("/page")
     @ResponseBody
-    public Page<EsimTempdate> findPage(@RequestBody PageQuery<EsimTempdate> pageQuery) {
+    public Page<Map> findPage(@RequestBody PageQuery<EsimTempdate> pageQuery) {
         return esimTempdateService.findPage(pageQuery);
     }
 

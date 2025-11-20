@@ -3,6 +3,7 @@ package com.yishuifengxiao.tool.personalkit.service;
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
+import com.yishuifengxiao.common.tool.utils.Assert;
 import com.yishuifengxiao.tool.personalkit.domain.entity.EsimMon;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ public class EsimMonService {
 
     public EsimMon save(EsimMon esimMon) {
         KeyHolder keyHolder = JdbcUtil.jdbcHelper().saveOrUpdate(esimMon);
-        esimMon.setId(keyHolder.getKeyAs(Long.class));
+        esimMon.setId(keyHolder.getKey().longValue());
         return esimMon;
     }
 
@@ -32,13 +33,16 @@ public class EsimMonService {
 
 
     public void deleteById(Long id) {
+        EsimMon esimMon = JdbcUtil.jdbcHelper().findByPrimaryKey(EsimMon.class, id);
+        Assert.isNotNull("记录不存在", esimMon);
+        Assert.isTrue("未禁用的不允许删除", esimMon.getStatus() == 0);
         JdbcUtil.jdbcHelper().deleteByPrimaryKey(EsimMon.class, id);
     }
 
 
     public EsimMon update(EsimMon esimMon) {
         KeyHolder keyHolder = JdbcUtil.jdbcHelper().saveOrUpdate(esimMon);
-        esimMon.setId(keyHolder.getKeyAs(Long.class));
+        esimMon.setId(keyHolder.getKey().longValue());
         return esimMon;
     }
 

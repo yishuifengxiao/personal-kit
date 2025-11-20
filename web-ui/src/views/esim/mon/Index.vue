@@ -55,12 +55,7 @@
             >
               删除
             </a-button>
-            <a-button 
-              type="link" 
-              @click="handleToggleStatus(record)"
-            >
-              {{ record.status === 1 ? '禁用' : '启用' }}
-            </a-button>
+
           </a-space>
         </template>
       </template>
@@ -227,7 +222,7 @@ export default defineComponent({
     query() {
       this.$http
         .request({
-          url: '/personkit/mon/page',
+          url: '/personkit/api/esim/mon/page',
           data: {
             num: this.pagination.current,
             query: this.formState,
@@ -300,7 +295,7 @@ export default defineComponent({
         onOk: () => {
           this.$http
             .request({
-              url: '/personkit/mon/delete',
+              url: '/personkit/api/esim/mon/delete',
               method: 'post',
               data: {
                 id: record.id
@@ -312,7 +307,7 @@ export default defineComponent({
             })
             .catch((err) => {
               console.error('删除失败:', err)
-              message.error('删除失败: ' + (err.message || '未知错误'))
+              // message.error('删除失败: ' + (err.message || '未知错误'))
             })
         }
       })
@@ -357,7 +352,7 @@ export default defineComponent({
      */
     handleModalOk() {
       this.$refs.modalFormRef.validate().then(() => {
-        const url = this.modalFormData.id ? '/personkit/mon/update' : '/personkit/mon/add'
+        const url = this.modalFormData.id ? '/personkit/api/esim/mon/update' : '/personkit/api/esim/mon/save'
         
         this.$http
           .request({
@@ -372,7 +367,7 @@ export default defineComponent({
           })
           .catch((err) => {
             console.error('操作失败:', err)
-            message.error('操作失败: ' + (err.message || '未知错误'))
+            // message.error('操作失败: ' + (err.message || '未知错误'))
           })
       }).catch(() => {
         // 表单验证失败

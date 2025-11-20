@@ -16,7 +16,7 @@ public class EsimCertService {
 
     public EsimCert save(EsimCert esimCert) {
         KeyHolder keyHolder = JdbcUtil.jdbcHelper().saveOrUpdate(esimCert);
-        esimCert.setId(keyHolder.getKeyAs(Long.class));
+        esimCert.setId(keyHolder.getKey().longValue());
         return esimCert;
     }
 
@@ -38,7 +38,7 @@ public class EsimCertService {
 
     public EsimCert update(EsimCert esimCert) {
         KeyHolder keyHolder = JdbcUtil.jdbcHelper().saveOrUpdate(esimCert);
-        esimCert.setId(keyHolder.getKeyAs(Long.class));
+        esimCert.setId(keyHolder.getKey().longValue());
         return esimCert;
     }
 

@@ -13,10 +13,16 @@
           <a-input v-model:value="formState.tempName" placeholder="模板名称，模糊查询"> </a-input>
         </a-form-item>
         <a-form-item label="Profile Type" name="profileType">
-          <a-input v-model:value="formState.profileType" placeholder="Profile Type，模糊查询"> </a-input>
+          <a-input v-model:value="formState.profileType" placeholder="Profile Type，模糊查询">
+          </a-input>
         </a-form-item>
         <a-form-item label="所属运营商" name="monId">
-          <a-select v-model:value="formState.monId" placeholder="请选择运营商" allow-clear style="width: 150px">
+          <a-select
+            v-model:value="formState.monId"
+            placeholder="请选择运营商"
+            allow-clear
+            style="width: 150px"
+          >
             <a-select-option v-for="mon in monList" :key="mon.id" :value="mon.id">
               {{ mon.monName }}
             </a-select-option>
@@ -42,19 +48,13 @@
     <a-table :columns="columns" :data-source="tableData" size="small" :pagination="false">
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'monName'">
-          {{ getMonName(record.monId) }}
+          {{ record.monName }}
         </template>
         <template v-if="column.dataIndex === 'action'">
           <a-space>
             <a-button type="link" @click="handleView(record)">详情</a-button>
             <a-button type="link" @click="handleEdit(record)">编辑</a-button>
-            <a-button 
-              type="link" 
-              danger 
-              @click="handleDelete(record)"
-            >
-              删除
-            </a-button>
+            <a-button type="link" danger @click="handleDelete(record)"> 删除 </a-button>
           </a-space>
         </template>
       </template>
@@ -103,7 +103,11 @@
           />
         </a-form-item>
         <a-form-item label="所属运营商" name="monId">
-          <a-select v-model:value="modalFormData.monId" placeholder="请选择运营商" style="width: 100%">
+          <a-select
+            v-model:value="modalFormData.monId"
+            placeholder="请选择运营商"
+            style="width: 100%"
+          >
             <a-select-option v-for="mon in monList" :key="mon.id" :value="mon.id">
               {{ mon.monName }}
             </a-select-option>
@@ -132,9 +136,16 @@
         <a-descriptions-item label="Profile Type">{{ detailData.profileType }}</a-descriptions-item>
         <a-descriptions-item label="所属运营商">{{ getMonName(detailData.monId) }}</a-descriptions-item>
         <a-descriptions-item label="创建时间">{{ detailData.createTime }}</a-descriptions-item>
-        <a-descriptions-item label="更新时间">{{ detailData.updateTime }}</a-descriptions-item>
+        <a-descriptions-item label="更新时间" :span="2">{{ detailData.updateTime }}</a-descriptions-item>
         <a-descriptions-item label="模板内容" :span="2">
-          <pre style="white-space: pre-wrap; word-break: break-all; max-height: 300px; overflow-y: auto;">
+          <pre
+            style="
+              white-space: pre-wrap;
+              word-break: break-all;
+              max-height: 300px;
+              overflow-y: auto;
+            "
+          >
             {{ detailData.tempContent }}
           </pre>
         </a-descriptions-item>
@@ -144,7 +155,7 @@
 </template>
 
 <script>
-import { message } from 'ant-design-vue'
+import { message, Modal } from 'ant-design-vue'
 
 export default {
   name: 'TempdateManage',
@@ -224,12 +235,8 @@ export default {
           { required: true, message: '请输入Profile Type', trigger: 'blur' },
           { max: 50, message: 'Profile Type长度不能超过50个字符', trigger: 'blur' }
         ],
-        monId: [
-          { required: true, message: '请选择所属运营商', trigger: 'change' }
-        ],
-        tempContent: [
-          { required: true, message: '请输入模板内容', trigger: 'blur' }
-        ]
+        monId: [{ required: true, message: '请选择所属运营商', trigger: 'change' }],
+        tempContent: [{ required: true, message: '请输入模板内容', trigger: 'blur' }]
       }
     }
   },
@@ -256,36 +263,40 @@ export default {
       const params = {
         pageNum: this.pagination.current,
         pageSize: this.pagination.pageSize,
-        ...this.formState
+        query: this.formState
       }
-      this.$http.request({
-        url: '/esim/tempdate/list',
-        method: 'post',
-        data: params
-      }).then(res => {
-        if (res.code === 200) {
-          this.data = res.data.list
-          this.pagination.total = res.data.total
-        } else {
-          message.error(res.msg)
-        }
-      })
+      this.$http
+        .request({
+          url: '/personkit/api/esim/tempdate/page',
+          method: 'post',
+          data: params
+        })
+        .then((res) => {
+          console.log('模板列表接口返回:', res)
+          this.data = res.data || []
+          console.log('模板数据:', this.data)
+          this.pagination.total = res.total || 0
+        })
     },
     loadMonList() {
-      this.$http.request({
-        url: '/esim/mon/list',
-        method: 'post',
-        data: { pageNum: 1, pageSize: 1000 }
-      }).then(res => {
-        if (res.code === 200) {
-          this.monList = res.data.list
-        } else {
-          message.error(res.msg)
-        }
-      })
+      return this.$http
+        .request({
+          url: '/personkit/api/esim/mon/list',
+          method: 'post',
+          data: { pageNum: 1, pageSize: 1000 }
+        })
+        .then((res) => {
+          console.log('运营商接口返回:', res)
+          this.monList = res || []
+          console.log('设置monList:', this.monList)
+          return this.monList
+        })
     },
     getMonName(monId) {
-      const mon = this.monList.find(item => item.id === monId)
+      console.log('getMonName 调用:', monId, '类型:', typeof monId)
+      console.log('monList:', this.monList)
+      const mon = this.monList.find((item) => item.id === monId)
+      console.log('匹配结果:', mon)
       return mon ? mon.monName : ''
     },
     handleAdd() {
@@ -301,14 +312,44 @@ export default {
     },
     handleEdit(record) {
       this.modalTitle = '编辑模板'
-      this.modalFormData = {
-        id: record.id,
-        tempName: record.tempName,
-        profileType: record.profileType,
-        monId: record.monId,
-        tempContent: record.tempContent
+      console.log('编辑记录:', record)
+      console.log('运营商ID:', record.monId, '类型:', typeof record.monId)
+      console.log('当前运营商列表:', this.monList)
+
+      // 检查运营商列表中的ID类型
+      if (this.monList.length > 0) {
+        console.log('运营商列表ID示例:', this.monList[0].id, '类型:', typeof this.monList[0].id)
       }
-      this.modalVisible = true
+
+      // 确保运营商列表已加载
+      if (this.monList.length === 0) {
+        this.loadMonList().then(() => {
+          console.log('运营商列表加载完成:', this.monList)
+          console.log('设置monId:', record.monId)
+          // 确保类型匹配，转换为数字类型
+          const monIdValue = Number(record.monId)
+          this.modalFormData = {
+            id: record.id,
+            tempName: record.tempName,
+            profileType: record.profileType,
+            monId: monIdValue,
+            tempContent: record.tempContent
+          }
+          console.log('modalFormData:', this.modalFormData)
+          this.modalVisible = true
+        })
+      } else {
+        // 确保类型匹配，转换为数字类型
+        const monIdValue = Number(record.monId)
+        this.modalFormData = {
+          id: record.id,
+          tempName: record.tempName,
+          profileType: record.profileType,
+          monId: monIdValue,
+          tempContent: record.tempContent
+        }
+        this.modalVisible = true
+      }
     },
     handleView(record) {
       this.detailData = {
@@ -322,44 +363,45 @@ export default {
       this.detailVisible = true
     },
     handleDelete(record) {
-      this.$modal.confirm({
+      Modal.confirm({
         title: '确认删除',
         content: `确定要删除模板"${record.tempName}"吗？`,
         onOk: () => {
-          this.$http.request({
-            url: '/esim/tempdate/delete',
-            method: 'post',
-            data: { id: record.id }
-          }).then(res => {
-            if (res.code === 200) {
+          this.$http
+            .request({
+              url: '/personkit/api/esim/tempdate/delete',
+              method: 'post',
+              data: { id: record.id }
+            })
+            .then((res) => {
               message.success('删除成功')
               this.query()
-            } else {
-              message.error(res.msg)
-            }
-          })
+            })
         }
       })
     },
     handleModalOk() {
-      this.$refs.modalFormRef.validate().then(() => {
-        const url = this.modalFormData.id ? '/esim/tempdate/update' : '/esim/tempdate/add'
-        this.$http.request({
-          url: url,
-          method: 'post',
-          data: this.modalFormData
-        }).then(res => {
-          if (res.code === 200) {
-            message.success(this.modalFormData.id ? '更新成功' : '新增成功')
-            this.modalVisible = false
-            this.query()
-          } else {
-            message.error(res.msg)
-          }
+      this.$refs.modalFormRef
+        .validate()
+        .then(() => {
+          const url = this.modalFormData.id
+            ? '/personkit/api/esim/tempdate/update'
+            : '/personkit/api/esim/tempdate/save'
+          this.$http
+            .request({
+              url: url,
+              method: 'post',
+              data: this.modalFormData
+            })
+            .then((res) => {
+              message.success(this.modalFormData.id ? '更新成功' : '新增成功')
+              this.modalVisible = false
+              this.query()
+            })
         })
-      }).catch(error => {
-        console.log('表单验证失败:', error)
-      })
+        .catch((error) => {
+          console.log('表单验证失败:', error)
+        })
     },
     handleModalCancel() {
       this.modalVisible = false
@@ -367,6 +409,14 @@ export default {
     },
     handleDetailCancel() {
       this.detailVisible = false
+    }
+  },
+  watch: {
+    'modalFormData.monId'(newVal, oldVal) {
+      console.log('monId 变化:', oldVal, '->', newVal)
+    },
+    monList(newVal) {
+      console.log('monList 变化:', newVal)
     }
   },
   created() {

@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * @author yishui
@@ -35,6 +35,13 @@ public class EsimMonController {
     @ResponseBody
     public Page<EsimMon> findPage(@RequestBody PageQuery<EsimMon> pageQuery) {
         return esimMonService.findPage(pageQuery);
+    }
+
+    @PostMapping("/list")
+    @ResponseBody
+    public List<EsimMon> list(@RequestBody EsimMon pageQuery) {
+        PageQuery<EsimMon> query = PageQuery.of(pageQuery);
+        return esimMonService.findPage(query).getData();
     }
 
     @PostMapping(value = "/save", produces = {"application/json;charset=utf-8"})

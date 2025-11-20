@@ -15,7 +15,7 @@ public class EsimBusinessRecordService {
 
     public EsimBusinessRecord save(EsimBusinessRecord esimBusinessRecord) {
         KeyHolder keyHolder = JdbcUtil.jdbcHelper().saveOrUpdate(esimBusinessRecord);
-        esimBusinessRecord.setId(keyHolder.getKeyAs(Long.class));
+        esimBusinessRecord.setId(keyHolder.getKey().longValue());
         return esimBusinessRecord;
     }
 
@@ -33,7 +33,7 @@ public class EsimBusinessRecordService {
 
     public EsimBusinessRecord update(EsimBusinessRecord esimBusinessRecord) {
         KeyHolder keyHolder = JdbcUtil.jdbcHelper().saveOrUpdate(esimBusinessRecord);
-        esimBusinessRecord.setId(keyHolder.getKeyAs(Long.class));
+        esimBusinessRecord.setId(keyHolder.getKey().longValue());
         return esimBusinessRecord;
     }
 
