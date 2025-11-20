@@ -1,14 +1,18 @@
 <template>
-  <div class="login" :style="{ backgroundImage: 'url(' + backgroundImage + ')' }">
-    <div class="login-content">
-      <div class="login-container">
-        <img :src="loginFormImage" class="loginFormImage" />
+  <div class="register" :style="{ backgroundImage: 'url(' + backgroundImage + ')' }">
+    <div class="register-content">
+      <div class="register-container">
+        <img :src="registerFormImage" class="registerFormImage" />
         <div class="div-form">
-          <div class="form_title">欢迎登录系统</div>
+          <div class="form_title">欢迎注册系统</div>
           <a-form class="form" :model="formState" name="basic" :label-col="{ span: 4 }" :wrapper-col="{ span: 16 }"
             autocomplete="off" @finish="onFinish" @finishFailed="onFinishFailed">
             <a-form-item label="账号" name="username" class="username" :rules="[{ required: true, message: '账号不能为空' }]">
               <a-input name="username" v-model:value="formState.username" size="large" allowClear />
+            </a-form-item>
+
+            <a-form-item label="邮箱" name="email" class="email" :rules="[{ required: true, message: '邮箱不能为空' }, { type: 'email', message: '请输入有效的邮箱地址' }]">
+              <a-input name="email" v-model:value="formState.email" size="large" allowClear />
             </a-form-item>
 
             <a-form-item label="密码" name="password" class="password" :rules="[{ required: true, message: '密码不能为空' }]">
@@ -20,11 +24,11 @@
             </a-form-item>
 
             <a-form-item :wrapper-col="{ offset: 4, span: 16 }">
-              <a-button block type="primary" html-type="submit" size="large">登陆</a-button>
+              <a-button block type="primary" html-type="submit" size="large">注册</a-button>
             </a-form-item>
           </a-form>
           <div class="form_tail">
-            <div class="form_tail_left"><a-button type="link" @click="goToRegister">注册账号</a-button></div>
+            <div class="form_tail_left"><a-button type="link" @click="goToLogin">已有账号？立即登录</a-button></div>
             <div class="form_tail_right"><a-button type="link" @click="goToForgotPassword">忘记密码</a-button></div>
           </div>
         </div>
@@ -37,55 +41,53 @@
 <script>
 import { reactive, defineComponent } from 'vue'
 import backgroundImage from '@/assets/backgroup/login-bg.png'
-import loginFormImage from '@/assets/backgroup/login_form.png'
-import { mapActions } from 'pinia'
-import { useUserStore } from '@/stores/user'
+import registerFormImage from '@/assets/backgroup/login_form.png'
 import ViewChoose from './login/ViewChoose.vue'
+
 export default defineComponent({
   data() {
     return {
       backgroundImage,
-      loginFormImage
+      registerFormImage
     }
   },
 
   methods: {
-    ...mapActions(useUserStore, ['setToken', 'setUser']),
     onFinish(values) {
       this.$http
         .request({
-          url: '/personkit/login',
+          url: '/personkit/register',
           data: values,
           method: 'post'
         })
         .then((res) => {
-  
-          this.setToken(res.value)
-          this.doAction()
+          this.$message.success('注册成功！')
+          this.$router.push({ name: 'login' })
         })
-        .catch((err) => console.log(err))
+        .catch((err) => {
+          console.log(err)
+          this.$message.error('注册失败，请重试')
+        })
     },
 
     onFinishFailed(errorInfo) {
       console.log('Failed:', errorInfo)
     },
 
-    doAction() {
-      this.$router.push({ name: 'home' })
-    },
-
-    goToRegister() {
-      this.$router.push({ name: 'register' })
+    goToLogin() {
+      this.$router.push({ name: 'login' })
     },
 
     goToForgotPassword() {
       this.$router.push({ name: 'forgotPassword' })
     }
   },
+
   setup() {
     const formState = reactive({
-      username: 'yishui',
-      password: '123456',
+      username: '',
+      email: '',
+      password: '',
       remember: true
     })
     return {
@@ -99,7 +101,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.login {
+.register {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -110,7 +112,7 @@ export default defineComponent({
   justify-content: center;
 }
 
-.login-content {
+.register-content {
   width: 100%;
   height: 100%;
   display: flex;
@@ -118,7 +120,7 @@ export default defineComponent({
   justify-content: center;
 }
 
-.login-container {
+.register-container {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -133,7 +135,7 @@ export default defineComponent({
   overflow: hidden;
 }
 
-.loginFormImage {
+.registerFormImage {
   width: 50%;
   height: 100%;
   object-fit: cover;
@@ -173,13 +175,13 @@ export default defineComponent({
 
 /* 响应式设计 */
 @media (max-width: 1024px) {
-  .login-container {
+  .register-container {
     width: 95%;
     height: 80vh;
     max-height: 600px;
   }
   
-  .loginFormImage {
+  .registerFormImage {
     width: 45%;
   }
   
@@ -195,7 +197,7 @@ export default defineComponent({
 }
 
 @media (max-width: 768px) {
-  .login-container {
+  .register-container {
     flex-direction: column;
     height: auto;
     min-height: 80vh;
@@ -204,7 +206,7 @@ export default defineComponent({
     max-width: 400px;
   }
   
-  .loginFormImage {
+  .registerFormImage {
     width: 100%;
     height: 200px;
     border-radius: 2rem 2rem 0 0;
@@ -222,7 +224,7 @@ export default defineComponent({
 }
 
 @media (max-width: 480px) {
-  .login-container {
+  .register-container {
     width: 95%;
     max-width: 350px;
   }
@@ -239,7 +241,7 @@ export default defineComponent({
 
 /* 超小屏幕适配 */
 @media (max-width: 320px) {
-  .login-container {
+  .register-container {
     border-radius: 1rem;
   }
   

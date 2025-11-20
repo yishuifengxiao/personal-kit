@@ -15,6 +15,22 @@ const routes = [
     }
   },
   {
+    path: '/register',
+    name: 'register',
+    component: () => import('@/views/Register.vue'),
+    meta: {
+      requiresAuth: false
+    }
+  },
+  {
+    path: '/forgot-password',
+    name: 'forgotPassword',
+    component: () => import('@/views/ForgotPassword.vue'),
+    meta: {
+      requiresAuth: false
+    }
+  },
+  {
     path: '/search',
     name: 'search',
     component: () => import('@/views/search/MySearch.vue'),

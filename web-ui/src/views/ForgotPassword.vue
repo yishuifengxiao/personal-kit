@@ -1,31 +1,44 @@
 <template>
-  <div class="login" :style="{ backgroundImage: 'url(' + backgroundImage + ')' }">
-    <div class="login-content">
-      <div class="login-container">
-        <img :src="loginFormImage" class="loginFormImage" />
+  <div class="forgot-password" :style="{ backgroundImage: 'url(' + backgroundImage + ')' }">
+    <div class="forgot-password-content">
+      <div class="forgot-password-container">
+        <img :src="forgotPasswordFormImage" class="forgotPasswordFormImage" />
         <div class="div-form">
-          <div class="form_title">欢迎登录系统</div>
+          <div class="form_title">忘记密码</div>
           <a-form class="form" :model="formState" name="basic" :label-col="{ span: 4 }" :wrapper-col="{ span: 16 }"
             autocomplete="off" @finish="onFinish" @finishFailed="onFinishFailed">
             <a-form-item label="账号" name="username" class="username" :rules="[{ required: true, message: '账号不能为空' }]">
               <a-input name="username" v-model:value="formState.username" size="large" allowClear />
             </a-form-item>
 
+            <a-form-item label="邮箱" name="email" class="email" :rules="[{ required: true, message: '邮箱不能为空' }, { type: 'email', message: '请输入有效的邮箱地址' }]">
+              <a-input name="email" v-model:value="formState.email" size="large" allowClear />
+            </a-form-item>
+
             <a-form-item label="密码" name="password" class="password" :rules="[{ required: true, message: '密码不能为空' }]">
               <a-input-password name="password" v-model:value="formState.password" size="large" allowClear />
             </a-form-item>
 
-            <a-form-item label="记住账号" name="remember">
-              <a-checkbox name="remember" v-model:checked="formState.remember">是</a-checkbox>
+            <a-form-item label="验证码" name="verificationCode" class="verification-code" :rules="[{ required: true, message: '请输入验证码' }]">
+              <a-row :gutter="8">
+                <a-col :span="14">
+                  <a-input name="verificationCode" v-model:value="formState.verificationCode" size="large" allowClear />
+                </a-col>
+                <a-col :span="10">
+                  <a-button type="primary" size="large" @click="sendVerificationCode" :disabled="countdown > 0">
+                    {{ countdown > 0 ? `${countdown}秒后重试` : '发送验证码' }}
+                  </a-button>
+                </a-col>
+              </a-row>
             </a-form-item>
 
             <a-form-item :wrapper-col="{ offset: 4, span: 16 }">
-              <a-button block type="primary" html-type="submit" size="large">登陆</a-button>
+              <a-button block type="primary" html-type="submit" size="large">重置密码</a-button>
             </a-form-item>
           </a-form>
           <div class="form_tail">
-            <div class="form_tail_left"><a-button type="link" @click="goToRegister">注册账号</a-button></div>
-            <div class="form_tail_right"><a-button type="link" @click="goToForgotPassword">忘记密码</a-button></div>
+            <div class="form_tail_left"><a-button type="link" @click="goToLogin">返回登录</a-button></div>
+            <div class="form_tail_right"><a-button type="link" @click="goToRegister">注册账号</a-button></div>
           </div>
         </div>
       </div>
@@ -37,56 +50,75 @@
 <script>
 import { reactive, defineComponent } from 'vue'
 import backgroundImage from '@/assets/backgroup/login-bg.png'
-import loginFormImage from '@/assets/backgroup/login_form.png'
-import { mapActions } from 'pinia'
-import { useUserStore } from '@/stores/user'
+import forgotPasswordFormImage from '@/assets/backgroup/login_form.png'
 import ViewChoose from './login/ViewChoose.vue'
+
 export default defineComponent({
   data() {
     return {
       backgroundImage,
-      loginFormImage
+      forgotPasswordFormImage,
+      countdown: 0
     }
   },
 
   methods: {
-    ...mapActions(useUserStore, ['setToken', 'setUser']),
     onFinish(values) {
       this.$http
         .request({
-          url: '/personkit/login',
+          url: '/personkit/reset-password',
           data: values,
           method: 'post'
         })
         .then((res) => {
-  
-          this.setToken(res.value)
-          this.doAction()
+          this.$message.success('密码重置成功！')
+          this.$router.push({ name: 'login' })
         })
-        .catch((err) => console.log(err))
+        .catch((err) => {
+          console.log(err)
+          this.$message.error('密码重置失败，请重试')
+        })
     },
 
     onFinishFailed(errorInfo) {
       console.log('Failed:', errorInfo)
     },
 
-    doAction() {
-      this.$router.push({ name: 'home' })
+
+
+    sendVerificationCode() {
+      if (!this.formState.email) {
+        this.$message.warning('请先输入邮箱地址')
+        return
+      }
+      
+      // 模拟发送验证码
+      this.countdown = 60
+      const timer = setInterval(() => {
+        this.countdown--
+        if (this.countdown <= 0) {
+          clearInterval(timer)
+        }
+      }, 1000)
+      
+      this.$message.success('验证码已发送到您的邮箱')
+    },
+
+    goToLogin() {
+      this.$router.push({ name: 'login' })
     },
 
     goToRegister() {
       this.$router.push({ name: 'register' })
-    },
-
-    goToForgotPassword() {
-      this.$router.push({ name: 'forgotPassword' })
     }
   },
+
   setup() {
     const formState = reactive({
-      username: 'yishui',
-      password: '123456',
-      remember: true
+      username: '',
+      email: '',
+      password: '',
+      verificationCode: ''
     })
     return {
       formState
@@ -99,7 +131,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.login {
+.forgot-password {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -110,7 +142,7 @@ export default defineComponent({
   justify-content: center;
 }
 
-.login-content {
+.forgot-password-content {
   width: 100%;
   height: 100%;
   display: flex;
@@ -118,7 +150,7 @@ export default defineComponent({
   justify-content: center;
 }
 
-.login-container {
+.forgot-password-container {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -133,7 +165,7 @@ export default defineComponent({
   overflow: hidden;
 }
 
-.loginFormImage {
+.forgotPasswordFormImage {
   width: 50%;
   height: 100%;
   object-fit: cover;
@@ -173,13 +205,13 @@ export default defineComponent({
 
 /* 响应式设计 */
 @media (max-width: 1024px) {
-  .login-container {
-    width: 95%;
-    height: 80vh;
-    max-height: 600px;
-  }
+    .forgot-password-container {
+      width: 95%;
+      height: 80vh;
+      max-height: 600px;
+    }
   
-  .loginFormImage {
+  .forgotPasswordFormImage {
     width: 45%;
   }
   
@@ -195,7 +227,7 @@ export default defineComponent({
 }
 
 @media (max-width: 768px) {
-  .login-container {
+  .forgot-password-container {
     flex-direction: column;
     height: auto;
     min-height: 80vh;
@@ -204,7 +236,7 @@ export default defineComponent({
     max-width: 400px;
   }
   
-  .loginFormImage {
+  .forgotPasswordFormImage {
     width: 100%;
     height: 200px;
     border-radius: 2rem 2rem 0 0;
@@ -222,7 +254,7 @@ export default defineComponent({
 }
 
 @media (max-width: 480px) {
-  .login-container {
+  .forgot-password-container {
     width: 95%;
     max-width: 350px;
   }
@@ -239,7 +271,7 @@ export default defineComponent({
 
 /* 超小屏幕适配 */
 @media (max-width: 320px) {
-  .login-container {
+  .forgot-password-container {
     border-radius: 1rem;
   }
   
