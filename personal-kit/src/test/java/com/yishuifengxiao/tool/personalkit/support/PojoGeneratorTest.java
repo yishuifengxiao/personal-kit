@@ -14,9 +14,9 @@ public class PojoGeneratorTest {
     public void test() {
         // 创建配置
         PojoGenerator.GeneratorConfig config = new PojoGenerator.GeneratorConfig(
-                "jdbc:mysql://127.0.0.1:3306/personkit",
+                "jdbc:mysql://10.28.1.219:3306/personkit",
                 "root",
-                "123456"
+                "Whty2023sys"
         );
 
         // 配置参数
@@ -32,7 +32,7 @@ public class PojoGeneratorTest {
         config.addExcludeTable("schema_migrations");
         config.addExcludeTable("flyway_schema_history");
 
-        config.addIncludeTable("user_token");
+//        config.addIncludeTable("user_token");
 
         // 启用所有高级功能
         config.setUseLombok(true);

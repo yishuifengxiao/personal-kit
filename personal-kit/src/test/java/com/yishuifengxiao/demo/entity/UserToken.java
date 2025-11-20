@@ -1,13 +1,12 @@
 package com.yishuifengxiao.demo.entity;
 
+import java.io.Serializable;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * UserToken 实体类
@@ -34,37 +33,40 @@ public class UserToken implements Serializable {
     /**
      * token信息
      */
-    @Column(name = "token", length = 255, columnDefinition = "VARCHAR(255)  COMMENT 'token信息'")
+    @Column(name = "token", length = 255, columnDefinition = "VARCHAR(255) COMMENT 'token信息'")
     private String token;
 
     /**
      * 用户
      */
-    @Column(name = "user_name", length = 255, columnDefinition = "VARCHAR(255)  COMMENT '用户'")
+    @Column(name = "user_name", length = 255, columnDefinition = "VARCHAR(255) COMMENT '用户'")
     private String userName;
 
     /**
      * 设备id
      */
-    @Column(name = "device_id", length = 255, columnDefinition = "VARCHAR(255)  COMMENT '设备id'")
+    @Column(name = "device_id", length = 255, columnDefinition = "VARCHAR(255) COMMENT '设备id'")
     private String deviceId;
 
     /**
      * token的详细信息
      */
-    @Column(name = "value", columnDefinition = "TEXT  COMMENT 'token的详细信息'")
+    @Column(name = "value", columnDefinition = "TEXT COMMENT 'token的详细信息'")
     private String value;
 
     /**
      * token颁发时间
      */
-    @Column(name = "issue_at", columnDefinition = "DATETIME NULL COMMENT 'token颁发时间'")
+    @Column(name = "issue_at", columnDefinition = "DATETIME COMMENT 'token颁发时间'")
     private LocalDateTime issueAt;
 
     /**
      * token过期时间
      */
-    @Column(name = "expire_at", columnDefinition = "DATETIME NULL COMMENT 'token过期时间'")
+    @Column(name = "expire_at", columnDefinition = "DATETIME COMMENT 'token过期时间'")
     private LocalDateTime expireAt;
+
+    @Column(name = "a", length = 255, columnDefinition = "VARCHAR(255) DEFAULT 'aa'")
+    private String a;
 
 }
