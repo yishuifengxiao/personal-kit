@@ -286,7 +286,7 @@
 
 <script>
 import { reactive, defineComponent, ref } from 'vue'
-import { message } from 'ant-design-vue'
+import { message, Modal } from 'ant-design-vue'
 import {
   SafetyOutlined,
   SettingOutlined,
@@ -471,7 +471,8 @@ export default defineComponent({
       this.detailVisible = true
     },
     handleDelete(record) {
-      this.$modal.confirm({
+      // 使用全局注册的 Modal 而不是 this.$modal
+      Modal.confirm({
         title: '确认删除',
         content: `确定要删除证书"${record.certName}"吗？`,
         onOk: () => {
