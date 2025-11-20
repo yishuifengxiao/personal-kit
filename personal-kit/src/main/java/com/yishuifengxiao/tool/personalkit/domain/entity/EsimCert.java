@@ -44,6 +44,7 @@ public class EsimCert implements Serializable {
     @Column(name = "ci_cert", columnDefinition = "TEXT COMMENT 'CI证书内容'")
     private String ciCert;
 
+
     /**
      * CI SubCA证书内容
      */
@@ -67,6 +68,7 @@ public class EsimCert implements Serializable {
      */
     @Column(name = "auth_key", nullable = false, columnDefinition = "TEXT NOT NULL COMMENT '认证私钥/标签'")
     private String authKey;
+
 
     /**
      * 数据绑定证书内容
