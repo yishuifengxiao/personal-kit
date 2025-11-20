@@ -136,7 +136,7 @@
         <a-descriptions-item label="Profile Type">{{ detailData.profileType }}</a-descriptions-item>
         <a-descriptions-item label="所属运营商">{{ getMonName(detailData.monId) }}</a-descriptions-item>
         <a-descriptions-item label="创建时间">{{ detailData.createTime }}</a-descriptions-item>
-        <a-descriptions-item label="更新时间" :span="2">{{ detailData.updateTime }}</a-descriptions-item>
+        <a-descriptions-item label="更新时间">{{ detailData.updateTime }}</a-descriptions-item>
         <a-descriptions-item label="模板内容" :span="2">
           <pre
             style="

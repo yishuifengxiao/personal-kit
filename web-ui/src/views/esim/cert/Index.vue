@@ -39,12 +39,19 @@
             <template #cover>
               <div class="card-cover-compact">
                 <div class="cert-icon-container">
-                  <a-avatar :size="48" class="cert-avatar" :style="{ backgroundColor: getCertTypeColor(cert.certType) }">
+                  <a-avatar
+                    :size="48"
+                    class="cert-avatar"
+                    :style="{ backgroundColor: getCertTypeColor(cert.certType) }"
+                  >
                     <SafetyOutlined />
                   </a-avatar>
                 </div>
                 <!-- 状态标签 -->
-                <div class="status-badge" :style="{ backgroundColor: getCertStatusColor(cert.isLabel) }">
+                <div
+                  class="status-badge"
+                  :style="{ backgroundColor: getCertStatusColor(cert.isLabel) }"
+                >
                   {{ cert.isLabel === 1 ? '标签' : '私钥' }}
                 </div>
                 <!-- 操作按钮覆盖层 -->
@@ -85,23 +92,33 @@
                   <div class="cert-info">
                     <div class="info-item">
                       <span class="label">CI证书:</span>
-                      <span class="value" :title="cert.ciCert">{{ formatCertContent(cert.ciCert) }}</span>
+                      <span class="value" :title="cert.ciCert">{{
+                        formatCertContent(cert.ciCert)
+                      }}</span>
                     </div>
                     <div class="info-item" v-if="cert.ciSubCaCert">
                       <span class="label">CI SubCA:</span>
-                      <span class="value" :title="cert.ciSubCaCert">{{ formatCertContent(cert.ciSubCaCert) }}</span>
+                      <span class="value" :title="cert.ciSubCaCert">{{
+                        formatCertContent(cert.ciSubCaCert)
+                      }}</span>
                     </div>
                     <div class="info-item" v-if="cert.dpSubCaCert">
                       <span class="label">DP SubCA:</span>
-                      <span class="value" :title="cert.dpSubCaCert">{{ formatCertContent(cert.dpSubCaCert) }}</span>
+                      <span class="value" :title="cert.dpSubCaCert">{{
+                        formatCertContent(cert.dpSubCaCert)
+                      }}</span>
                     </div>
                     <div class="info-item">
                       <span class="label">认证证书:</span>
-                      <span class="value" :title="cert.authCert">{{ formatCertContent(cert.authCert) }}</span>
+                      <span class="value" :title="cert.authCert">{{
+                        formatCertContent(cert.authCert)
+                      }}</span>
                     </div>
                     <div class="info-item">
                       <span class="label">数据绑定证书:</span>
-                      <span class="value" :title="cert.dbCert">{{ formatCertContent(cert.dbCert) }}</span>
+                      <span class="value" :title="cert.dbCert">{{
+                        formatCertContent(cert.dbCert)
+                      }}</span>
                     </div>
                   </div>
                 </div>
@@ -114,13 +131,14 @@
 
     <!-- 分页 -->
     <div class="pagination-container-compact">
-      <a-pagination 
-        v-model:current="pagination.current" 
-        :total="pagination.total" 
+      <a-pagination
+        v-model:current="pagination.current"
+        :total="pagination.total"
         :show-total="(total) => `共 ${total} 个证书`"
         @change="onPaginationChange"
         size="small"
-        class="pagination-compact" />
+        class="pagination-compact"
+      />
     </div>
 
     <!-- 新增/编辑弹窗 -->
@@ -323,24 +341,12 @@ export default defineComponent({
           { required: true, message: '请输入证书名称', trigger: 'blur' },
           { min: 2, max: 100, message: '证书名称长度在 2 到 100 个字符', trigger: 'blur' }
         ],
-        ciCert: [
-          { required: true, message: '请输入CI证书', trigger: 'blur' }
-        ],
-        authCert: [
-          { required: true, message: '请输入认证证书', trigger: 'blur' }
-        ],
-        authKey: [
-          { required: true, message: '请输入认证私钥或标签', trigger: 'blur' }
-        ],
-        dbCert: [
-          { required: true, message: '请输入数据绑定证书', trigger: 'blur' }
-        ],
-        dbKey: [
-          { required: true, message: '请输入数据绑定私钥或标签', trigger: 'blur' }
-        ],
-        isLabel: [
-          { required: true, message: '请选择是否标签', trigger: 'change' }
-        ]
+        ciCert: [{ required: true, message: '请输入CI证书', trigger: 'blur' }],
+        authCert: [{ required: true, message: '请输入认证证书', trigger: 'blur' }],
+        authKey: [{ required: true, message: '请输入认证私钥或标签', trigger: 'blur' }],
+        dbCert: [{ required: true, message: '请输入数据绑定证书', trigger: 'blur' }],
+        dbKey: [{ required: true, message: '请输入数据绑定私钥或标签', trigger: 'blur' }],
+        isLabel: [{ required: true, message: '请选择是否标签', trigger: 'change' }]
       }
     }
   },
@@ -366,20 +372,18 @@ export default defineComponent({
       const params = {
         pageNum: this.pagination.current,
         pageSize: this.pagination.pageSize,
-        ...this.formState
+        query: this.formState
       }
-      this.$http.request({
-        url: '/esim/cert/list',
-        method: 'post',
-        data: params
-      }).then(res => {
-        if (res.code === 200) {
-          this.certData = res.data.list
-          this.pagination.total = res.data.total
-        } else {
-          message.error(res.msg)
-        }
-      })
+      this.$http
+        .request({
+          url: '/personkit/api/esim/cert/page',
+          method: 'post',
+          data: params
+        })
+        .then((res) => {
+          this.certData = res.data || []
+          this.pagination.total = res.total || 0
+        })
     },
     getCertTypeColor(isLabel) {
       return isLabel === 1 ? '#1890ff' : '#52c41a'
@@ -444,18 +448,16 @@ export default defineComponent({
         title: '确认删除',
         content: `确定要删除证书"${record.certName}"吗？`,
         onOk: () => {
-          this.$http.request({
-            url: '/esim/cert/delete',
-            method: 'post',
-            data: { id: record.id }
-          }).then(res => {
-            if (res.code === 200) {
+          this.$http
+            .request({
+              url: '/personkit/api/esim/cert/delete',
+              method: 'post',
+              data: { id: record.id }
+            })
+            .then((res) => {
               message.success('删除成功')
               this.query()
-            } else {
-              message.error(res.msg)
-            }
-          })
+            })
         }
       })
     },
@@ -473,24 +475,27 @@ export default defineComponent({
       }
     },
     handleModalOk() {
-      this.$refs.modalFormRef.validate().then(() => {
-        const url = this.modalFormData.id ? '/esim/cert/update' : '/esim/cert/add'
-        this.$http.request({
-          url: url,
-          method: 'post',
-          data: this.modalFormData
-        }).then(res => {
-          if (res.code === 200) {
-            message.success(this.modalFormData.id ? '更新成功' : '新增成功')
-            this.modalVisible = false
-            this.query()
-          } else {
-            message.error(res.msg)
-          }
+      this.$refs.modalFormRef
+        .validate()
+        .then(() => {
+          const url = this.modalFormData.id
+            ? '/personkit/api/esim/cert/update'
+            : '/personkit/api/esim/cert/save'
+          this.$http
+            .request({
+              url: url,
+              method: 'post',
+              data: this.modalFormData
+            })
+            .then((res) => {
+              message.success(this.modalFormData.id ? '更新成功' : '新增成功')
+              this.modalVisible = false
+              this.query()
+            })
         })
-      }).catch(error => {
-        console.log('表单验证失败:', error)
-      })
+        .catch((error) => {
+          console.log('表单验证失败:', error)
+        })
     },
     handleModalCancel() {
       this.modalVisible = false
