@@ -12,8 +12,8 @@
         <a-form-item label="证书名称" name="certName">
           <a-input v-model:value="formState.certName" placeholder="证书名称，模糊查询"> </a-input>
         </a-form-item>
-        <a-form-item label="CI证书" name="ciCert">
-          <a-input v-model:value="formState.ciCert" placeholder="CI证书，模糊查询"> </a-input>
+        <a-form-item label="CI公钥ID" name="ciPkid">
+          <a-input v-model:value="formState.ciPkid" placeholder="CI公钥ID，模糊查询"> </a-input>  
         </a-form-item>
         <a-form-item>
           <a-button type="primary" html-type="submit"> 搜索 </a-button>
@@ -37,8 +37,11 @@
         <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" v-for="cert in certData" :key="cert.id">
           <a-card hoverable class="cert-card-compact">
             <template #cover>
-              <div class="card-cover-compact">
-                <div class="cert-icon-container">
+              <div class="card-cover-compact" @mouseleave="cert.showDetail = false">
+                <div 
+                  class="cert-icon-container" 
+                  @mouseenter="cert.showDetail = true"
+                >
                   <a-avatar
                     :size="48"
                     class="cert-avatar"
@@ -91,39 +94,49 @@
                 <div class="card-description-compact">
                   <div class="cert-info">
                     <div class="info-item">
-                      <span class="label">CI证书:</span>
-                      <span class="value" :title="cert.ciCert">{{
-                        formatCertContent(cert.ciCert)
-                      }}</span>
-                    </div>
-                    <div class="info-item" v-if="cert.ciSubCaCert">
-                      <span class="label">CI SubCA:</span>
-                      <span class="value" :title="cert.ciSubCaCert">{{
-                        formatCertContent(cert.ciSubCaCert)
-                      }}</span>
-                    </div>
-                    <div class="info-item" v-if="cert.dpSubCaCert">
-                      <span class="label">DP SubCA:</span>
-                      <span class="value" :title="cert.dpSubCaCert">{{
-                        formatCertContent(cert.dpSubCaCert)
-                      }}</span>
-                    </div>
-                    <div class="info-item">
-                      <span class="label">认证证书:</span>
-                      <span class="value" :title="cert.authCert">{{
-                        formatCertContent(cert.authCert)
-                      }}</span>
-                    </div>
-                    <div class="info-item">
-                      <span class="label">数据绑定证书:</span>
-                      <span class="value" :title="cert.dbCert">{{
-                        formatCertContent(cert.dbCert)
+                      <span class="label">CI公钥ID:</span>
+                      <span class="value truncated-text" :title="cert.cipkid">{{
+                        truncateText(cert.cipkid, 20)
                       }}</span>
                     </div>
                   </div>
                 </div>
               </template>
             </a-card-meta>
+
+            <!-- 悬停详细信息面板 -->
+            <div class="hover-detail-panel" v-show="cert.showDetail">
+              <div class="detail-header">
+                <span class="detail-title">证书详情</span>
+                <a-tag :color="cert.isLabel === 1 ? 'blue' : 'green'" size="small">
+                  {{ cert.isLabel === 1 ? '标签' : '私钥' }}
+                </a-tag>
+              </div>
+              <div class="detail-content">
+                <div class="detail-item">
+                  <span class="detail-label">证书名称:</span>
+                  <span class="detail-value">{{ cert.certName }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">CI公钥ID:</span>
+                  <span class="detail-value">{{ cert.cipkid || '-' }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">创建时间:</span>
+                  <span class="detail-value">{{ formatDate(cert.createTime) }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">更新时间:</span>
+                  <span class="detail-value">{{ formatDate(cert.updateTime) }}</span>
+                </div>
+              </div>
+              <div class="detail-actions">
+                <a-button type="link" size="small" @click="handleView(cert)">
+                  <EyeOutlined />
+                  查看完整信息
+                </a-button>
+              </div>
+            </div>
           </a-card>
         </a-col>
       </a-row>
@@ -295,7 +308,7 @@ export default defineComponent({
     return {
       formState: reactive({
         certName: '',
-        ciCert: ''
+        ciPkid: ''
       }),
       certData: reactive([]),
       modalVisible: false,
@@ -358,7 +371,7 @@ export default defineComponent({
     handleReset() {
       this.formState = {
         certName: '',
-        ciCert: ''
+        ciPkid: ''
       }
       this.pagination.current = 1
       this.query()
@@ -381,7 +394,10 @@ export default defineComponent({
           data: params
         })
         .then((res) => {
-          this.certData = res.data || []
+          this.certData = (res.data || []).map(cert => ({
+            ...cert,
+            showDetail: false
+          }))
           this.pagination.total = res.total || 0
         })
     },
@@ -394,6 +410,17 @@ export default defineComponent({
     formatCertContent(content) {
       if (!content) return '-'
       return content.length > 30 ? content.substring(0, 30) + '...' : content
+    },
+    truncateText(text, maxLength) {
+      if (!text) return ''
+      return text.length > maxLength ? text.substring(0, maxLength) + '...' : text
+    },
+    formatDate(dateString) {
+      if (!dateString) return ''
+      return dateString.replace('T', ' ').substring(0, 16)
+    },
+    getCardTooltip(cert) {
+      return `证书名称: ${cert.certName || ''}\nCI PKID: ${cert.cipkid || ''}\n创建时间: ${this.formatDate(cert.createTime) || ''}`
     },
     handleAdd() {
       this.modalTitle = '新增证书'
@@ -523,14 +550,19 @@ export default defineComponent({
 
 .cert-card-compact {
   height: 280px;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  transition: all 0.3s ease;
+  border: 1px solid #f0f0f0;
+  position: relative;
 }
 
 .cert-card-compact:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: #1890ff;
+}
+
+.cert-icon-container:hover {
+  cursor: pointer;
 }
 
 .card-cover-compact {
@@ -546,10 +578,13 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  z-index: 5;
 }
 
 .cert-avatar {
   font-size: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .status-badge {
@@ -561,6 +596,7 @@ export default defineComponent({
   color: white;
   font-size: 12px;
   font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .card-actions-overlay {
@@ -574,6 +610,7 @@ export default defineComponent({
   padding: 0 12px;
   height: 28px;
   font-size: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .card-title-compact {
@@ -587,7 +624,7 @@ export default defineComponent({
 }
 
 .card-description-compact {
-  height: 120px;
+  height: 100px;
   overflow: hidden;
 }
 
@@ -598,7 +635,7 @@ export default defineComponent({
 
 .info-item {
   display: flex;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   align-items: flex-start;
 }
 
@@ -615,6 +652,15 @@ export default defineComponent({
   text-overflow: ellipsis;
   white-space: nowrap;
   color: #8c8c8c;
+}
+
+.truncated-text {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  background: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
 }
 
 .pagination-container-compact {
@@ -649,5 +695,112 @@ export default defineComponent({
   background: #fafafa;
   padding: 6px;
   border-radius: 4px;
+}
+
+/* 调整卡片元信息区域 */
+.ant-card-meta {
+  padding: 16px;
+  position: relative;
+  height: calc(100% - 120px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* 悬停详细信息面板 */
+.hover-detail-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  padding: 16px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(24, 144, 255, 0.2);
+  /* 去掉动画效果防止闪烁 */
+  animation: none !important;
+  transition: none !important;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.detail-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.detail-item {
+  display: flex;
+  margin-bottom: 8px;
+  align-items: flex-start;
+}
+
+.detail-label {
+  flex-shrink: 0;
+  width: 70px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #434343;
+}
+
+.detail-value {
+  flex: 1;
+  font-size: 12px;
+  color: #595959;
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+.detail-actions {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
+  text-align: center;
+}
+
+/* 响应式调整 */
+@media (max-width: 576px) {
+  .cert-card-compact {
+    height: 260px;
+  }
+  
+  .card-cover-compact {
+    height: 100px;
+  }
+  
+  .cert-avatar {
+    :size="40"
+  }
+  
+  .hover-detail-panel {
+    padding: 12px;
+  }
+  
+  .detail-label {
+    width: 60px;
+    font-size: 11px;
+  }
+  
+  .detail-value {
+    font-size: 11px;
+  }
 }
 </style>
