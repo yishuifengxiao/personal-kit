@@ -700,11 +700,47 @@ export default defineComponent({
 
 /* 调整卡片元信息区域 */
 .ant-card-meta {
-  padding: 16px;
+  padding: 12px;
   position: relative;
-  height: calc(100% - 120px);
+  height: auto;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+}
+
+/* 调整卡片元信息详情区域，使其更紧凑 */
+.ant-card-meta-detail {
+  padding: 0;
+  margin: 0;
+  line-height: 1.3;
+  height: auto;
+  min-height: 0;
+  flex-shrink: 1;
+  overflow: hidden;
+}
+
+/* 调整标题间距 */
+.ant-card-meta-title {
+  margin-bottom: 6px !important;
+  font-size: 14px !important;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+}
+
+/* 调整描述间距 */
+.ant-card-meta-description {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  font-size: 12px !important;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* 减小卡片底部留白 */
