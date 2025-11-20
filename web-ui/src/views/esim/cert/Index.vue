@@ -424,34 +424,33 @@ export default defineComponent({
     },
     handleAdd() {
       this.modalTitle = '新增证书'
-      this.modalFormData = {
-        id: undefined,
-        certName: '',
-        ciCert: '',
-        ciSubCaCert: '',
-        dpSubCaCert: '',
-        authCert: '',
-        authKey: '',
-        dbCert: '',
-        dbKey: '',
-        isLabel: 1
-      }
+      // 不要替换整个reactive对象，而是逐个更新属性以保持响应性
+      this.modalFormData.id = undefined
+      this.modalFormData.certName = ''
+      this.modalFormData.ciCert = ''
+      this.modalFormData.ciSubCaCert = ''
+      this.modalFormData.dpSubCaCert = ''
+      this.modalFormData.authCert = ''
+      this.modalFormData.authKey = ''
+      this.modalFormData.dbCert = ''
+      this.modalFormData.dbKey = ''
+      this.modalFormData.isLabel = 1
       this.modalVisible = true
     },
     handleEdit(record) {
       this.modalTitle = '编辑证书'
-      this.modalFormData = {
-        id: record.id,
-        certName: record.certName,
-        ciCert: record.ciCert,
-        ciSubCaCert: record.ciSubCaCert,
-        dpSubCaCert: record.dpSubCaCert,
-        authCert: record.authCert,
-        authKey: record.authKey,
-        dbCert: record.dbCert,
-        dbKey: record.dbKey,
-        isLabel: record.isLabel
-      }
+      // 不要替换整个reactive对象，而是逐个更新属性以保持响应性
+      this.modalFormData.id = record.id
+      this.modalFormData.certName = record.certName
+      this.modalFormData.ciCert = record.ciCert
+      this.modalFormData.ciSubCaCert = record.ciSubCaCert
+      this.modalFormData.dpSubCaCert = record.dpSubCaCert
+      this.modalFormData.authCert = record.authCert
+      this.modalFormData.authKey = record.authKey
+      this.modalFormData.dbCert = record.dbCert
+      this.modalFormData.dbKey = record.dbKey
+      // 处理布尔类型的isLabel值，转换为对应的数字类型
+      this.modalFormData.isLabel = typeof record.isLabel === 'boolean' ? (record.isLabel ? 1 : 0) : record.isLabel
       this.modalVisible = true
     },
     handleView(record) {
@@ -464,7 +463,8 @@ export default defineComponent({
         authKey: record.authKey,
         dbCert: record.dbCert,
         dbKey: record.dbKey,
-        isLabel: record.isLabel,
+        // 处理布尔类型的isLabel值，转换为对应的数字类型
+        isLabel: typeof record.isLabel === 'boolean' ? (record.isLabel ? 1 : 0) : record.isLabel,
         createTime: record.createTime,
         updateTime: record.updateTime
       }
@@ -705,6 +705,12 @@ export default defineComponent({
   height: calc(100% - 120px);
   display: flex;
   flex-direction: column;
+}
+
+/* 减小卡片底部留白 */
+.ant-card-body {
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 /* 悬停详细信息面板 */
