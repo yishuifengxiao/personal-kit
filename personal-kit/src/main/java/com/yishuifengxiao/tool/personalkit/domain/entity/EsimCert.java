@@ -106,4 +106,15 @@ public class EsimCert implements Serializable {
     @Column(name = "cipkid", length = 100, columnDefinition = "VARCHAR(100) COMMENT 'CI证书的CIPKID'")
     private String cipkid;
 
+    /**
+     * CI证书的OID
+     */
+    @Column(name = "ci_oid", length = 100, columnDefinition = "VARCHAR(100) COMMENT 'CI证书的OID'")
+    private String ciOid;
+    /**
+     * 扩展信息
+     */
+    @Column(name = "extend_info", columnDefinition = "TEXT COMMENT '扩展信息'")
+    private String extendInfo;
+
 }
