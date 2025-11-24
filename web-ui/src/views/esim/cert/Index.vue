@@ -25,6 +25,14 @@
 
       <a-space>
         <a-button type="primary" @click="handleAdd">新增证书</a-button>
+        <a-upload
+          name="file"
+          :show-upload-list="false"
+          :before-upload="beforeUpload"
+          :custom-request="customRequest"
+        >
+          <a-button type="primary">上传证书</a-button>
+        </a-upload>
       </a-space>
     </div>
 
@@ -34,7 +42,7 @@
     <!-- 卡片网格 -->
     <div class="content-area-compact">
       <a-row :gutter="[16, 16]" class="cert-grid-compact">
-        <a-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" v-for="cert in certData" :key="cert.id">
+        <a-col :xs="24" :sm="12" :md="9" :lg="8" :xl="6" v-for="cert in certData" :key="cert.id">
           <a-card hoverable class="cert-card-compact">
             <template #cover>
               <div class="card-cover-compact" @mouseleave="cert.showDetail = false">
@@ -160,7 +168,7 @@
       :title="modalTitle"
       @ok="handleModalOk"
       @cancel="handleModalCancel"
-      width="600px"
+      width="800px"
     >
       <a-form
         ref="modalFormRef"
@@ -246,8 +254,10 @@
       v-model:open="detailVisible"
       title="证书详情"
       @cancel="handleDetailCancel"
-      width="600px"
+      width="800px"
       :footer="null"
+      scrollable
+      :bodyStyle="{ maxHeight: '70vh', overflowY: 'auto', padding: '16px' }"
     >
       <a-descriptions :column="1" bordered size="small">
         <a-descriptions-item label="证书名称">{{ detailData.certName }}</a-descriptions-item>
@@ -286,7 +296,7 @@
 
 <script>
 import { reactive, defineComponent, ref } from 'vue'
-import { message, Modal } from 'ant-design-vue'
+import { message, Modal, Upload } from 'ant-design-vue'
 import {
   SafetyOutlined,
   SettingOutlined,
@@ -302,7 +312,8 @@ export default defineComponent({
     SettingOutlined,
     EditOutlined,
     DeleteOutlined,
-    EyeOutlined
+    EyeOutlined,
+    AUpload: Upload
   },
   data() {
     return {
@@ -531,6 +542,41 @@ export default defineComponent({
     },
     handleDetailCancel() {
       this.detailVisible = false
+    },
+    beforeUpload(file) {
+      const isExcel = file.type === 'application/vnd.ms-excel' || 
+                     file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+                     file.name.endsWith('.xls') ||
+                     file.name.endsWith('.xlsx');
+      if (!isExcel) {
+        message.error('只能上传Excel文件!');
+      }
+      return isExcel;
+    },
+    customRequest(options) {
+      const { file, onSuccess, onError } = options;
+      const formData = new FormData();
+      formData.append('file', file);
+
+      this.$http
+        .request({
+          url: '/personkit/api/esim/cert/upload',
+          method: 'post',
+          data: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        .then((res) => {
+          message.success('上传成功');
+          onSuccess(res);
+          // 上传成功后刷新列表
+          this.query();
+        })
+        .catch((error) => {
+          message.error('上传失败');
+          onError(error);
+        });
     }
   },
   created() {
@@ -625,18 +671,22 @@ export default defineComponent({
 }
 
 .card-description-compact {
-  height: 100px;
+  height: auto;
+  min-height: 40px;
+  max-height: 60px;
   overflow: hidden;
 }
 
 .cert-info {
   font-size: 13px;
   color: #595959;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .info-item {
   display: flex;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   align-items: flex-start;
 }
 
@@ -687,15 +737,15 @@ export default defineComponent({
 }
 
 .cert-content-small {
-  max-height: 120px;
-  overflow-y: auto;
+  max-height: none;
   word-break: break-all;
   font-family: 'Courier New', monospace;
-  font-size: 11px;
-  line-height: 1.4;
+  font-size: 13px;
+  line-height: 1.6;
   background: #fafafa;
-  padding: 6px;
+  padding: 8px;
   border-radius: 4px;
+  border: 1px solid #e8e8e8;
 }
 
 /* 调整卡片元信息区域 */
@@ -743,10 +793,12 @@ export default defineComponent({
   white-space: nowrap;
 }
 
-/* 减小卡片底部留白 */
+/* 完全移除卡片内边距，特别是底部内边距 */
 .ant-card-body {
   padding: 0 !important;
+  padding-bottom: 0 !important;
   margin: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 /* 悬停详细信息面板 */

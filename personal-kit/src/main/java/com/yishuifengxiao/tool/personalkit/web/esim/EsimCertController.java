@@ -1,21 +1,29 @@
 package com.yishuifengxiao.tool.personalkit.web.esim;
 
+import com.alibaba.excel.EasyExcel;
+import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
+import com.yishuifengxiao.common.tool.io.IoUtil;
+import com.yishuifengxiao.common.tool.random.IdWorker;
 import com.yishuifengxiao.tool.personalkit.aspect.Trim;
+import com.yishuifengxiao.tool.personalkit.domain.bo.EsimCertExcel;
 import com.yishuifengxiao.tool.personalkit.domain.entity.EsimCert;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.service.EsimCertService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.UUID;
+import java.util.List;
 
 /**
  * @author yishui
@@ -42,31 +50,33 @@ public class EsimCertController {
 
     @PostMapping(value = "/upload")
     @ResponseBody
-    public EsimCert upload(@RequestPart("file") MultipartFile file) throws IOException {
-        // 确保上传的是Excel文件
-        if (!file.getOriginalFilename().endsWith(".xlsx") && !file.getOriginalFilename().endsWith(".xls")) {
-            throw new IllegalArgumentException("请上传Excel文件");
-        }
+    public void upload(@RequestPart("file") MultipartFile file) throws IOException {
+
 
         // 创建保存目录（如果不存在）
-        File uploadDir = new File("uploads");
+        File uploadDir = new File(IdWorker.snowflakeStringId());
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
         }
-
-        // 生成唯一文件名
-        String fileName = UUID.randomUUID().toString() +
-                file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
-
         // 保存文件
-        File savedFile = new File(uploadDir, fileName);
-        file.transferTo(savedFile);
+        File savedFile = new File(uploadDir, file.getOriginalFilename());
 
-        // 这里可以添加Excel文件解析逻辑，将解析结果转换为EsimCert对象
-        EsimCert param = new EsimCert();
-        // 设置param的属性...
+        try {
+            IoUtil.copy(file.getInputStream(), new FileOutputStream(savedFile));
+            // 解析Excel文件
+            List<EsimCertExcel> list = EasyExcel.read(savedFile).head(EsimCertExcel.class).sheet().doReadSync();
+            if (!CollectionUtils.isEmpty(list)) {
+                for (EsimCertExcel cert : list) {
+                    EsimCert esimCert = BeanUtil.copy(cert, new EsimCert());
+                    esimCertService.save(esimCert);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            FileUtils.forceDelete(uploadDir);
+        }
 
-        return esimCertService.save(param);
     }
 
     @PostMapping(value = "/save", produces = {"application/json;charset=utf-8"})

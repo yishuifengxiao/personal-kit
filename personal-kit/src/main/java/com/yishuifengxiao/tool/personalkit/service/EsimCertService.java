@@ -23,12 +23,25 @@ public class EsimCertService {
 
 
     public EsimCert save(EsimCert esimCert) {
+        EsimCert existCert = JdbcUtil.jdbcHelper().findOne(new EsimCert().setCertName(esimCert.getCertName()), false);
+        if (null != existCert) {
+            throw new UncheckedException("certName already exists");
+        }
+
         try {
             esimCert = parseEsimCert(esimCert);
+            existCert = JdbcUtil.jdbcHelper().findOne(new EsimCert().setCertName(esimCert.getCipkid()), false);
+            if (null != existCert) {
+                throw new UncheckedException("cipkid already exists");
+            }
             KeyHolder keyHolder = JdbcUtil.jdbcHelper().saveOrUpdate(esimCert);
             esimCert.setId(keyHolder.getKey().longValue());
 
         } catch (Exception e) {
+            if (e instanceof UncheckedException) {
+                throw (UncheckedException) e;
+            }
+            e.printStackTrace();
         }
         return esimCert;
     }
@@ -42,7 +55,7 @@ public class EsimCertService {
             throw new UncheckedException("ciCert is not a valid x509 certificate");
         }
         if (!ciCertFullInfo.getIsValid()) {
-            throw new UncheckedException("ciCert is not valid");
+//            throw new UncheckedException("ciCert is not valid");
         }
         X509Certificate ciSubX509Certificate = null;
         // 是否有子集CA证书
@@ -55,7 +68,7 @@ public class EsimCertService {
                 throw new UncheckedException("ciSubCaCert is not a valid x509 certificate");
             }
             if (!ciSubCaCertFullInfo.getIsValid()) {
-                throw new UncheckedException("ciSubCaCert is not valid");
+//                throw new UncheckedException("ciSubCaCert is not valid");
             }
             boolean issued = X509Helper.isIssuedBy(ciCertX509Certificate, ciSubX509Certificate);
             if (!issued) {
@@ -73,7 +86,7 @@ public class EsimCertService {
                 throw new UncheckedException("dpSubCaCert is not a valid x509 certificate");
             }
             if (!dpSubCaCertFullInfo.getIsValid()) {
-                throw new UncheckedException("dpSubCaCert is not valid");
+//                throw new UncheckedException("dpSubCaCert is not valid");
             }
 
             boolean issued = X509Helper.isIssuedBy(ciCertX509Certificate, dpSubCaCertX509Certificate);
@@ -90,7 +103,7 @@ public class EsimCertService {
             throw new UncheckedException("authCert is not a valid x509 certificate");
         }
         if (!authCertFullInfo.getIsValid()) {
-            throw new UncheckedException("authCert is not valid");
+//            throw new UncheckedException("authCert is not valid");
         }
         if (null != dpSubCaCertX509Certificate) {
             boolean issued = X509Helper.isIssuedBy(dpSubCaCertX509Certificate, authX509Certificate);
@@ -118,7 +131,7 @@ public class EsimCertService {
             throw new UncheckedException("dbCert is not a valid x509 certificate");
         }
         if (!dbCertFullInfo.getIsValid()) {
-            throw new UncheckedException("dbCert is not valid");
+//            throw new UncheckedException("dbCert is not valid");
         }
         if (null != dpSubCaCertX509Certificate) {
             boolean issued = X509Helper.isIssuedBy(dpSubCaCertX509Certificate, dpX509Certificate);
