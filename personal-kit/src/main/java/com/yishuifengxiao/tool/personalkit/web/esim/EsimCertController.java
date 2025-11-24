@@ -14,6 +14,7 @@ import com.yishuifengxiao.tool.personalkit.service.EsimCertService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ import java.util.List;
 @RequestMapping("/api/esim/cert")
 @RequiredArgsConstructor
 @Trim
+@Slf4j
 public class EsimCertController {
 
     @Autowired
@@ -67,8 +69,13 @@ public class EsimCertController {
             List<EsimCertExcel> list = EasyExcel.read(savedFile).head(EsimCertExcel.class).sheet().doReadSync();
             if (!CollectionUtils.isEmpty(list)) {
                 for (EsimCertExcel cert : list) {
-                    EsimCert esimCert = BeanUtil.copy(cert, new EsimCert());
-                    esimCertService.save(esimCert);
+                    try {
+                        EsimCert esimCert = BeanUtil.copy(cert, new EsimCert());
+                        esimCertService.save(esimCert);
+                    } catch (Exception e) {
+                        log.warn("---------> 获取文件 ={} 的失败 ，失败的原因为 {}", cert, e.getMessage());
+                    }
+
                 }
             }
         } catch (Exception e) {

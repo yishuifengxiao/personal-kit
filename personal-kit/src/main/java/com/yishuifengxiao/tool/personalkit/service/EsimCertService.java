@@ -13,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +45,7 @@ public class EsimCertService {
         return esimCert;
     }
 
-    private EsimCert parseEsimCert(EsimCert esimCert) throws CertificateException {
+    private EsimCert parseEsimCert(EsimCert esimCert) throws Exception {
         String extendInfo = JSONObject.toJSONString(esimCert);
         String ciCert = HexUtil.isHex(esimCert.getCiCert()) ? esimCert.getCiCert() : HexUtil.base64ToHex(esimCert.getCiCert());
         X509Certificate ciCertX509Certificate = X509Helper.parseCert(ciCert);
@@ -122,6 +121,7 @@ public class EsimCertService {
         if (!match) {
             throw new UncheckedException("authKey is not match with authCert");
         }
+        String authKeyDValue = ECC.extractPrivateDValue(authKey);
 
         //DP PB证书
         String dbCert = HexUtil.isHex(esimCert.getDbCert()) ? esimCert.getDbCert() : HexUtil.base64ToHex(esimCert.getDbCert());
@@ -149,7 +149,7 @@ public class EsimCertService {
         if (!match) {
             throw new UncheckedException("dbKey is not match with dbCert");
         }
-
+        String dbKeyDValue = ECC.extractPrivateDValue(dbKey);
 
         esimCert.setCiCert(ciCert);
         esimCert.setCiOid(ciCertFullInfo.getOid());
@@ -159,10 +159,10 @@ public class EsimCertService {
             esimCert.setCiSubCaCert(ciSubCaCert);
         }
         esimCert.setDpSubCaCert(dpSubCaCert);
-        esimCert.setAuthCert(authCert);
-        esimCert.setAuthKey(authKey);
-        esimCert.setDbCert(dbCert);
-        esimCert.setDbKey(dbKey);
+        esimCert.setAuthCert(authCertFullInfo.getPublicKeyValue());
+        esimCert.setAuthKey(authKeyDValue);
+        esimCert.setDbCert(dbCertFullInfo.getPublicKeyValue());
+        esimCert.setDbKey(dbKeyDValue);
         esimCert.setExtendInfo(extendInfo);
         return esimCert;
     }
@@ -184,8 +184,22 @@ public class EsimCertService {
 
 
     public EsimCert update(EsimCert esimCert) {
-        KeyHolder keyHolder = JdbcUtil.jdbcHelper().saveOrUpdate(esimCert);
-        esimCert.setId(keyHolder.getKey().longValue());
+
+        try {
+            esimCert = parseEsimCert(esimCert);
+            EsimCert existCert = JdbcUtil.jdbcHelper().findByPrimaryKey(EsimCert.class, esimCert.getId());
+            if (null == existCert) {
+                throw new UncheckedException("id does not exist");
+            }
+            KeyHolder keyHolder = JdbcUtil.jdbcHelper().saveOrUpdate(esimCert);
+            esimCert.setId(keyHolder.getKey().longValue());
+
+        } catch (Exception e) {
+            if (e instanceof UncheckedException) {
+                throw (UncheckedException) e;
+            }
+            e.printStackTrace();
+        }
         return esimCert;
     }
 
