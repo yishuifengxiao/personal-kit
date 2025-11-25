@@ -129,21 +129,34 @@
       v-model:open="detailVisible"
       title="模板详情"
       @cancel="handleDetailCancel"
-      width="800px"
+      width="900px"
+      :height="600"
+      :body-style="{ overflow: 'hidden', maxHeight: '500px' }"
+      destroy-on-close
     >
-      <a-descriptions :column="2" bordered>
+      <a-descriptions :column="1" bordered size="small">
         <a-descriptions-item label="模板名称">{{ detailData.tempName }}</a-descriptions-item>
         <a-descriptions-item label="Profile Type">{{ detailData.profileType }}</a-descriptions-item>
         <a-descriptions-item label="所属运营商">{{ getMonName(detailData.monId) }}</a-descriptions-item>
         <a-descriptions-item label="创建时间">{{ detailData.createTime }}</a-descriptions-item>
         <a-descriptions-item label="更新时间">{{ detailData.updateTime }}</a-descriptions-item>
-        <a-descriptions-item label="模板内容" :span="2">
+        <a-descriptions-item label="模板内容" :span="1">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span>内容展示</span>
+            <a-button size="small" @click="handleCopyContent">复制内容</a-button>
+          </div>
           <pre
             style="
               white-space: pre-wrap;
               word-break: break-all;
-              max-height: 300px;
+              max-height: 350px;
               overflow-y: auto;
+              background-color: #f6f8fa;
+              padding: 12px;
+              border-radius: 4px;
+              font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+              font-size: 12px;
+              line-height: 1.5;
             "
           >
             {{ detailData.tempContent }}
@@ -409,6 +422,38 @@ export default {
     },
     handleDetailCancel() {
       this.detailVisible = false
+    },
+    handleCopyContent() {
+      if (this.detailData.tempContent) {
+        // 创建一个临时的textarea元素
+        const textarea = document.createElement('textarea')
+        textarea.value = this.detailData.tempContent
+        // 设置样式使其不可见
+        textarea.style.position = 'fixed'
+        textarea.style.left = '-999999px'
+        textarea.style.top = '-999999px'
+        document.body.appendChild(textarea)
+        // 选中并复制
+        textarea.focus()
+        textarea.select()
+        
+        try {
+          const successful = document.execCommand('copy')
+          if (successful) {
+            message.success('内容已复制到剪贴板')
+          } else {
+            message.error('复制失败，请手动复制')
+          }
+        } catch (err) {
+          message.error('复制失败，请手动复制')
+          console.error('复制内容出错:', err)
+        }
+        
+        // 清理
+        document.body.removeChild(textarea)
+      } else {
+        message.warning('没有可复制的内容')
+      }
     }
   },
   watch: {
