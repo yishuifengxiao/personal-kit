@@ -4,12 +4,8 @@
     <a-page-header class="compact-header" :title="pageTitle" @back="handleCancel">
       <template #extra>
         <div class="header-actions">
-          <a-button v-if="!isView" type="primary" size="large" @click="handleSubmit">保存</a-button>
-          <a-button v-if="!isView" size="large" @click="handleCancel">取消</a-button>
-          <a-button v-if="isView" type="primary" size="large" @click="switchToEditMode"
-            >编辑</a-button
-          >
-          <a-button v-if="isView" size="large" @click="handleCancel">关闭</a-button>
+          <a-button type="primary" size="large" @click="handleSubmit">保存</a-button>
+          <a-button size="large" @click="handleCancel">取消</a-button>
         </div>
       </template>
     </a-page-header>
@@ -19,9 +15,8 @@
       <div class="info-content">
         <div class="info-item">
           <span class="info-label">ICCID：</span>
-          <span v-if="isView" class="info-value">{{ formData.iccid }}</span>
           <a-input
-            v-else-if="isAdd"
+            v-if="isAdd"
             v-model:value="formData.iccid"
             placeholder="请输入20位16进制ICCID"
             :maxlength="20"
@@ -32,9 +27,8 @@
         </div>
         <div class="info-item">
           <span class="info-label">EID：</span>
-          <span v-if="isView" class="info-value">{{ formData.eid }}</span>
           <a-input
-            v-else-if="isAdd"
+            v-if="isAdd"
             v-model:value="formData.eid"
             placeholder="请输入32位16进制EID"
             :maxlength="32"
@@ -46,9 +40,7 @@
 
         <div class="info-item">
           <span class="info-label">所属租户：</span>
-          <span v-if="isView" class="info-value">{{ formData.tenant }}</span>
           <a-select
-            v-else
             v-model:value="formData.tenant"
             placeholder="请选择租户"
             allow-clear
@@ -64,9 +56,7 @@
         </div>
         <div class="info-item">
           <span class="info-label">ASN模版：</span>
-          <span v-if="isView" class="info-value">{{ formData.asnTemplate }}</span>
           <a-select
-            v-else
             v-model:value="formData.asnTemplate"
             placeholder="请选择ASN模版"
             allow-clear
@@ -104,7 +94,7 @@
             :model="formData"
             :label-col="{ span: 6 }"
             :wrapper-col="{ span: 16 }"
-            :disabled="isView"
+
             @finish="handleSubmit"
           >
             <!-- 三列布局区域 - 严格按照要求包含13个字段 -->
@@ -505,7 +495,7 @@
                 v-model:value="formData.v3Support.features"
                 mode="multiple"
                 placeholder="请选择功能"
-                :disabled="isView"
+
                 allow-clear
                 style="width: 100%"
                 size="small"
@@ -539,7 +529,7 @@
                     v-model:value="formData.v3Support.rpmConfig.rpmType"
                     mode="multiple"
                     placeholder="请选择RPM类型"
-                    :disabled="isView"
+      
                     allow-clear
                     style="width: 100%"
                     :maxTagCount="2"
@@ -564,7 +554,6 @@
                 <a-select
                   v-model:value="formData.v3Support.rpmConfig.rpmDownloadMethod"
                   placeholder="请选择RPM下载方式"
-                  :disabled="isView"
                   allow-clear
                   style="width: 100%"
                   size="small"
@@ -582,7 +571,6 @@
                 <a-select
                   v-model:value="formData.v3Support.rpmConfig.allowedCA"
                   placeholder="请选择允许的CA"
-                  :disabled="isView"
                   allow-clear
                   style="width: 100%"
                   size="small"
@@ -602,7 +590,6 @@
                 <a-select
                   v-model:value="formData.v3Support.rpmConfig.rpmPollingAddress"
                   placeholder="请选择RPM轮询地址"
-                  :disabled="isView"
                   allow-clear
                   style="width: 100%"
                   size="small"
@@ -636,7 +623,6 @@
                 v-model:value="formData.v3Support.rpmConfig.allowedTags"
                 mode="multiple"
                 placeholder="请选择允许的Tags"
-                :disabled="isView"
                 allow-clear
                 style="width: 100%"
                 :maxTagCount="3"
@@ -686,7 +672,6 @@
               >
                 <a-radio-group
                   v-model:value="formData.v3Support.deviceSwitch.deviceSwitchMethod"
-                  :disabled="isView"
                 >
                   <a-radio value="requestPlatform">请求平台</a-radio>
                   <a-radio value="useStoredCode">使用存储的激活码</a-radio>
@@ -698,7 +683,6 @@
                 <a-select
                   v-model:value="formData.v3Support.deviceSwitch.allowedCA"
                   placeholder="请选择允许的CA"
-                  :disabled="isView"
                   allow-clear
                   style="width: 100%"
                   size="small"
@@ -720,7 +704,6 @@
               >
                 <a-radio-group
                   v-model:value="formData.v3Support.deviceSwitch.needNewEID"
-                  :disabled="isView"
                 >
                   <a-radio value="yes">是</a-radio>
                   <a-radio value="no">否</a-radio>
@@ -735,7 +718,6 @@
               >
                 <a-radio-group
                   v-model:value="formData.v3Support.deviceSwitch.needNewTAC"
-                  :disabled="isView"
                 >
                   <a-radio value="yes">是</a-radio>
                   <a-radio value="no">否</a-radio>
@@ -760,7 +742,6 @@
                 <a-select
                   v-model:value="formData.v3Support.enterprise.enterpriseName"
                   placeholder="请选择企业名称"
-                  :disabled="isView"
                   allow-clear
                   style="width: 100%"
                 >
@@ -787,7 +768,6 @@
                   :min="0"
                   :max="10"
                   placeholder="请输入数量"
-                  :disabled="isView"
                   style="width: 100%"
                 />
               </a-form-item>
@@ -808,7 +788,6 @@
                 v-model:value="formData.v3Support.enterprise.enterpriseRules"
                 mode="multiple"
                 placeholder="请选择规则"
-                :disabled="isView"
                 allow-clear
                 style="width: 100%"
               >
@@ -977,7 +956,7 @@ export default defineComponent({
       }
     })
 
-    const isView = computed(() => pageType.value === 'view')
+
 
     // 获取Profile状态对应的颜色
     const getProfileStatusColor = (status) => {
@@ -1135,18 +1114,12 @@ export default defineComponent({
       router.push('/view/profile_manage')
     }
 
-    // 切换到编辑模式
-    const switchToEditMode = () => {
-      pageType.value = 'edit'
-      router.replace({
-        path: '/profile_form',
-        query: { type: 'edit', id: recordId.value }
-      })
-    }
+
 
     onMounted(() => {
       const { type, id } = route.query
-      pageType.value = type || 'add'
+      // 移除详情模式，所有情况都使用编辑模式
+      pageType.value = (type === 'view') ? 'edit' : (type || 'add')
       recordId.value = id || ''
       // 加载下拉数据
       fetchAsnTemplates()
@@ -1159,7 +1132,6 @@ export default defineComponent({
       formRef,
       formData,
       pageTitle,
-      isView,
       isAdd,
       asnTemplates,
       carriers,
@@ -1168,8 +1140,7 @@ export default defineComponent({
       getDownloadMethodText,
       getResetRuleText,
       handleSubmit,
-      handleCancel,
-      switchToEditMode
+      handleCancel
     }
   }
 })
