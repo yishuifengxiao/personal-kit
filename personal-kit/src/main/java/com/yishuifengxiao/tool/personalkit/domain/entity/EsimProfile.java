@@ -119,7 +119,7 @@ public class EsimProfile implements Serializable {
     /**
      * 电话号码
      */
-    @Column(name = "phone_number", length = 20, columnDefinition = "VARCHAR(20) COMMENT '电话号码'")
+    @Column(name = "phone_number", length = 100, columnDefinition = "VARCHAR(100) COMMENT '电话号码'")
     private String phoneNumber;
 
     /**
@@ -185,104 +185,27 @@ public class EsimProfile implements Serializable {
     /**
      * ADM1
      */
-    @Column(name = "adm1", nullable = false, length = 10, columnDefinition = "VARCHAR(10) NOT NULL COMMENT 'ADM1'")
+    @Column(name = "adm1", nullable = false, length = 50, columnDefinition = "VARCHAR(50) NOT NULL COMMENT 'ADM1'")
     private String adm1;
 
     /**
      * KI密钥
      */
-    @Column(name = "ki", length = 20, columnDefinition = "VARCHAR(20) COMMENT 'KI密钥'")
+    @Column(name = "ki", length = 50, columnDefinition = "VARCHAR(50) COMMENT 'KI密钥'")
     private String ki;
 
     /**
      * OPC密钥
      */
-    @Column(name = "opc", length = 20, columnDefinition = "VARCHAR(20) COMMENT 'OPC密钥'")
+    @Column(name = "opc", length = 50, columnDefinition = "VARCHAR(50) COMMENT 'OPC密钥'")
     private String opc;
 
     /**
      * SMSP
      */
-    @Column(name = "smsp", length = 20, columnDefinition = "VARCHAR(20) COMMENT 'SMSP'")
+    @Column(name = "smsp", length = 50, columnDefinition = "VARCHAR(50) COMMENT 'SMSP'")
     private String smsp;
 
-    /**
-     * V3功能支持：rpmData-RPM数据, deviceSwitchData-设备切换数据, enterpriseProfileData-企业Profile数据
-     */
-    @Column(name = "v3_features", columnDefinition = "JSON COMMENT 'V3功能支持：rpmData-RPM数据, deviceSwitchData-设备切换数据, enterpriseProfileData-企业Profile数据'")
-    private String v3Features;
-
-    /**
-     * RPM类型：Enable, Disable, Delete, ListProfileInfo, ContactPcmp
-     */
-    @Column(name = "rpm_type", columnDefinition = "JSON COMMENT 'RPM类型：Enable, Disable, Delete, ListProfileInfo, ContactPcmp'")
-    private String rpmType;
-
-    /**
-     * RPM下载方式：SM-DP+, SM-DS
-     */
-    @Column(name = "rpm_download_method", length = 20, columnDefinition = "VARCHAR(20) COMMENT 'RPM下载方式：SM-DP+, SM-DS'")
-    private String rpmDownloadMethod;
-
-    /**
-     * RPM轮询地址URL
-     */
-    @Column(name = "rpm_polling_address", length = 200, columnDefinition = "VARCHAR(200) COMMENT 'RPM轮询地址URL'")
-    private String rpmPollingAddress;
-
-    /**
-     * 允许的CA：CA1, CA2, CA3
-     */
-    @Column(name = "allowed_ca", length = 10, columnDefinition = "VARCHAR(10) COMMENT '允许的CA：CA1, CA2, CA3'")
-    private String allowedCa;
-
-    /**
-     * 允许的Tags (JSON数组)
-     */
-    @Column(name = "allowed_tags", columnDefinition = "JSON COMMENT '允许的Tags (JSON数组)'")
-    private String allowedTags;
-
-    /**
-     * 设备切换方式：requestPlatform-请求平台, useStoredCode-使用存储的激活码
-     */
-    @Column(name = "device_switch_method", length = 20, columnDefinition = "VARCHAR(20) COMMENT '设备切换方式：requestPlatform-请求平台, useStoredCode-使用存储的激活码'")
-    private String deviceSwitchMethod;
-
-    /**
-     * 是否需要新设备EID：yes, no
-     */
-    @Column(name = "need_new_eid", length = 10, columnDefinition = "VARCHAR(10) COMMENT '是否需要新设备EID：yes, no'")
-    private String needNewEid;
-
-    /**
-     * 是否需要新设备TAC：yes, no
-     */
-    @Column(name = "need_new_tac", length = 10, columnDefinition = "VARCHAR(10) COMMENT '是否需要新设备TAC：yes, no'")
-    private String needNewTac;
-
-    /**
-     * 设备切换允许的CA：CA1, CA2, CA3
-     */
-    @Column(name = "device_switch_allowed_ca", length = 10, columnDefinition = "VARCHAR(10) COMMENT '设备切换允许的CA：CA1, CA2, CA3'")
-    private String deviceSwitchAllowedCa;
-
-    /**
-     * 企业名称
-     */
-    @Column(name = "enterprise_name", length = 50, columnDefinition = "VARCHAR(50) COMMENT '企业名称'")
-    private String enterpriseName;
-
-    /**
-     * 企业规则 (JSON数组)：priorityEnterpriseProfile-优先级企业Profile, onlyInstallEnterpriseProfile-只能安装企业Profile
-     */
-    @Column(name = "enterprise_rules", columnDefinition = "JSON COMMENT '企业规则 (JSON数组)：priorityEnterpriseProfile-优先级企业Profile, onlyInstallEnterpriseProfile-只能安装企业Profile'")
-    private String enterpriseRules;
-
-    /**
-     * 非企业Profile数量
-     */
-    @Column(name = "non_enterprise_profile_count", columnDefinition = "INT(11) DEFAULT '0' COMMENT '非企业Profile数量'")
-    private Integer nonEnterpriseProfileCount;
 
     /**
      * ASN模板：template1-标准模版, template2-企业模版, template3-自定义模版
@@ -290,11 +213,6 @@ public class EsimProfile implements Serializable {
     @Column(name = "asn_template", length = 50, columnDefinition = "VARCHAR(50) COMMENT 'ASN模板：template1-标准模版, template2-企业模版, template3-自定义模版'")
     private String asnTemplate;
 
-    /**
-     * 备注
-     */
-    @Column(name = "remark", length = 500, columnDefinition = "VARCHAR(500) COMMENT '备注'")
-    private String remark;
 
     /**
      * 删除标志（0代表存在 1代表删除）
@@ -311,7 +229,7 @@ public class EsimProfile implements Serializable {
     /**
      * 创建时间
      */
-    @Column(name = "create_time", columnDefinition = "DATETIME DEFAULT 'CURRENT_TIMESTAMP' COMMENT '创建时间'")
+    @Column(name = "create_time", columnDefinition = "DATETIME  COMMENT '创建时间'")
     private LocalDateTime createTime;
 
     /**
@@ -323,7 +241,7 @@ public class EsimProfile implements Serializable {
     /**
      * 更新时间
      */
-    @Column(name = "update_time", columnDefinition = "DATETIME DEFAULT 'CURRENT_TIMESTAMP' COMMENT '更新时间'")
+    @Column(name = "update_time", columnDefinition = "DATETIME COMMENT '更新时间'")
     private LocalDateTime updateTime;
 
 }

@@ -3,6 +3,7 @@ package com.yishuifengxiao.tool.personalkit.web.esim;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.aspect.Trim;
+import com.yishuifengxiao.tool.personalkit.domain.bo.Profile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.EsimProfile;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.service.EsimProfileService;
@@ -11,8 +12,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 /**
  * @author yishui
@@ -39,13 +38,13 @@ public class EsimProfileController {
 
     @PostMapping(value = "/save", produces = {"application/json;charset=utf-8"})
     @ResponseBody
-    public EsimProfile save(@RequestBody EsimProfile param) {
+    public EsimProfile save(@RequestBody Profile param) {
         return esimProfileService.save(param);
     }
 
     @PostMapping("/update")
     @ResponseBody
-    public void update(@RequestBody EsimProfile param) {
+    public void update(@RequestBody Profile param) {
         esimProfileService.update(param);
     }
 

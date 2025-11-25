@@ -74,9 +74,13 @@
             :rules="[{ required: true, message: '请选择ASN模版' }]"
             size="small"
           >
-            <a-select-option value="template1">标准模版</a-select-option>
-            <a-select-option value="template2">企业模版</a-select-option>
-            <a-select-option value="template3">自定义模版</a-select-option>
+            <a-select-option
+              v-for="template in asnTemplates"
+              :key="template.value"
+              :value="template.value"
+            >
+              {{ template.label }}
+            </a-select-option>
           </a-select>
         </div>
         <div class="info-item" v-if="!isAdd">
@@ -158,10 +162,13 @@
               <a-col :span="8">
                 <a-form-item label="运营商" name="carrier">
                   <a-select v-model:value="formData.carrier" placeholder="请选择运营商" allow-clear size="small">
-                    <a-select-option value="中国移动">中国移动</a-select-option>
-                    <a-select-option value="中国联通">中国联通</a-select-option>
-                    <a-select-option value="中国电信">中国电信</a-select-option>
-                    <a-select-option value="中国广电">中国广电</a-select-option>
+                    <a-select-option
+                      v-for="carrier in carriers"
+                      :key="carrier.value"
+                      :value="carrier.value"
+                    >
+                      {{ carrier.label }}
+                    </a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -440,14 +447,14 @@
           <a-form-item label="v3功能支持" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
             <a-tooltip
               :title="
-                formData.v3Features && formData.v3Features.length > 0
-                  ? formData.v3Features.join(', ')
+                formData.v3Support.features && formData.v3Support.features.length > 0
+                  ? formData.v3Support.features.join(', ')
                   : '暂无选择'
               "
               placement="top"
             >
               <a-select
-                v-model:value="formData.v3Features"
+                v-model:value="formData.v3Support.features"
                 mode="multiple"
                 placeholder="请选择功能"
                 :disabled="isView"
@@ -466,7 +473,7 @@
         <!-- RPM数据配置 -->
         <div
           class="rpm-config-section"
-          v-if="formData.v3Features && formData.v3Features.includes('rpmData')"
+          v-if="formData.v3Support.features && formData.v3Support.features.includes('rpmData')"
         >
           <a-divider dashed orientation="center">RPM数据配置</a-divider>
           <a-row :gutter="16">
@@ -481,7 +488,7 @@
                   placement="top"
                 >
                   <a-select
-                        v-model:value="formData.rpmType"
+                        v-model:value="formData.v3Support.rpmConfig.rpmType"
                         mode="multiple"
                         placeholder="请选择RPM类型"
                         :disabled="isView"
@@ -507,7 +514,7 @@
                 :wrapper-col="{ span: 12 }"
               >
                 <a-select
-                        v-model:value="formData.rpmDownloadMethod"
+                        v-model:value="formData.v3Support.rpmConfig.rpmDownloadMethod"
                         placeholder="请选择RPM下载方式"
                         :disabled="isView"
                         allow-clear
@@ -525,7 +532,7 @@
             <a-col :span="12">
               <a-form-item label="允许的CA" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
                 <a-select
-                        v-model:value="formData.allowedCA"
+                        v-model:value="formData.v3Support.rpmConfig.allowedCA"
                         placeholder="请选择允许的CA"
                         :disabled="isView"
                         allow-clear
@@ -538,14 +545,14 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col :span="12" v-if="formData.rpmDownloadMethod">
+            <a-col :span="12" v-if="formData.v3Support.rpmConfig.rpmDownloadMethod">
               <a-form-item
                 label="RPM轮询地址"
                 :label-col="{ span: 12 }"
                 :wrapper-col="{ span: 12 }"
               >
                 <a-select
-                        v-model:value="formData.rpmPollAddress"
+                        v-model:value="formData.v3Support.rpmConfig.rpmPollingAddress"
                         placeholder="请选择RPM轮询地址"
                         :disabled="isView"
                         allow-clear
@@ -578,7 +585,7 @@
               placement="top"
             >
               <a-select
-                        v-model:value="formData.allowedTags"
+                        v-model:value="formData.v3Support.rpmConfig.allowedTags"
                         mode="multiple"
                         placeholder="请选择允许的Tags"
                         :disabled="isView"
@@ -617,7 +624,7 @@
         <!-- 设备切换数据 -->
         <div
           class="device-switch-section"
-          v-if="formData.v3Features && formData.v3Features.includes('deviceSwitchData')"
+          v-if="formData.v3Support.features && formData.v3Support.features.includes('deviceSwitchData')"
         >
           <a-divider dashed orientation="center">设备切换数据</a-divider>
           <a-row :gutter="16">
@@ -627,7 +634,7 @@
                 :label-col="{ span: 12 }"
                 :wrapper-col="{ span: 12 }"
               >
-                <a-radio-group v-model:value="formData.deviceSwitchMethod" :disabled="isView">
+                <a-radio-group v-model:value="formData.v3Support.deviceSwitch.deviceSwitchMethod" :disabled="isView">
                   <a-radio value="requestPlatform">请求平台</a-radio>
                   <a-radio value="useStoredCode">使用存储的激活码</a-radio>
                 </a-radio-group>
@@ -636,7 +643,7 @@
             <a-col :span="12">
               <a-form-item label="允许的CA" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
                 <a-select
-                  v-model:value="formData.deviceSwitchAllowedCA"
+                  v-model:value="formData.v3Support.deviceSwitch.allowedCA"
                   placeholder="请选择允许的CA"
                   :disabled="isView"
                   allow-clear
@@ -658,7 +665,7 @@
                 :label-col="{ span: 12 }"
                 :wrapper-col="{ span: 12 }"
               >
-                <a-radio-group v-model:value="formData.needNewEID" :disabled="isView">
+                <a-radio-group v-model:value="formData.v3Support.deviceSwitch.needNewEID" :disabled="isView">
                   <a-radio value="yes">是</a-radio>
                   <a-radio value="no">否</a-radio>
                 </a-radio-group>
@@ -670,7 +677,7 @@
                 :label-col="{ span: 12 }"
                 :wrapper-col="{ span: 12 }"
               >
-                <a-radio-group v-model:value="formData.needNewTAC" :disabled="isView">
+                <a-radio-group v-model:value="formData.v3Support.deviceSwitch.needNewTAC" :disabled="isView">
                   <a-radio value="yes">是</a-radio>
                   <a-radio value="no">否</a-radio>
                 </a-radio-group>
@@ -682,14 +689,14 @@
         <!-- 企业Profile数据 -->
         <div
           class="enterprise-profile-section"
-          v-if="formData.v3Features && formData.v3Features.includes('enterpriseProfileData')"
+          v-if="formData.v3Support.features && formData.v3Support.features.includes('enterpriseProfileData')"
         >
           <a-divider dashed orientation="center">企业Profile数据</a-divider>
           <a-row :gutter="16">
             <a-col :span="12">
               <a-form-item label="企业名称" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
                 <a-select
-                  v-model:value="formData.enterpriseName"
+                  v-model:value="formData.v3Support.enterprise.enterpriseName"
                   placeholder="请选择企业名称"
                   :disabled="isView"
                   allow-clear
@@ -703,7 +710,7 @@
             </a-col>
             <a-col
               :span="12"
-              v-if="formData.enterpriseRules && formData.enterpriseRules.length > 0"
+              v-if="formData.v3Support.enterprise.enterpriseRules && formData.v3Support.enterprise.enterpriseRules.length > 0"
             >
               <a-form-item
                 label="非企业Profile数量"
@@ -711,7 +718,7 @@
                 :wrapper-col="{ span: 12 }"
               >
                 <a-input-number
-                  v-model:value="formData.nonEnterpriseProfileCount"
+                  v-model:value="formData.v3Support.enterprise.nonEnterpriseProfileCount"
                   :min="0"
                   :max="10"
                   placeholder="请输入数量"
@@ -733,13 +740,13 @@
               placement="top"
             >
               <a-select
-                v-model:value="formData.enterpriseRules"
-                mode="multiple"
-                placeholder="请选择规则"
-                :disabled="isView"
-                allow-clear
-                style="width: 100%"
-              >
+                  v-model:value="formData.v3Support.enterprise.enterpriseRules"
+                  mode="multiple"
+                  placeholder="请选择规则"
+                  :disabled="isView"
+                  allow-clear
+                  style="width: 100%"
+                >
                 <a-select-option value="priorityEnterpriseProfile"
                   >优先级企业Profile</a-select-option
                 >
@@ -756,7 +763,7 @@
 </template>
 
 <script>
-import { defineComponent, ref, reactive, computed, onMounted } from 'vue'
+import { defineComponent, ref, reactive, computed, onMounted, getCurrentInstance } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message, Modal } from 'ant-design-vue'
 
@@ -765,6 +772,8 @@ export default defineComponent({
   setup() {
     const route = useRoute()
     const router = useRouter()
+    const { proxy } = getCurrentInstance()
+    const $http = proxy.$http
     const formRef = ref()
 
     const pageType = ref('add') // add, edit, view
@@ -803,24 +812,89 @@ export default defineComponent({
       ki: '',
       opc: '',
       smsp: '',
-      // V3功能支持字段 - 初始化为数组避免类型错误
-      v3Features: [],
-      // RPM数据配置字段
-      rpmType: [],
-      rpmDownloadMethod: '',
-      rpmPollingAddress: '',
-      allowedCA: '',
-      allowedTags: [],
-      // 设备切换数据字段
-      deviceSwitchMethod: '',
-      needNewEID: '',
-      needNewTAC: '',
-      deviceSwitchAllowedCA: '',
-      // 企业Profile数据字段
-      enterpriseName: '',
-      enterpriseRules: [],
-      nonEnterpriseProfileCount: 0
+      // V3功能支持字段 - 重构为嵌套结构
+      v3Support: {
+        // 支持的v3功能列表
+        features: [],
+        // RPM数据配置
+        rpmConfig: {
+          rpmType: [],
+          rpmDownloadMethod: '',
+          rpmPollingAddress: '',
+          allowedCA: '',
+          allowedTags: []
+        },
+        // 设备切换数据配置
+        deviceSwitch: {
+          deviceSwitchMethod: '',
+          needNewEID: '',
+          needNewTAC: '',
+          allowedCA: ''
+        },
+        // 企业Profile数据配置
+        enterprise: {
+          enterpriseName: '',
+          enterpriseRules: [],
+          nonEnterpriseProfileCount: 0
+        }
+      }
     })
+    
+    // 下拉选项数据
+    const asnTemplates = ref([]) // ASN模板列表
+    const carriers = ref([]) // 运营商列表
+    
+    // 获取ASN模板数据
+    const fetchAsnTemplates = async () => {
+      try {
+        const response = await $http.request({
+          url: '/personkit/api/esim/tempdate/page',
+          method: 'post',
+          data: {
+            pageNum: 1,
+            pageSize: 10,
+            query: {
+              tempName: '',
+              profileType: ''
+            }
+          }
+        })
+        // 按照接口实际响应格式处理数据
+        asnTemplates.value = response.data.map(item => ({
+          value: item.id,
+          label: item.tempName
+        }))
+      } catch (error) {
+        console.error('获取ASN模板失败:', error)
+        message.error('获取ASN模板失败')
+      }
+    }
+    
+    // 获取运营商数据
+    const fetchCarriers = async () => {
+      try {
+        const response = await $http.request({
+          url: '/personkit/api/esim/mon/page',
+          method: 'post',
+          data: {
+            num: 1,
+            size: 10,
+            query: {
+              monName: '',
+              monShortName: ''
+            }
+          }
+        })
+        // 按照接口实际响应格式处理数据
+        carriers.value = response.data.map(item => ({
+          value: item.id,
+          label: item.monName
+        }))
+      } catch (error) {
+        console.error('获取运营商失败:', error)
+        message.error('获取运营商失败')
+      }
+    }
 
     // 计算属性：是否为新增模式
     const isAdd = computed(() => pageType.value === 'add')
@@ -923,19 +997,27 @@ export default defineComponent({
           ki: 'ki123456',
           opc: 'opc123456',
           smsp: 'smsp123',
-          v3Features: ['rpmData', 'deviceSwitchData'],
-          rpmType: ['Enable', 'Disable'],
-          rpmDownloadMethod: 'SM-DP+',
-          rpmPollingAddress: 'http://rpm.example.com',
-          allowedCA: 'CA1',
-          allowedTags: ['Service provider name', 'Profile name'],
-          deviceSwitchMethod: 'requestPlatform',
-          needNewEID: 'yes',
-          needNewTAC: 'no',
-          deviceSwitchAllowedCA: 'CA1',
-          enterpriseName: '',
-          enterpriseRules: [],
-          nonEnterpriseProfileCount: 0
+          v3Support: {
+            features: ['rpmData', 'deviceSwitchData'],
+            rpmConfig: {
+              rpmType: ['Enable', 'Disable'],
+              rpmDownloadMethod: 'SM-DP+',
+              rpmPollingAddress: 'http://rpm.example.com',
+              allowedCA: 'CA1',
+              allowedTags: ['Service provider name', 'Profile name']
+            },
+            deviceSwitch: {
+              deviceSwitchMethod: 'requestPlatform',
+              needNewEID: 'yes',
+              needNewTAC: 'no',
+              allowedCA: 'CA1'
+            },
+            enterprise: {
+              enterpriseName: '',
+              enterpriseRules: [],
+              nonEnterpriseProfileCount: 0
+            }
+          }
         }
       }
     }
@@ -954,32 +1036,81 @@ export default defineComponent({
         }
       } else if (pageType.value === 'add') {
         // 新增时清空表单数据
+        // 重置基本字段
         Object.keys(formData).forEach((key) => {
-          if (
-            key === 'v3Features' ||
-            key === 'rpmType' ||
-            key === 'allowedTags' ||
-            key === 'enterpriseRules'
-          ) {
-            formData[key] = []
-          } else if (key === 'nonEnterpriseProfileCount') {
-            formData[key] = 0
+          if (key !== 'v3Support' && key !== 'notificationEvent') {
+            formData[key] = ''
           } else if (key === 'notificationEvent') {
             formData[key] = undefined
-          } else {
-            formData[key] = ''
           }
         })
+        
+        // 重置v3Support及其子字段
+        formData.v3Support = {
+          features: [],
+          rpmConfig: {
+            rpmType: [],
+            rpmDownloadMethod: '',
+            rpmPollingAddress: '',
+            allowedCA: '',
+            allowedTags: []
+          },
+          deviceSwitch: {
+            deviceSwitchMethod: '',
+            needNewEID: '',
+            needNewTAC: '',
+            allowedCA: ''
+          },
+          enterprise: {
+            enterpriseName: '',
+            enterpriseRules: [],
+            nonEnterpriseProfileCount: 0
+          }
+        }
       }
     }
 
     const handleSubmit = async () => {
       try {
-        await formRef.value.validate()
-        message.success('保存成功')
-        router.push('/view/profile_manage')
+        // 表单验证
+        await formRef.value.validate().catch(errorInfo => {
+          // 显示验证失败的详细信息
+          console.error('表单验证失败:', errorInfo)
+          const firstErrorField = errorInfo.errorFields[0]
+          if (firstErrorField) {
+            message.error(`${firstErrorField.errors[0]}`)
+          }
+          throw new Error('表单验证失败')
+        })
+        
+        // 根据是新增还是编辑调用不同的接口
+        if (isAdd.value) {
+          // 新增 - 调用保存接口
+          await $http.request({
+            url: '/personkit/api/esim/profile/save',
+            method: 'post',
+            data: formData
+          })
+          message.success('保存成功')
+          router.push('/view/profile_manage')
+        } else {
+          // 编辑 - 调用更新接口
+          await $http.request({
+            url: '/personkit/api/esim/profile/update',
+            method: 'post',
+            data: {
+              ...formData,
+              id: recordId.value
+            }
+          })
+          message.success('更新成功')
+          router.push('/view/profile_manage')
+        }
       } catch (error) {
-        console.error('表单验证失败:', error)
+        console.error('表单提交失败:', error)
+        if (error.message !== '表单验证失败') {
+          message.error('操作失败')
+        }
       }
     }
 
@@ -1000,6 +1131,10 @@ export default defineComponent({
       const { type, id } = route.query
       pageType.value = type || 'add'
       recordId.value = id || ''
+      // 加载下拉数据
+      fetchAsnTemplates()
+      fetchCarriers()
+      // 加载详情数据
       loadDetail()
     })
 
@@ -1009,6 +1144,8 @@ export default defineComponent({
       pageTitle,
       isView,
       isAdd,
+      asnTemplates,
+      carriers,
       getProfileStatusColor,
       getNotificationStatusStatus,
       getDownloadMethodText,

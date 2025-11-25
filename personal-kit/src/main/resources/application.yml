@@ -22,13 +22,13 @@ spring:
     name: personkit
   main:
     banner-mode: off
-  sql:
-    init:
-      mode: always
-      schema-locations: classpath:db/ddl.sql
-      data-locations: classpath:db/dml.sql
-      continue-on-error: false
-      encoding: UTF-8
+#  sql:
+#    init:
+#      mode: always
+#      schema-locations: classpath:db/ddl.sql
+#      data-locations: classpath:db/dml.sql
+#      continue-on-error: false
+#      encoding: UTF-8
   servlet:
     multipart:
       max-file-size: 1000MB
