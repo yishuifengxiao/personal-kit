@@ -380,7 +380,16 @@ export default defineComponent({
         width: 120,
         customCell: () => ({
           title: 'Profile的下载方式，如默认SM-DP+、激活码等'
-        })
+        }),
+        customRender: ({ text }) => {
+          const downloadMethodMap = {
+            'default': '默认SM-DP+',
+            'activation': '激活码',
+            'alt-smds': 'ALT-SM-DS',
+            'root-smds': 'ROOT-SM-DS'
+          }
+          return downloadMethodMap[text] || text
+        }
       },
       {
         title: '所属租户',
@@ -422,7 +431,16 @@ export default defineComponent({
         width: 120,
         customCell: () => ({
           title: 'Profile的重置规则，包括不可重置、可重置、自动重置、自动回收'
-        })
+        }),
+        customRender: ({ text }) => {
+          const resetRuleMap = {
+            'no_reset': '不可重置',
+            'resetable': '可重置',
+            'auto_reset': '自动重置',
+            'auto_recycle': '自动回收'
+          }
+          return resetRuleMap[text] || text
+        }
       },
       {
         title: 'DS标记',
