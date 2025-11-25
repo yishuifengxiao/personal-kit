@@ -291,10 +291,11 @@
 </template>
 
 <script>
-import { defineComponent, ref, reactive, computed } from 'vue'
+import { defineComponent, ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { message, Modal } from 'ant-design-vue'
 import { DownOutlined } from '@ant-design/icons-vue'
+import http from '@/api/http'
 
 export default defineComponent({
   name: 'ProfileManage',
@@ -305,6 +306,9 @@ export default defineComponent({
     const router = useRouter()
     const loading = ref(false)
     const selectedRowKeys = ref([])
+    
+    // 创建http实例 (这里简化处理，假设不需要pinia实例)
+    const httpInstance = new http(null, router, message, Modal)
     
     const searchForm = reactive({
       queryType: 'all',
@@ -447,40 +451,7 @@ export default defineComponent({
       }
     ]
 
-    const tableData = ref([
-      {
-        id: '1',
-        iccid: '89000000000000000000',
-        matchingId: 'WTBIJ-EG8C0-C72NY-VNOPX',
-        profileStatus: 'Available',
-        eid: '1234567890ABCDEF1234567890ABCDEF',
-        notificationStatus: 'Enabled',
-        downloadMethod: '默认SM-DP+',
-        tenant: '租户A',
-        carrier: '中国移动',
-        profileClass: 'operational',
-        pprPolicy: 'PPR1',
-        resetRule: '可重置',
-        dsFlag: '标记1',
-        updateTime: '2024年01月15日 10:30:00'
-      },
-      {
-        id: '2',
-        iccid: '89000000000000000001',
-        matchingId: 'ABCDE-FGHIJ-KLMNO-PQRST',
-        profileStatus: 'Installed',
-        eid: 'ABCDEF1234567890ABCDEF1234567890',
-        notificationStatus: 'Disabled',
-        downloadMethod: '激活码',
-        tenant: '租户B',
-        carrier: '中国联通',
-        profileClass: 'test',
-        pprPolicy: 'PPR2',
-        resetRule: '不可重置',
-        dsFlag: '标记2',
-        updateTime: '2024年01月14日 15:45:00'
-      }
-    ])
+    const tableData = ref([])
 
     const paginationConfig = reactive({
       current: 1,
@@ -488,7 +459,17 @@ export default defineComponent({
       total: 0,
       showTotal: (total) => `共 ${total} 条数据`,
       showSizeChanger: true,
-      showQuickJumper: true
+      showQuickJumper: true,
+      onChange: (page, pageSize) => {
+        paginationConfig.current = page
+        paginationConfig.pageSize = pageSize
+        handleSearch()
+      },
+      onShowSizeChange: (current, size) => {
+        paginationConfig.current = 1
+        paginationConfig.pageSize = size
+        handleSearch()
+      }
     })
 
     const rowSelection = reactive({
@@ -545,13 +526,69 @@ export default defineComponent({
       }
     }
 
-    const handleSearch = () => {
+    const handleSearch = async () => {
       loading.value = true
-      // 模拟搜索操作
-      setTimeout(() => {
-        loading.value = false
+      try {
+        // 构建请求参数，符合接口要求的格式
+        const requestData = {
+          size: paginationConfig.pageSize.toString(),
+          num: paginationConfig.current.toString(),
+          query: {
+            id: searchForm.id || undefined,
+            iccid: searchForm.iccid || undefined,
+            matchingId: searchForm.matchingId || undefined,
+            eid: searchForm.eid || undefined,
+            // 根据需要添加其他查询参数
+            profileStatus: searchForm.profileStatus || undefined,
+            notificationStatus: searchForm.notificationStatus || undefined,
+            downloadMethod: searchForm.downloadMethod || undefined,
+            tenant: searchForm.tenant || undefined,
+            carrier: searchForm.carrier || undefined,
+            profileClass: searchForm.profileClass || undefined,
+            pprPolicy: searchForm.pprPolicy || undefined,
+            resetRule: searchForm.resetRule || undefined,
+            dsFlag: searchForm.dsFlag || undefined,
+            updateTime: searchForm.updateTime || undefined
+          }
+        }
+        
+        // 过滤掉undefined的值
+        Object.keys(requestData.query).forEach(key => {
+          if (requestData.query[key] === undefined) {
+            delete requestData.query[key]
+          }
+        })
+        
+        // 调用指定的接口
+        const response = await httpInstance.request({
+          url: '/personkit/api/esim/profile/page',
+          method: 'post',
+          data: requestData
+        })
+        
+        // 更新表格数据
+        if (response && response.data) {
+          tableData.value = response.data
+          paginationConfig.total = response.total || 0
+          // 如果接口返回了pages信息，也可以使用它
+          if (response.pages !== undefined) {
+            // 可以根据需要使用pages信息
+            console.log('总页数:', response.pages)
+          }
+        } else {
+          tableData.value = []
+          paginationConfig.total = 0
+        }
+        
         message.success('搜索完成')
-      }, 1000)
+      } catch (error) {
+        console.error('搜索失败:', error)
+        message.error('搜索失败，请重试')
+        tableData.value = []
+        paginationConfig.total = 0
+      } finally {
+        loading.value = false
+      }
     }
 
     const handleReset = () => {
@@ -712,6 +749,11 @@ export default defineComponent({
     const handleDownloadDer = (record) => {
       message.info(`下载DER数据: ${record.iccid}`)
     }
+
+    // 页面加载时自动调用搜索接口
+    onMounted(() => {
+      handleSearch()
+    })
 
     return {
         loading,
