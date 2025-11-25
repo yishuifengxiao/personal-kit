@@ -706,14 +706,14 @@ export default defineComponent({
     const showDetail = (record) => {
       router.push({
         name: 'profile_form',
-        query: { type: 'view', id: record.iccid }
+        query: { type: 'view', id: record.id }
       })
     }
 
     const handleEdit = (record) => {
       router.push({
         name: 'profile_form',
-        query: { type: 'edit', id: record.iccid }
+        query: { type: 'edit', id: record.id }
       })
     }
 

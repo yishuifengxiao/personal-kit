@@ -161,7 +161,12 @@
               </a-col>
               <a-col :span="8">
                 <a-form-item label="运营商" name="carrier">
-                  <a-select v-model:value="formData.carrier" placeholder="请选择运营商" allow-clear size="small">
+                  <a-select
+                    v-model:value="formData.carrier"
+                    placeholder="请选择运营商"
+                    allow-clear
+                    size="small"
+                  >
                     <a-select-option
                       v-for="carrier in carriers"
                       :key="carrier.value"
@@ -215,7 +220,7 @@
                   </a-select>
                 </a-form-item>
               </a-col>
-                    <a-col :span="8">
+              <a-col :span="8">
                 <a-form-item label="Profile类" name="profileClass">
                   <a-select
                     v-model:value="formData.profileClass"
@@ -233,7 +238,7 @@
 
             <a-row :gutter="16">
               <!-- 第四行：Profile类、PPR策略、DS标记 -->
-        
+
               <a-col :span="8">
                 <a-form-item label="PPR策略" name="pprPolicy">
                   <a-select
@@ -250,14 +255,17 @@
               </a-col>
               <a-col :span="8">
                 <a-form-item label="DS标记" name="dsFlag">
-                  <a-input v-model:value="formData.dsFlag" placeholder="请输入DS标记" allow-clear size="small" />
+                  <a-input
+                    v-model:value="formData.dsFlag"
+                    placeholder="请输入DS标记"
+                    allow-clear
+                    size="small"
+                  />
                 </a-form-item>
               </a-col>
             </a-row>
 
-            <a-row :gutter="16">
-        
-            </a-row>
+            <a-row :gutter="16"> </a-row>
 
             <!-- 两列布局区域：通知事件和通知地址 -->
             <a-row :gutter="24">
@@ -272,14 +280,14 @@
                     placement="top"
                   >
                     <a-select
-                        v-model:value="formData.notificationEvent"
-                        mode="multiple"
-                        placeholder="请选择通知事件"
-                        allow-clear
-                        :maxTagCount="2"
-                        :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
-                        size="small"
-                      >
+                      v-model:value="formData.notificationEvent"
+                      mode="multiple"
+                      placeholder="请选择通知事件"
+                      allow-clear
+                      :maxTagCount="2"
+                      :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
+                      size="small"
+                    >
                       <a-select-option value="下载">下载</a-select-option>
                       <a-select-option value="启用">启用</a-select-option>
                       <a-select-option value="禁用">禁用</a-select-option>
@@ -300,11 +308,11 @@
                   :rules="[{ required: true, message: '请选择通知地址' }]"
                 >
                   <a-select
-                        v-model:value="formData.notificationAddress"
-                        placeholder="请选择通知地址"
-                        allow-clear
-                        size="small"
-                      >
+                    v-model:value="formData.notificationAddress"
+                    placeholder="请选择通知地址"
+                    allow-clear
+                    size="small"
+                  >
                     <a-select-option value="http://localhost:8080/notification"
                       >本地通知地址</a-select-option
                     >
@@ -332,7 +340,12 @@
                   name="imsi"
                   :rules="[{ required: true, message: '请输入IMSI' }]"
                 >
-                  <a-input v-model:value="formData.imsi" placeholder="请输入IMSI" allow-clear size="small" />
+                  <a-input
+                    v-model:value="formData.imsi"
+                    placeholder="请输入IMSI"
+                    allow-clear
+                    size="small"
+                  />
                 </a-form-item>
               </a-col>
 
@@ -355,7 +368,12 @@
                   name="pin1"
                   :rules="[{ required: true, message: '请输入PIN1' }]"
                 >
-                  <a-input v-model:value="formData.pin1" placeholder="请输入PIN1" allow-clear size="small" />
+                  <a-input
+                    v-model:value="formData.pin1"
+                    placeholder="请输入PIN1"
+                    allow-clear
+                    size="small"
+                  />
                 </a-form-item>
               </a-col>
 
@@ -365,7 +383,12 @@
                   name="pin2"
                   :rules="[{ required: true, message: '请输入PIN2' }]"
                 >
-                  <a-input v-model:value="formData.pin2" placeholder="请输入PIN2" allow-clear size="small" />
+                  <a-input
+                    v-model:value="formData.pin2"
+                    placeholder="请输入PIN2"
+                    allow-clear
+                    size="small"
+                  />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -377,7 +400,12 @@
                   name="puk1"
                   :rules="[{ required: true, message: '请输入PUK1' }]"
                 >
-                  <a-input v-model:value="formData.puk1" placeholder="请输入PUK1" allow-clear size="small" />
+                  <a-input
+                    v-model:value="formData.puk1"
+                    placeholder="请输入PUK1"
+                    allow-clear
+                    size="small"
+                  />
                 </a-form-item>
               </a-col>
 
@@ -387,7 +415,12 @@
                   name="puk2"
                   :rules="[{ required: true, message: '请输入PUK2' }]"
                 >
-                  <a-input v-model:value="formData.puk2" placeholder="请输入PUK2" allow-clear size="small" />
+                  <a-input
+                    v-model:value="formData.puk2"
+                    placeholder="请输入PUK2"
+                    allow-clear
+                    size="small"
+                  />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -399,7 +432,12 @@
                   name="ki"
                   :rules="[{ required: true, message: '请输入KI' }]"
                 >
-                  <a-input v-model:value="formData.ki" placeholder="请输入KI" allow-clear size="small" />
+                  <a-input
+                    v-model:value="formData.ki"
+                    placeholder="请输入KI"
+                    allow-clear
+                    size="small"
+                  />
                 </a-form-item>
               </a-col>
 
@@ -422,7 +460,12 @@
                   name="smsp"
                   :rules="[{ required: true, message: '请输入SMSP' }]"
                 >
-                  <a-input v-model:value="formData.smsp" placeholder="请输入SMSP" allow-clear size="small" />
+                  <a-input
+                    v-model:value="formData.smsp"
+                    placeholder="请输入SMSP"
+                    allow-clear
+                    size="small"
+                  />
                 </a-form-item>
               </a-col>
 
@@ -432,7 +475,12 @@
                   name="adm1"
                   :rules="[{ required: true, message: '请输入ADM1' }]"
                 >
-                  <a-input v-model:value="formData.adm1" placeholder="请输入ADM1" allow-clear size="small" />
+                  <a-input
+                    v-model:value="formData.adm1"
+                    placeholder="请输入ADM1"
+                    allow-clear
+                    size="small"
+                  />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -488,16 +536,16 @@
                   placement="top"
                 >
                   <a-select
-                        v-model:value="formData.v3Support.rpmConfig.rpmType"
-                        mode="multiple"
-                        placeholder="请选择RPM类型"
-                        :disabled="isView"
-                        allow-clear
-                        style="width: 100%"
-                        :maxTagCount="2"
-                        :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
-                        size="small"
-                      >
+                    v-model:value="formData.v3Support.rpmConfig.rpmType"
+                    mode="multiple"
+                    placeholder="请选择RPM类型"
+                    :disabled="isView"
+                    allow-clear
+                    style="width: 100%"
+                    :maxTagCount="2"
+                    :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
+                    size="small"
+                  >
                     <a-select-option value="Enable">Enable</a-select-option>
                     <a-select-option value="Disable">Disable</a-select-option>
                     <a-select-option value="Delete">Delete</a-select-option>
@@ -514,13 +562,13 @@
                 :wrapper-col="{ span: 12 }"
               >
                 <a-select
-                        v-model:value="formData.v3Support.rpmConfig.rpmDownloadMethod"
-                        placeholder="请选择RPM下载方式"
-                        :disabled="isView"
-                        allow-clear
-                        style="width: 100%"
-                        size="small"
-                      >
+                  v-model:value="formData.v3Support.rpmConfig.rpmDownloadMethod"
+                  placeholder="请选择RPM下载方式"
+                  :disabled="isView"
+                  allow-clear
+                  style="width: 100%"
+                  size="small"
+                >
                   <a-select-option value="SM-DP+">SM-DP+</a-select-option>
                   <a-select-option value="SM-DS">SM-DS</a-select-option>
                 </a-select>
@@ -532,13 +580,13 @@
             <a-col :span="12">
               <a-form-item label="允许的CA" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
                 <a-select
-                        v-model:value="formData.v3Support.rpmConfig.allowedCA"
-                        placeholder="请选择允许的CA"
-                        :disabled="isView"
-                        allow-clear
-                        style="width: 100%"
-                        size="small"
-                      >
+                  v-model:value="formData.v3Support.rpmConfig.allowedCA"
+                  placeholder="请选择允许的CA"
+                  :disabled="isView"
+                  allow-clear
+                  style="width: 100%"
+                  size="small"
+                >
                   <a-select-option value="CA1">CA1</a-select-option>
                   <a-select-option value="CA2">CA2</a-select-option>
                   <a-select-option value="CA3">CA3</a-select-option>
@@ -552,13 +600,13 @@
                 :wrapper-col="{ span: 12 }"
               >
                 <a-select
-                        v-model:value="formData.v3Support.rpmConfig.rpmPollingAddress"
-                        placeholder="请选择RPM轮询地址"
-                        :disabled="isView"
-                        allow-clear
-                        style="width: 100%"
-                        size="small"
-                      >
+                  v-model:value="formData.v3Support.rpmConfig.rpmPollingAddress"
+                  placeholder="请选择RPM轮询地址"
+                  :disabled="isView"
+                  allow-clear
+                  style="width: 100%"
+                  size="small"
+                >
                   <a-select-option value="https://api.example.com/rpm1"
                     >https://api.example.com/rpm1</a-select-option
                   >
@@ -585,16 +633,16 @@
               placement="top"
             >
               <a-select
-                        v-model:value="formData.v3Support.rpmConfig.allowedTags"
-                        mode="multiple"
-                        placeholder="请选择允许的Tags"
-                        :disabled="isView"
-                        allow-clear
-                        style="width: 100%"
-                        :maxTagCount="3"
-                        :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
-                        size="small"
-                      >
+                v-model:value="formData.v3Support.rpmConfig.allowedTags"
+                mode="multiple"
+                placeholder="请选择允许的Tags"
+                :disabled="isView"
+                allow-clear
+                style="width: 100%"
+                :maxTagCount="3"
+                :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
+                size="small"
+              >
                 <a-select-option value="Service provider name"
                   >Service provider name</a-select-option
                 >
@@ -624,7 +672,9 @@
         <!-- 设备切换数据 -->
         <div
           class="device-switch-section"
-          v-if="formData.v3Support.features && formData.v3Support.features.includes('deviceSwitchData')"
+          v-if="
+            formData.v3Support.features && formData.v3Support.features.includes('deviceSwitchData')
+          "
         >
           <a-divider dashed orientation="center">设备切换数据</a-divider>
           <a-row :gutter="16">
@@ -634,7 +684,10 @@
                 :label-col="{ span: 12 }"
                 :wrapper-col="{ span: 12 }"
               >
-                <a-radio-group v-model:value="formData.v3Support.deviceSwitch.deviceSwitchMethod" :disabled="isView">
+                <a-radio-group
+                  v-model:value="formData.v3Support.deviceSwitch.deviceSwitchMethod"
+                  :disabled="isView"
+                >
                   <a-radio value="requestPlatform">请求平台</a-radio>
                   <a-radio value="useStoredCode">使用存储的激活码</a-radio>
                 </a-radio-group>
@@ -665,7 +718,10 @@
                 :label-col="{ span: 12 }"
                 :wrapper-col="{ span: 12 }"
               >
-                <a-radio-group v-model:value="formData.v3Support.deviceSwitch.needNewEID" :disabled="isView">
+                <a-radio-group
+                  v-model:value="formData.v3Support.deviceSwitch.needNewEID"
+                  :disabled="isView"
+                >
                   <a-radio value="yes">是</a-radio>
                   <a-radio value="no">否</a-radio>
                 </a-radio-group>
@@ -677,7 +733,10 @@
                 :label-col="{ span: 12 }"
                 :wrapper-col="{ span: 12 }"
               >
-                <a-radio-group v-model:value="formData.v3Support.deviceSwitch.needNewTAC" :disabled="isView">
+                <a-radio-group
+                  v-model:value="formData.v3Support.deviceSwitch.needNewTAC"
+                  :disabled="isView"
+                >
                   <a-radio value="yes">是</a-radio>
                   <a-radio value="no">否</a-radio>
                 </a-radio-group>
@@ -689,7 +748,10 @@
         <!-- 企业Profile数据 -->
         <div
           class="enterprise-profile-section"
-          v-if="formData.v3Support.features && formData.v3Support.features.includes('enterpriseProfileData')"
+          v-if="
+            formData.v3Support.features &&
+            formData.v3Support.features.includes('enterpriseProfileData')
+          "
         >
           <a-divider dashed orientation="center">企业Profile数据</a-divider>
           <a-row :gutter="16">
@@ -710,7 +772,10 @@
             </a-col>
             <a-col
               :span="12"
-              v-if="formData.v3Support.enterprise.enterpriseRules && formData.v3Support.enterprise.enterpriseRules.length > 0"
+              v-if="
+                formData.v3Support.enterprise.enterpriseRules &&
+                formData.v3Support.enterprise.enterpriseRules.length > 0
+              "
             >
               <a-form-item
                 label="非企业Profile数量"
@@ -740,13 +805,13 @@
               placement="top"
             >
               <a-select
-                  v-model:value="formData.v3Support.enterprise.enterpriseRules"
-                  mode="multiple"
-                  placeholder="请选择规则"
-                  :disabled="isView"
-                  allow-clear
-                  style="width: 100%"
-                >
+                v-model:value="formData.v3Support.enterprise.enterpriseRules"
+                mode="multiple"
+                placeholder="请选择规则"
+                :disabled="isView"
+                allow-clear
+                style="width: 100%"
+              >
                 <a-select-option value="priorityEnterpriseProfile"
                   >优先级企业Profile</a-select-option
                 >
@@ -839,11 +904,11 @@ export default defineComponent({
         }
       }
     })
-    
+
     // 下拉选项数据
     const asnTemplates = ref([]) // ASN模板列表
     const carriers = ref([]) // 运营商列表
-    
+
     // 获取ASN模板数据
     const fetchAsnTemplates = async () => {
       try {
@@ -860,7 +925,7 @@ export default defineComponent({
           }
         })
         // 按照接口实际响应格式处理数据
-        asnTemplates.value = response.data.map(item => ({
+        asnTemplates.value = response.data.map((item) => ({
           value: item.id,
           label: item.tempName
         }))
@@ -869,7 +934,7 @@ export default defineComponent({
         message.error('获取ASN模板失败')
       }
     }
-    
+
     // 获取运营商数据
     const fetchCarriers = async () => {
       try {
@@ -886,7 +951,7 @@ export default defineComponent({
           }
         })
         // 按照接口实际响应格式处理数据
-        carriers.value = response.data.map(item => ({
+        carriers.value = response.data.map((item) => ({
           value: item.id,
           label: item.monName
         }))
@@ -960,65 +1025,21 @@ export default defineComponent({
       return ruleMap[rule] || rule
     }
 
-    // 模拟获取Profile详情的API函数
+    // 获取Profile详情的API函数
     const getProfileDetail = async (id) => {
-      // 这里应该是真实的API调用
-      // 现在返回模拟数据
-      return {
-        code: 200,
-        data: {
-          iccid: '12345678901234567890',
-          matchingId: 'matching-' + id,
-          profileStatus: 'Available',
-          eid: '12345678901234567890123456789012',
-          notificationStatus: 'Enabled',
-          downloadMethod: '1',
-          tenant: 'default-tenant',
-          carrier: '中国移动',
-          profileClass: 'operational',
-          pprPolicy: 'PPR1',
-          resetRule: '1',
-          dsFlag: 'flag1',
-          remark: '测试数据',
-          confirmationCode: 'code123',
-          profileName: '测试Profile',
-          phoneNumber: '13800138000',
-          serviceProvider: 'provider1',
-          notificationEvent: undefined,
-          notificationAddress: 'http://example.com',
-          profileIcon: 'icon1',
-          imsi: '460001234567890',
-          imsi2: '',
-          pin1: '1234',
-          pin2: '5678',
-          puk1: '12345678',
-          puk2: '87654321',
-          adm1: 'adm1234',
-          ki: 'ki123456',
-          opc: 'opc123456',
-          smsp: 'smsp123',
-          v3Support: {
-            features: ['rpmData', 'deviceSwitchData'],
-            rpmConfig: {
-              rpmType: ['Enable', 'Disable'],
-              rpmDownloadMethod: 'SM-DP+',
-              rpmPollingAddress: 'http://rpm.example.com',
-              allowedCA: 'CA1',
-              allowedTags: ['Service provider name', 'Profile name']
-            },
-            deviceSwitch: {
-              deviceSwitchMethod: 'requestPlatform',
-              needNewEID: 'yes',
-              needNewTAC: 'no',
-              allowedCA: 'CA1'
-            },
-            enterprise: {
-              enterpriseName: '',
-              enterpriseRules: [],
-              nonEnterpriseProfileCount: 0
-            }
-          }
-        }
+      try {
+        // 调用真实的API接口
+        const response = await $http.request({
+          url: '/personkit/api/esim/profile/detail',
+          method: 'post',
+          data: { id: id }
+        })
+        // 直接返回响应数据
+        return response
+      } catch (error) {
+        console.error('获取Profile详情失败:', error)
+        // 抛出错误以便loadDetail函数捕获处理
+        throw error
       }
     }
 
@@ -1026,11 +1047,7 @@ export default defineComponent({
       if (recordId.value) {
         try {
           const response = await getProfileDetail(recordId.value)
-          if (response.code === 200) {
-            Object.assign(formData, response.data)
-          } else {
-            message.error(response.message || '获取详情失败')
-          }
+          Object.assign(formData, response)
         } catch (error) {
           message.error('获取详情失败')
         }
@@ -1044,7 +1061,7 @@ export default defineComponent({
             formData[key] = undefined
           }
         })
-        
+
         // 重置v3Support及其子字段
         formData.v3Support = {
           features: [],
@@ -1073,7 +1090,7 @@ export default defineComponent({
     const handleSubmit = async () => {
       try {
         // 表单验证
-        await formRef.value.validate().catch(errorInfo => {
+        await formRef.value.validate().catch((errorInfo) => {
           // 显示验证失败的详细信息
           console.error('表单验证失败:', errorInfo)
           const firstErrorField = errorInfo.errorFields[0]
@@ -1082,7 +1099,7 @@ export default defineComponent({
           }
           throw new Error('表单验证失败')
         })
-        
+
         // 根据是新增还是编辑调用不同的接口
         if (isAdd.value) {
           // 新增 - 调用保存接口
