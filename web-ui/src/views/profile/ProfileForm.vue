@@ -19,16 +19,17 @@
             style="width: 200px" size="middle" />
           <span v-else class="info-value">{{ formData.iccid }}</span>
         </div>
-        <div class="info-item">
-          <span class="info-label">EID：</span>
-          <a-input v-if="isAdd" v-model:value="formData.eid" placeholder="请输入32位16进制EID" :maxlength="32"
-            style="width: 200px" size="middle" />
-          <span v-else class="info-value">{{ formData.eid }}</span>
-        </div>
         <div class="info-item" v-if="!isAdd">
           <span class="info-label">MatchingId：</span>
           <span class="info-value">{{ formData.matchingId }}</span>
         </div>
+        <div class="info-item">
+          <span class="info-label">EID：</span>
+          <a-input  v-model:value="formData.eid" placeholder="请输入32位16进制EID" :maxlength="32"
+            style="width: 200px" size="middle" />
+    
+        </div>
+
         <div class="info-item">
           <span class="info-label">ASN模版：</span>
           <a-select v-model:value="formData.asnTemplate" placeholder="请选择ASN模版" allow-clear style="width: 200px"
@@ -80,7 +81,8 @@
                 <a-form-item label="确认码" name="confirmationCode" :rules="[
                   { max: 8, message: '确认码最长8个字符' }
                 ]">
-                  <a-input v-model:value="formData.confirmationCode" placeholder="请输入确认码" allow-clear size="middle" :maxlength="8" />
+                  <a-input v-model:value="formData.confirmationCode" placeholder="请输入确认码" allow-clear size="middle"
+                    :maxlength="8" />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
@@ -132,7 +134,8 @@
                 <a-form-item label="服务提供商" name="serviceProvider" :rules="[
                   { max: 50, message: '服务提供商最长50个字符' }
                 ]">
-                  <a-input v-model:value="formData.serviceProvider" placeholder="请输入服务提供商" allow-clear size="middle" :maxlength="50" />
+                  <a-input v-model:value="formData.serviceProvider" placeholder="请输入服务提供商" allow-clear size="middle"
+                    :maxlength="50" />
                 </a-form-item>
               </a-col>
 
@@ -140,7 +143,8 @@
                 <a-form-item label="Profile名称" name="profileName" :rules="[
                   { max: 50, message: 'Profile名称最长50个字符' }
                 ]">
-                  <a-input v-model:value="formData.profileName" placeholder="请输入Profile名称" allow-clear size="middle" :maxlength="50" />
+                  <a-input v-model:value="formData.profileName" placeholder="请输入Profile名称" allow-clear size="middle"
+                    :maxlength="50" />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
@@ -177,7 +181,8 @@
                 <a-form-item label="电话号码" name="phoneNumber" :rules="[
                   { max: 20, message: '电话号码最长20个字符' }
                 ]">
-                  <a-input v-model:value="formData.phoneNumber" placeholder="请输入电话号码" allow-clear size="middle" :maxlength="20" />
+                  <a-input v-model:value="formData.phoneNumber" placeholder="请输入电话号码" allow-clear size="middle"
+                    :maxlength="20" />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -231,7 +236,8 @@
                   { max: 15, message: 'IMSI最长15个字符' },
                   { pattern: /^[0-9+]+$/, message: 'IMSI只能包含数字或+' }
                 ]">
-                  <a-input v-model:value="formData.imsi" placeholder="请输入IMSI" allow-clear size="middle" :maxlength="15" />
+                  <a-input v-model:value="formData.imsi" placeholder="请输入IMSI" allow-clear size="middle"
+                    :maxlength="15" />
                 </a-form-item>
               </a-col>
 
@@ -240,7 +246,8 @@
                   { max: 15, message: 'IMSI2最长15个字符' },
                   { pattern: /^[0-9+]+$/, message: 'IMSI2只能包含数字或+' }
                 ]">
-                  <a-input v-model:value="formData.imsi2" placeholder="请输入IMSI2（可选）" allow-clear size="middle" :maxlength="15" />
+                  <a-input v-model:value="formData.imsi2" placeholder="请输入IMSI2（可选）" allow-clear size="middle"
+                    :maxlength="15" />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -252,7 +259,8 @@
                   { pattern: /^\d{4,8}$/, message: 'PIN1只能由4至8位数字组成' },
                   { max: 8, message: 'PIN1最长8个字符' }
                 ]">
-                  <a-input v-model:value="formData.pin1" placeholder="请输入PIN1" allow-clear size="middle" :maxlength="8" />
+                  <a-input v-model:value="formData.pin1" placeholder="请输入PIN1" allow-clear size="middle"
+                    :maxlength="8" />
                 </a-form-item>
               </a-col>
 
@@ -262,7 +270,8 @@
                   { pattern: /^\d{4,8}$/, message: 'PIN2只能由4至8位数字组成' },
                   { max: 8, message: 'PIN2最长8个字符' }
                 ]">
-                  <a-input v-model:value="formData.pin2" placeholder="请输入PIN2" allow-clear size="middle" :maxlength="8" />
+                  <a-input v-model:value="formData.pin2" placeholder="请输入PIN2" allow-clear size="middle"
+                    :maxlength="8" />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -274,7 +283,8 @@
                   { pattern: /^\d{4,8}$/, message: 'PUK1只能由4至8位数字组成' },
                   { max: 8, message: 'PUK1最长8个字符' }
                 ]">
-                  <a-input v-model:value="formData.puk1" placeholder="请输入PUK1" allow-clear size="middle" :maxlength="8" />
+                  <a-input v-model:value="formData.puk1" placeholder="请输入PUK1" allow-clear size="middle"
+                    :maxlength="8" />
                 </a-form-item>
               </a-col>
 
@@ -284,7 +294,8 @@
                   { pattern: /^\d{4,8}$/, message: 'PUK2只能由4至8位数字组成' },
                   { max: 8, message: 'PUK2最长8个字符' }
                 ]">
-                  <a-input v-model:value="formData.puk2" placeholder="请输入PUK2" allow-clear size="middle" :maxlength="8" />
+                  <a-input v-model:value="formData.puk2" placeholder="请输入PUK2" allow-clear size="middle"
+                    :maxlength="8" />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -315,7 +326,8 @@
                   { required: true, message: '请输入SMSP' },
                   { max: 32, message: 'SMSP最长32个字符' }
                 ]">
-                  <a-input v-model:value="formData.smsp" placeholder="请输入SMSP" allow-clear size="middle" :maxlength="32" />
+                  <a-input v-model:value="formData.smsp" placeholder="请输入SMSP" allow-clear size="middle"
+                    :maxlength="32" />
                 </a-form-item>
               </a-col>
 
@@ -324,7 +336,8 @@
                   { required: true, message: '请输入ADM1' },
                   { max: 32, message: 'ADM1最长32个字符' }
                 ]">
-                  <a-input v-model:value="formData.adm1" placeholder="请输入ADM1" allow-clear size="middle" :maxlength="32" />
+                  <a-input v-model:value="formData.adm1" placeholder="请输入ADM1" allow-clear size="middle"
+                    :maxlength="32" />
                 </a-form-item>
               </a-col>
             </a-row>
