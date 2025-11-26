@@ -83,8 +83,8 @@
               </a-col>
               <a-col :span="8">
                 <a-form-item label="确认码次数" name="confirmLimit">
-                  <a-input-number v-model:value="formData.confirmLimit" placeholder="请输入确认码次数" :min="0"
-                    allow-clear size="middle" style="width: 100%" />
+                  <a-input-number v-model:value="formData.confirmLimit" placeholder="请输入确认码次数" :min="0" allow-clear
+                    size="middle" style="width: 100%" />
                 </a-form-item>
               </a-col>
 
@@ -95,20 +95,20 @@
               <a-col :span="8">
                 <a-form-item label="下载方式" name="downloadMethod">
                   <a-select v-model:value="formData.downloadMethod" placeholder="请选择下载方式" allow-clear size="middle">
-                    <a-select-option value="default">默认SM-DP+</a-select-option>
+                    <a-select-option value="defaultMethod">默认SM-DP+</a-select-option>
                     <a-select-option value="activation">激活码</a-select-option>
-                    <a-select-option value="alt-smds">ALT-SM-DS</a-select-option>
-                    <a-select-option value="root-smds">ROOT-SM-DS</a-select-option>
+                    <a-select-option value="rootSmDs">ALT-SM-DS</a-select-option>
+                    <a-select-option value="altSmDs">ROOT-SM-DS</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
               <a-col :span="8">
                 <a-form-item label="重置规则" name="resetRule">
                   <a-select v-model:value="formData.resetRule" placeholder="请选择重置规则" allow-clear size="middle">
-                    <a-select-option value="no_reset">不可重置</a-select-option>
-                    <a-select-option value="resetable">可重置</a-select-option>
-                    <a-select-option value="auto_reset">自动重置</a-select-option>
-                    <a-select-option value="auto_recycle">自动回收</a-select-option>
+                    <a-select-option value="noReset">不可重置</a-select-option>
+                    <a-select-option value="resettable">可重置</a-select-option>
+                    <a-select-option value="autoReset">自动重置</a-select-option>
+                    <a-select-option value="autoRecycle">自动回收</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -161,8 +161,8 @@
                 <a-form-item label="DS标记" name="dsFlag">
                   <a-select v-model:value="formData.dsFlag" placeholder="请选择DS标记" allow-clear size="middle"
                     style="width: 100%">
-                    <a-select-option value="是">是</a-select-option>
-                    <a-select-option value="否">否</a-select-option>
+                    <a-select-option value="1">是</a-select-option>
+                    <a-select-option value="0">否</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>

@@ -2,19 +2,9 @@
   <div class="profile-manage-container">
     <!-- 搜索条件和操作按钮区域 - 合并到同一行 -->
     <div class="search-operation-area">
-      <a-form
-        layout="inline"
-        :model="searchForm"
-        @finish="handleSearch"
-        class="search-form"
-      >
+      <a-form layout="inline" :model="searchForm" @finish="handleSearch" class="search-form">
         <a-form-item label="查询类型" name="queryType">
-          <a-select
-            v-model:value="searchForm.queryType"
-            style="width: 120px"
-            placeholder="请选择查询类型"
-            allow-clear
-          >
+          <a-select v-model:value="searchForm.queryType" style="width: 120px" placeholder="请选择查询类型" allow-clear>
             <a-select-option value="all">全部数据</a-select-option>
             <a-select-option value="downloadable">可下载</a-select-option>
             <a-select-option value="resetable">可重置</a-select-option>
@@ -22,40 +12,21 @@
         </a-form-item>
 
         <a-form-item label="ICCID" name="iccid">
-          <a-input
-            v-model:value="searchForm.iccid"
-            placeholder="请输入20位16进制ICCID"
-            style="width: 200px"
-            allow-clear
-          />
+          <a-input v-model:value="searchForm.iccid" placeholder="请输入20位16进制ICCID" style="width: 200px" allow-clear />
         </a-form-item>
 
         <a-form-item label="MatchingId" name="matchingId">
-          <a-input
-            v-model:value="searchForm.matchingId"
-            placeholder="如：WTBIJ-EG8C0-C72NY-VNOPX"
-            style="width: 200px"
-            allow-clear
-          />
+          <a-input v-model:value="searchForm.matchingId" placeholder="如：WTBIJ-EG8C0-C72NY-VNOPX" style="width: 200px"
+            allow-clear />
         </a-form-item>
 
         <a-form-item label="EID" name="eid">
-          <a-input
-            v-model:value="searchForm.eid"
-            placeholder="请输入32位16进制EID"
-            style="width: 200px"
-            allow-clear
-          />
+          <a-input v-model:value="searchForm.eid" placeholder="请输入32位16进制EID" style="width: 200px" allow-clear />
         </a-form-item>
 
         <a-form-item label="Profile状态" name="profileState">
-          <a-select
-            v-model:value="searchForm.profileState"
-            style="width: 140px"
-            placeholder="请选择状态"
-            allow-clear
-          >
-            <a-select-option value="">全部</a-select-option>
+          <a-select v-model:value="searchForm.profileState" style="width: 140px" placeholder="请选择状态" allow-clear>
+
             <a-select-option value="Available">Available</a-select-option>
             <a-select-option value="Allocated">Allocated</a-select-option>
             <a-select-option value="Linked">Linked</a-select-option>
@@ -69,13 +40,8 @@
         </a-form-item>
 
         <a-form-item label="通知状态" name="localProfileState">
-          <a-select
-            v-model:value="searchForm.localProfileState"
-            style="width: 120px"
-            placeholder="请选择状态"
-            allow-clear
-          >
-            <a-select-option value="">全部</a-select-option>
+          <a-select v-model:value="searchForm.localProfileState" style="width: 120px" placeholder="请选择状态" allow-clear>
+
             <a-select-option value="Enabled">Enabled</a-select-option>
             <a-select-option value="Disabled">Disabled</a-select-option>
             <a-select-option value="Deleted">Deleted</a-select-option>
@@ -83,46 +49,24 @@
         </a-form-item>
 
         <a-form-item label="下载方式" name="downloadMethod">
-          <a-select
-            v-model:value="searchForm.downloadMethod"
-            style="width: 140px"
-            placeholder="请选择下载方式"
-            allow-clear
-          >
-            <a-select-option value="">全部</a-select-option>
-            <a-select-option value="default">默认SM-DP+</a-select-option>
+          <a-select v-model:value="searchForm.downloadMethod" style="width: 140px" placeholder="请选择下载方式" allow-clear>
+            <a-select-option value="defaultMethod">默认SM-DP+</a-select-option>
             <a-select-option value="activation">激活码</a-select-option>
-            <a-select-option value="alt-smds">ALT-SM-DS</a-select-option>
-            <a-select-option value="root-smds">ROOT-SM-DS</a-select-option>
+            <a-select-option value="rootSmDs">ALT-SM-DS</a-select-option>
+            <a-select-option value="altSmDs">ROOT-SM-DS</a-select-option>
           </a-select>
         </a-form-item>
 
         <a-form-item label="所属租户" name="tenant">
-          <a-input
-            v-model:value="searchForm.tenant"
-            placeholder="请输入租户"
-            style="width: 150px"
-            allow-clear
-          />
+          <a-input v-model:value="searchForm.tenant" placeholder="请输入租户" style="width: 150px" allow-clear />
         </a-form-item>
 
         <a-form-item label="运营商" name="carrier">
-          <a-input
-            v-model:value="searchForm.carrier"
-            placeholder="请输入运营商"
-            style="width: 150px"
-            allow-clear
-          />
+          <a-input v-model:value="searchForm.carrier" placeholder="请输入运营商" style="width: 150px" allow-clear />
         </a-form-item>
 
         <a-form-item label="Profile类" name="profileClass">
-          <a-select
-            v-model:value="searchForm.profileClass"
-            style="width: 120px"
-            placeholder="请选择Profile类"
-            allow-clear
-          >
-            <a-select-option value="">全部</a-select-option>
+          <a-select v-model:value="searchForm.profileClass" style="width: 120px" placeholder="请选择Profile类" allow-clear>
             <a-select-option value="test">test</a-select-option>
             <a-select-option value="provisioning">provisioning</a-select-option>
             <a-select-option value="operational">operational</a-select-option>
@@ -130,13 +74,7 @@
         </a-form-item>
 
         <a-form-item label="PPR策略" name="pprPolicy">
-          <a-select
-            v-model:value="searchForm.pprPolicy"
-            style="width: 120px"
-            placeholder="请选择PPR策略"
-            allow-clear
-          >
-            <a-select-option value="">全部</a-select-option>
+          <a-select v-model:value="searchForm.pprPolicy" style="width: 120px" placeholder="请选择PPR策略" allow-clear>
             <a-select-option value="PPR1">PPR1</a-select-option>
             <a-select-option value="PPR2">PPR2</a-select-option>
             <a-select-option value="PPR1,PPR2">PPR1、PPR2</a-select-option>
@@ -144,37 +82,22 @@
         </a-form-item>
 
         <a-form-item label="重置规则" name="resetRule">
-          <a-select
-            v-model:value="searchForm.resetRule"
-            style="width: 140px"
-            placeholder="请选择重置规则"
-            allow-clear
-          >
-            <a-select-option value="">全部</a-select-option>
-            <a-select-option value="no_reset">不可重置</a-select-option>
-            <a-select-option value="resetable">可重置</a-select-option>
-            <a-select-option value="auto_reset">自动重置</a-select-option>
-            <a-select-option value="auto_recycle">自动回收</a-select-option>
+          <a-select v-model:value="searchForm.resetRule" style="width: 140px" placeholder="请选择重置规则" allow-clear>
+            <a-select-option value="noReset">不可重置</a-select-option>
+            <a-select-option value="resettable">可重置</a-select-option>
+            <a-select-option value="autoReset">自动重置</a-select-option>
+            <a-select-option value="autoRecycle">自动回收</a-select-option>
           </a-select>
         </a-form-item>
 
         <a-form-item label="DS标记" name="dsFlag">
-          <a-input
-            v-model:value="searchForm.dsFlag"
-            placeholder="请输入DS标记"
-            style="width: 150px"
-            allow-clear
-          />
+          <a-select-option value="1">是</a-select-option>
+          <a-select-option value="0">否</a-select-option>
         </a-form-item>
 
         <a-form-item label="更新时间" name="updateTime">
-          <a-range-picker
-            v-model:value="searchForm.updateTime"
-            style="width: 240px"
-            show-time
-            format="YYYY-MM-DD HH:mm:ss"
-            value-format="YYYY-MM-DD HH:mm:ss"
-          />
+          <a-range-picker v-model:value="searchForm.updateTime" style="width: 240px" show-time
+            format="YYYY-MM-DD HH:mm:ss" value-format="YYYY-MM-DD HH:mm:ss" />
         </a-form-item>
 
         <a-form-item>
@@ -222,46 +145,35 @@
 
     <!-- 表格区域 -->
     <div class="table-area">
-      <a-table
-        :columns="columns"
-        :data-source="tableData"
-        :row-selection="rowSelection"
-        :pagination="paginationConfig"
-        :loading="loading"
-        size="small"
-        row-key="id"
-        :scroll="{ x: 1200 }"
-      >
+      <a-table :columns="columns" :data-source="tableData" :row-selection="rowSelection" :pagination="paginationConfig"
+        :loading="loading" size="small" row-key="id" :scroll="{ x: 1200 }">
         <template #bodyCell="{ column, record }">
           <template v-if="column.dataIndex === 'iccid'">
             <span :title="record.iccid">{{ record.iccid }}</span>
           </template>
-          
+
           <template v-else-if="column.dataIndex === 'matchingId'">
             <span :title="record.matchingId">{{ record.matchingId }}</span>
           </template>
-          
+
           <template v-else-if="column.dataIndex === 'eid'">
             <span :title="record.eid">{{ record.eid }}</span>
           </template>
-          
+
           <template v-else-if="column.dataIndex === 'profileState'">
-            <a-badge
-              :status="getProfileStatusColor(record.profileState)"
-              :text="record.profileState"
-            />
+            <a-badge :status="getProfileStatusColor(record.profileState)" :text="record.profileState" />
           </template>
-          
+
           <template v-else-if="column.dataIndex === 'localProfileState'">
             <a-tag :color="getNotificationStatusColor(record.localProfileState)">
               {{ record.localProfileState }}
             </a-tag>
           </template>
-          
+
           <template v-else-if="column.dataIndex === 'updateTime'">
             <span :title="record.updateTime">{{ record.updateTime }}</span>
           </template>
-          
+
           <template v-else-if="column.dataIndex === 'action'">
             <a-space>
               <a-button type="link" @click="showDetail(record)">详情</a-button>
@@ -306,10 +218,10 @@ export default defineComponent({
     const router = useRouter()
     const loading = ref(false)
     const selectedRowKeys = ref([])
-    
+
     // 创建http实例 (这里简化处理，假设不需要pinia实例)
     const httpInstance = new http(null, router, message, Modal)
-    
+
     const searchForm = reactive({
       queryType: 'all',
       iccid: '',
@@ -383,10 +295,10 @@ export default defineComponent({
         }),
         customRender: ({ text }) => {
           const downloadMethodMap = {
-            'default': '默认SM-DP+',
+            'defaultMethod': '默认SM-DP+',
             'activation': '激活码',
-            'alt-smds': 'ALT-SM-DS',
-            'root-smds': 'ROOT-SM-DS'
+            'altSmDs': 'ALT-SM-DS',
+            'rootSmDs': 'ROOT-SM-DS'
           }
           return downloadMethodMap[text] || text
         }
@@ -569,21 +481,21 @@ export default defineComponent({
             updateTime: searchForm.updateTime || undefined
           }
         }
-        
+
         // 过滤掉undefined的值
         Object.keys(requestData.query).forEach(key => {
           if (requestData.query[key] === undefined) {
             delete requestData.query[key]
           }
         })
-        
+
         // 调用指定的接口
         const response = await httpInstance.request({
           url: '/personkit/api/esim/profile/page',
           method: 'post',
           data: requestData
         })
-        
+
         // 更新表格数据
         if (response && response.data) {
           tableData.value = response.data
@@ -597,7 +509,7 @@ export default defineComponent({
           tableData.value = []
           paginationConfig.total = 0
         }
-        
+
         message.success('搜索完成')
       } catch (error) {
         console.error('搜索失败:', error)
@@ -774,36 +686,36 @@ export default defineComponent({
     })
 
     return {
-        loading,
-        searchForm,
-        columns,
-        tableData,
-        paginationConfig,
-        rowSelection,
-        selectedRowKeys,
-        getProfileStatusColor,
-        getNotificationStatusColor,
-        formatDateTime,
-        handleSearch,
-        handleReset,
-        handleAdd,
-        handleImport,
-        showImportHistory,
-        handleBatchDelete,
-        handleBatchReset,
-        handleBatchAssignTenant,
-        handleBatchReuse,
-        handleBatchExport,
-        showDetail,
-        handleEdit,
-        handleCopy,
-        handleDelete,
-        handleResetSingle,
-        handleAssignTenant,
-        handleReuse,
-        handleDownloadDer,
-        router
-      }
+      loading,
+      searchForm,
+      columns,
+      tableData,
+      paginationConfig,
+      rowSelection,
+      selectedRowKeys,
+      getProfileStatusColor,
+      getNotificationStatusColor,
+      formatDateTime,
+      handleSearch,
+      handleReset,
+      handleAdd,
+      handleImport,
+      showImportHistory,
+      handleBatchDelete,
+      handleBatchReset,
+      handleBatchAssignTenant,
+      handleBatchReuse,
+      handleBatchExport,
+      showDetail,
+      handleEdit,
+      handleCopy,
+      handleDelete,
+      handleResetSingle,
+      handleAssignTenant,
+      handleReuse,
+      handleDownloadDer,
+      router
+    }
   }
 })
 </script>
@@ -881,7 +793,7 @@ export default defineComponent({
   .search-form {
     gap: 6px;
   }
-  
+
   .search-form :deep(.ant-form-item) {
     margin-bottom: 6px;
     margin-right: 6px;
