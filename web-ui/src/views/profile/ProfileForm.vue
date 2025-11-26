@@ -257,6 +257,18 @@
                   </a-select>
                 </a-form-item>
               </a-col>
+              <a-col :span="8">
+                <a-form-item label="确认码次数" name="confirmationCodeCount">
+                  <a-input-number
+                    v-model:value="formData.confirmationCodeCount"
+                    placeholder="请输入确认码次数"
+                    :min="0"
+                    allow-clear
+                    size="small"
+                    style="width: 100%"
+                  />
+                </a-form-item>
+              </a-col>
             </a-row>
 
             <a-row :gutter="16"> </a-row>
@@ -862,6 +874,7 @@ export default defineComponent({
       pprPolicy: '',
       resetRule: '',
       dsFlag: '',
+      confirmationCodeCount: '',
       remark: '',
       // 新增基本信息字段
       confirmationCode: '',
