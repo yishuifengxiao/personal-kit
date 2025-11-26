@@ -550,7 +550,7 @@ export default defineComponent({
         // 构建请求参数，符合接口要求的格式
         const requestData = {
           size: paginationConfig.pageSize.toString(),
-          num: paginationConfig.current.toString(),
+          pageNum: paginationConfig.current.toString(),
           query: {
             id: searchForm.id || undefined,
             iccid: searchForm.iccid || undefined,

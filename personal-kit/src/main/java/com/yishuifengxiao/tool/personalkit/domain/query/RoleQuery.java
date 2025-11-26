@@ -1,6 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.domain.query;
 
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysRole;
 import lombok.Data;
 
 

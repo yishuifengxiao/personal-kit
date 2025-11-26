@@ -1,8 +1,6 @@
 package com.yishuifengxiao.tool.personalkit;
 
-import com.yishuifengxiao.tool.personalkit.dao.repository.SysUserRepository;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
-import org.springframework.data.domain.Example;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysUser;
 
 import java.util.function.Function;
 

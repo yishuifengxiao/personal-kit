@@ -5,8 +5,8 @@ import com.yishuifengxiao.common.security.httpsecurity.authorize.custom.CustomRe
 import com.yishuifengxiao.common.tool.collections.CollUtil;
 import com.yishuifengxiao.common.tool.utils.ValidateUtils;
 import com.yishuifengxiao.tool.personalkit.dao.SysUserDao;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysRole;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.enums.RoleStat;
 import com.yishuifengxiao.tool.personalkit.support.ContextCache;
 import jakarta.servlet.http.HttpServletRequest;

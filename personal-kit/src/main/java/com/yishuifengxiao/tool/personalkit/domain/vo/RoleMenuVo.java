@@ -1,6 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.domain.vo;
 
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysMenu;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

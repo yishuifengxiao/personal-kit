@@ -1,11 +1,8 @@
 package com.yishuifengxiao.tool.personalkit.dao.repository;
 
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
-import org.springframework.data.jpa.domain.Specification;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-
-import java.util.stream.Stream;
 
 /**
  * @author yishui

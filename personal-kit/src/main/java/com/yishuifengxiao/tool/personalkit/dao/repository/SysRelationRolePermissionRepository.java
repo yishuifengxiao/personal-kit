@@ -1,6 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.dao.repository;
 
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenuPermission;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysMenuPermission;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

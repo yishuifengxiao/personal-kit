@@ -2,7 +2,7 @@ package com.yishuifengxiao.tool.personalkit.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yishuifengxiao.common.security.token.SecurityToken;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -2,7 +2,7 @@ package com.yishuifengxiao.tool.personalkit.domain.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.yishuifengxiao.common.tool.entity.StringKeyValue;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysUser;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

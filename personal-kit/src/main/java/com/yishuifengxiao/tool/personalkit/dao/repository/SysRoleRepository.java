@@ -1,7 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.dao.repository;
 
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

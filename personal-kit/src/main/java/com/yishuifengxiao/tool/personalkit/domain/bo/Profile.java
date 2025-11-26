@@ -47,6 +47,7 @@ public class Profile {
     private String ki;
     private String opc;
     private String smsp;
+    private String asnTemplate;
     private V3Support v3Support;
 
     /**

@@ -150,7 +150,11 @@
                 </a-form-item>
               </a-col>
               <a-col :span="8">
-                <a-form-item label="运营商" name="carrier">
+                <a-form-item 
+                  label="运营商" 
+                  name="carrier"
+                  :rules="[{ required: true, message: '请选择运营商' }]"
+                >
                   <a-select
                     v-model:value="formData.carrier"
                     placeholder="请选择运营商"
@@ -356,7 +360,10 @@
                 <a-form-item
                   label="PIN1"
                   name="pin1"
-                  :rules="[{ required: true, message: '请输入PIN1' }]"
+                  :rules="[
+                    { required: true, message: '请输入PIN1' },
+                    { pattern: /^\d{4,8}$/, message: 'PIN1只能由4至8位数字组成' }
+                  ]"
                 >
                   <a-input
                     v-model:value="formData.pin1"
@@ -371,7 +378,10 @@
                 <a-form-item
                   label="PIN2"
                   name="pin2"
-                  :rules="[{ required: true, message: '请输入PIN2' }]"
+                  :rules="[
+                    { required: true, message: '请输入PIN2' },
+                    { pattern: /^\d{4,8}$/, message: 'PIN2只能由4至8位数字组成' }
+                  ]"
                 >
                   <a-input
                     v-model:value="formData.pin2"
@@ -388,7 +398,10 @@
                 <a-form-item
                   label="PUK1"
                   name="puk1"
-                  :rules="[{ required: true, message: '请输入PUK1' }]"
+                  :rules="[
+                    { required: true, message: '请输入PUK1' },
+                    { pattern: /^\d{4,8}$/, message: 'PUK1只能由4至8位数字组成' }
+                  ]"
                 >
                   <a-input
                     v-model:value="formData.puk1"
@@ -403,7 +416,10 @@
                 <a-form-item
                   label="PUK2"
                   name="puk2"
-                  :rules="[{ required: true, message: '请输入PUK2' }]"
+                  :rules="[
+                    { required: true, message: '请输入PUK2' },
+                    { pattern: /^\d{4,8}$/, message: 'PUK2只能由4至8位数字组成' }
+                  ]"
                 >
                   <a-input
                     v-model:value="formData.puk2"
@@ -420,7 +436,10 @@
                 <a-form-item
                   label="KI"
                   name="ki"
-                  :rules="[{ required: true, message: '请输入KI' }]"
+                  :rules="[
+                    { required: true, message: '请输入KI' },
+                    { pattern: /^[0-9a-fA-F]{32}$/, message: 'KI只能由32位16进制数组成' }
+                  ]"
                 >
                   <a-input
                     v-model:value="formData.ki"
@@ -432,7 +451,14 @@
               </a-col>
 
               <a-col :span="12">
-                <a-form-item label="OPC" name="opc">
+                <a-form-item 
+                  label="OPC" 
+                  name="opc"
+                  :rules="[
+                    { required: true, message: '请输入OPC' },
+                    { pattern: /^[0-9a-fA-F]{32}$/, message: 'OPC只能由32位16进制数组成' }
+                  ]"
+                >
                   <a-input
                     v-model:value="formData.opc"
                     placeholder="请输入OPC（可选）"
@@ -903,9 +929,9 @@ export default defineComponent({
             }
           }
         })
-        // 按照接口实际响应格式处理数据
+        // 按照接口实际响应格式处理数据，将id转换为字符串类型以匹配详情接口返回的格式
         asnTemplates.value = response.data.map((item) => ({
-          value: item.id,
+          value: String(item.id),
           label: item.tempName
         }))
       } catch (error) {
@@ -1013,7 +1039,7 @@ export default defineComponent({
           method: 'post',
           data: { id: id }
         })
-        // 直接返回响应数据
+        // 返回响应数据，确保类型一致性
         return response
       } catch (error) {
         console.error('获取Profile详情失败:', error)

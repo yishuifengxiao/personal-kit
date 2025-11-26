@@ -1,6 +1,6 @@
 package com.yishuifengxiao.tool.personalkit.domain.vo;
 
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysSecurityRecord;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysSecurityRecord;
 import lombok.Data;
 
 /**

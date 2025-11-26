@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit;
 
 import com.yishuifengxiao.common.jdbc.JdbcHelper;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysUser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

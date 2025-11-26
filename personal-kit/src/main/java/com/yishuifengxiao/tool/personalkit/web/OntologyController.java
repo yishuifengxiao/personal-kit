@@ -5,7 +5,7 @@ import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.Ontology;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
-import com.yishuifengxiao.tool.personalkit.service.OntologyService;
+import com.yishuifengxiao.tool.personalkit.service.graph.OntologyService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

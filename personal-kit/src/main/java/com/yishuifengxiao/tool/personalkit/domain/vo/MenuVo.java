@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.domain.vo;
 
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysMenu;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysPermission;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysMenu;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysPermission;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.dao;
 
 import com.yishuifengxiao.common.jdbc.JdbcUtil;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

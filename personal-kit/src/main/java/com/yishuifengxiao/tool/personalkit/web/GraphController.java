@@ -6,7 +6,7 @@ import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.mongo.GraphDefine;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.domain.vo.GraphDefineVo;
-import com.yishuifengxiao.tool.personalkit.service.GraphService;
+import com.yishuifengxiao.tool.personalkit.service.graph.GraphService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

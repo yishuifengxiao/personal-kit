@@ -10,7 +10,7 @@ import com.yishuifengxiao.common.tool.exception.CustomException;
 import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.query.LoginQuery;
 import com.yishuifengxiao.tool.personalkit.domain.vo.CurrentUser;
-import com.yishuifengxiao.tool.personalkit.service.UserService;
+import com.yishuifengxiao.tool.personalkit.service.sys.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;

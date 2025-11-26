@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.domain.vo;
 
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysRole;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysRole;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysUser;
 import jakarta.validation.Valid;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;

@@ -2,7 +2,7 @@ package com.yishuifengxiao.tool.personalkit;
 
 import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.random.IdWorker;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.vo.CurrentUser;
 
 import java.time.LocalDateTime;

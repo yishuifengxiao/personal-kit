@@ -1,7 +1,7 @@
 package com.yishuifengxiao.tool.personalkit.listener.event;
 
 import com.yishuifengxiao.tool.personalkit.domain.entity.DiskFile;
-import com.yishuifengxiao.tool.personalkit.domain.entity.SysUser;
+import com.yishuifengxiao.tool.personalkit.domain.entity.sys.SysUser;
 import com.yishuifengxiao.tool.personalkit.domain.entity.UploadRecord;
 import com.yishuifengxiao.tool.personalkit.domain.enums.UploadMode;
 import lombok.AllArgsConstructor;
