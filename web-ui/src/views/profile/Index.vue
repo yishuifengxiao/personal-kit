@@ -510,7 +510,7 @@ export default defineComponent({
           paginationConfig.total = 0
         }
 
-        message.success('搜索完成')
+        // message.success('搜索完成')
       } catch (error) {
         console.error('搜索失败:', error)
         message.error('搜索失败，请重试')
@@ -555,7 +555,7 @@ export default defineComponent({
       message.info('导入记录功能开发中...')
     }
 
-    const handleBatchDelete = () => {
+    const handleBatchDelete = async () => {
       if (selectedRowKeys.value.length === 0) {
         message.warning('请选择要删除的数据')
         return
@@ -563,9 +563,21 @@ export default defineComponent({
       Modal.confirm({
         title: '确认批量删除',
         content: `确定要删除选中的 ${selectedRowKeys.value.length} 条数据吗？`,
-        onOk() {
-          message.success('批量删除成功！')
-          selectedRowKeys.value = []
+        async onOk() {
+          try {
+            const response = await httpInstance.request({
+              url: '/personkit/api/esim/profile/deletes',
+              method: 'post',
+              data: { ids: selectedRowKeys.value }
+            })
+            message.success('批量删除成功！')
+            selectedRowKeys.value = []
+            // 重新加载数据
+            handleSearch()
+          } catch (error) {
+            console.error('批量删除失败:', error)
+            message.error('批量删除失败，请重试')
+          }
         },
         onCancel() {
           console.log('取消批量删除')
@@ -633,12 +645,24 @@ export default defineComponent({
       message.info(`复制: ${record.iccid}`)
     }
 
-    const handleDelete = (record) => {
+    const handleDelete = async (record) => {
       Modal.confirm({
         title: '确认删除',
         content: `确定要删除ICCID为 ${record.iccid} 的Profile吗？`,
-        onOk() {
-          message.success('删除成功！')
+        async onOk() {
+          try {
+            const response = await httpInstance.request({
+              url: '/personkit/api/esim/profile/deletes',
+              method: 'post',
+              data: { ids: [record.id] }
+            })
+            message.success('删除成功！')
+            // 重新加载数据
+            handleSearch()
+          } catch (error) {
+            console.error('删除失败:', error)
+            message.error('删除失败，请重试')
+          }
         },
         onCancel() {
           console.log('取消删除')

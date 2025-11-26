@@ -6,6 +6,7 @@ import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.bo.Profile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.esim.EsimProfile;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
+import com.yishuifengxiao.tool.personalkit.domain.request.IdsReq;
 import com.yishuifengxiao.tool.personalkit.service.esim.EsimProfileService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -48,10 +49,10 @@ public class EsimProfileController {
         esimProfileService.update(param);
     }
 
-    @PostMapping("/delete")
+    @PostMapping("/deletes")
     @ResponseBody
-    public void delete(@Valid @RequestBody IdReq param) {
-        esimProfileService.deleteById(Long.valueOf(param.getId()));
+    public void delete(@Valid @RequestBody IdsReq req) {
+        esimProfileService.deleteByIds(req.getIds());
     }
 
     @PostMapping("/detail")

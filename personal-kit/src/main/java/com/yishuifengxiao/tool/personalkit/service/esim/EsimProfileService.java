@@ -8,6 +8,8 @@ import com.yishuifengxiao.tool.personalkit.domain.bo.Profile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.esim.EsimProfile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.esim.EsimProfileDetail;
 import com.yishuifengxiao.tool.personalkit.domain.enums.esim.ProfileState;
+import jakarta.validation.Valid;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
@@ -62,27 +64,28 @@ public class EsimProfileService {
     }
 
     /**
-     * 生成全局唯一的matchId，格式为2C9B-BF19-4573-8ED2
+     * 生成全局唯一的matchId，格式为WTBIJ-EG8C0-C72NY-VNOPX
      *
      * @return 唯一的matchId
      */
     private String generateUniqueMatchId() {
         String matchId;
         do {
-            // 生成格式为 XXXX-XXXX-XXXX-XXXX 的唯一ID
+            // 生成格式为 XXXXX-XXXXX-XXXXX-XXXXX 的唯一ID
             UUID uuid = UUID.randomUUID();
             String uuidStr = uuid.toString().toUpperCase().replace("-", "");
 
-            // 取前16位转换为4组4位的格式
+            // 使用前20位转换为4组5位的格式
             matchId = String.format("%s-%s-%s-%s",
-                    uuidStr.substring(0, 4),
-                    uuidStr.substring(4, 8),
-                    uuidStr.substring(8, 12),
-                    uuidStr.substring(12, 16));
+                    uuidStr.substring(0, 5),
+                    uuidStr.substring(5, 10),
+                    uuidStr.substring(10, 15),
+                    uuidStr.substring(15, 20));
         } while (isMatchIdExists(matchId)); // 检查是否已存在，如果存在则重新生成
 
         return matchId;
     }
+
 
     /**
      * 检查matchId是否已经存在
@@ -254,5 +257,13 @@ public class EsimProfileService {
 
     public Page<EsimProfile> findPage(PageQuery<EsimProfile> pageQuery) {
         return JdbcUtil.jdbcHelper().findPage(pageQuery, true);
+    }
+
+    public void deleteByIds(@Valid List<Long> ids) {
+        String deleteDetailSql = "delete from esim_profile_detail where profile_id in (:ids)";
+
+        String sql = "delete from esim_profile where id in (:ids)";
+        JdbcUtil.jdbcHelper().namedParameterJdbcTemplate().update(deleteDetailSql, new MapSqlParameterSource("ids", ids));
+        JdbcUtil.jdbcHelper().namedParameterJdbcTemplate().update(sql, new MapSqlParameterSource("ids", ids));
     }
 }
