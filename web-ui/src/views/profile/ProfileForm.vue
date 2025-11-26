@@ -526,7 +526,7 @@ export default defineComponent({
       matchingId: '',
       profileState: '',
       eid: '',
-      notificationStatus: '',
+      localProfileState: '',
       downloadMethod: '',
       tenant: '',
       carrier: '',

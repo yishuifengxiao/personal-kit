@@ -22,7 +22,7 @@ public class Profile {
     private String profileState;
 
     private String eid;
-    private String notificationStatus;
+    private String localProfileState;
     private String downloadMethod;
     private String tenant;
     private String carrier;

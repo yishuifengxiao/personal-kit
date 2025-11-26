@@ -8,7 +8,7 @@ public class ProfileForm {
     private String matchingId;
     private String profileState;
     private String eid;
-    private String notificationStatus;
+    private String localProfileState;
     private String downloadMethod;
     private String tenant;
     private String carrier;
@@ -70,11 +70,11 @@ public class ProfileForm {
     }
 
     public String getNotificationStatus() {
-        return notificationStatus;
+        return localProfileState;
     }
 
-    public void setNotificationStatus(String notificationStatus) {
-        this.notificationStatus = notificationStatus;
+    public void setNotificationStatus(String localProfileState) {
+        this.localProfileState = localProfileState;
     }
 
     public String getDownloadMethod() {
@@ -292,7 +292,7 @@ public class ProfileForm {
                 + ", matchingId='" + matchingId + '\''
                 + ", profileState='" + profileState + '\''
                 + ", eid='" + eid + '\''
-                + ", notificationStatus='" + notificationStatus + '\''
+                + ", localProfileState='" + localProfileState + '\''
                 + ", downloadMethod='" + downloadMethod + '\''
                 + ", tenant='" + tenant + '\''
                 + ", carrier='" + carrier + '\''

@@ -68,9 +68,9 @@
           </a-select>
         </a-form-item>
 
-        <a-form-item label="通知状态" name="notificationStatus">
+        <a-form-item label="通知状态" name="localProfileState">
           <a-select
-            v-model:value="searchForm.notificationStatus"
+            v-model:value="searchForm.localProfileState"
             style="width: 120px"
             placeholder="请选择状态"
             allow-clear
@@ -252,9 +252,9 @@
             />
           </template>
           
-          <template v-else-if="column.dataIndex === 'notificationStatus'">
-            <a-tag :color="getNotificationStatusColor(record.notificationStatus)">
-              {{ record.notificationStatus }}
+          <template v-else-if="column.dataIndex === 'localProfileState'">
+            <a-tag :color="getNotificationStatusColor(record.localProfileState)">
+              {{ record.localProfileState }}
             </a-tag>
           </template>
           
@@ -316,7 +316,7 @@ export default defineComponent({
       matchingId: '',
       profileState: '',
       eid: '',
-      notificationStatus: '',
+      localProfileState: '',
       downloadMethod: '',
       tenant: '',
       carrier: '',
@@ -368,7 +368,7 @@ export default defineComponent({
       },
       {
         title: '通知状态',
-        dataIndex: 'notificationStatus',
+        dataIndex: 'localProfileState',
         width: 100,
         customCell: () => ({
           title: '通知功能的启用状态，包括Enabled、Disabled、Deleted'
@@ -558,7 +558,7 @@ export default defineComponent({
             eid: searchForm.eid || undefined,
             // 根据需要添加其他查询参数
             profileState: searchForm.profileState || undefined,
-            notificationStatus: searchForm.notificationStatus || undefined,
+            localProfileState: searchForm.localProfileState || undefined,
             downloadMethod: searchForm.downloadMethod || undefined,
             tenant: searchForm.tenant || undefined,
             carrier: searchForm.carrier || undefined,
@@ -616,7 +616,7 @@ export default defineComponent({
         matchingId: '',
         profileState: '',
         eid: '',
-        notificationStatus: '',
+        localProfileState: '',
         downloadMethod: '',
         tenant: '',
         carrier: '',

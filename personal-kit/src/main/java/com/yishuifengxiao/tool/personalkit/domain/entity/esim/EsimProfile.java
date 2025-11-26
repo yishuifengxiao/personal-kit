@@ -59,8 +59,8 @@ public class EsimProfile implements Serializable {
     /**
      * 通知状态：Enabled, Disabled, Deleted
      */
-    @Column(name = "notification_status", length = 20, columnDefinition = "VARCHAR(20) DEFAULT 'Enabled' COMMENT '通知状态：Enabled, Disabled, Deleted'")
-    private String notificationStatus;
+    @Column(name = "local_profile_state", length = 20, columnDefinition = "VARCHAR(20) DEFAULT 'Enabled' COMMENT '通知状态：Enabled, Disabled, Deleted'")
+    private String localProfileState;
 
     /**
      * 下载方式：1-标准下载, 2-快速下载, 3-批量下载, default-默认SM-DP+, activation-激活码, alt-smds-ALT-SM-DS, root-smds-ROOT-SM-DS
