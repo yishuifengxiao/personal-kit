@@ -25,9 +25,8 @@
         </div>
         <div class="info-item">
           <span class="info-label">EID：</span>
-          <a-input  v-model:value="formData.eid" placeholder="请输入32位16进制EID" :maxlength="32"
-            style="width: 200px" size="middle" />
-    
+          <a-input v-model:value="formData.eid" placeholder="请输入32位16进制EID" :maxlength="32" style="width: 200px"
+            size="middle" />
         </div>
 
         <div class="info-item">
@@ -49,8 +48,6 @@
             <a-select-option value="系统租户">系统租户</a-select-option>
           </a-select>
         </div>
-
-
       </div>
     </div>
 
@@ -78,9 +75,7 @@
               </a-col>
               <!-- 第一行：确认码、电话号码、Profile图标 -->
               <a-col :span="8">
-                <a-form-item label="确认码" name="confirmationCode" :rules="[
-                  { max: 8, message: '确认码最长8个字符' }
-                ]">
+                <a-form-item label="确认码" name="confirmationCode" :rules="[{ max: 8, message: '确认码最长8个字符' }]">
                   <a-input v-model:value="formData.confirmationCode" placeholder="请输入确认码" allow-clear size="middle"
                     :maxlength="8" />
                 </a-form-item>
@@ -91,7 +86,6 @@
                     size="middle" style="width: 100%" />
                 </a-form-item>
               </a-col>
-
             </a-row>
 
             <a-row :gutter="16">
@@ -131,18 +125,14 @@
             <a-row :gutter="16">
               <!-- 第三行：服务提供商、通知事件、通知地址 -->
               <a-col :span="8">
-                <a-form-item label="服务提供商" name="serviceProvider" :rules="[
-                  { max: 50, message: '服务提供商最长50个字符' }
-                ]">
+                <a-form-item label="服务提供商" name="serviceProvider" :rules="[{ max: 50, message: '服务提供商最长50个字符' }]">
                   <a-input v-model:value="formData.serviceProvider" placeholder="请输入服务提供商" allow-clear size="middle"
                     :maxlength="50" />
                 </a-form-item>
               </a-col>
 
               <a-col :span="8">
-                <a-form-item label="Profile名称" name="profileName" :rules="[
-                  { max: 50, message: 'Profile名称最长50个字符' }
-                ]">
+                <a-form-item label="Profile名称" name="profileName" :rules="[{ max: 50, message: 'Profile名称最长50个字符' }]">
                   <a-input v-model:value="formData.profileName" placeholder="请输入Profile名称" allow-clear size="middle"
                     :maxlength="50" />
                 </a-form-item>
@@ -152,7 +142,6 @@
                   <a-input v-model:value="formData.profileIcon" placeholder="请输入Profile图标" allow-clear size="middle" />
                 </a-form-item>
               </a-col>
-
             </a-row>
 
             <a-row :gutter="16">
@@ -178,9 +167,7 @@
               </a-col>
 
               <a-col :span="8">
-                <a-form-item label="电话号码" name="phoneNumber" :rules="[
-                  { max: 20, message: '电话号码最长20个字符' }
-                ]">
+                <a-form-item label="电话号码" name="phoneNumber" :rules="[{ max: 20, message: '电话号码最长20个字符' }]">
                   <a-input v-model:value="formData.phoneNumber" placeholder="请输入电话号码" allow-clear size="middle"
                     :maxlength="20" />
                 </a-form-item>
@@ -194,8 +181,8 @@
               <a-col :span="12">
                 <a-form-item label="通知事件" name="notificationEvent">
                   <a-tooltip :title="formData.notificationEvent && formData.notificationEvent.length > 0
-                    ? formData.notificationEvent.join(', ')
-                    : '暂无选择'
+                      ? formData.notificationEvent.join(', ')
+                      : '暂无选择'
                     " placement="top">
                     <a-select v-model:value="formData.notificationEvent" mode="multiple" placeholder="请选择通知事件"
                       allow-clear :maxTagCount="2" :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
@@ -217,10 +204,9 @@
                 <a-form-item label="通知地址" name="notificationAddress" :rules="[{ required: true, message: '请选择通知地址' }]">
                   <a-select v-model:value="formData.notificationAddress" placeholder="请选择通知地址" allow-clear
                     size="middle">
-                    <a-select-option value="http://localhost:8080/notification">本地通知地址</a-select-option>
-                    <a-select-option value="http://api.example.com/notify">示例API地址</a-select-option>
-                    <a-select-option value="https://notify.service.com/callback">生产通知地址</a-select-option>
-                    <a-select-option value="http://test.notify.com/webhook">测试通知地址</a-select-option>
+                    <a-select-option v-for="addr in notifyAddresses" :key="addr.value" :value="addr.value">
+                      {{ addr.label }}
+                    </a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -351,8 +337,8 @@
         <div class="v3-features-section">
           <a-form-item label="v3功能支持" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
             <a-tooltip :title="formData.v3Support.features && formData.v3Support.features.length > 0
-              ? formData.v3Support.features.join(', ')
-              : '暂无选择'
+                ? formData.v3Support.features.join(', ')
+                : '暂无选择'
               " placement="top">
               <a-select v-model:value="formData.v3Support.features" mode="multiple" placeholder="请选择功能" allow-clear
                 style="width: 100%" size="middle">
@@ -368,65 +354,36 @@
         <div class="rpm-config-section"
           v-if="formData.v3Support.features && formData.v3Support.features.includes('rpmData')">
           <a-divider dashed orientation="center">RPM数据配置</a-divider>
-          <a-row :gutter="16">
-            <a-col :span="12">
-              <a-form-item label="RPM类型" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-                <a-tooltip :title="formData.rpmType && formData.rpmType.length > 0
-                  ? formData.rpmType.join(', ')
-                  : '暂无选择'
-                  " placement="top">
-                  <a-select v-model:value="formData.v3Support.rpmConfig.rpmType" mode="multiple" placeholder="请选择RPM类型"
-                    allow-clear style="width: 100%" :maxTagCount="2"
-                    :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`" size="middle">
-                    <a-select-option value="Enable">Enable</a-select-option>
-                    <a-select-option value="Disable">Disable</a-select-option>
-                    <a-select-option value="Delete">Delete</a-select-option>
-                    <a-select-option value="ListProfileInfo">ListProfileInfo</a-select-option>
-                    <a-select-option value="ContactPcmp">ContactPcmp</a-select-option>
-                  </a-select>
-                </a-tooltip>
-              </a-form-item>
-            </a-col>
-            <a-col :span="12">
-              <a-form-item label="RPM下载方式" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-                <a-select v-model:value="formData.v3Support.rpmConfig.rpmDownloadMethod" placeholder="请选择RPM下载方式"
-                  allow-clear style="width: 100%" size="middle">
-                  <a-select-option value="SMDP">SM-DP+</a-select-option>
-                  <a-select-option value="SMDS">SM-DS</a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
-          </a-row>
-
-          <a-row :gutter="16">
-            <a-col :span="12">
-              <a-form-item label="允许的CA" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-                <a-select v-model:value="formData.v3Support.rpmConfig.allowedCA" placeholder="请选择允许的CA" allow-clear
-                  style="width: 100%" size="middle">
-                  <a-select-option value="CA1">CA1</a-select-option>
-                  <a-select-option value="CA2">CA2</a-select-option>
-                  <a-select-option value="CA3">CA3</a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
-            <a-col :span="12" v-if="formData.v3Support.rpmConfig.rpmDownloadMethod">
-              <a-form-item label="RPM轮询地址" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-                <a-select v-model:value="formData.v3Support.rpmConfig.rpmPollingAddress" placeholder="请选择RPM轮询地址"
-                  allow-clear style="width: 100%" size="middle">
-                  <a-select-option value="https://api.example.com/rpm1">https://api.example.com/rpm1</a-select-option>
-                  <a-select-option value="https://api.example.com/rpm2">https://api.example.com/rpm2</a-select-option>
-                  <a-select-option value="https://api.example.com/rpm3">https://api.example.com/rpm3</a-select-option>
-                  <a-select-option value="custom">自定义地址</a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
-          </a-row>
+          <a-form-item label="RPM类型" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
+            <a-tooltip :title="formData.rpmType && formData.rpmType.length > 0
+                ? formData.rpmType.join(', ')
+                : '暂无选择'
+              " placement="top">
+              <a-select v-model:value="formData.v3Support.rpmConfig.rpmType" mode="multiple" placeholder="请选择RPM类型"
+                allow-clear style="width: 100%" :maxTagCount="2"
+                :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`" size="middle">
+                <a-select-option value="Enable">Enable</a-select-option>
+                <a-select-option value="Disable">Disable</a-select-option>
+                <a-select-option value="Delete">Delete</a-select-option>
+                <a-select-option value="ListProfileInfo">ListProfileInfo</a-select-option>
+                <a-select-option value="ContactPcmp">ContactPcmp</a-select-option>
+              </a-select>
+            </a-tooltip>
+          </a-form-item>
+          <a-form-item label="RPM轮询地址" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
+            <a-select v-model:value="formData.v3Support.rpmConfig.rpmPollingAddress" placeholder="请选择RPM轮询地址"
+              allow-clear style="width: 100%" size="middle">
+              <a-select-option v-for="addr in rpmPollingAddresses" :key="addr.value" :value="addr.value">
+                {{ addr.label }}
+              </a-select-option>
+            </a-select>
+          </a-form-item>
 
           <!-- 允许的Tags -->
           <a-form-item label="允许的Tags" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
             <a-tooltip :title="formData.allowedTags && formData.allowedTags.length > 0
-              ? formData.allowedTags.join(', ')
-              : '暂无选择'
+                ? formData.allowedTags.join(', ')
+                : '暂无选择'
               " placement="top">
               <a-select v-model:value="formData.v3Support.rpmConfig.allowedTags" mode="multiple"
                 placeholder="请选择允许的Tags" allow-clear style="width: 100%" :maxTagCount="3"
@@ -447,6 +404,27 @@
               </a-select>
             </a-tooltip>
           </a-form-item>
+          <a-row :gutter="16">
+            <a-col :span="12"> <a-form-item label="允许的CA" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-select v-model:value="formData.v3Support.rpmConfig.allowedCA" placeholder="请选择允许的CA" allow-clear
+                  style="width: 100%" size="middle">
+                  <a-select-option value="CA1">CA1</a-select-option>
+                  <a-select-option value="CA2">CA2</a-select-option>
+                  <a-select-option value="CA3">CA3</a-select-option>
+                </a-select>
+              </a-form-item></a-col>
+            <a-col :span="12">
+              <a-form-item label="RPM下载方式" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-select v-model:value="formData.v3Support.rpmConfig.rpmDownloadMethod" placeholder="请选择RPM下载方式"
+                  allow-clear style="width: 100%" size="middle">
+                  <a-select-option value="SMDP">SM-DP+</a-select-option>
+                  <a-select-option value="SMDS">SM-DS</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+          </a-row>
+
+
         </div>
 
         <!-- 设备切换数据 -->
@@ -526,8 +504,8 @@
           <!-- 规则 -->
           <a-form-item label="规则" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
             <a-tooltip :title="formData.enterpriseRules && formData.enterpriseRules.length > 0
-              ? formData.enterpriseRules.join(', ')
-              : '暂无选择'
+                ? formData.enterpriseRules.join(', ')
+                : '暂无选择'
               " placement="top">
               <a-select v-model:value="formData.v3Support.enterprise.enterpriseRules" mode="multiple"
                 placeholder="请选择规则" allow-clear style="width: 100%">
@@ -624,6 +602,8 @@ export default defineComponent({
     // 下拉选项数据
     const asnTemplates = ref([]) // ASN模板列表
     const carriers = ref([]) // 运营商列表
+    const notifyAddresses = ref([]) // 通知地址列表
+    const rpmPollingAddresses = ref([]) // RPM轮询地址列表
 
     // 获取ASN模板数据
     const fetchAsnTemplates = async () => {
@@ -677,6 +657,30 @@ export default defineComponent({
       }
     }
 
+    // 获取配置数据（通知地址和RPM轮询地址）
+    const fetchConfigData = async () => {
+      try {
+        const response = await $http.request({
+          url: '/personkit/api/esim/config/all',
+          method: 'post'
+        })
+
+        // 处理通知地址数据
+        if (response.notifyAddrs && Array.isArray(response.notifyAddrs)) {
+          notifyAddresses.value = response.notifyAddrs.map((item) => ({
+            value: item.url,
+            label: item.name
+          }))
+
+          // 将相同的数据也用于RPM轮询地址
+          rpmPollingAddresses.value = [...notifyAddresses.value]
+        }
+      } catch (error) {
+        console.error('获取配置数据失败:', error)
+        message.error('获取配置数据失败')
+      }
+    }
+
     // 计算属性：是否为新增模式
     const isAdd = computed(() => pageType.value === 'add')
 
@@ -692,8 +696,6 @@ export default defineComponent({
           return 'Profile管理'
       }
     })
-
-
 
     // 获取Profile状态对应的颜色
     const getProfileStatusColor = (status) => {
@@ -851,16 +853,15 @@ export default defineComponent({
       router.push('/view/profile_manage')
     }
 
-
-
     onMounted(() => {
       const { type, id } = route.query
       // 移除详情模式，所有情况都使用编辑模式
-      pageType.value = (type === 'view') ? 'edit' : (type || 'add')
+      pageType.value = type === 'view' ? 'edit' : type || 'add'
       recordId.value = id || ''
       // 加载下拉数据
       fetchAsnTemplates()
       fetchCarriers()
+      fetchConfigData() // 加载配置数据
       // 加载详情数据
       loadDetail()
     })
@@ -872,6 +873,8 @@ export default defineComponent({
       isAdd,
       asnTemplates,
       carriers,
+      notifyAddresses,
+      rpmPollingAddresses,
       getProfileStatusColor,
       getNotificationStatusStatus,
       getDownloadMethodText,
