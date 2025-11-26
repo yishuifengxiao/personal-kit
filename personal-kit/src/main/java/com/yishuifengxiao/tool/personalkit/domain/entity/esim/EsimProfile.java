@@ -244,4 +244,6 @@ public class EsimProfile implements Serializable {
     @Column(name = "update_time", columnDefinition = "DATETIME COMMENT '更新时间'")
     private LocalDateTime updateTime;
 
+    @Column(name = "confirm_limit", columnDefinition = "INT COMMENT '确认限制'")
+    private Integer confirmLimit;
 }

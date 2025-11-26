@@ -15,68 +15,41 @@
       <div class="info-content">
         <div class="info-item">
           <span class="info-label">ICCID：</span>
-          <a-input
-            v-if="isAdd"
-            v-model:value="formData.iccid"
-            placeholder="请输入20位16进制ICCID"
-            :maxlength="20"
-            style="width: 200px"
-            size="small"
-          />
+          <a-input v-if="isAdd" v-model:value="formData.iccid" placeholder="请输入20位16进制ICCID" :maxlength="20"
+            style="width: 200px" size="middle" />
           <span v-else class="info-value">{{ formData.iccid }}</span>
         </div>
         <div class="info-item">
           <span class="info-label">EID：</span>
-          <a-input
-            v-if="isAdd"
-            v-model:value="formData.eid"
-            placeholder="请输入32位16进制EID"
-            :maxlength="32"
-            style="width: 200px"
-            size="small"
-          />
+          <a-input v-if="isAdd" v-model:value="formData.eid" placeholder="请输入32位16进制EID" :maxlength="32"
+            style="width: 200px" size="middle" />
           <span v-else class="info-value">{{ formData.eid }}</span>
         </div>
-
+        <div class="info-item" v-if="!isAdd">
+          <span class="info-label">MatchingId：</span>
+          <span class="info-value">{{ formData.matchingId }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">ASN模版：</span>
+          <a-select v-model:value="formData.asnTemplate" placeholder="请选择ASN模版" allow-clear style="width: 200px"
+            :rules="[{ required: true, message: '请选择ASN模版' }]" size="middle">
+            <a-select-option v-for="template in asnTemplates" :key="template.value" :value="template.value">
+              {{ template.label }}
+            </a-select-option>
+          </a-select>
+        </div>
         <div class="info-item">
           <span class="info-label">所属租户：</span>
-          <a-select
-            v-model:value="formData.tenant"
-            placeholder="请选择租户"
-            allow-clear
-            style="width: 200px"
-            :rules="[{ required: true, message: '请选择所属租户' }]"
-            size="small"
-          >
+          <a-select v-model:value="formData.tenant" placeholder="请选择租户" allow-clear style="width: 200px"
+            :rules="[{ required: true, message: '请选择所属租户' }]" size="middle">
             <a-select-option value="租户A">租户A</a-select-option>
             <a-select-option value="租户B">租户B</a-select-option>
             <a-select-option value="租户C">租户C</a-select-option>
             <a-select-option value="系统租户">系统租户</a-select-option>
           </a-select>
         </div>
-        <div class="info-item">
-          <span class="info-label">ASN模版：</span>
-          <a-select
-            v-model:value="formData.asnTemplate"
-            placeholder="请选择ASN模版"
-            allow-clear
-            style="width: 200px"
-            :rules="[{ required: true, message: '请选择ASN模版' }]"
-            size="small"
-          >
-            <a-select-option
-              v-for="template in asnTemplates"
-              :key="template.value"
-              :value="template.value"
-            >
-              {{ template.label }}
-            </a-select-option>
-          </a-select>
-        </div>
-        <div class="info-item" v-if="!isAdd">
-          <span class="info-label">MatchingId：</span>
-          <span class="info-value">{{ formData.matchingId }}</span>
-        </div>
+
+
       </div>
     </div>
 
@@ -89,59 +62,39 @@
             <h3>基本信息</h3>
           </div>
 
-          <a-form
-            ref="formRef"
-            :model="formData"
-            :label-col="{ span: 6 }"
-            :wrapper-col="{ span: 16 }"
-
-            @finish="handleSubmit"
-          >
+          <a-form ref="formRef" :model="formData" :label-col="{ span: 6 }" :wrapper-col="{ span: 16 }"
+            @finish="handleSubmit">
             <!-- 三列布局区域 - 严格按照要求包含13个字段 -->
             <a-row :gutter="16">
+              <a-col :span="8">
+                <a-form-item label="运营商" name="carrier" :rules="[{ required: true, message: '请选择运营商' }]">
+                  <a-select v-model:value="formData.carrier" placeholder="请选择运营商" allow-clear size="middle">
+                    <a-select-option v-for="carrier in carriers" :key="carrier.value" :value="carrier.value">
+                      {{ carrier.label }}
+                    </a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
               <!-- 第一行：确认码、电话号码、Profile图标 -->
               <a-col :span="8">
                 <a-form-item label="确认码" name="confirmationCode">
-                  <a-input
-                    v-model:value="formData.confirmationCode"
-                    placeholder="请输入确认码"
-                    allow-clear
-                    size="small"
-                  />
+                  <a-input v-model:value="formData.confirmationCode" placeholder="请输入确认码" allow-clear size="middle" />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
-                <a-form-item label="电话号码" name="phoneNumber">
-                  <a-input
-                    v-model:value="formData.phoneNumber"
-                    placeholder="请输入电话号码"
-                    allow-clear
-                    size="small"
-                  />
+                <a-form-item label="确认码次数" name="confirmLimit">
+                  <a-input-number v-model:value="formData.confirmLimit" placeholder="请输入确认码次数" :min="0"
+                    allow-clear size="middle" style="width: 100%" />
                 </a-form-item>
               </a-col>
-              <a-col :span="8">
-                <a-form-item label="Profile图标" name="profileIcon">
-                  <a-input
-                    v-model:value="formData.profileIcon"
-                    placeholder="请输入Profile图标"
-                    allow-clear
-                    size="small"
-                  />
-                </a-form-item>
-              </a-col>
+
             </a-row>
 
             <a-row :gutter="16">
               <!-- 第二行：下载方式、运营商、Profile名称 -->
               <a-col :span="8">
                 <a-form-item label="下载方式" name="downloadMethod">
-                  <a-select
-                    v-model:value="formData.downloadMethod"
-                    placeholder="请选择下载方式"
-                    allow-clear
-                    size="small"
-                  >
+                  <a-select v-model:value="formData.downloadMethod" placeholder="请选择下载方式" allow-clear size="middle">
                     <a-select-option value="default">默认SM-DP+</a-select-option>
                     <a-select-option value="activation">激活码</a-select-option>
                     <a-select-option value="alt-smds">ALT-SM-DS</a-select-option>
@@ -150,59 +103,8 @@
                 </a-form-item>
               </a-col>
               <a-col :span="8">
-                <a-form-item 
-                  label="运营商" 
-                  name="carrier"
-                  :rules="[{ required: true, message: '请选择运营商' }]"
-                >
-                  <a-select
-                    v-model:value="formData.carrier"
-                    placeholder="请选择运营商"
-                    allow-clear
-                    size="small"
-                  >
-                    <a-select-option
-                      v-for="carrier in carriers"
-                      :key="carrier.value"
-                      :value="carrier.value"
-                    >
-                      {{ carrier.label }}
-                    </a-select-option>
-                  </a-select>
-                </a-form-item>
-              </a-col>
-              <a-col :span="8">
-                <a-form-item label="Profile名称" name="profileName">
-                  <a-input
-                    v-model:value="formData.profileName"
-                    placeholder="请输入Profile名称"
-                    allow-clear
-                    size="small"
-                  />
-                </a-form-item>
-              </a-col>
-            </a-row>
-
-            <a-row :gutter="16">
-              <!-- 第三行：服务提供商、通知事件、通知地址 -->
-              <a-col :span="8">
-                <a-form-item label="服务提供商" name="serviceProvider">
-                  <a-input
-                    v-model:value="formData.serviceProvider"
-                    placeholder="请输入服务提供商"
-                    allow-clear
-                    size="small"
-                  />
-                </a-form-item>
-              </a-col>
-              <a-col :span="8">
                 <a-form-item label="重置规则" name="resetRule">
-                  <a-select
-                    v-model:value="formData.resetRule"
-                    placeholder="请选择重置规则"
-                    allow-clear
-                    size="small"
-                  >
+                  <a-select v-model:value="formData.resetRule" placeholder="请选择重置规则" allow-clear size="middle">
                     <a-select-option value="no_reset">不可重置</a-select-option>
                     <a-select-option value="resetable">可重置</a-select-option>
                     <a-select-option value="auto_reset">自动重置</a-select-option>
@@ -210,14 +112,10 @@
                   </a-select>
                 </a-form-item>
               </a-col>
+
               <a-col :span="8">
                 <a-form-item label="Profile类" name="profileClass">
-                  <a-select
-                    v-model:value="formData.profileClass"
-                    placeholder="请选择Profile类"
-                    allow-clear
-                    size="small"
-                  >
+                  <a-select v-model:value="formData.profileClass" placeholder="请选择Profile类" allow-clear size="middle">
                     <a-select-option value="test">test</a-select-option>
                     <a-select-option value="provisioning">provisioning</a-select-option>
                     <a-select-option value="operational">operational</a-select-option>
@@ -227,16 +125,32 @@
             </a-row>
 
             <a-row :gutter="16">
+              <!-- 第三行：服务提供商、通知事件、通知地址 -->
+              <a-col :span="8">
+                <a-form-item label="服务提供商" name="serviceProvider">
+                  <a-input v-model:value="formData.serviceProvider" placeholder="请输入服务提供商" allow-clear size="middle" />
+                </a-form-item>
+              </a-col>
+
+              <a-col :span="8">
+                <a-form-item label="Profile名称" name="profileName">
+                  <a-input v-model:value="formData.profileName" placeholder="请输入Profile名称" allow-clear size="middle" />
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item label="Profile图标" name="profileIcon">
+                  <a-input v-model:value="formData.profileIcon" placeholder="请输入Profile图标" allow-clear size="middle" />
+                </a-form-item>
+              </a-col>
+
+            </a-row>
+
+            <a-row :gutter="16">
               <!-- 第四行：Profile类、PPR策略、DS标记 -->
 
               <a-col :span="8">
                 <a-form-item label="PPR策略" name="pprPolicy">
-                  <a-select
-                    v-model:value="formData.pprPolicy"
-                    placeholder="请选择PPR策略"
-                    allow-clear
-                    size="small"
-                  >
+                  <a-select v-model:value="formData.pprPolicy" placeholder="请选择PPR策略" allow-clear size="middle">
                     <a-select-option value="PPR1">PPR1</a-select-option>
                     <a-select-option value="PPR2">PPR2</a-select-option>
                     <a-select-option value="PPR1,PPR2">PPR1、PPR2</a-select-option>
@@ -245,28 +159,17 @@
               </a-col>
               <a-col :span="8">
                 <a-form-item label="DS标记" name="dsFlag">
-                  <a-select
-                    v-model:value="formData.dsFlag"
-                    placeholder="请选择DS标记"
-                    allow-clear
-                    size="small"
-                    style="width: 100%"
-                  >
+                  <a-select v-model:value="formData.dsFlag" placeholder="请选择DS标记" allow-clear size="middle"
+                    style="width: 100%">
                     <a-select-option value="是">是</a-select-option>
                     <a-select-option value="否">否</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
+
               <a-col :span="8">
-                <a-form-item label="确认码次数" name="confirmationCodeCount">
-                  <a-input-number
-                    v-model:value="formData.confirmationCodeCount"
-                    placeholder="请输入确认码次数"
-                    :min="0"
-                    allow-clear
-                    size="small"
-                    style="width: 100%"
-                  />
+                <a-form-item label="电话号码" name="phoneNumber">
+                  <a-input v-model:value="formData.phoneNumber" placeholder="请输入电话号码" allow-clear size="middle" />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -277,23 +180,13 @@
             <a-row :gutter="24">
               <a-col :span="12">
                 <a-form-item label="通知事件" name="notificationEvent">
-                  <a-tooltip
-                    :title="
-                      formData.notificationEvent && formData.notificationEvent.length > 0
-                        ? formData.notificationEvent.join(', ')
-                        : '暂无选择'
-                    "
-                    placement="top"
-                  >
-                    <a-select
-                      v-model:value="formData.notificationEvent"
-                      mode="multiple"
-                      placeholder="请选择通知事件"
-                      allow-clear
-                      :maxTagCount="2"
-                      :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
-                      size="small"
-                    >
+                  <a-tooltip :title="formData.notificationEvent && formData.notificationEvent.length > 0
+                    ? formData.notificationEvent.join(', ')
+                    : '暂无选择'
+                    " placement="top">
+                    <a-select v-model:value="formData.notificationEvent" mode="multiple" placeholder="请选择通知事件"
+                      allow-clear :maxTagCount="2" :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
+                      size="middle">
                       <a-select-option value="下载">下载</a-select-option>
                       <a-select-option value="启用">启用</a-select-option>
                       <a-select-option value="禁用">禁用</a-select-option>
@@ -308,29 +201,13 @@
               </a-col>
 
               <a-col :span="12">
-                <a-form-item
-                  label="通知地址"
-                  name="notificationAddress"
-                  :rules="[{ required: true, message: '请选择通知地址' }]"
-                >
-                  <a-select
-                    v-model:value="formData.notificationAddress"
-                    placeholder="请选择通知地址"
-                    allow-clear
-                    size="small"
-                  >
-                    <a-select-option value="http://localhost:8080/notification"
-                      >本地通知地址</a-select-option
-                    >
-                    <a-select-option value="http://api.example.com/notify"
-                      >示例API地址</a-select-option
-                    >
-                    <a-select-option value="https://notify.service.com/callback"
-                      >生产通知地址</a-select-option
-                    >
-                    <a-select-option value="http://test.notify.com/webhook"
-                      >测试通知地址</a-select-option
-                    >
+                <a-form-item label="通知地址" name="notificationAddress" :rules="[{ required: true, message: '请选择通知地址' }]">
+                  <a-select v-model:value="formData.notificationAddress" placeholder="请选择通知地址" allow-clear
+                    size="middle">
+                    <a-select-option value="http://localhost:8080/notification">本地通知地址</a-select-option>
+                    <a-select-option value="http://api.example.com/notify">示例API地址</a-select-option>
+                    <a-select-option value="https://notify.service.com/callback">生产通知地址</a-select-option>
+                    <a-select-option value="http://test.notify.com/webhook">测试通知地址</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -341,174 +218,88 @@
 
             <a-row :gutter="24">
               <a-col :span="12">
-                <a-form-item
-                  label="IMSI"
-                  name="imsi"
-                  :rules="[{ required: true, message: '请输入IMSI' }]"
-                >
-                  <a-input
-                    v-model:value="formData.imsi"
-                    placeholder="请输入IMSI"
-                    allow-clear
-                    size="small"
-                  />
+                <a-form-item label="IMSI" name="imsi" :rules="[{ required: true, message: '请输入IMSI' }]">
+                  <a-input v-model:value="formData.imsi" placeholder="请输入IMSI" allow-clear size="middle" />
                 </a-form-item>
               </a-col>
 
               <a-col :span="12">
                 <a-form-item label="IMSI2" name="imsi2">
-                  <a-input
-                    v-model:value="formData.imsi2"
-                    placeholder="请输入IMSI2（可选）"
-                    allow-clear
-                    size="small"
-                  />
+                  <a-input v-model:value="formData.imsi2" placeholder="请输入IMSI2（可选）" allow-clear size="middle" />
                 </a-form-item>
               </a-col>
             </a-row>
 
             <a-row :gutter="24">
               <a-col :span="12">
-                <a-form-item
-                  label="PIN1"
-                  name="pin1"
-                  :rules="[
-                    { required: true, message: '请输入PIN1' },
-                    { pattern: /^\d{4,8}$/, message: 'PIN1只能由4至8位数字组成' }
-                  ]"
-                >
-                  <a-input
-                    v-model:value="formData.pin1"
-                    placeholder="请输入PIN1"
-                    allow-clear
-                    size="small"
-                  />
+                <a-form-item label="PIN1" name="pin1" :rules="[
+                  { required: true, message: '请输入PIN1' },
+                  { pattern: /^\d{4,8}$/, message: 'PIN1只能由4至8位数字组成' }
+                ]">
+                  <a-input v-model:value="formData.pin1" placeholder="请输入PIN1" allow-clear size="middle" />
                 </a-form-item>
               </a-col>
 
               <a-col :span="12">
-                <a-form-item
-                  label="PIN2"
-                  name="pin2"
-                  :rules="[
-                    { required: true, message: '请输入PIN2' },
-                    { pattern: /^\d{4,8}$/, message: 'PIN2只能由4至8位数字组成' }
-                  ]"
-                >
-                  <a-input
-                    v-model:value="formData.pin2"
-                    placeholder="请输入PIN2"
-                    allow-clear
-                    size="small"
-                  />
+                <a-form-item label="PIN2" name="pin2" :rules="[
+                  { required: true, message: '请输入PIN2' },
+                  { pattern: /^\d{4,8}$/, message: 'PIN2只能由4至8位数字组成' }
+                ]">
+                  <a-input v-model:value="formData.pin2" placeholder="请输入PIN2" allow-clear size="middle" />
                 </a-form-item>
               </a-col>
             </a-row>
 
             <a-row :gutter="24">
               <a-col :span="12">
-                <a-form-item
-                  label="PUK1"
-                  name="puk1"
-                  :rules="[
-                    { required: true, message: '请输入PUK1' },
-                    { pattern: /^\d{4,8}$/, message: 'PUK1只能由4至8位数字组成' }
-                  ]"
-                >
-                  <a-input
-                    v-model:value="formData.puk1"
-                    placeholder="请输入PUK1"
-                    allow-clear
-                    size="small"
-                  />
+                <a-form-item label="PUK1" name="puk1" :rules="[
+                  { required: true, message: '请输入PUK1' },
+                  { pattern: /^\d{4,8}$/, message: 'PUK1只能由4至8位数字组成' }
+                ]">
+                  <a-input v-model:value="formData.puk1" placeholder="请输入PUK1" allow-clear size="middle" />
                 </a-form-item>
               </a-col>
 
               <a-col :span="12">
-                <a-form-item
-                  label="PUK2"
-                  name="puk2"
-                  :rules="[
-                    { required: true, message: '请输入PUK2' },
-                    { pattern: /^\d{4,8}$/, message: 'PUK2只能由4至8位数字组成' }
-                  ]"
-                >
-                  <a-input
-                    v-model:value="formData.puk2"
-                    placeholder="请输入PUK2"
-                    allow-clear
-                    size="small"
-                  />
+                <a-form-item label="PUK2" name="puk2" :rules="[
+                  { required: true, message: '请输入PUK2' },
+                  { pattern: /^\d{4,8}$/, message: 'PUK2只能由4至8位数字组成' }
+                ]">
+                  <a-input v-model:value="formData.puk2" placeholder="请输入PUK2" allow-clear size="middle" />
                 </a-form-item>
               </a-col>
             </a-row>
 
             <a-row :gutter="24">
               <a-col :span="12">
-                <a-form-item
-                  label="KI"
-                  name="ki"
-                  :rules="[
-                    { required: true, message: '请输入KI' },
-                    { pattern: /^[0-9a-fA-F]{32}$/, message: 'KI只能由32位16进制数组成' }
-                  ]"
-                >
-                  <a-input
-                    v-model:value="formData.ki"
-                    placeholder="请输入KI"
-                    allow-clear
-                    size="small"
-                  />
+                <a-form-item label="KI" name="ki" :rules="[
+                  { required: true, message: '请输入KI' },
+                  { pattern: /^[0-9a-fA-F]{32}$/, message: 'KI只能由32位16进制数组成' }
+                ]">
+                  <a-input v-model:value="formData.ki" placeholder="请输入KI" allow-clear size="middle" />
                 </a-form-item>
               </a-col>
 
               <a-col :span="12">
-                <a-form-item 
-                  label="OPC" 
-                  name="opc"
-                  :rules="[
-                    { required: true, message: '请输入OPC' },
-                    { pattern: /^[0-9a-fA-F]{32}$/, message: 'OPC只能由32位16进制数组成' }
-                  ]"
-                >
-                  <a-input
-                    v-model:value="formData.opc"
-                    placeholder="请输入OPC（可选）"
-                    allow-clear
-                    size="small"
-                  />
+                <a-form-item label="OPC" name="opc" :rules="[
+                  { required: true, message: '请输入OPC' },
+                  { pattern: /^[0-9a-fA-F]{32}$/, message: 'OPC只能由32位16进制数组成' }
+                ]">
+                  <a-input v-model:value="formData.opc" placeholder="请输入OPC（可选）" allow-clear size="middle" />
                 </a-form-item>
               </a-col>
             </a-row>
 
             <a-row :gutter="24">
               <a-col :span="12">
-                <a-form-item
-                  label="SMSP"
-                  name="smsp"
-                  :rules="[{ required: true, message: '请输入SMSP' }]"
-                >
-                  <a-input
-                    v-model:value="formData.smsp"
-                    placeholder="请输入SMSP"
-                    allow-clear
-                    size="small"
-                  />
+                <a-form-item label="SMSP" name="smsp" :rules="[{ required: true, message: '请输入SMSP' }]">
+                  <a-input v-model:value="formData.smsp" placeholder="请输入SMSP" allow-clear size="middle" />
                 </a-form-item>
               </a-col>
 
               <a-col :span="12">
-                <a-form-item
-                  label="ADM1"
-                  name="adm1"
-                  :rules="[{ required: true, message: '请输入ADM1' }]"
-                >
-                  <a-input
-                    v-model:value="formData.adm1"
-                    placeholder="请输入ADM1"
-                    allow-clear
-                    size="small"
-                  />
+                <a-form-item label="ADM1" name="adm1" :rules="[{ required: true, message: '请输入ADM1' }]">
+                  <a-input v-model:value="formData.adm1" placeholder="请输入ADM1" allow-clear size="middle" />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -521,23 +312,12 @@
         <!-- V3功能支持 - 整行布局 -->
         <div class="v3-features-section">
           <a-form-item label="v3功能支持" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
-            <a-tooltip
-              :title="
-                formData.v3Support.features && formData.v3Support.features.length > 0
-                  ? formData.v3Support.features.join(', ')
-                  : '暂无选择'
-              "
-              placement="top"
-            >
-              <a-select
-                v-model:value="formData.v3Support.features"
-                mode="multiple"
-                placeholder="请选择功能"
-
-                allow-clear
-                style="width: 100%"
-                size="small"
-              >
+            <a-tooltip :title="formData.v3Support.features && formData.v3Support.features.length > 0
+              ? formData.v3Support.features.join(', ')
+              : '暂无选择'
+              " placement="top">
+              <a-select v-model:value="formData.v3Support.features" mode="multiple" placeholder="请选择功能" allow-clear
+                style="width: 100%" size="middle">
                 <a-select-option value="rpmData">RPM数据</a-select-option>
                 <a-select-option value="deviceSwitchData">设备切换数据</a-select-option>
                 <a-select-option value="enterpriseProfileData">企业Profile数据</a-select-option>
@@ -547,33 +327,19 @@
         </div>
 
         <!-- RPM数据配置 -->
-        <div
-          class="rpm-config-section"
-          v-if="formData.v3Support.features && formData.v3Support.features.includes('rpmData')"
-        >
+        <div class="rpm-config-section"
+          v-if="formData.v3Support.features && formData.v3Support.features.includes('rpmData')">
           <a-divider dashed orientation="center">RPM数据配置</a-divider>
           <a-row :gutter="16">
             <a-col :span="12">
               <a-form-item label="RPM类型" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-                <a-tooltip
-                  :title="
-                    formData.rpmType && formData.rpmType.length > 0
-                      ? formData.rpmType.join(', ')
-                      : '暂无选择'
-                  "
-                  placement="top"
-                >
-                  <a-select
-                    v-model:value="formData.v3Support.rpmConfig.rpmType"
-                    mode="multiple"
-                    placeholder="请选择RPM类型"
-      
-                    allow-clear
-                    style="width: 100%"
-                    :maxTagCount="2"
-                    :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
-                    size="small"
-                  >
+                <a-tooltip :title="formData.rpmType && formData.rpmType.length > 0
+                  ? formData.rpmType.join(', ')
+                  : '暂无选择'
+                  " placement="top">
+                  <a-select v-model:value="formData.v3Support.rpmConfig.rpmType" mode="multiple" placeholder="请选择RPM类型"
+                    allow-clear style="width: 100%" :maxTagCount="2"
+                    :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`" size="middle">
                     <a-select-option value="Enable">Enable</a-select-option>
                     <a-select-option value="Disable">Disable</a-select-option>
                     <a-select-option value="Delete">Delete</a-select-option>
@@ -584,18 +350,9 @@
               </a-form-item>
             </a-col>
             <a-col :span="12">
-              <a-form-item
-                label="RPM下载方式"
-                :label-col="{ span: 12 }"
-                :wrapper-col="{ span: 12 }"
-              >
-                <a-select
-                  v-model:value="formData.v3Support.rpmConfig.rpmDownloadMethod"
-                  placeholder="请选择RPM下载方式"
-                  allow-clear
-                  style="width: 100%"
-                  size="small"
-                >
+              <a-form-item label="RPM下载方式" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-select v-model:value="formData.v3Support.rpmConfig.rpmDownloadMethod" placeholder="请选择RPM下载方式"
+                  allow-clear style="width: 100%" size="middle">
                   <a-select-option value="SM-DP+">SM-DP+</a-select-option>
                   <a-select-option value="SM-DS">SM-DS</a-select-option>
                 </a-select>
@@ -606,13 +363,8 @@
           <a-row :gutter="16">
             <a-col :span="12">
               <a-form-item label="允许的CA" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-                <a-select
-                  v-model:value="formData.v3Support.rpmConfig.allowedCA"
-                  placeholder="请选择允许的CA"
-                  allow-clear
-                  style="width: 100%"
-                  size="small"
-                >
+                <a-select v-model:value="formData.v3Support.rpmConfig.allowedCA" placeholder="请选择允许的CA" allow-clear
+                  style="width: 100%" size="middle">
                   <a-select-option value="CA1">CA1</a-select-option>
                   <a-select-option value="CA2">CA2</a-select-option>
                   <a-select-option value="CA3">CA3</a-select-option>
@@ -620,27 +372,12 @@
               </a-form-item>
             </a-col>
             <a-col :span="12" v-if="formData.v3Support.rpmConfig.rpmDownloadMethod">
-              <a-form-item
-                label="RPM轮询地址"
-                :label-col="{ span: 12 }"
-                :wrapper-col="{ span: 12 }"
-              >
-                <a-select
-                  v-model:value="formData.v3Support.rpmConfig.rpmPollingAddress"
-                  placeholder="请选择RPM轮询地址"
-                  allow-clear
-                  style="width: 100%"
-                  size="small"
-                >
-                  <a-select-option value="https://api.example.com/rpm1"
-                    >https://api.example.com/rpm1</a-select-option
-                  >
-                  <a-select-option value="https://api.example.com/rpm2"
-                    >https://api.example.com/rpm2</a-select-option
-                  >
-                  <a-select-option value="https://api.example.com/rpm3"
-                    >https://api.example.com/rpm3</a-select-option
-                  >
+              <a-form-item label="RPM轮询地址" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-select v-model:value="formData.v3Support.rpmConfig.rpmPollingAddress" placeholder="请选择RPM轮询地址"
+                  allow-clear style="width: 100%" size="middle">
+                  <a-select-option value="https://api.example.com/rpm1">https://api.example.com/rpm1</a-select-option>
+                  <a-select-option value="https://api.example.com/rpm2">https://api.example.com/rpm2</a-select-option>
+                  <a-select-option value="https://api.example.com/rpm3">https://api.example.com/rpm3</a-select-option>
                   <a-select-option value="custom">自定义地址</a-select-option>
                 </a-select>
               </a-form-item>
@@ -649,68 +386,40 @@
 
           <!-- 允许的Tags -->
           <a-form-item label="允许的Tags" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
-            <a-tooltip
-              :title="
-                formData.allowedTags && formData.allowedTags.length > 0
-                  ? formData.allowedTags.join(', ')
-                  : '暂无选择'
-              "
-              placement="top"
-            >
-              <a-select
-                v-model:value="formData.v3Support.rpmConfig.allowedTags"
-                mode="multiple"
-                placeholder="请选择允许的Tags"
-                allow-clear
-                style="width: 100%"
-                :maxTagCount="3"
-                :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
-                size="small"
-              >
-                <a-select-option value="Service provider name"
-                  >Service provider name</a-select-option
-                >
+            <a-tooltip :title="formData.allowedTags && formData.allowedTags.length > 0
+              ? formData.allowedTags.join(', ')
+              : '暂无选择'
+              " placement="top">
+              <a-select v-model:value="formData.v3Support.rpmConfig.allowedTags" mode="multiple"
+                placeholder="请选择允许的Tags" allow-clear style="width: 100%" :maxTagCount="3"
+                :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`" size="middle">
+                <a-select-option value="Service provider name">Service provider name</a-select-option>
                 <a-select-option value="Profile name">Profile name</a-select-option>
-                <a-select-option value="Notification Configuration Info"
-                  >Notification Configuration Info</a-select-option
-                >
+                <a-select-option value="Notification Configuration Info">Notification Configuration
+                  Info</a-select-option>
                 <a-select-option value="Icon type and Icon">Icon type and Icon</a-select-option>
                 <a-select-option value="Profile Policy Rules">Profile Policy Rules</a-select-option>
-                <a-select-option value="Service Specific Data stored in eUICC"
-                  >Service Specific Data stored in eUICC</a-select-option
-                >
+                <a-select-option value="Service Specific Data stored in eUICC">Service Specific Data stored in
+                  eUICC</a-select-option>
                 <a-select-option value="RPM Configuration">RPM Configuration</a-select-option>
                 <a-select-option value="HRI Server address">HRI Server address</a-select-option>
                 <a-select-option value="LPR Configuration">LPR Configuration</a-select-option>
-                <a-select-option value="Enterprise Configuration"
-                  >Enterprise Configuration</a-select-option
-                >
-                <a-select-option value="Device Change configuration"
-                  >Device Change configuration</a-select-option
-                >
+                <a-select-option value="Enterprise Configuration">Enterprise Configuration</a-select-option>
+                <a-select-option value="Device Change configuration">Device Change configuration</a-select-option>
               </a-select>
             </a-tooltip>
           </a-form-item>
         </div>
 
         <!-- 设备切换数据 -->
-        <div
-          class="device-switch-section"
-          v-if="
-            formData.v3Support.features && formData.v3Support.features.includes('deviceSwitchData')
-          "
-        >
+        <div class="device-switch-section" v-if="
+          formData.v3Support.features && formData.v3Support.features.includes('deviceSwitchData')
+        ">
           <a-divider dashed orientation="center">设备切换数据</a-divider>
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item
-                label="设备切换方式"
-                :label-col="{ span: 12 }"
-                :wrapper-col="{ span: 12 }"
-              >
-                <a-radio-group
-                  v-model:value="formData.v3Support.deviceSwitch.deviceSwitchMethod"
-                >
+              <a-form-item label="设备切换方式" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-radio-group v-model:value="formData.v3Support.deviceSwitch.deviceSwitchMethod">
                   <a-radio value="requestPlatform">请求平台</a-radio>
                   <a-radio value="useStoredCode">使用存储的激活码</a-radio>
                 </a-radio-group>
@@ -718,13 +427,8 @@
             </a-col>
             <a-col :span="12">
               <a-form-item label="允许的CA" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-                <a-select
-                  v-model:value="formData.v3Support.deviceSwitch.allowedCA"
-                  placeholder="请选择允许的CA"
-                  allow-clear
-                  style="width: 100%"
-                  size="small"
-                >
+                <a-select v-model:value="formData.v3Support.deviceSwitch.allowedCA" placeholder="请选择允许的CA" allow-clear
+                  style="width: 100%" size="middle">
                   <a-select-option value="CA1">CA1</a-select-option>
                   <a-select-option value="CA2">CA2</a-select-option>
                   <a-select-option value="CA3">CA3</a-select-option>
@@ -735,28 +439,16 @@
 
           <a-row :gutter="16">
             <a-col :span="12">
-              <a-form-item
-                label="是否需要新设备EID"
-                :label-col="{ span: 12 }"
-                :wrapper-col="{ span: 12 }"
-              >
-                <a-radio-group
-                  v-model:value="formData.v3Support.deviceSwitch.needNewEID"
-                >
+              <a-form-item label="是否需要新设备EID" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-radio-group v-model:value="formData.v3Support.deviceSwitch.needNewEID">
                   <a-radio value="yes">是</a-radio>
                   <a-radio value="no">否</a-radio>
                 </a-radio-group>
               </a-form-item>
             </a-col>
             <a-col :span="12">
-              <a-form-item
-                label="是否需要新设备TAC"
-                :label-col="{ span: 12 }"
-                :wrapper-col="{ span: 12 }"
-              >
-                <a-radio-group
-                  v-model:value="formData.v3Support.deviceSwitch.needNewTAC"
-                >
+              <a-form-item label="是否需要新设备TAC" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-radio-group v-model:value="formData.v3Support.deviceSwitch.needNewTAC">
                   <a-radio value="yes">是</a-radio>
                   <a-radio value="no">否</a-radio>
                 </a-radio-group>
@@ -766,75 +458,43 @@
         </div>
 
         <!-- 企业Profile数据 -->
-        <div
-          class="enterprise-profile-section"
-          v-if="
-            formData.v3Support.features &&
-            formData.v3Support.features.includes('enterpriseProfileData')
-          "
-        >
+        <div class="enterprise-profile-section" v-if="
+          formData.v3Support.features &&
+          formData.v3Support.features.includes('enterpriseProfileData')
+        ">
           <a-divider dashed orientation="center">企业Profile数据</a-divider>
           <a-row :gutter="16">
             <a-col :span="12">
               <a-form-item label="企业名称" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-                <a-select
-                  v-model:value="formData.v3Support.enterprise.enterpriseName"
-                  placeholder="请选择企业名称"
-                  allow-clear
-                  style="width: 100%"
-                >
+                <a-select v-model:value="formData.v3Support.enterprise.enterpriseName" placeholder="请选择企业名称" allow-clear
+                  style="width: 100%">
                   <a-select-option value="enterprise1">企业1</a-select-option>
                   <a-select-option value="enterprise2">企业2</a-select-option>
                   <a-select-option value="enterprise3">企业3</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col
-              :span="12"
-              v-if="
-                formData.v3Support.enterprise.enterpriseRules &&
-                formData.v3Support.enterprise.enterpriseRules.length > 0
-              "
-            >
-              <a-form-item
-                label="非企业Profile数量"
-                :label-col="{ span: 12 }"
-                :wrapper-col="{ span: 12 }"
-              >
-                <a-input-number
-                  v-model:value="formData.v3Support.enterprise.nonEnterpriseProfileCount"
-                  :min="0"
-                  :max="10"
-                  placeholder="请输入数量"
-                  style="width: 100%"
-                />
+            <a-col :span="12" v-if="
+              formData.v3Support.enterprise.enterpriseRules &&
+              formData.v3Support.enterprise.enterpriseRules.length > 0
+            ">
+              <a-form-item label="非企业Profile数量" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
+                <a-input-number v-model:value="formData.v3Support.enterprise.nonEnterpriseProfileCount" :min="0"
+                  :max="10" placeholder="请输入数量" style="width: 100%" />
               </a-form-item>
             </a-col>
           </a-row>
 
           <!-- 规则 -->
           <a-form-item label="规则" :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
-            <a-tooltip
-              :title="
-                formData.enterpriseRules && formData.enterpriseRules.length > 0
-                  ? formData.enterpriseRules.join(', ')
-                  : '暂无选择'
-              "
-              placement="top"
-            >
-              <a-select
-                v-model:value="formData.v3Support.enterprise.enterpriseRules"
-                mode="multiple"
-                placeholder="请选择规则"
-                allow-clear
-                style="width: 100%"
-              >
-                <a-select-option value="priorityEnterpriseProfile"
-                  >优先级企业Profile</a-select-option
-                >
-                <a-select-option value="onlyInstallEnterpriseProfile"
-                  >只能安装企业Profile</a-select-option
-                >
+            <a-tooltip :title="formData.enterpriseRules && formData.enterpriseRules.length > 0
+              ? formData.enterpriseRules.join(', ')
+              : '暂无选择'
+              " placement="top">
+              <a-select v-model:value="formData.v3Support.enterprise.enterpriseRules" mode="multiple"
+                placeholder="请选择规则" allow-clear style="width: 100%">
+                <a-select-option value="priorityEnterpriseProfile">优先级企业Profile</a-select-option>
+                <a-select-option value="onlyInstallEnterpriseProfile">只能安装企业Profile</a-select-option>
               </a-select>
             </a-tooltip>
           </a-form-item>
@@ -874,7 +534,7 @@ export default defineComponent({
       pprPolicy: '',
       resetRule: '',
       dsFlag: '',
-      confirmationCodeCount: '',
+      confirmLimit: '',
       remark: '',
       // 新增基本信息字段
       confirmationCode: '',
@@ -1249,7 +909,8 @@ export default defineComponent({
   min-height: calc(100vh - 100px);
   max-height: calc(100vh - 100px);
   overflow-y: auto;
-  overflow-x: hidden; /* 防止水平滚动 */
+  overflow-x: hidden;
+  /* 防止水平滚动 */
 }
 
 /* 左侧区域 */
@@ -1260,23 +921,29 @@ export default defineComponent({
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   min-width: 0;
   overflow: visible;
-  max-height: calc(100vh - 124px); /* 添加最大高度限制 */
-  overflow-y: auto; /* 允许垂直滚动 */
+  max-height: calc(100vh - 124px);
+  /* 添加最大高度限制 */
+  overflow-y: auto;
+  /* 允许垂直滚动 */
 }
 
 /* 基本信息编辑区域 */
 .basic-info-section {
-  padding: 8px; /* 减少内边距 */
+  padding: 8px;
+  /* 减少内边距 */
   overflow: visible;
-  padding-bottom: 15px; /* 减少底部内边距 */
+  padding-bottom: 15px;
+  /* 减少底部内边距 */
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px; /* 减少底部间距 */
-  padding-bottom: 4px; /* 减少底部内边距 */
+  margin-bottom: 8px;
+  /* 减少底部间距 */
+  padding-bottom: 4px;
+  /* 减少底部内边距 */
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -1301,32 +968,37 @@ export default defineComponent({
   overflow-y: auto;
   max-height: calc(100vh - 124px);
   min-width: 0;
-  padding-bottom: 10px; /* 减少底部内边距 */
-  background: #fff; /* 默认白色背景 */
+  padding-bottom: 10px;
+  /* 减少底部内边距 */
+  background: #fff;
+  /* 默认白色背景 */
   border: 1px solid #e8e8e8;
   border-radius: 6px;
 }
 
 /* V3功能支持 */
 .v3-features-section {
-  padding: 8px; /* 减少内边距 */
+  padding: 8px;
+  /* 减少内边距 */
   margin-bottom: 0;
-  border-bottom: 1px solid #e8e8e8;
 }
 
 .rpm-config-section,
 .device-switch-section,
 .enterprise-profile-section {
-  padding: 8px; /* 减少内边距 */
+  padding: 8px;
+  /* 减少内边距 */
   margin-bottom: 0;
   overflow: visible;
-  min-height: auto; /* 移除最小高度限制 */
-  border-bottom: 1px solid #e8e8e8;
+  min-height: auto;
+  /* 移除最小高度限制 */
 }
 
 .enterprise-profile-section {
-  margin-bottom: 10px; /* 减少底部间距 */
-  border-bottom: none; /* 最后一个section不需要底部边框 */
+  margin-bottom: 10px;
+  /* 减少底部间距 */
+  border-bottom: none;
+  /* 最后一个section不需要底部边框 */
 }
 
 .readonly-value {
@@ -1342,7 +1014,8 @@ export default defineComponent({
 }
 
 :deep(.ant-form-item) {
-  margin-bottom: 4px; /* 减少表单项目间距 */
+  margin-bottom: 4px;
+  /* 减少表单项目间距 */
 }
 
 /* 优化多选下拉框的显示 */
@@ -1402,24 +1075,25 @@ export default defineComponent({
 }
 
 :deep(.ant-divider) {
-  margin: 4px 0; /* 减少分割线间距 */
+  margin: 4px 0;
+  /* 减少分割线间距 */
   font-size: 13px;
   font-weight: 500;
 }
 
 /* 确保表单区域有足够的间距 */
 :deep(.ant-form-item-control) {
-  min-height: 32px; /* 确保控件有足够高度 */
+  min-height: 32px;
+  /* 确保控件有足够高度 */
 }
 
 :deep(.ant-select-multiple .ant-select-selector) {
-  min-height: 32px; /* 多选框最小高度 */
+  min-height: 32px;
+  /* 多选框最小高度 */
   padding: 2px 4px;
 }
 
 :deep(.ant-divider-dashed) {
-  border-color: #d9d9d9;
-  border-style: dashed;
   border-width: 1px 0 0 0;
 }
 
@@ -1452,7 +1126,8 @@ export default defineComponent({
   }
 
   .left-section {
-    max-height: none; /* 在小屏幕上移除高度限制 */
+    max-height: none;
+    /* 在小屏幕上移除高度限制 */
   }
 }
 

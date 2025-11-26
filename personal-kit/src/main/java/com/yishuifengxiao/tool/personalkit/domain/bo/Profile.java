@@ -48,6 +48,7 @@ public class Profile {
     private String opc;
     private String smsp;
     private String asnTemplate;
+    private Integer confirmLimit;
     private V3Support v3Support;
 
     /**
