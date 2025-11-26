@@ -360,7 +360,7 @@
                 : '暂无选择'
               " placement="top">
               <a-select v-model:value="formData.v3Support.rpmConfig.rpmType" mode="multiple" placeholder="请选择RPM类型"
-                allow-clear style="width: 100%" :maxTagCount="2"
+                allow-clear style="width: 100%" :maxTagCount="4"
                 :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`" size="middle">
                 <a-select-option value="Enable">Enable</a-select-option>
                 <a-select-option value="Disable">Disable</a-select-option>
