@@ -91,8 +91,10 @@
         </a-form-item>
 
         <a-form-item label="DS标记" name="dsFlag">
-          <a-select-option value="1">是</a-select-option>
-          <a-select-option value="0">否</a-select-option>
+          <a-select v-model:value="searchForm.dsFlag" style="width: 140px" placeholder="请选择DS标记" allow-clear >
+            <a-select-option value="1">是</a-select-option>
+            <a-select-option value="0">否</a-select-option>
+          </a-select>
         </a-form-item>
 
         <a-form-item label="更新时间" name="updateTime">
@@ -115,7 +117,7 @@
             <a-dropdown>
               <template #overlay>
                 <a-menu>
-                   <a-menu-item key="import" @click="handleImport">导入数据</a-menu-item>
+                  <a-menu-item key="import" @click="handleImport">导入数据</a-menu-item>
                   <a-menu-item key="history" @click="showImportHistory">导入记录</a-menu-item>
                   <a-menu-item key="delete" @click="handleBatchDelete">删除</a-menu-item>
                   <a-menu-item key="reset" @click="handleBatchReset">重置</a-menu-item>
@@ -337,6 +339,10 @@ export default defineComponent({
         }),
         customRender: ({ text }) => {
           const resetRuleMap = {
+            'noReset': '不可重置',
+            'resettable': '可重置',
+            'autoReset': '自动重置',
+            'autoRecycle': '自动回收',
             'no_reset': '不可重置',
             'resetable': '可重置',
             'auto_reset': '自动重置',
@@ -351,7 +357,14 @@ export default defineComponent({
         width: 100,
         customCell: () => ({
           title: '数据存储标记'
-        })
+        }),
+        customRender: ({ text }) => {
+          const dsFlagMap = {
+            '1': '是',
+            '0': '否'
+          }
+          return dsFlagMap[text] || text
+        }
       },
       {
         title: '更新时间',
