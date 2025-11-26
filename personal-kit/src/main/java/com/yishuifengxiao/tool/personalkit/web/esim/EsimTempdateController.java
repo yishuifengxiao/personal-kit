@@ -6,7 +6,6 @@ import com.yishuifengxiao.tool.personalkit.aspect.Trim;
 import com.yishuifengxiao.tool.personalkit.domain.entity.esim.EsimTempdate;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.service.esim.EsimTempdateService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import java.util.Map;
  * @date 2024/1/2 19:02
  * @since 1.0.0
  */
-@Tag(name = "Esim模板数据管理")
 @Valid
 @RestController
 @RequestMapping("/api/esim/tempdate")

@@ -11,7 +11,6 @@ import com.yishuifengxiao.tool.personalkit.domain.bo.EsimCertExcel;
 import com.yishuifengxiao.tool.personalkit.domain.entity.esim.EsimCert;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.service.esim.EsimCertService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +31,6 @@ import java.util.List;
  * @date 2024/1/2 19:02
  * @since 1.0.0
  */
-@Tag(name = "Esim证书管理")
 @Valid
 @RestController
 @RequestMapping("/api/esim/cert")
