@@ -77,8 +77,10 @@
               </a-col>
               <!-- 第一行：确认码、电话号码、Profile图标 -->
               <a-col :span="8">
-                <a-form-item label="确认码" name="confirmationCode">
-                  <a-input v-model:value="formData.confirmationCode" placeholder="请输入确认码" allow-clear size="middle" />
+                <a-form-item label="确认码" name="confirmationCode" :rules="[
+                  { max: 8, message: '确认码最长8个字符' }
+                ]">
+                  <a-input v-model:value="formData.confirmationCode" placeholder="请输入确认码" allow-clear size="middle" :maxlength="8" />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
@@ -127,14 +129,18 @@
             <a-row :gutter="16">
               <!-- 第三行：服务提供商、通知事件、通知地址 -->
               <a-col :span="8">
-                <a-form-item label="服务提供商" name="serviceProvider">
-                  <a-input v-model:value="formData.serviceProvider" placeholder="请输入服务提供商" allow-clear size="middle" />
+                <a-form-item label="服务提供商" name="serviceProvider" :rules="[
+                  { max: 50, message: '服务提供商最长50个字符' }
+                ]">
+                  <a-input v-model:value="formData.serviceProvider" placeholder="请输入服务提供商" allow-clear size="middle" :maxlength="50" />
                 </a-form-item>
               </a-col>
 
               <a-col :span="8">
-                <a-form-item label="Profile名称" name="profileName">
-                  <a-input v-model:value="formData.profileName" placeholder="请输入Profile名称" allow-clear size="middle" />
+                <a-form-item label="Profile名称" name="profileName" :rules="[
+                  { max: 50, message: 'Profile名称最长50个字符' }
+                ]">
+                  <a-input v-model:value="formData.profileName" placeholder="请输入Profile名称" allow-clear size="middle" :maxlength="50" />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
@@ -168,8 +174,10 @@
               </a-col>
 
               <a-col :span="8">
-                <a-form-item label="电话号码" name="phoneNumber">
-                  <a-input v-model:value="formData.phoneNumber" placeholder="请输入电话号码" allow-clear size="middle" />
+                <a-form-item label="电话号码" name="phoneNumber" :rules="[
+                  { max: 20, message: '电话号码最长20个字符' }
+                ]">
+                  <a-input v-model:value="formData.phoneNumber" placeholder="请输入电话号码" allow-clear size="middle" :maxlength="20" />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -218,14 +226,21 @@
 
             <a-row :gutter="24">
               <a-col :span="12">
-                <a-form-item label="IMSI" name="imsi" :rules="[{ required: true, message: '请输入IMSI' }]">
-                  <a-input v-model:value="formData.imsi" placeholder="请输入IMSI" allow-clear size="middle" />
+                <a-form-item label="IMSI" name="imsi" :rules="[
+                  { required: true, message: '请输入IMSI' },
+                  { max: 15, message: 'IMSI最长15个字符' },
+                  { pattern: /^[0-9+]+$/, message: 'IMSI只能包含数字或+' }
+                ]">
+                  <a-input v-model:value="formData.imsi" placeholder="请输入IMSI" allow-clear size="middle" :maxlength="15" />
                 </a-form-item>
               </a-col>
 
               <a-col :span="12">
-                <a-form-item label="IMSI2" name="imsi2">
-                  <a-input v-model:value="formData.imsi2" placeholder="请输入IMSI2（可选）" allow-clear size="middle" />
+                <a-form-item label="IMSI2" name="imsi2" :rules="[
+                  { max: 15, message: 'IMSI2最长15个字符' },
+                  { pattern: /^[0-9+]+$/, message: 'IMSI2只能包含数字或+' }
+                ]">
+                  <a-input v-model:value="formData.imsi2" placeholder="请输入IMSI2（可选）" allow-clear size="middle" :maxlength="15" />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -292,14 +307,20 @@
 
             <a-row :gutter="24">
               <a-col :span="12">
-                <a-form-item label="SMSP" name="smsp" :rules="[{ required: true, message: '请输入SMSP' }]">
-                  <a-input v-model:value="formData.smsp" placeholder="请输入SMSP" allow-clear size="middle" />
+                <a-form-item label="SMSP" name="smsp" :rules="[
+                  { required: true, message: '请输入SMSP' },
+                  { max: 32, message: 'SMSP最长32个字符' }
+                ]">
+                  <a-input v-model:value="formData.smsp" placeholder="请输入SMSP" allow-clear size="middle" :maxlength="32" />
                 </a-form-item>
               </a-col>
 
               <a-col :span="12">
-                <a-form-item label="ADM1" name="adm1" :rules="[{ required: true, message: '请输入ADM1' }]">
-                  <a-input v-model:value="formData.adm1" placeholder="请输入ADM1" allow-clear size="middle" />
+                <a-form-item label="ADM1" name="adm1" :rules="[
+                  { required: true, message: '请输入ADM1' },
+                  { max: 32, message: 'ADM1最长32个字符' }
+                ]">
+                  <a-input v-model:value="formData.adm1" placeholder="请输入ADM1" allow-clear size="middle" :maxlength="32" />
                 </a-form-item>
               </a-col>
             </a-row>

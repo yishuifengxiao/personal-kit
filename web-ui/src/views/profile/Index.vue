@@ -111,21 +111,12 @@
         <a-form-item class="operation-buttons">
           <a-space>
             <a-button type="primary" @click="handleAdd">新增</a-button>
+
             <a-dropdown>
               <template #overlay>
                 <a-menu>
-                  <a-menu-item key="import" @click="handleImport">导入</a-menu-item>
+                   <a-menu-item key="import" @click="handleImport">导入数据</a-menu-item>
                   <a-menu-item key="history" @click="showImportHistory">导入记录</a-menu-item>
-                </a-menu>
-              </template>
-              <a-button>
-                导入
-                <DownOutlined />
-              </a-button>
-            </a-dropdown>
-            <a-dropdown>
-              <template #overlay>
-                <a-menu>
                   <a-menu-item key="delete" @click="handleBatchDelete">删除</a-menu-item>
                   <a-menu-item key="reset" @click="handleBatchReset">重置</a-menu-item>
                   <a-menu-item key="assignTenant" @click="handleBatchAssignTenant">分配租户</a-menu-item>
