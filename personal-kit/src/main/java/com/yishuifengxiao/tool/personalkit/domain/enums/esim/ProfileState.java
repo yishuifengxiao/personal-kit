@@ -1,4 +1,4 @@
-package com.yishuifengxiao.tool.personalkit.domain.enums;
+package com.yishuifengxiao.tool.personalkit.domain.enums.esim;
 
 import com.yishuifengxiao.common.tool.entity.RootEnum;
 

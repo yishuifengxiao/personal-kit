@@ -187,16 +187,12 @@
               <!-- 第三行：服务提供商、通知事件、通知地址 -->
               <a-col :span="8">
                 <a-form-item label="服务提供商" name="serviceProvider">
-                  <a-select
+                  <a-input
                     v-model:value="formData.serviceProvider"
-                    placeholder="请选择服务提供商"
+                    placeholder="请输入服务提供商"
                     allow-clear
                     size="small"
-                  >
-                    <a-select-option value="provider1">提供商1</a-select-option>
-                    <a-select-option value="provider2">提供商2</a-select-option>
-                    <a-select-option value="provider3">提供商3</a-select-option>
-                  </a-select>
+                  />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
@@ -249,12 +245,16 @@
               </a-col>
               <a-col :span="8">
                 <a-form-item label="DS标记" name="dsFlag">
-                  <a-input
+                  <a-select
                     v-model:value="formData.dsFlag"
-                    placeholder="请输入DS标记"
+                    placeholder="请选择DS标记"
                     allow-clear
                     size="small"
-                  />
+                    style="width: 100%"
+                  >
+                    <a-select-option value="是">是</a-select-option>
+                    <a-select-option value="否">否</a-select-option>
+                  </a-select>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -955,9 +955,9 @@ export default defineComponent({
             }
           }
         })
-        // 按照接口实际响应格式处理数据
+        // 按照接口实际响应格式处理数据，将id转换为字符串类型以匹配详情接口返回的格式
         carriers.value = response.data.map((item) => ({
-          value: item.id,
+          value: String(item.id),
           label: item.monName
         }))
       } catch (error) {

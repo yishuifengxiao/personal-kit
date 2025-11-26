@@ -7,7 +7,7 @@ import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.bo.Profile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.esim.EsimProfile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.esim.EsimProfileDetail;
-import com.yishuifengxiao.tool.personalkit.domain.enums.ProfileState;
+import com.yishuifengxiao.tool.personalkit.domain.enums.esim.ProfileState;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
