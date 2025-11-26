@@ -200,14 +200,14 @@
                     <a-select v-model:value="formData.notificationEvent" mode="multiple" placeholder="请选择通知事件"
                       allow-clear :maxTagCount="2" :maxTagPlaceholder="(omittedValues) => `+${omittedValues.length} 更多`"
                       size="middle">
-                      <a-select-option value="下载">下载</a-select-option>
-                      <a-select-option value="启用">启用</a-select-option>
-                      <a-select-option value="禁用">禁用</a-select-option>
-                      <a-select-option value="删除">删除</a-select-option>
-                      <a-select-option value="RPM启用">RPM启用</a-select-option>
-                      <a-select-option value="RPM禁用">RPM禁用</a-select-option>
-                      <a-select-option value="RPM删除">RPM删除</a-select-option>
-                      <a-select-option value="RPM结果">RPM结果</a-select-option>
+                      <a-select-option value="down">下载</a-select-option>
+                      <a-select-option value="enable">启用</a-select-option>
+                      <a-select-option value="disable">禁用</a-select-option>
+                      <a-select-option value="delete">删除</a-select-option>
+                      <a-select-option value="rpmEnable">RPM启用</a-select-option>
+                      <a-select-option value="rpmDisable">RPM禁用</a-select-option>
+                      <a-select-option value="rpmDelete">RPM删除</a-select-option>
+                      <a-select-option value="rpmResult">RPM结果</a-select-option>
                     </a-select>
                   </a-tooltip>
                 </a-form-item>
@@ -391,8 +391,8 @@
               <a-form-item label="RPM下载方式" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
                 <a-select v-model:value="formData.v3Support.rpmConfig.rpmDownloadMethod" placeholder="请选择RPM下载方式"
                   allow-clear style="width: 100%" size="middle">
-                  <a-select-option value="SM-DP+">SM-DP+</a-select-option>
-                  <a-select-option value="SM-DS">SM-DS</a-select-option>
+                  <a-select-option value="SMDP">SM-DP+</a-select-option>
+                  <a-select-option value="SMDS">SM-DS</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
