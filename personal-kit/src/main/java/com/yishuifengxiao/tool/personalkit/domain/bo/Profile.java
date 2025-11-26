@@ -1,9 +1,9 @@
 package com.yishuifengxiao.tool.personalkit.domain.bo;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 import java.util.List;
@@ -19,7 +19,8 @@ public class Profile {
     private String id;
     private String iccid;
     private String matchingId;
-    private String profileStatus;
+    private String profileState;
+
     private String eid;
     private String notificationStatus;
     private String downloadMethod;

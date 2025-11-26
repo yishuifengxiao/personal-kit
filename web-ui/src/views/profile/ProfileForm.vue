@@ -524,7 +524,7 @@ export default defineComponent({
     const formData = reactive({
       iccid: '',
       matchingId: '',
-      profileStatus: '',
+      profileState: '',
       eid: '',
       notificationStatus: '',
       downloadMethod: '',

@@ -3,9 +3,10 @@ package com.example.personal_kit;
 import java.util.List;
 
 public class ProfileForm {
+
     private String iccid;
     private String matchingId;
-    private String profileStatus;
+    private String profileState;
     private String eid;
     private String notificationStatus;
     private String downloadMethod;
@@ -53,11 +54,11 @@ public class ProfileForm {
     }
 
     public String getProfileStatus() {
-        return profileStatus;
+        return profileState;
     }
 
-    public void setProfileStatus(String profileStatus) {
-        this.profileStatus = profileStatus;
+    public void setProfileStatus(String profileState) {
+        this.profileState = profileState;
     }
 
     public String getEid() {
@@ -286,38 +287,38 @@ public class ProfileForm {
 
     @Override
     public String toString() {
-        return "ProfileForm{" +
-                "iccid='" + iccid + '\'' +
-                ", matchingId='" + matchingId + '\'' +
-                ", profileStatus='" + profileStatus + '\'' +
-                ", eid='" + eid + '\'' +
-                ", notificationStatus='" + notificationStatus + '\'' +
-                ", downloadMethod='" + downloadMethod + '\'' +
-                ", tenant='" + tenant + '\'' +
-                ", carrier='" + carrier + '\'' +
-                ", profileClass='" + profileClass + '\'' +
-                ", pprPolicy='" + pprPolicy + '\'' +
-                ", resetRule='" + resetRule + '\'' +
-                ", dsFlag='" + dsFlag + '\'' +
-                ", remark='" + remark + '\'' +
-                ", confirmationCode='" + confirmationCode + '\'' +
-                ", profileName='" + profileName + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", serviceProvider='" + serviceProvider + '\'' +
-                ", notificationEvent='" + notificationEvent + '\'' +
-                ", notificationAddress='" + notificationAddress + '\'' +
-                ", profileIcon='" + profileIcon + '\'' +
-                ", imsi='" + imsi + '\'' +
-                ", imsi2='" + imsi2 + '\'' +
-                ", pin1='" + pin1 + '\'' +
-                ", pin2='" + pin2 + '\'' +
-                ", puk1='" + puk1 + '\'' +
-                ", puk2='" + puk2 + '\'' +
-                ", adm1='" + adm1 + '\'' +
-                ", ki='" + ki + '\'' +
-                ", opc='" + opc + '\'' +
-                ", smsp='" + smsp + '\'' +
-                ", v3Support=" + v3Support +
-                '}';
+        return "ProfileForm{"
+                + "iccid='" + iccid + '\''
+                + ", matchingId='" + matchingId + '\''
+                + ", profileState='" + profileState + '\''
+                + ", eid='" + eid + '\''
+                + ", notificationStatus='" + notificationStatus + '\''
+                + ", downloadMethod='" + downloadMethod + '\''
+                + ", tenant='" + tenant + '\''
+                + ", carrier='" + carrier + '\''
+                + ", profileClass='" + profileClass + '\''
+                + ", pprPolicy='" + pprPolicy + '\''
+                + ", resetRule='" + resetRule + '\''
+                + ", dsFlag='" + dsFlag + '\''
+                + ", remark='" + remark + '\''
+                + ", confirmationCode='" + confirmationCode + '\''
+                + ", profileName='" + profileName + '\''
+                + ", phoneNumber='" + phoneNumber + '\''
+                + ", serviceProvider='" + serviceProvider + '\''
+                + ", notificationEvent='" + notificationEvent + '\''
+                + ", notificationAddress='" + notificationAddress + '\''
+                + ", profileIcon='" + profileIcon + '\''
+                + ", imsi='" + imsi + '\''
+                + ", imsi2='" + imsi2 + '\''
+                + ", pin1='" + pin1 + '\''
+                + ", pin2='" + pin2 + '\''
+                + ", puk1='" + puk1 + '\''
+                + ", puk2='" + puk2 + '\''
+                + ", adm1='" + adm1 + '\''
+                + ", ki='" + ki + '\''
+                + ", opc='" + opc + '\''
+                + ", smsp='" + smsp + '\''
+                + ", v3Support=" + v3Support
+                + '}';
     }
 }

@@ -53,8 +53,8 @@ public class EsimProfile implements Serializable {
     /**
      * Profile状态：Available, Allocated, Linked, Confirmed, Released, Downloaded, Installed, Error, Unavailable
      */
-    @Column(name = "profile_status", length = 20, columnDefinition = "VARCHAR(20) DEFAULT 'Available' COMMENT 'Profile状态：Available, Allocated, Linked, Confirmed, Released, Downloaded, Installed, Error, Unavailable'")
-    private String profileStatus;
+    @Column(name = "profile_state", length = 20, columnDefinition = "VARCHAR(20) DEFAULT 'Available' COMMENT 'Profile状态：Available, Allocated, Linked, Confirmed, Released, Downloaded, Installed, Error, Unavailable'")
+    private String profileState;
 
     /**
      * 通知状态：Enabled, Disabled, Deleted

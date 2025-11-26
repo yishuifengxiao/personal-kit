@@ -30,7 +30,7 @@ public class EsimProfileService {
         } else {
             profile.setNotificationEvent(null);
         }
-        profile.setProfileStatus(ProfileState.Released.name());
+        profile.setProfileState(ProfileState.Released.name());
         EsimProfileDetail detail = new EsimProfileDetail();
         Profile.V3Support v3Support = esimProfile.getV3Support();
         if (null != v3Support) {

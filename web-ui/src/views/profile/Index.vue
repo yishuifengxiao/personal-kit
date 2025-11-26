@@ -48,9 +48,9 @@
           />
         </a-form-item>
 
-        <a-form-item label="Profile状态" name="profileStatus">
+        <a-form-item label="Profile状态" name="profileState">
           <a-select
-            v-model:value="searchForm.profileStatus"
+            v-model:value="searchForm.profileState"
             style="width: 140px"
             placeholder="请选择状态"
             allow-clear
@@ -245,10 +245,10 @@
             <span :title="record.eid">{{ record.eid }}</span>
           </template>
           
-          <template v-else-if="column.dataIndex === 'profileStatus'">
+          <template v-else-if="column.dataIndex === 'profileState'">
             <a-badge
-              :status="getProfileStatusColor(record.profileStatus)"
-              :text="record.profileStatus"
+              :status="getProfileStatusColor(record.profileState)"
+              :text="record.profileState"
             />
           </template>
           
@@ -314,7 +314,7 @@ export default defineComponent({
       queryType: 'all',
       iccid: '',
       matchingId: '',
-      profileStatus: '',
+      profileState: '',
       eid: '',
       notificationStatus: '',
       downloadMethod: '',
@@ -350,7 +350,7 @@ export default defineComponent({
       },
       {
         title: 'Profile状态',
-        dataIndex: 'profileStatus',
+        dataIndex: 'profileState',
         width: 120,
         fixed: 'left',
         customCell: () => ({
@@ -557,7 +557,7 @@ export default defineComponent({
             matchingId: searchForm.matchingId || undefined,
             eid: searchForm.eid || undefined,
             // 根据需要添加其他查询参数
-            profileStatus: searchForm.profileStatus || undefined,
+            profileState: searchForm.profileState || undefined,
             notificationStatus: searchForm.notificationStatus || undefined,
             downloadMethod: searchForm.downloadMethod || undefined,
             tenant: searchForm.tenant || undefined,
@@ -614,7 +614,7 @@ export default defineComponent({
         queryType: 'all',
         iccid: '',
         matchingId: '',
-        profileStatus: '',
+        profileState: '',
         eid: '',
         notificationStatus: '',
         downloadMethod: '',
