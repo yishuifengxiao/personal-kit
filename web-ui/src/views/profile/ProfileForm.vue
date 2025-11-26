@@ -249,18 +249,20 @@
               <a-col :span="12">
                 <a-form-item label="PIN1" name="pin1" :rules="[
                   { required: true, message: '请输入PIN1' },
-                  { pattern: /^\d{4,8}$/, message: 'PIN1只能由4至8位数字组成' }
+                  { pattern: /^\d{4,8}$/, message: 'PIN1只能由4至8位数字组成' },
+                  { max: 8, message: 'PIN1最长8个字符' }
                 ]">
-                  <a-input v-model:value="formData.pin1" placeholder="请输入PIN1" allow-clear size="middle" />
+                  <a-input v-model:value="formData.pin1" placeholder="请输入PIN1" allow-clear size="middle" :maxlength="8" />
                 </a-form-item>
               </a-col>
 
               <a-col :span="12">
                 <a-form-item label="PIN2" name="pin2" :rules="[
                   { required: true, message: '请输入PIN2' },
-                  { pattern: /^\d{4,8}$/, message: 'PIN2只能由4至8位数字组成' }
+                  { pattern: /^\d{4,8}$/, message: 'PIN2只能由4至8位数字组成' },
+                  { max: 8, message: 'PIN2最长8个字符' }
                 ]">
-                  <a-input v-model:value="formData.pin2" placeholder="请输入PIN2" allow-clear size="middle" />
+                  <a-input v-model:value="formData.pin2" placeholder="请输入PIN2" allow-clear size="middle" :maxlength="8" />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -269,18 +271,20 @@
               <a-col :span="12">
                 <a-form-item label="PUK1" name="puk1" :rules="[
                   { required: true, message: '请输入PUK1' },
-                  { pattern: /^\d{4,8}$/, message: 'PUK1只能由4至8位数字组成' }
+                  { pattern: /^\d{4,8}$/, message: 'PUK1只能由4至8位数字组成' },
+                  { max: 8, message: 'PUK1最长8个字符' }
                 ]">
-                  <a-input v-model:value="formData.puk1" placeholder="请输入PUK1" allow-clear size="middle" />
+                  <a-input v-model:value="formData.puk1" placeholder="请输入PUK1" allow-clear size="middle" :maxlength="8" />
                 </a-form-item>
               </a-col>
 
               <a-col :span="12">
                 <a-form-item label="PUK2" name="puk2" :rules="[
                   { required: true, message: '请输入PUK2' },
-                  { pattern: /^\d{4,8}$/, message: 'PUK2只能由4至8位数字组成' }
+                  { pattern: /^\d{4,8}$/, message: 'PUK2只能由4至8位数字组成' },
+                  { max: 8, message: 'PUK2最长8个字符' }
                 ]">
-                  <a-input v-model:value="formData.puk2" placeholder="请输入PUK2" allow-clear size="middle" />
+                  <a-input v-model:value="formData.puk2" placeholder="请输入PUK2" allow-clear size="middle" :maxlength="8" />
                 </a-form-item>
               </a-col>
             </a-row>
