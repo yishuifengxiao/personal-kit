@@ -72,7 +72,7 @@
                       <a-menu @click="({ key }) => handleCertAction(key, cert)">
                         <a-menu-item key="view">
                           <EyeOutlined />
-                          查看详情
+                          详情
                         </a-menu-item>
                         <a-menu-item key="edit">
                           <EditOutlined />
@@ -254,7 +254,7 @@
       v-model:open="detailVisible"
       title="证书详情"
       @cancel="handleDetailCancel"
-      width="800px"
+      width="1000px"
       :footer="null"
       scrollable
       :bodyStyle="{ maxHeight: '70vh', overflowY: 'auto', padding: '16px' }"
