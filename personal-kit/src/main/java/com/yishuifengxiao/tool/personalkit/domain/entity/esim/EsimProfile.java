@@ -77,8 +77,8 @@ public class EsimProfile implements Serializable {
     /**
      * 运营商：中国移动, 中国联通, 中国电信, 中国广电
      */
-    @Column(name = "carrier", length = 20, columnDefinition = "VARCHAR(20) COMMENT '运营商：中国移动, 中国联通, 中国电信, 中国广电'")
-    private String carrier;
+    @Column(name = "mon_oid", length = 20, columnDefinition = "VARCHAR(20) COMMENT '运营商：中国移动, 中国联通, 中国电信, 中国广电'")
+    private String monOid;
 
     /**
      * Profile类别：operational, test, provisioning

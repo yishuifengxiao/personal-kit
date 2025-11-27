@@ -5,6 +5,7 @@ import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.bo.Profile;
+import com.yishuifengxiao.tool.personalkit.domain.entity.esim.EsimMon;
 import com.yishuifengxiao.tool.personalkit.domain.entity.esim.EsimProfile;
 import com.yishuifengxiao.tool.personalkit.domain.entity.esim.EsimProfileDetail;
 import com.yishuifengxiao.tool.personalkit.domain.enums.esim.ProfileState;
@@ -13,9 +14,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -255,8 +254,17 @@ public class EsimProfileService {
     }
 
 
-    public Page<EsimProfile> findPage(PageQuery<EsimProfile> pageQuery) {
-        return JdbcUtil.jdbcHelper().findPage(pageQuery, true);
+    public Page<Map<String, Object>> findPage(PageQuery<EsimProfile> pageQuery) {
+        Map<String, String> cache = new HashMap<>();
+        return JdbcUtil.jdbcHelper().findPage(pageQuery, true).map(s -> {
+            Map<String, Object> map = BeanUtil.beanToMap(s);
+            String monName = cache.computeIfAbsent(s.getMonOid(), k -> {
+                EsimMon esimMon = JdbcUtil.jdbcHelper().findOne(new EsimMon().setMonOid(s.getMonOid()), false);
+                return Optional.ofNullable(esimMon).map(EsimMon::getMonName).orElse("");
+            });
+            map.put("monName", monName);
+            return map;
+        });
     }
 
     public void deleteByIds(@Valid List<Long> ids) {

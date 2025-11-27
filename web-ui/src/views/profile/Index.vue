@@ -307,7 +307,7 @@ export default defineComponent({
       },
       {
         title: '运营商',
-        dataIndex: 'carrier',
+        dataIndex: 'monName',
         width: 120,
         ellipsis: true,
         customCell: () => ({

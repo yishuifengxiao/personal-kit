@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 /**
  * @author yishui
  * @version 1.0.0
@@ -31,7 +33,7 @@ public class EsimProfileController {
 
     @PostMapping("/page")
     @ResponseBody
-    public Page<EsimProfile> findPage(@RequestBody PageQuery<EsimProfile> pageQuery) {
+    public Page<Map<String, Object>> findPage(@RequestBody PageQuery<EsimProfile> pageQuery) {
         return esimProfileService.findPage(pageQuery);
     }
 

@@ -25,7 +25,7 @@ public class Profile {
     private String localProfileState;
     private String downloadMethod;
     private String tenant;
-    private String carrier;
+    private String monOid;
     private String profileClass;
     private String pprPolicy;
     private String resetRule;
