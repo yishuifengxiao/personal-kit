@@ -137,7 +137,7 @@
       <a-descriptions :column="1" bordered size="small">
         <a-descriptions-item label="模板名称">{{ detailData.tempName }}</a-descriptions-item>
         <a-descriptions-item label="Profile Type">{{ detailData.profileType }}</a-descriptions-item>
-        <a-descriptions-item label="所属运营商">{{ getMonName(detailData.monId) }}</a-descriptions-item>
+        <a-descriptions-item label="所属运营商">{{ detailData.monName }}</a-descriptions-item>
         <a-descriptions-item label="创建时间">{{ detailData.createTime }}</a-descriptions-item>
         <a-descriptions-item label="更新时间">{{ detailData.updateTime }}</a-descriptions-item>
         <a-descriptions-item label="模板内容" :span="1">
@@ -193,6 +193,7 @@ export default {
       detailVisible: false,
       detailData: {
         tempName: '',
+        monName: '',
         profileType: '',
         monId: undefined,
         tempContent: '',
@@ -369,6 +370,7 @@ export default {
         tempName: record.tempName,
         profileType: record.profileType,
         monId: record.monId,
+        monName: record.monName,
         tempContent: record.tempContent,
         createTime: record.createTime,
         updateTime: record.updateTime
