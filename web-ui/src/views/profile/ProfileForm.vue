@@ -456,7 +456,7 @@
           <a-row :gutter="16">
             <a-col :span="12">
               <a-form-item label="是否需要新设备EID" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-                <a-radio-group v-model:value="formData.v3Support.deviceSwitch.needNewEID">
+                <a-radio-group v-model:value="formData.v3Support.deviceSwitch.needNewEid">
                   <a-radio value="yes">是</a-radio>
                   <a-radio value="no">否</a-radio>
                 </a-radio-group>
@@ -464,7 +464,7 @@
             </a-col>
             <a-col :span="12">
               <a-form-item label="是否需要新设备TAC" :label-col="{ span: 12 }" :wrapper-col="{ span: 12 }">
-                <a-radio-group v-model:value="formData.v3Support.deviceSwitch.needNewTAC">
+                <a-radio-group v-model:value="formData.v3Support.deviceSwitch.needNewTac">
                   <a-radio value="yes">是</a-radio>
                   <a-radio value="no">否</a-radio>
                 </a-radio-group>
@@ -586,8 +586,8 @@ export default defineComponent({
         // 设备切换数据配置
         deviceSwitch: {
           deviceSwitchMethod: '',
-          needNewEID: '',
-          needNewTAC: '',
+          needNewEid: '',
+          needNewTac: '',
           allowedCA: ''
         },
         // 企业Profile数据配置
@@ -792,8 +792,8 @@ export default defineComponent({
           },
           deviceSwitch: {
             deviceSwitchMethod: '',
-            needNewEID: '',
-            needNewTAC: '',
+            needNewEid: '',
+            needNewTac: '',
             allowedCA: ''
           },
           enterprise: {

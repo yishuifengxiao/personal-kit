@@ -92,8 +92,8 @@ public class Profile {
     @AllArgsConstructor
     public static class DeviceSwitch {
         private String deviceSwitchMethod;
-        private String needNewEID;
-        private String needNewTAC;
+        private String needNewEid;
+        private String needNewTac;
         private String allowedCA;
     }
 
