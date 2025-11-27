@@ -61,8 +61,12 @@
           <a-input v-model:value="searchForm.tenant" placeholder="请输入租户" style="width: 150px" allow-clear />
         </a-form-item>
 
-        <a-form-item label="运营商" name="carrier">
-          <a-input v-model:value="searchForm.carrier" placeholder="请输入运营商" style="width: 150px" allow-clear />
+        <a-form-item label="运营商" name="monOid">
+          <a-select v-model:value="searchForm.monOid" style="width: 150px" placeholder="请选择运营商" allow-clear>
+            <a-select-option v-for="item in carriers" :key="item.value" :value="item.value">
+              {{ item.label }}
+            </a-select-option>
+          </a-select>
         </a-form-item>
 
         <a-form-item label="Profile类" name="profileClass">
@@ -211,9 +215,36 @@ export default defineComponent({
     const router = useRouter()
     const loading = ref(false)
     const selectedRowKeys = ref([])
+    const carriers = ref([]) // 运营商列表
 
     // 创建http实例 (这里简化处理，假设不需要pinia实例)
     const httpInstance = new http(null, router, message, Modal)
+    
+    // 获取运营商数据
+    const fetchCarriers = async () => {
+      try {
+        const response = await httpInstance.request({
+          url: '/personkit/api/esim/mon/page',
+          method: 'post',
+          data: {
+            num: 1,
+            size: 10,
+            query: {
+              monName: '',
+              monShortName: ''
+            }
+          }
+        })
+        // 按照接口实际响应格式处理数据
+        carriers.value = response.data.map((item) => ({
+          value: item.monOid,
+          label: item.monName
+        }))
+      } catch (error) {
+        console.error('获取运营商失败:', error)
+        message.error('获取运营商失败')
+      }
+    }
 
     const searchForm = reactive({
       queryType: 'all',
@@ -224,7 +255,7 @@ export default defineComponent({
       localProfileState: '',
       downloadMethod: '',
       tenant: '',
-      carrier: '',
+      monOid: '',
       profileClass: '',
       pprPolicy: '',
       resetRule: '',
@@ -477,7 +508,7 @@ export default defineComponent({
             localProfileState: searchForm.localProfileState || undefined,
             downloadMethod: searchForm.downloadMethod || undefined,
             tenant: searchForm.tenant || undefined,
-            carrier: searchForm.carrier || undefined,
+            monOid: searchForm.monOid || undefined,
             profileClass: searchForm.profileClass || undefined,
             pprPolicy: searchForm.pprPolicy || undefined,
             resetRule: searchForm.resetRule || undefined,
@@ -535,7 +566,7 @@ export default defineComponent({
         localProfileState: '',
         downloadMethod: '',
         tenant: '',
-        carrier: '',
+        monOid: '',
         profileClass: '',
         pprPolicy: '',
         resetRule: '',
@@ -710,6 +741,7 @@ export default defineComponent({
 
     // 页面加载时自动调用搜索接口
     onMounted(() => {
+      fetchCarriers() // 初始化时获取运营商数据
       handleSearch()
     })
 
@@ -721,6 +753,7 @@ export default defineComponent({
       paginationConfig,
       rowSelection,
       selectedRowKeys,
+      carriers,
       getProfileStatusColor,
       getNotificationStatusColor,
       formatDateTime,
