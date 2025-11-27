@@ -30,7 +30,7 @@ public class EsimConfigController {
     public EsimConfigResp config() {
         List<EsimConfigResp.NotifyAddr> notifyAddrs = new ArrayList<>();
         notifyAddrs.add(new EsimConfigResp.NotifyAddr("通知地址1", "http://www.baidu.com"));
-        notifyAddrs.add(new EsimConfigResp.NotifyAddr("通知地址2", "http://www.baidu.com"));
+        notifyAddrs.add(new EsimConfigResp.NotifyAddr("通知地址2", "http://www.yishuifengxiao.com"));
         return new EsimConfigResp(notifyAddrs);
     }
 }
