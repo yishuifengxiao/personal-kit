@@ -65,10 +65,10 @@
             <!-- 三列布局区域 - 严格按照要求包含13个字段 -->
             <a-row :gutter="16">
               <a-col :span="8">
-                <a-form-item label="运营商" name="carrier" :rules="[{ required: true, message: '请选择运营商' }]">
-                  <a-select v-model:value="formData.carrier" placeholder="请选择运营商" allow-clear size="middle">
-                    <a-select-option v-for="carrier in carriers" :key="carrier.value" :value="carrier.value">
-                      {{ carrier.label }}
+                <a-form-item label="运营商" name="monOid" :rules="[{ required: true, message: '请选择运营商' }]">
+                  <a-select v-model:value="formData.monOid" placeholder="请选择运营商" allow-clear size="middle">
+                    <a-select-option v-for="monOid in carriers" :key="monOid.value" :value="monOid.value">
+                      {{ monOid.label }}
                     </a-select-option>
                   </a-select>
                 </a-form-item>
@@ -545,7 +545,7 @@ export default defineComponent({
       localProfileState: '',
       downloadMethod: '',
       tenant: '',
-      carrier: '',
+      monOid: '',
       profileClass: '',
       pprPolicy: '',
       resetRule: '',
@@ -648,7 +648,7 @@ export default defineComponent({
         })
         // 按照接口实际响应格式处理数据，将id转换为字符串类型以匹配详情接口返回的格式
         carriers.value = response.data.map((item) => ({
-          value: String(item.id),
+          value: item.monOid,
           label: item.monName
         }))
       } catch (error) {
