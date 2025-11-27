@@ -85,19 +85,19 @@ public class EsimCert implements Serializable {
     /**
      * 是否标签 1-标签 0-私钥
      */
-    @Column(name = "is_label", columnDefinition = "BIT DEFAULT '0' COMMENT '是否标签 1-标签 0-私钥'")
+    @Column(name = "is_label", columnDefinition = "tinyint(1) DEFAULT '0' COMMENT '是否标签 1-标签 0-私钥'")
     private Boolean isLabel;
 
     /**
      * 创建时间
      */
-    @Column(name = "create_time", columnDefinition = "DATETIME DEFAULT 'CURRENT_TIMESTAMP' COMMENT '创建时间'")
+    @Column(name = "create_time", columnDefinition = "DATETIME   COMMENT '创建时间'")
     private LocalDateTime createTime;
 
     /**
      * 更新时间
      */
-    @Column(name = "update_time", columnDefinition = "DATETIME DEFAULT 'CURRENT_TIMESTAMP' COMMENT '更新时间'")
+    @Column(name = "update_time", columnDefinition = "DATETIME   COMMENT '更新时间'")
     private LocalDateTime updateTime;
 
     /**

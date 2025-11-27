@@ -71,7 +71,7 @@ public class EsimBusinessRecord implements Serializable {
     /**
      * 状态 0-成功 1-失败
      */
-    @Column(name = "status", columnDefinition = "BIT DEFAULT '0' COMMENT '状态 0-成功 1-失败'")
+    @Column(name = "status", columnDefinition = "tinyint(1) DEFAULT '0' COMMENT '状态 0-成功 1-失败'")
     private Boolean status;
 
     /**
@@ -83,13 +83,13 @@ public class EsimBusinessRecord implements Serializable {
     /**
      * 创建时间
      */
-    @Column(name = "create_time", columnDefinition = "DATETIME DEFAULT 'CURRENT_TIMESTAMP' COMMENT '创建时间'")
+    @Column(name = "create_time", columnDefinition = "DATETIME COMMENT '创建时间'")
     private LocalDateTime createTime;
 
     /**
      * 更新时间
      */
-    @Column(name = "update_time", columnDefinition = "DATETIME DEFAULT 'CURRENT_TIMESTAMP' COMMENT '更新时间'")
+    @Column(name = "update_time", columnDefinition = "DATETIME COMMENT '更新时间'")
     private LocalDateTime updateTime;
 
     /**

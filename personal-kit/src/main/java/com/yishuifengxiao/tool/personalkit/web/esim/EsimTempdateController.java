@@ -3,7 +3,7 @@ package com.yishuifengxiao.tool.personalkit.web.esim;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.aspect.Trim;
-import com.yishuifengxiao.tool.personalkit.domain.entity.esim.EsimTempdate;
+import com.yishuifengxiao.tool.personalkit.domain.entity.esim.EsimTemplate;
 import com.yishuifengxiao.tool.personalkit.domain.request.IdReq;
 import com.yishuifengxiao.tool.personalkit.service.esim.EsimTempdateService;
 import jakarta.validation.Valid;
@@ -31,19 +31,19 @@ public class EsimTempdateController {
 
     @PostMapping("/page")
     @ResponseBody
-    public Page<Map> findPage(@RequestBody PageQuery<EsimTempdate> pageQuery) {
+    public Page<Map> findPage(@RequestBody PageQuery<EsimTemplate> pageQuery) {
         return esimTempdateService.findPage(pageQuery);
     }
 
     @PostMapping(value = "/save", produces = {"application/json;charset=utf-8"})
     @ResponseBody
-    public EsimTempdate save(@RequestBody EsimTempdate param) {
+    public EsimTemplate save(@RequestBody EsimTemplate param) {
         return esimTempdateService.save(param);
     }
 
     @PostMapping("/update")
     @ResponseBody
-    public void update(@RequestBody EsimTempdate param) {
+    public void update(@RequestBody EsimTemplate param) {
         esimTempdateService.update(param);
     }
 

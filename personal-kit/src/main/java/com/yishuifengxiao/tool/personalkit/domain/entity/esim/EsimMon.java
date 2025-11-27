@@ -59,13 +59,13 @@ public class EsimMon implements Serializable {
     /**
      * 创建时间
      */
-    @Column(name = "create_time", columnDefinition = "DATETIME DEFAULT 'CURRENT_TIMESTAMP' COMMENT '创建时间'")
+    @Column(name = "create_time", columnDefinition = "DATETIME   COMMENT '创建时间'")
     private LocalDateTime createTime;
 
     /**
      * 更新时间
      */
-    @Column(name = "update_time", columnDefinition = "DATETIME DEFAULT 'CURRENT_TIMESTAMP' COMMENT '更新时间'")
+    @Column(name = "update_time", columnDefinition = "DATETIME  COMMENT '更新时间'")
     private LocalDateTime updateTime;
 
     /**

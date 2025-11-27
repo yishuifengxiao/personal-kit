@@ -5,7 +5,7 @@ import com.yishuifengxiao.common.tool.bean.BeanUtil;
 import com.yishuifengxiao.common.tool.entity.Page;
 import com.yishuifengxiao.common.tool.entity.PageQuery;
 import com.yishuifengxiao.tool.personalkit.domain.entity.esim.EsimMon;
-import com.yishuifengxiao.tool.personalkit.domain.entity.esim.EsimTempdate;
+import com.yishuifengxiao.tool.personalkit.domain.entity.esim.EsimTemplate;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
@@ -17,35 +17,35 @@ import java.util.Optional;
 public class EsimTempdateService {
 
 
-    public EsimTempdate save(EsimTempdate esimTempdate) {
-        KeyHolder keyHolder = JdbcUtil.jdbcHelper().saveOrUpdate(esimTempdate);
-        esimTempdate.setId(keyHolder.getKey().longValue());
-        return esimTempdate;
+    public EsimTemplate save(EsimTemplate esimTemplate) {
+        KeyHolder keyHolder = JdbcUtil.jdbcHelper().saveOrUpdate(esimTemplate);
+        esimTemplate.setId(keyHolder.getKey().longValue());
+        return esimTemplate;
     }
 
 
-    public List<EsimTempdate> findAll(EsimTempdate esimTempdate) {
-        return JdbcUtil.jdbcHelper().findAll(esimTempdate, true);
+    public List<EsimTemplate> findAll(EsimTemplate esimTemplate) {
+        return JdbcUtil.jdbcHelper().findAll(esimTemplate, true);
     }
 
 
-    public Optional<EsimTempdate> findById(Long id) {
-        return Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(EsimTempdate.class, id));
+    public Optional<EsimTemplate> findById(Long id) {
+        return Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(EsimTemplate.class, id));
     }
 
 
     public void deleteById(Long id) {
-        JdbcUtil.jdbcHelper().deleteByPrimaryKey(EsimTempdate.class, id);
+        JdbcUtil.jdbcHelper().deleteByPrimaryKey(EsimTemplate.class, id);
     }
 
 
-    public EsimTempdate update(EsimTempdate esimTempdate) {
-        KeyHolder keyHolder = JdbcUtil.jdbcHelper().saveOrUpdate(esimTempdate);
-        esimTempdate.setId(keyHolder.getKey().longValue());
-        return esimTempdate;
+    public EsimTemplate update(EsimTemplate esimTemplate) {
+        KeyHolder keyHolder = JdbcUtil.jdbcHelper().saveOrUpdate(esimTemplate);
+        esimTemplate.setId(keyHolder.getKey().longValue());
+        return esimTemplate;
     }
 
-    public Page<Map> findPage(PageQuery<EsimTempdate> pageQuery) {
+    public Page<Map> findPage(PageQuery<EsimTemplate> pageQuery) {
         return JdbcUtil.jdbcHelper().findPage(pageQuery, true).map(s -> {
             Map map = BeanUtil.beanToMap(s);
             map.put("monName", Optional.ofNullable(JdbcUtil.jdbcHelper().findByPrimaryKey(EsimMon.class, s.getMonId())).map(EsimMon::getMonShortName).orElse(""));

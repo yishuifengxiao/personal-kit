@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * EsimTempdate 实体类
+ * EsimTemplate 实体类
  * 对应数据库表: esim_tempdate
  * 表注释: 模板管理表
  */
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name = "esim_tempdate") // 模板管理表
-public class EsimTempdate implements Serializable {
+public class EsimTemplate implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,13 +59,13 @@ public class EsimTempdate implements Serializable {
     /**
      * 创建时间
      */
-    @Column(name = "create_time", columnDefinition = "DATETIME DEFAULT 'CURRENT_TIMESTAMP' COMMENT '创建时间'")
+    @Column(name = "create_time", columnDefinition = "DATETIME  COMMENT '创建时间'")
     private LocalDateTime createTime;
 
     /**
      * 更新时间
      */
-    @Column(name = "update_time", columnDefinition = "TIMESTAMP DEFAULT 'CURRENT_TIMESTAMP' COMMENT '更新时间'")
+    @Column(name = "update_time", columnDefinition = "DATETIME  COMMENT '更新时间'")
     private LocalDateTime updateTime;
 
 }
